@@ -196,12 +196,20 @@ input[type=file]{display:none}
     <div class="card-bd">
       <div class="drop-zone" id="dropZone" onclick="document.getElementById('folderInput').click()">
         <span class="drop-icon">🖼️</span>
-        <h3>Kéo thả thư mục ảnh vào đây</h3>
+        <h3>Kéo thả nhiều thư mục ảnh vào đây</h3>
         <p>Hoặc nhấn nút bên dưới để duyệt thư mục<br/>
-           <small style="color:#aaa">Hỗ trợ: JPG, PNG, BMP, WEBP</small></p>
-        <button class="btn-upload" onclick="event.stopPropagation();document.getElementById('folderInput').click()">
-          📂 Chọn thư mục
-        </button>
+           <small style="color:#aaa">Hỗ trợ: JPG, PNG, BMP, WEBP — có thể thêm nhiều thư mục</small></p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn-upload" onclick="event.stopPropagation();document.getElementById('folderInput').click()">
+            📂 Chọn thư mục
+          </button>
+          <button class="btn-upload" id="btnAddFolder" style="display:none;background:#2E7D32" onclick="event.stopPropagation();document.getElementById('folderInput').click()">
+            ➕ Thêm thư mục
+          </button>
+          <button class="btn-upload" id="btnClearFolders" style="display:none;background:#B71C1C" onclick="event.stopPropagation();clearFolders()">
+            🗑️ Xóa tất cả
+          </button>
+        </div>
       </div>
       <input type="file" id="folderInput" webkitdirectory multiple accept="image/*,.xlsx"/>
 
@@ -223,11 +231,11 @@ input[type=file]{display:none}
       <div class="excel-row">
         <div class="excel-icon">📋</div>
         <div class="excel-info">
-          <strong>Upload Bao_gia.xlsx để tự động điền BKS và tên ga-ra</strong>
+          <strong>Upload Bao_gia.xlsx hoặc ảnh báo giá (.jpg/.png) để điền BKS và tên ga-ra</strong>
           Nếu không có, nhập tay ở bước tiếp theo
         </div>
         <button class="btn-sm" onclick="document.getElementById('excelInput').click()">Chọn file</button>
-        <input type="file" id="excelInput" accept=".xlsx,.xls"/>
+        <input type="file" id="excelInput" accept=".xlsx,.xls,.jpg,.jpeg,.png"/>
       </div>
       <div id="excelStatus" style="margin-top:10px;font-size:.82rem;color:var(--green);display:none"></div>
     </div>
@@ -417,14 +425,50 @@ function updateStepUI(n) {
 // ════════════════════════════════════════════════════════
 const IMAGE_EXTS = new Set(['.jpg','.jpeg','.png','.bmp','.webp']);
 
+// Accumulator — tích lũy ảnh qua nhiều lần chọn thư mục
+const accumulatedFiles = new Map(); // key: webkitRelativePath → File
+
+function mergeFiles(newFiles) {
+  newFiles.forEach(f => {
+    const key = f.webkitRelativePath || f.name;
+    accumulatedFiles.set(key, f);
+  });
+  handleFiles([...accumulatedFiles.values()]);
+}
+
+function clearFolders() {
+  accumulatedFiles.clear();
+  state.imageGroups = [];
+  document.getElementById('groupSection').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('btnAddFolder').style.display = 'none';
+  document.getElementById('btnClearFolders').style.display = 'none';
+  document.getElementById('btn1Next').disabled = true;
+}
+
 document.getElementById('folderInput').addEventListener('change', e => {
-  handleFiles([...e.target.files]);
+  mergeFiles([...e.target.files]);
   e.target.value = '';
 });
 
 document.getElementById('excelInput').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
   const reader = new FileReader();
+
+  // Xử lý ảnh JPG/PNG — hiển thị preview để nhập tay
+  if (/\.(jpe?g|png)$/i.test(f.name)) {
+    reader.onload = ev => {
+      const st = document.getElementById('excelStatus');
+      st.style.display = 'block';
+      st.style.color = '#E65100';
+      st.innerHTML = `📷 Đã tải ảnh báo giá — vui lòng nhập BKS và tên ga-ra ở bước tiếp theo.<br>
+        <img src="${ev.target.result}" style="margin-top:8px;max-width:100%;max-height:180px;border-radius:6px;border:1px solid #ddd;">`;
+    };
+    reader.readAsDataURL(f);
+    e.target.value = '';
+    return;
+  }
+
   reader.onload = ev => {
     try {
       const wb = XLSX.read(new Uint8Array(ev.target.result), {type:'array'});
@@ -488,16 +532,16 @@ dz.addEventListener('drop', e => {
           Object.defineProperty(f,'webkitRelativePath',{value:entry.fullPath.replace(/^\//,''),writable:false});
           files.push(f);
         }
-        if (--pending===0) handleFiles(files);
+        if (--pending===0) mergeFiles(files);
       });
     } else if (entry.isDirectory) {
       const reader = entry.createReader();
       function readMore() {
         pending++;
         reader.readEntries(entries => {
-          if (!entries.length) { if (--pending===0 && files.length) handleFiles(files); return; }
+          if (!entries.length) { if (--pending===0 && files.length) mergeFiles(files); return; }
           entries.forEach(scanEntry);
-          if (--pending===0 && files.length) handleFiles(files);
+          if (--pending===0 && files.length) mergeFiles(files);
           if (entries.length===100) readMore();
         });
       }
@@ -564,6 +608,8 @@ function renderGroups(groups) {
   sec.style.display='block';
   document.getElementById('emptyState').style.display='none';
   document.getElementById('btn1Next').disabled = false;
+  document.getElementById('btnAddFolder').style.display = 'inline-flex';
+  document.getElementById('btnClearFolders').style.display = 'inline-flex';
 }
 
 function showEmpty() {
