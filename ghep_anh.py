@@ -185,7 +185,15 @@ def _pts(mm_val):
     return mm_val * mm
 
 
-def draw_header(c: Canvas, page_w, page_h, bks: str, ga_ra: str, gdv: str, ngay: str = ""):
+LOAI_GD_MAP = {
+    "chitiet":    "Giám định chi tiết xe ô tô biển kiểm soát",
+    "hientruong": "Giám định hiện trường xe ô tô biển kiểm soát",
+    "giayto":     "Giám định giấy tờ xe ô tô biển kiểm soát",
+}
+
+
+def draw_header(c: Canvas, page_w, page_h, bks: str, ga_ra: str, gdv: str,
+                ngay: str = "", loai: str = "chitiet"):
     """Vẽ header: logo trái + tiêu đề giữa."""
     logo_size = _pts(LOGO_SIZE_MM)
     margin    = _pts(MARGIN_MM)
@@ -208,13 +216,9 @@ def draw_header(c: Canvas, page_w, page_h, bks: str, ga_ra: str, gdv: str, ngay:
     text_w = page_w - text_x - margin
     c.setFillColor(WHITE)
 
-    # Dòng 1: BKS  (16pt bold)
-    c.setFont("BVP-Bold", 16)
-    line1 = f"Giám định chi tiết xe ô tô biển kiểm soát : {bks}"
-    # Nếu tràn thì thu nhỏ font
-    while c.stringWidth(line1, "BVP-Bold", 16) > text_w and len(line1) > 10:
-        line1 = line1  # wrap handled below
-        break
+    # Dòng 1: loại giám định + BKS  (16pt bold)
+    prefix_loai = LOAI_GD_MAP.get(loai, LOAI_GD_MAP["chitiet"])
+    line1 = f"{prefix_loai} : {bks}"
 
     # Dòng 2: Ga-ra  (15pt)
     c.setFont("BVP", 15)
@@ -367,7 +371,7 @@ def draw_image_grid(c: Canvas, page_w, page_h, images_captions: list,
 # ── Tạo PDF ───────────────────────────────────────────────────────────────────
 
 def create_pdf(cover_images: list, main_images: list, layout: str, gdv: str,
-               bks: str, ga_ra: str, output_path: str, ngay: str = ""):
+               bks: str, ga_ra: str, output_path: str, ngay: str = "", loai: str = "chitiet"):
     """
     Tạo PDF theo 2 nhóm ảnh:
       cover_images : ảnh prefix 0 (Số khung, Tem đăng kiểm) — 1 trang đầu riêng biệt
@@ -393,7 +397,7 @@ def create_pdf(cover_images: list, main_images: list, layout: str, gdv: str,
     # ── Trang 1: ảnh nhận dạng xe (prefix 0) ──────────────────────────────────
     if cover_images:
         page_num += 1
-        draw_header(c, page_w, page_h, bks, ga_ra, gdv, ngay)
+        draw_header(c, page_w, page_h, bks, ga_ra, gdv, ngay, loai)
         draw_footer(c, page_w, page_num)
         draw_image_grid(c, page_w, page_h, cover_images, cols, rows)
         c.showPage()
@@ -404,7 +408,7 @@ def create_pdf(cover_images: list, main_images: list, layout: str, gdv: str,
     for i in range(n_main_pages):
         page_num += 1
         chunk = main_images[i * per_page: (i + 1) * per_page]
-        draw_header(c, page_w, page_h, bks, ga_ra, gdv, ngay)
+        draw_header(c, page_w, page_h, bks, ga_ra, gdv, ngay, loai)
         draw_footer(c, page_w, page_num)
         draw_image_grid(c, page_w, page_h, chunk, cols, rows)
         if i < n_main_pages - 1:
@@ -433,6 +437,9 @@ def main():
                         help="Biển kiểm soát xe (nếu không muốn đọc từ Excel)")
     parser.add_argument("--gara", default="",
                         help="Tên ga-ra / địa điểm (nếu không muốn đọc từ Excel)")
+    parser.add_argument("--loai", choices=["chitiet", "hientruong", "giayto"],
+                        default="chitiet",
+                        help="Loại giám định: chitiet | hientruong | giayto")
     args = parser.parse_args()
 
     bks, ga_ra = get_bks_garage()
@@ -457,7 +464,7 @@ def main():
         OUTPUT_DIR, f"giam_dinh_{safe_bks}_{args.layout}.pdf"
     )
 
-    create_pdf(cover_images, main_images, args.layout, args.gdv, bks, ga_ra, out_name, args.ngay)
+    create_pdf(cover_images, main_images, args.layout, args.gdv, bks, ga_ra, out_name, args.ngay, args.loai)
 
 
 if __name__ == "__main__":
