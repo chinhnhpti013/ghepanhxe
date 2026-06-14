@@ -1,732 +1,907 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ảnh Giám Định Xe — PTI SOS Quảng Ninh</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Ghép Ảnh Giám Định Xe — PTI SOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1565C0;--blue-d:#0D47A1;--blue-l:#E3F2FD;--blue-m:#1976D2;
+  --gray:#757575;--gray-l:#F5F5F5;--gray-b:#E0E0E0;
+  --green:#2E7D32;--red:#C62828;
+  --white:#fff;--text:#212121;
+  --r:10px;--sh:0 2px 16px rgba(21,101,192,.13);
+}
+body{font-family:'Be Vietnam Pro',sans-serif;color:var(--text);background:var(--gray-l);min-height:100vh}
 
-    :root {
-      --blue:        #1565C0;
-      --blue-dark:   #0D47A1;
-      --blue-light:  #E3F2FD;
-      --blue-mid:    #1976D2;
-      --gray:        #757575;
-      --gray-light:  #F5F5F5;
-      --gray-border: #E0E0E0;
-      --white:       #FFFFFF;
-      --text:        #212121;
-      --radius:      10px;
-      --shadow:      0 2px 12px rgba(21,101,192,.12);
-    }
+/* ── HEADER ── */
+.hdr{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);position:sticky;top:0;z-index:100}
+.hdr-in{max-width:860px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px}
+.hdr-logo{width:50px;height:50px;object-fit:contain;background:#fff;border-radius:8px;padding:4px;flex-shrink:0}
+.hdr-logo-fb{width:50px;height:50px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.hdr-t h1{font-size:1.1rem;font-weight:700;line-height:1.3}
+.hdr-t p{font-size:.78rem;opacity:.82;margin-top:2px}
 
-    body {
-      font-family: 'Be Vietnam Pro', sans-serif;
-      color: var(--text);
-      background: var(--gray-light);
-      min-height: 100vh;
-    }
+/* ── STEPS ── */
+.steps{max-width:860px;margin:0 auto;padding:20px 20px 0;display:flex;align-items:center}
+.step{display:flex;align-items:center;flex:1}
+.step-dot{width:34px;height:34px;border-radius:50%;border:2.5px solid var(--gray-b);background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:var(--gray);flex-shrink:0;transition:.3s}
+.step-dot.active{border-color:var(--blue);background:var(--blue);color:#fff}
+.step-dot.done{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+.step-info{margin-left:10px}
+.step-info h3{font-size:.8rem;font-weight:700;color:var(--gray)}
+.step-info h3.active{color:var(--blue-d)}
+.step-info p{font-size:.7rem;color:#aaa;margin-top:1px}
+.step-line{flex:1;height:2px;background:var(--gray-b);margin:0 12px;min-width:20px}
+.step-line.done{background:var(--blue)}
 
-    /* ── HEADER ── */
-    .site-header {
-      background: var(--blue);
-      color: var(--white);
-      padding: 0 24px;
-    }
-    .header-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 0;
-    }
-    .header-logo {
-      width: 56px;
-      height: 56px;
-      object-fit: contain;
-      flex-shrink: 0;
-      border-radius: 8px;
-      background: var(--white);
-      padding: 4px;
-    }
-    .header-text h1 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      line-height: 1.3;
-    }
-    .header-text p {
-      font-size: 0.85rem;
-      opacity: .85;
-      margin-top: 3px;
-    }
-    .header-badge {
-      margin-left: auto;
-      background: rgba(255,255,255,.18);
-      border: 1px solid rgba(255,255,255,.35);
-      color: var(--white);
-      border-radius: 20px;
-      padding: 4px 14px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
+/* ── MAIN ── */
+main{max-width:860px;margin:24px auto 60px;padding:0 20px}
+.panel{display:none}.panel.active{display:block}
 
-    /* ── MAIN ── */
-    main {
-      max-width: 900px;
-      margin: 32px auto;
-      padding: 0 16px;
-    }
+/* ── CARD ── */
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--gray-b);margin-bottom:20px;overflow:hidden}
+.card-hd{background:var(--blue);color:#fff;padding:13px 20px;font-weight:700;font-size:.92rem;display:flex;align-items:center;gap:8px}
+.card-bd{padding:20px}
 
-    /* ── SECTION TITLE ── */
-    .section-label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .section-label .step-num {
-      width: 32px; height: 32px;
-      background: var(--blue);
-      color: var(--white);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: .95rem;
-      flex-shrink: 0;
-    }
-    .section-label h2 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--blue-dark);
-    }
-    .section-label .subtitle {
-      font-size: .82rem;
-      color: var(--gray);
-      margin-top: 2px;
-    }
+/* ── DROP ZONE ── */
+.drop-zone{border:2.5px dashed var(--gray-b);border-radius:var(--r);padding:40px 20px;text-align:center;cursor:pointer;transition:.2s;background:#fafafa}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--blue);background:var(--blue-l)}
+.drop-icon{font-size:3rem;margin-bottom:12px;display:block}
+.drop-zone h3{font-size:1rem;font-weight:700;color:var(--blue-d);margin-bottom:6px}
+.drop-zone p{font-size:.82rem;color:var(--gray)}
+.btn-upload{display:inline-block;margin-top:14px;background:var(--blue);color:#fff;border:none;padding:9px 24px;border-radius:6px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s}
+.btn-upload:hover{background:var(--blue-d)}
+input[type=file]{display:none}
 
-    /* ── CARD ── */
-    .card {
-      background: var(--white);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border: 1px solid var(--gray-border);
-      margin-bottom: 28px;
-      overflow: hidden;
-    }
-    .card-header {
-      background: var(--blue);
-      color: var(--white);
-      padding: 14px 20px;
-      font-weight: 700;
-      font-size: .95rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .card-body {
-      padding: 20px;
-    }
+/* ── GROUP LIST ── */
+.group-list{display:flex;flex-direction:column;gap:10px}
+.group-item{display:flex;align-items:center;gap:12px;background:#fafafa;border:1px solid var(--gray-b);border-radius:8px;padding:10px 14px}
+.group-thumb{width:56px;height:40px;object-fit:cover;border-radius:5px;flex-shrink:0;background:#eee}
+.group-info{flex:1}
+.group-name{font-size:.85rem;font-weight:700;color:var(--text)}
+.group-count{font-size:.75rem;color:var(--gray);margin-top:2px}
+.badge{display:inline-block;border-radius:12px;padding:2px 10px;font-size:.7rem;font-weight:700}
+.badge-cover{background:#E8F5E9;color:#2E7D32}
+.badge-main{background:var(--blue-l);color:var(--blue-d)}
 
-    /* ── STEPS TIMELINE ── */
-    .timeline {
-      display: flex;
-      gap: 0;
-      margin-bottom: 32px;
-    }
-    .timeline-step {
-      flex: 1;
-      text-align: center;
-      position: relative;
-    }
-    .timeline-step:not(:last-child)::after {
-      content: '';
-      position: absolute;
-      top: 20px;
-      right: -1px;
-      width: calc(100% - 32px);
-      left: calc(50% + 16px);
-      height: 3px;
-      background: var(--blue-light);
-      z-index: 0;
-    }
-    .timeline-step.done::after { background: var(--blue); }
-    .step-circle {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: var(--blue-light);
-      border: 3px solid var(--blue);
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 10px;
-      font-weight: 700; color: var(--blue);
-      font-size: 1rem;
-      position: relative; z-index: 1;
-    }
-    .timeline-step h3 {
-      font-size: .82rem;
-      font-weight: 700;
-      color: var(--blue-dark);
-    }
-    .timeline-step p {
-      font-size: .75rem;
-      color: var(--gray);
-      margin-top: 3px;
-    }
+/* ── EXCEL UPLOAD ── */
+.excel-row{display:flex;align-items:center;gap:12px;padding:12px;background:#FFF8E1;border:1px solid #FFD54F;border-radius:8px}
+.excel-icon{font-size:1.4rem;flex-shrink:0}
+.excel-info{flex:1;font-size:.82rem;color:#5D4037}
+.excel-info strong{display:block;margin-bottom:2px}
+.btn-sm{border:1px solid var(--blue);color:var(--blue);background:#fff;padding:6px 14px;border-radius:5px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:.2s}
+.btn-sm:hover{background:var(--blue-l)}
 
-    /* ── FOLDER STRUCTURE ── */
-    .folder-tree {
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: .82rem;
-      line-height: 1.8;
-      background: #1a1a2e;
-      color: #e0e0e0;
-      border-radius: 8px;
-      padding: 16px 20px;
-    }
-    .folder-tree .dir  { color: #64B5F6; font-weight: 600; }
-    .folder-tree .file { color: #A5D6A7; }
-    .folder-tree .desc { color: #9E9E9E; }
-    .folder-tree .key  { color: #FFD54F; font-weight: 600; }
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.form-grid{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:.8rem;font-weight:700;color:var(--blue-d)}
+.form-group label span{color:#C62828;margin-left:2px}
+.form-group input,.form-group select{border:1.5px solid var(--gray-b);border-radius:6px;padding:9px 12px;font-size:.9rem;font-family:inherit;color:var(--text);transition:.2s;background:#fff}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.1)}
+.form-group input.filled{border-color:#43A047;background:#F1F8E9}
 
-    /* ── COMMAND BLOCK ── */
-    .cmd-block {
-      background: #1a1a2e;
-      border-radius: 8px;
-      padding: 14px 18px;
-      margin-bottom: 14px;
-      position: relative;
-    }
-    .cmd-block code {
-      display: block;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: .85rem;
-      color: #A5D6A7;
-      line-height: 1.6;
-      white-space: pre-wrap;
-    }
-    .cmd-block .cmd-label {
-      font-size: .72rem;
-      font-weight: 700;
-      color: #64B5F6;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-    .cmd-block .comment { color: #9E9E9E; }
-    .copy-btn {
-      position: absolute;
-      top: 10px; right: 10px;
-      background: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.2);
-      color: #ccc;
-      border-radius: 5px;
-      padding: 3px 10px;
-      font-size: .72rem;
-      cursor: pointer;
-      font-family: inherit;
-      transition: background .2s;
-    }
-    .copy-btn:hover { background: rgba(255,255,255,.2); color: #fff; }
-    .copy-btn.copied { color: #A5D6A7; }
+/* ── LAYOUT PICKER ── */
+.layout-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+.layout-opt{border:2px solid var(--gray-b);border-radius:8px;padding:14px;cursor:pointer;text-align:center;transition:.2s;position:relative}
+.layout-opt:hover{border-color:var(--blue)}
+.layout-opt input{position:absolute;opacity:0;pointer-events:none}
+.layout-opt.selected{border-color:var(--blue);background:var(--blue-l)}
+.layout-preview-grid{display:inline-grid;gap:3px;margin-bottom:8px}
+.layout-preview-grid.doc{grid-template-columns:repeat(2,22px);grid-template-rows:repeat(3,15px)}
+.layout-preview-grid.ngang{grid-template-columns:repeat(2,30px);grid-template-rows:repeat(2,18px)}
+.layout-preview-grid .cell{background:var(--blue-l);border:1.5px solid var(--blue);border-radius:2px}
+.layout-opt.selected .cell{background:var(--blue);border-color:var(--blue-d)}
+.layout-opt h4{font-size:.85rem;font-weight:700;color:var(--blue-d)}
+.layout-opt p{font-size:.75rem;color:var(--gray);margin-top:3px}
 
-    /* ── PARAM TABLE ── */
-    .param-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .85rem;
-    }
-    .param-table th {
-      background: var(--blue-light);
-      color: var(--blue-dark);
-      padding: 8px 14px;
-      text-align: left;
-      font-weight: 700;
-      font-size: .78rem;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-    .param-table td {
-      padding: 9px 14px;
-      border-bottom: 1px solid var(--gray-border);
-      vertical-align: top;
-    }
-    .param-table tr:last-child td { border-bottom: none; }
-    .param-table tr:nth-child(even) td { background: #FAFAFA; }
-    .param-table .param-name {
-      font-family: 'Consolas', monospace;
-      color: var(--blue);
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .badge-req {
-      display: inline-block;
-      background: #E53935;
-      color: #fff;
-      border-radius: 4px;
-      padding: 1px 7px;
-      font-size: .7rem;
-      font-weight: 700;
-      vertical-align: middle;
-      margin-left: 4px;
-    }
-    .badge-opt {
-      display: inline-block;
-      background: #43A047;
-      color: #fff;
-      border-radius: 4px;
-      padding: 1px 7px;
-      font-size: .7rem;
-      font-weight: 700;
-      vertical-align: middle;
-      margin-left: 4px;
-    }
+/* ── SUMMARY ── */
+.summary-box{background:var(--blue-l);border:1px solid #BBDEFB;border-radius:8px;padding:16px 20px}
+.summary-box h3{font-size:.95rem;font-weight:700;color:var(--blue-d);margin-bottom:10px}
+.summary-rows{display:flex;flex-direction:column;gap:6px}
+.summary-row{display:flex;justify-content:space-between;font-size:.85rem}
+.summary-row .lbl{color:var(--gray)}
+.summary-row .val{font-weight:700;color:var(--text)}
 
-    /* ── LAYOUT PREVIEW ── */
-    .layout-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    .layout-card {
-      border: 2px solid var(--gray-border);
-      border-radius: 8px;
-      padding: 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color .2s, box-shadow .2s;
-    }
-    .layout-card:hover, .layout-card.active {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(21,101,192,.12);
-    }
-    .layout-preview {
-      display: inline-grid;
-      gap: 4px;
-      margin-bottom: 10px;
-    }
-    .layout-preview .cell {
-      background: var(--blue-light);
-      border: 1.5px solid var(--blue);
-      border-radius: 3px;
-    }
-    .layout-preview.doc  { grid-template-columns: repeat(2,28px); grid-template-rows: repeat(3,20px); }
-    .layout-preview.ngang { grid-template-columns: repeat(2,36px); grid-template-rows: repeat(2,24px); }
-    .layout-card h4 { font-size: .88rem; font-weight: 700; color: var(--blue-dark); }
-    .layout-card p  { font-size: .78rem; color: var(--gray); margin-top: 4px; }
+/* ── PROGRESS ── */
+.progress-wrap{display:none;margin:16px 0}
+.progress-wrap.show{display:block}
+.progress-bar-bg{background:var(--gray-b);border-radius:10px;height:10px;overflow:hidden}
+.progress-bar-fill{height:100%;background:var(--blue);border-radius:10px;transition:width .2s;width:0%}
+.progress-text{font-size:.78rem;color:var(--gray);margin-top:6px;text-align:center}
 
-    /* ── TIPS ── */
-    .tip-box {
-      display: flex;
-      gap: 12px;
-      background: var(--blue-light);
-      border-left: 4px solid var(--blue);
-      border-radius: 0 8px 8px 0;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-      font-size: .85rem;
-      color: var(--blue-dark);
-    }
-    .tip-box .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
-    .warn-box {
-      background: #FFF8E1;
-      border-left-color: #F57F17;
-      color: #5D4037;
-    }
-    .warn-box .icon { color: #F57F17; }
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:12px;justify-content:flex-end;margin-top:20px}
+.btn-back{border:1.5px solid var(--gray-b);color:var(--gray);background:#fff;padding:10px 22px;border-radius:7px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s}
+.btn-back:hover{border-color:var(--gray);color:var(--text)}
+.btn-next{background:var(--blue);color:#fff;border:none;padding:10px 28px;border-radius:7px;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;display:flex;align-items:center;gap:8px}
+.btn-next:hover{background:var(--blue-d)}
+.btn-next:disabled{background:#90CAF9;cursor:not-allowed}
+.btn-big{font-size:1rem;padding:14px 40px;border-radius:8px;letter-spacing:.02em}
+.btn-dl{background:var(--green);margin-top:12px}
+.btn-dl:hover{background:#1B5E20}
 
-    /* ── DEPS ── */
-    .dep-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .dep-chip {
-      background: var(--blue-light);
-      border: 1px solid #BBDEFB;
-      color: var(--blue-dark);
-      border-radius: 20px;
-      padding: 4px 14px;
-      font-size: .8rem;
-      font-weight: 600;
-      font-family: 'Consolas', monospace;
-    }
+/* ── RESULT ── */
+.result-box{text-align:center;padding:20px 0}
+.result-icon{font-size:3.5rem;margin-bottom:12px}
+.result-box h3{font-size:1.1rem;font-weight:700;color:var(--green);margin-bottom:6px}
+.result-box p{font-size:.85rem;color:var(--gray)}
 
-    /* ── FOOTER ── */
-    .site-footer {
-      background: var(--blue-dark);
-      color: rgba(255,255,255,.7);
-      text-align: center;
-      padding: 22px 16px;
-      font-size: .8rem;
-      margin-top: 40px;
-    }
-    .site-footer strong { color: var(--white); }
+/* ── ALERT ── */
+.alert{padding:10px 14px;border-radius:7px;font-size:.82rem;margin-bottom:12px;display:none}
+.alert.show{display:block}
+.alert-err{background:#FFEBEE;border:1px solid #FFCDD2;color:var(--red)}
+.alert-ok{background:#E8F5E9;border:1px solid #C8E6C9;color:var(--green)}
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 600px) {
-      .layout-grid { grid-template-columns: 1fr; }
-      .header-badge { display: none; }
-      .timeline { flex-direction: column; gap: 12px; }
-      .timeline-step::after { display: none; }
-    }
-  </style>
+/* ── DIVIDER ── */
+.divider{border:none;border-top:1px solid var(--gray-b);margin:16px 0}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:30px;color:var(--gray)}
+.empty-state .ei{font-size:2.5rem;margin-bottom:8px}
+.empty-state p{font-size:.85rem}
+</style>
 </head>
 <body>
 
-<!-- ══ SITE HEADER ══ -->
-<header class="site-header">
-  <div class="header-inner">
-    <img src="assets/logo-ptisos.png" alt="PTI SOS" class="header-logo"
-         onerror="this.style.display='none'" />
-    <div class="header-text">
-      <h1>Ảnh Giám Định Xe Theo Tên File</h1>
+<!-- ── HEADER ── -->
+<header class="hdr">
+  <div class="hdr-in">
+    <img src="assets/logo-ptisos.png" alt="PTI SOS" class="hdr-logo"
+         onerror="this.style.display='none';document.getElementById('logo-fb').style.display='flex'"/>
+    <div class="hdr-logo-fb" id="logo-fb" style="display:none">🚗</div>
+    <div class="hdr-t">
+      <h1>Ghép Ảnh Giám Định Xe</h1>
       <p>Phòng Giám định và Cứu hộ tại Quảng Ninh — PTI SOS</p>
     </div>
-    <span class="header-badge">v2.0</span>
   </div>
 </header>
 
+<!-- ── STEP INDICATOR ── -->
+<div class="steps">
+  <div class="step">
+    <div class="step-dot active" id="dot1">1</div>
+    <div class="step-info"><h3 class="active" id="lbl1">Upload ảnh</h3><p>Chọn thư mục ảnh</p></div>
+  </div>
+  <div class="step-line" id="line1"></div>
+  <div class="step">
+    <div class="step-dot" id="dot2">2</div>
+    <div class="step-info"><h3 id="lbl2">Thông tin</h3><p>GĐV, BKS, ngày</p></div>
+  </div>
+  <div class="step-line" id="line2"></div>
+  <div class="step">
+    <div class="step-dot" id="dot3">3</div>
+    <div class="step-info"><h3 id="lbl3">Tạo PDF</h3><p>Xuất file</p></div>
+  </div>
+</div>
+
 <main>
 
-  <!-- ══ TIMELINE ══ -->
-  <div class="timeline">
-    <div class="timeline-step done">
-      <div class="step-circle">1</div>
-      <h3>Chuẩn bị ảnh</h3>
-      <p>Đặt ảnh vào<br/>thư mục input/</p>
-    </div>
-    <div class="timeline-step done">
-      <div class="step-circle">2</div>
-      <h3>Đặt tên file</h3>
-      <p>Chạy<br/>dat_ten_file.py</p>
-    </div>
-    <div class="timeline-step">
-      <div class="step-circle">3</div>
-      <h3>Ghép PDF</h3>
-      <p>Chạy<br/>ghep_anh.py</p>
-    </div>
-  </div>
+<!-- ════════════════════════════════
+     BƯỚC 1: UPLOAD
+════════════════════════════════ -->
+<div class="panel active" id="panel1">
 
-  <!-- ══ GIỚI THIỆU ══ -->
   <div class="card">
-    <div class="card-header">📋 Tổng quan</div>
-    <div class="card-body">
-      <p style="font-size:.9rem;line-height:1.7;color:#424242;margin-bottom:12px;">
-        Công cụ tự động ghép ảnh hiện trường xe ô tô thành file <strong>PDF khổ A4 chuẩn</strong>
-        với tiêu đề, logo PTI SOS, caption từng hạng mục và số trang.
-        Quy trình gồm <strong>2 bước</strong>: đặt tên file theo thư mục → ghép ảnh vào khung PDF.
-      </p>
-      <div class="dep-list">
-        <span class="dep-chip">Python 3.10+</span>
-        <span class="dep-chip">Pillow ≥ 10</span>
-        <span class="dep-chip">ReportLab ≥ 4</span>
-        <span class="dep-chip">openpyxl ≥ 3.1</span>
-        <span class="dep-chip">python-docx ≥ 1.1</span>
+    <div class="card-hd">📁 Chọn thư mục ảnh</div>
+    <div class="card-bd">
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('folderInput').click()">
+        <span class="drop-icon">🖼️</span>
+        <h3>Kéo thả thư mục ảnh vào đây</h3>
+        <p>Hoặc nhấn nút bên dưới để duyệt thư mục<br/>
+           <small style="color:#aaa">Hỗ trợ: JPG, PNG, BMP, WEBP</small></p>
+        <button class="btn-upload" onclick="event.stopPropagation();document.getElementById('folderInput').click()">
+          📂 Chọn thư mục
+        </button>
       </div>
-    </div>
-  </div>
+      <input type="file" id="folderInput" webkitdirectory multiple accept="image/*,.xlsx"/>
 
-  <!-- ══ CẤU TRÚC THƯ MỤC ══ -->
-  <div class="section-label">
-    <div class="step-num">📁</div>
-    <div>
-      <h2>Cấu trúc thư mục</h2>
-      <div class="subtitle">Đặt ảnh đúng vị trí trước khi chạy</div>
-    </div>
-  </div>
-
-  <div class="card" style="margin-bottom:28px;">
-    <div class="card-body" style="padding:0;">
-      <div class="folder-tree">
-<span class="key">anh-giam-dinh-vcx-theo-ten-file/</span>
-├── <span class="dir">input/</span>                        <span class="desc">← ảnh gốc + file báo giá</span>
-│   ├── <span class="dir">0.1 Hiện trạng tổng thể xe/</span>  <span class="desc">← ảnh nhận dạng (prefix 0)</span>
-│   ├── <span class="dir">0.2 Số khung xe/</span>
-│   ├── <span class="dir">1. Đèn hậu bên phải vỡ/</span>    <span class="desc">← ảnh hạng mục (prefix 1, 2...)</span>
-│   ├── <span class="dir">2. Hông xe bên phải bẹp xước/</span>
-│   └── <span class="file">Bao_gia.xlsx</span>              <span class="desc">← nguồn BKS + tên ga-ra</span>
-├── <span class="dir">renamed/</span>                      <span class="desc">← ảnh đã đặt tên (tự tạo)</span>
-│   └── <span class="file">mapping.json</span>
-├── <span class="dir">output/</span>                       <span class="desc">← PDF kết xuất</span>
-├── <span class="dir">assets/</span><span class="file">logo-ptisos.png</span>
-├── <span class="dir">fonts/</span><span class="file">BeVietnamPro-*.ttf</span>
-├── <span class="key">dat_ten_file.py</span>               <span class="desc">← Giai đoạn 1</span>
-├── <span class="key">ghep_anh.py</span>                  <span class="desc">← Giai đoạn 2</span>
-├── <span class="file">chay_doc.bat</span>
-└── <span class="file">chay_ngang.bat</span>
+      <div id="groupSection" style="margin-top:16px;display:none">
+        <div class="alert alert-ok show" id="alertOk"></div>
+        <div class="group-list" id="groupList"></div>
       </div>
-    </div>
-  </div>
 
-  <!-- ══ GIAI ĐOẠN 1 ══ -->
-  <div class="section-label">
-    <div class="step-num">1</div>
-    <div>
-      <h2>Giai đoạn 1 — Đặt tên file</h2>
-      <div class="subtitle">dat_ten_file.py — Đọc thư mục con, sao chép và đổi tên ảnh</div>
+      <div id="emptyState" class="empty-state" style="display:none">
+        <div class="ei">⚠️</div>
+        <p>Không tìm thấy thư mục hạng mục nào.<br/>Hãy chắc chắn thư mục ảnh có cấu trúc <code>0. Tên/</code>, <code>1. Tên/</code>...</p>
+      </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-body">
-      <div class="tip-box">
-        <span class="icon">ℹ️</span>
-        <div>Thư mục <code style="background:rgba(21,101,192,.1);padding:1px 6px;border-radius:4px;">renamed/</code> sẽ tự động <strong>xóa sạch và tạo lại</strong> mỗi lần chạy — tránh file cũ gây lỗi.</div>
+    <div class="card-hd">📊 Excel báo giá (tùy chọn)</div>
+    <div class="card-bd">
+      <div class="excel-row">
+        <div class="excel-icon">📋</div>
+        <div class="excel-info">
+          <strong>Upload Bao_gia.xlsx để tự động điền BKS và tên ga-ra</strong>
+          Nếu không có, nhập tay ở bước tiếp theo
+        </div>
+        <button class="btn-sm" onclick="document.getElementById('excelInput').click()">Chọn file</button>
+        <input type="file" id="excelInput" accept=".xlsx,.xls"/>
       </div>
-
-      <div class="cmd-block">
-        <div class="cmd-label">Terminal</div>
-        <button class="copy-btn" onclick="copyCmd(this, 'python dat_ten_file.py')">Sao chép</button>
-        <code>python dat_ten_file.py</code>
-      </div>
-
-      <p style="font-size:.85rem;color:#424242;margin-top:4px;line-height:1.6;">
-        Kết quả: ảnh được sao chép sang <code>renamed/</code> với tên dạng
-        <code>1. Đèn hậu bên phải vỡ_1.jpg</code>, <code>..._2.jpg</code> và
-        file <code>mapping.json</code> lưu ánh xạ tên → caption.
-      </p>
+      <div id="excelStatus" style="margin-top:10px;font-size:.82rem;color:var(--green);display:none"></div>
     </div>
   </div>
 
-  <!-- ══ GIAI ĐOẠN 2 ══ -->
-  <div class="section-label">
-    <div class="step-num">2</div>
-    <div>
-      <h2>Giai đoạn 2 — Ghép ảnh thành PDF</h2>
-      <div class="subtitle">ghep_anh.py — Tạo file PDF khổ A4 từ ảnh đã đặt tên</div>
+  <div class="btn-row">
+    <button class="btn-next" id="btn1Next" onclick="goStep(2)" disabled>
+      Tiếp tục <span>→</span>
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     BƯỚC 2: THÔNG TIN
+════════════════════════════════ -->
+<div class="panel" id="panel2">
+  <div class="card">
+    <div class="card-hd">🚗 Thông tin giám định</div>
+    <div class="card-bd">
+      <div class="alert alert-err" id="alertErr2"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Biển kiểm soát (BKS)<span>*</span></label>
+          <input type="text" id="fBks" placeholder="Ví dụ: 14C-402.84"/>
+        </div>
+        <div class="form-group">
+          <label>Tên ga-ra / Địa điểm<span>*</span></label>
+          <input type="text" id="fGara" placeholder="Ví dụ: Gara Toyota Quảng Ninh"/>
+        </div>
+        <div class="form-group">
+          <label>Tên giám định viên<span>*</span></label>
+          <input type="text" id="fGdv" placeholder="Ví dụ: Nguyễn Văn A"/>
+        </div>
+        <div class="form-group">
+          <label>Ngày giám định</label>
+          <input type="text" id="fNgay" placeholder="DD/MM/YYYY (tùy chọn)"/>
+        </div>
+      </div>
+
+      <hr class="divider"/>
+
+      <div class="form-group">
+        <label>Bố cục trang</label>
+        <div class="layout-row">
+          <label class="layout-opt selected" id="optDoc" onclick="selectLayout('doc')">
+            <input type="radio" name="layout" value="doc" checked/>
+            <div class="layout-preview-grid doc">
+              <div class="cell"></div><div class="cell"></div>
+              <div class="cell"></div><div class="cell"></div>
+              <div class="cell"></div><div class="cell"></div>
+            </div>
+            <h4>Dọc — Portrait A4</h4>
+            <p>Grid 2×3 — 6 ảnh/trang</p>
+          </label>
+          <label class="layout-opt" id="optNgang" onclick="selectLayout('ngang')">
+            <input type="radio" name="layout" value="ngang"/>
+            <div class="layout-preview-grid ngang">
+              <div class="cell"></div><div class="cell"></div>
+              <div class="cell"></div><div class="cell"></div>
+            </div>
+            <h4>Ngang — Landscape A4</h4>
+            <p>Grid 2×2 — 4 ảnh/trang</p>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-back" onclick="goStep(1)">← Quay lại</button>
+    <button class="btn-next" onclick="goStep(3)">Tiếp tục →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     BƯỚC 3: TẠO PDF
+════════════════════════════════ -->
+<div class="panel" id="panel3">
+  <div class="card">
+    <div class="card-hd">📄 Tóm tắt</div>
+    <div class="card-bd">
+      <div class="summary-box">
+        <h3>Thông tin giám định</h3>
+        <div class="summary-rows" id="summaryRows"></div>
+      </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-body">
+    <div class="card-hd">⚡ Tạo PDF</div>
+    <div class="card-bd">
+      <div class="alert alert-err" id="alertErr3"></div>
 
-      <!-- Layout preview -->
-      <div class="layout-grid" style="margin-bottom:20px;">
-        <div class="layout-card active">
-          <div class="layout-preview doc">
-            <div class="cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell"></div>
+      <div id="stateReady">
+        <div class="result-box" style="padding:10px 0">
+          <div class="result-icon">📑</div>
+          <p id="readyMsg" style="font-size:.9rem;color:var(--text);font-weight:500"></p>
+          <p style="color:var(--gray);font-size:.82rem;margin-top:6px">Nhấn nút bên dưới để bắt đầu tạo PDF</p>
+        </div>
+        <div style="text-align:center">
+          <button class="btn-next btn-big" onclick="startGenerate()">⚡ Tạo PDF</button>
+        </div>
+      </div>
+
+      <div id="stateProgress" style="display:none">
+        <div class="progress-wrap show">
+          <div class="progress-bar-bg"><div class="progress-bar-fill" id="progFill"></div></div>
+          <div class="progress-text" id="progText">Đang chuẩn bị...</div>
+        </div>
+      </div>
+
+      <div id="stateDone" style="display:none">
+        <div class="result-box">
+          <div class="result-icon">✅</div>
+          <h3>PDF đã được tạo thành công!</h3>
+          <p id="doneMsg"></p>
+          <div style="margin-top:16px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button class="btn-next btn-big btn-dl" id="btnDownload">⬇️ Tải xuống PDF</button>
+            <button class="btn-back" onclick="resetApp()">🔄 Làm lại</button>
           </div>
-          <h4>Dọc (Portrait A4)</h4>
-          <p>Grid 2×3 — 6 ảnh/trang<br/><code>--layout doc</code></p>
-        </div>
-        <div class="layout-card">
-          <div class="layout-preview ngang">
-            <div class="cell"></div><div class="cell"></div>
-            <div class="cell"></div><div class="cell"></div>
-          </div>
-          <h4>Ngang (Landscape A4)</h4>
-          <p>Grid 2×2 — 4 ảnh/trang<br/><code>--layout ngang</code></p>
         </div>
       </div>
-
-      <!-- Commands -->
-      <div class="cmd-block">
-        <div class="cmd-label">Lệnh cơ bản</div>
-        <button class="copy-btn" onclick="copyCmd(this, 'python ghep_anh.py --gdv \"Nguyễn Văn A\" --layout doc')">Sao chép</button>
-        <code>python ghep_anh.py --gdv "Nguyễn Văn A" --layout doc</code>
-      </div>
-
-      <div class="cmd-block">
-        <div class="cmd-label">Có ngày giám định</div>
-        <button class="copy-btn" onclick="copyCmd(this, 'python ghep_anh.py --gdv \"Trần Thị B\" --layout doc --ngay \"14/06/2026\"')">Sao chép</button>
-        <code>python ghep_anh.py --gdv "Trần Thị B" --layout doc --ngay "14/06/2026"</code>
-      </div>
-
-      <div class="cmd-block">
-        <div class="cmd-label">Truyền BKS và Ga-ra thủ công</div>
-        <button class="copy-btn" onclick="copyCmd(this, 'python ghep_anh.py --gdv \"Lê Văn C\" --layout ngang --bks \"14C-402.84\" --gara \"Gara XYZ\"')">Sao chép</button>
-        <code>python ghep_anh.py --gdv "Lê Văn C" --layout ngang --bks "14C-402.84" --gara "Gara XYZ"</code>
-      </div>
-
-      <!-- Params table -->
-      <table class="param-table" style="margin-top:8px;">
-        <thead>
-          <tr>
-            <th>Tham số</th>
-            <th>Mô tả</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="param-name">--gdv <span class="badge-req">Bắt buộc</span></td>
-            <td>Tên giám định viên, ví dụ: <code>"Nguyễn Văn A"</code></td>
-          </tr>
-          <tr>
-            <td class="param-name">--layout</td>
-            <td><code>doc</code> (mặc định) hoặc <code>ngang</code></td>
-          </tr>
-          <tr>
-            <td class="param-name">--ngay <span class="badge-opt">Tùy chọn</span></td>
-            <td>Ngày giám định, ví dụ: <code>"14/06/2026"</code></td>
-          </tr>
-          <tr>
-            <td class="param-name">--bks <span class="badge-opt">Tùy chọn</span></td>
-            <td>Biển kiểm soát (nếu không có <code>Bao_gia.xlsx</code>)</td>
-          </tr>
-          <tr>
-            <td class="param-name">--gara <span class="badge-opt">Tùy chọn</span></td>
-            <td>Tên ga-ra / địa điểm</td>
-          </tr>
-          <tr>
-            <td class="param-name">--output <span class="badge-opt">Tùy chọn</span></td>
-            <td>Đường dẫn file PDF đầu ra tùy chỉnh</td>
-          </tr>
-        </tbody>
-      </table>
-
     </div>
   </div>
 
-  <!-- ══ CHẠY NHANH ══ -->
-  <div class="section-label">
-    <div class="step-num">⚡</div>
-    <div>
-      <h2>Chạy nhanh (Double-click)</h2>
-      <div class="subtitle">Không cần mở terminal — nhập tên GĐV rồi Enter</div>
-    </div>
+  <div class="btn-row">
+    <button class="btn-back" id="btnBack3" onclick="goStep(2)">← Quay lại</button>
   </div>
-
-  <div class="card">
-    <div class="card-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-        <div style="border:2px solid var(--blue);border-radius:8px;padding:16px;text-align:center;">
-          <div style="font-size:2rem;margin-bottom:8px;">📄</div>
-          <h4 style="color:var(--blue-dark);font-size:.95rem;">chay_doc.bat</h4>
-          <p style="font-size:.8rem;color:var(--gray);margin-top:4px;">Layout dọc — 6 ảnh/trang<br/>Portrait A4</p>
-        </div>
-        <div style="border:2px solid var(--blue);border-radius:8px;padding:16px;text-align:center;">
-          <div style="font-size:2rem;margin-bottom:8px;">📄</div>
-          <h4 style="color:var(--blue-dark);font-size:.95rem;">chay_ngang.bat</h4>
-          <p style="font-size:.8rem;color:var(--gray);margin-top:4px;">Layout ngang — 4 ảnh/trang<br/>Landscape A4</p>
-        </div>
-      </div>
-      <p style="font-size:.82rem;color:#424242;margin-top:14px;line-height:1.6;">
-        Sau khi chạy xong, thư mục <code>output/</code> tự mở. File PDF đặt tên theo biển số và layout,
-        ví dụ: <code>output/giam_dinh_14C-402_84_doc.pdf</code>
-      </p>
-    </div>
-  </div>
-
-  <!-- ══ LÀM LẠI HỒ SƠ MỚI ══ -->
-  <div class="section-label">
-    <div class="step-num">🔄</div>
-    <div>
-      <h2>Làm lại hồ sơ mới</h2>
-      <div class="subtitle">Quy trình reset dữ liệu cho hồ sơ tiếp theo</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-body">
-      <div class="warn-box tip-box">
-        <span class="icon">⚠️</span>
-        <div>Thư mục <code>renamed/</code> tự xóa khi chạy <code>dat_ten_file.py</code>. Cần xóa thủ công file PDF cũ trong <code>output/</code>.</div>
-      </div>
-
-      <div class="cmd-block">
-        <div class="cmd-label">PowerShell</div>
-        <code><span class="comment"># 1. Xóa PDF cũ</span>
-Remove-Item output\*.pdf -Force
-
-<span class="comment"># 2. Đặt ảnh mới vào input/, cập nhật Bao_gia.xlsx nếu cần</span>
-
-<span class="comment"># 3. Chạy 2 bước</span>
-python dat_ten_file.py
-python ghep_anh.py --gdv "Tên GĐV" --layout doc --ngay "DD/MM/YYYY"</code>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ THIẾT KẾ PDF ══ -->
-  <div class="section-label">
-    <div class="step-num">🎨</div>
-    <div>
-      <h2>Thông số thiết kế PDF</h2>
-      <div class="subtitle">Font, màu sắc, kích thước chuẩn</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-body" style="padding:0;">
-      <table class="param-table">
-        <thead>
-          <tr><th>Tham số</th><th>Giá trị</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Font</td><td>Be Vietnam Pro (Regular + Bold)</td></tr>
-          <tr><td>Màu header</td><td><span style="display:inline-block;width:14px;height:14px;background:#1565C0;border-radius:3px;vertical-align:middle;margin-right:6px;"></span><code>#1565C0</code></td></tr>
-          <tr><td>Màu caption</td><td><span style="display:inline-block;width:14px;height:14px;background:#1565C0;border-radius:3px;vertical-align:middle;margin-right:6px;"></span><code>#1565C0</code> nền, chữ trắng</td></tr>
-          <tr><td>Chiều cao header</td><td>28 mm (giảm 20% so với bản gốc 35 mm)</td></tr>
-          <tr><td>Logo PTI SOS</td><td>23 mm × 23 mm, góc trái header</td></tr>
-          <tr><td>Lề trang</td><td>8 mm</td></tr>
-          <tr><td>Khoảng cách ô ảnh</td><td>2 mm</td></tr>
-          <tr><td>Bo góc ảnh</td><td>4% chiều rộng ô ảnh</td></tr>
-          <tr><td>Footer</td><td>Tên phòng (xám trái) + số trang (xanh phải), 13 pt</td></tr>
-          <tr><td>Caption ảnh</td><td>14 pt, tự thu nhỏ nếu tràn</td></tr>
-          <tr><td>Bố cục dọc</td><td>Portrait A4, grid 2×3, 6 ảnh/trang</td></tr>
-          <tr><td>Bố cục ngang</td><td>Landscape A4, grid 2×2, 4 ảnh/trang</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- ══ CÀI ĐẶT ══ -->
-  <div class="section-label">
-    <div class="step-num">📦</div>
-    <div>
-      <h2>Cài đặt dependencies</h2>
-      <div class="subtitle">Chạy một lần duy nhất</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-body">
-      <div class="cmd-block">
-        <div class="cmd-label">pip</div>
-        <button class="copy-btn" onclick="copyCmd(this, 'pip install -r requirements.txt')">Sao chép</button>
-        <code>pip install -r requirements.txt</code>
-      </div>
-    </div>
-  </div>
+</div>
 
 </main>
 
-<!-- ══ SITE FOOTER ══ -->
-<footer class="site-footer">
-  <strong>PTI SOS — Phòng Giám định và Cứu hộ tại Quảng Ninh</strong><br/>
-  <span style="margin-top:4px;display:inline-block;">
-    Công cụ nội bộ — Tạo ảnh giám định xe ô tô chuẩn A4
-  </span>
-</footer>
-
 <script>
-  // Copy button
-  function copyCmd(btn, text) {
-    navigator.clipboard.writeText(text).then(() => {
-      btn.textContent = '✓ Đã chép';
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = 'Sao chép';
-        btn.classList.remove('copied');
-      }, 2000);
-    });
+// ════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════
+const state = {
+  step: 1,
+  imageGroups: [],   // [{name, files:[File], iscover}] sorted
+  bks: '', gaRa: '', gdv: '', ngay: '', layout: 'doc',
+  pdfBytes: null,
+  pdfName: ''
+};
+
+// ════════════════════════════════════════════════════════
+//  STEP NAVIGATION
+// ════════════════════════════════════════════════════════
+function goStep(n) {
+  if (n === 2) {
+    if (!validateStep1()) return;
+    prefillStep2();
+  }
+  if (n === 3) {
+    if (!validateStep2()) return;
+    buildSummary();
+    resetGenerate();
+  }
+  state.step = n;
+  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
+  updateStepUI(n);
+  window.scrollTo(0,0);
+}
+
+function updateStepUI(n) {
+  [1,2,3].forEach(i => {
+    const dot = document.getElementById('dot'+i);
+    const lbl = document.getElementById('lbl'+i);
+    dot.className = 'step-dot' + (i===n?' active':i<n?' done':'');
+    lbl.className = i===n?'active':'';
+    if (i<3) document.getElementById('line'+i).className = 'step-line'+(i<n?' done':'');
+  });
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP 1 — FILE HANDLING
+// ════════════════════════════════════════════════════════
+const IMAGE_EXTS = new Set(['.jpg','.jpeg','.png','.bmp','.webp']);
+
+document.getElementById('folderInput').addEventListener('change', e => {
+  handleFiles([...e.target.files]);
+  e.target.value = '';
+});
+
+document.getElementById('excelInput').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const wb = XLSX.read(new Uint8Array(ev.target.result), {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1});
+      let bks='', gaRa='';
+      for (let i=0;i<Math.min(4,rows.length);i++) {
+        const val = rows[i].find(c=>c&&String(c).trim()&&!String(c).startsWith('Địa chỉ'));
+        if (val) { gaRa=String(val).trim(); break; }
+      }
+      for (const row of rows.slice(0,20)) {
+        for (let i=0;i<row.length;i++) {
+          const c=row[i];
+          if (c && /Biển số|Biển kiểm soát|Bien so|BKS/i.test(String(c))) {
+            for (let j=i+1;j<row.length;j++) {
+              if (row[j]) { bks=String(row[j]).trim(); break; }
+            }
+            if (bks) break;
+          }
+        }
+        if (bks) break;
+      }
+      state.bks = bks; state.gaRa = gaRa;
+      const st = document.getElementById('excelStatus');
+      st.style.display='block';
+      st.textContent = `✅ Đã đọc: BKS = "${bks||'(chưa tìm thấy)'}", Ga-ra = "${gaRa||'(chưa tìm thấy)'}"`;
+    } catch(err) {
+      document.getElementById('excelStatus').style.display='block';
+      document.getElementById('excelStatus').style.color='#C62828';
+      document.getElementById('excelStatus').textContent='❌ Không đọc được file Excel: '+err.message;
+    }
+  };
+  reader.readAsArrayBuffer(f);
+  e.target.value='';
+});
+
+// Drag & drop
+const dz = document.getElementById('dropZone');
+['dragover','dragenter'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave','dragend'].forEach(ev => dz.addEventListener(ev, () => dz.classList.remove('drag')));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag');
+  const items = [...e.dataTransfer.items];
+  const files = [];
+  let pending = 0;
+  function scanEntry(entry) {
+    if (entry.isFile) {
+      pending++;
+      entry.file(f => {
+        const ext = f.name.slice(f.name.lastIndexOf('.')).toLowerCase();
+        if (IMAGE_EXTS.has(ext)) {
+          // Reconstruct webkitRelativePath via fullPath
+          Object.defineProperty(f,'webkitRelativePath',{value:entry.fullPath.replace(/^\//,''),writable:false});
+          files.push(f);
+        }
+        if (--pending===0) handleFiles(files);
+      });
+    } else if (entry.isDirectory) {
+      const reader = entry.createReader();
+      function readMore() {
+        pending++;
+        reader.readEntries(entries => {
+          if (!entries.length) { if (--pending===0 && files.length) handleFiles(files); return; }
+          entries.forEach(scanEntry);
+          if (--pending===0 && files.length) handleFiles(files);
+          if (entries.length===100) readMore();
+        });
+      }
+      readMore();
+    }
+  }
+  items.forEach(item => { const e = item.webkitGetAsEntry(); if (e) scanEntry(e); });
+});
+
+function handleFiles(files) {
+  const imageFiles = files.filter(f => {
+    const ext = f.name.slice(f.name.lastIndexOf('.')).toLowerCase();
+    return IMAGE_EXTS.has(ext);
+  });
+  if (!imageFiles.length) { showEmpty(); return; }
+
+  // Group by parent folder
+  const groups = {};
+  imageFiles.forEach(f => {
+    const parts = (f.webkitRelativePath||f.name).split('/');
+    const subfolder = parts.length >= 2 ? parts[parts.length-2] : null;
+    if (!subfolder || !/^\d/.test(subfolder)) return;
+    if (!groups[subfolder]) groups[subfolder] = [];
+    groups[subfolder].push(f);
+  });
+
+  if (!Object.keys(groups).length) { showEmpty(); return; }
+
+  // Sort groups by prefix number then name
+  const sorted = Object.entries(groups).sort(([a],[b]) => {
+    const na = parseInt(a)||0, nb = parseInt(b)||0;
+    return na!==nb ? na-nb : a.localeCompare(b, 'vi');
+  }).map(([name, files]) => ({
+    name,
+    files: files.sort((a,b) => a.name.localeCompare(b.name,'vi',{numeric:true})),
+    isCover: /^0/.test(name)
+  }));
+
+  state.imageGroups = sorted;
+  renderGroups(sorted);
+}
+
+function renderGroups(groups) {
+  const sec = document.getElementById('groupSection');
+  const list = document.getElementById('groupList');
+  const coverCount = groups.filter(g=>g.isCover).reduce((s,g)=>s+g.files.length,0);
+  const mainCount  = groups.filter(g=>!g.isCover).reduce((s,g)=>s+g.files.length,0);
+  document.getElementById('alertOk').textContent =
+    `✅ Phát hiện ${groups.length} nhóm — ${coverCount} ảnh nhận dạng xe + ${mainCount} ảnh hạng mục`;
+  list.innerHTML = '';
+  groups.forEach(g => {
+    const thumbUrl = URL.createObjectURL(g.files[0]);
+    const item = document.createElement('div');
+    item.className = 'group-item';
+    item.innerHTML = `
+      <img class="group-thumb" src="${thumbUrl}" alt="" onload="URL.revokeObjectURL(this.src)"/>
+      <div class="group-info">
+        <div class="group-name">${g.name}</div>
+        <div class="group-count">${g.files.length} ảnh</div>
+      </div>
+      <span class="badge ${g.isCover?'badge-cover':'badge-main'}">${g.isCover?'Nhận dạng xe':'Hạng mục'}</span>`;
+    list.appendChild(item);
+  });
+  sec.style.display='block';
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('btn1Next').disabled = false;
+}
+
+function showEmpty() {
+  document.getElementById('emptyState').style.display='block';
+  document.getElementById('groupSection').style.display='none';
+  document.getElementById('btn1Next').disabled = true;
+}
+
+function validateStep1() {
+  return state.imageGroups.length > 0;
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP 2 — FORM
+// ════════════════════════════════════════════════════════
+function prefillStep2() {
+  if (state.bks)  { document.getElementById('fBks').value  = state.bks;  document.getElementById('fBks').classList.add('filled'); }
+  if (state.gaRa) { document.getElementById('fGara').value = state.gaRa; document.getElementById('fGara').classList.add('filled'); }
+}
+
+function selectLayout(v) {
+  state.layout = v;
+  document.getElementById('optDoc').classList.toggle('selected', v==='doc');
+  document.getElementById('optNgang').classList.toggle('selected', v==='ngang');
+}
+
+function validateStep2() {
+  const bks  = document.getElementById('fBks').value.trim();
+  const gara = document.getElementById('fGara').value.trim();
+  const gdv  = document.getElementById('fGdv').value.trim();
+  const err  = document.getElementById('alertErr2');
+  if (!bks)  { err.textContent='❌ Vui lòng nhập Biển kiểm soát (BKS)'; err.className='alert alert-err show'; return false; }
+  if (!gara) { err.textContent='❌ Vui lòng nhập tên Ga-ra / Địa điểm'; err.className='alert alert-err show'; return false; }
+  if (!gdv)  { err.textContent='❌ Vui lòng nhập tên Giám định viên';    err.className='alert alert-err show'; return false; }
+  err.className='alert alert-err';
+  state.bks  = bks;
+  state.gaRa = gara;
+  state.gdv  = gdv;
+  state.ngay = document.getElementById('fNgay').value.trim();
+  return true;
+}
+
+// ════════════════════════════════════════════════════════
+//  STEP 3 — SUMMARY + GENERATE
+// ════════════════════════════════════════════════════════
+function buildSummary() {
+  const perPage = state.layout==='doc'?6:4;
+  const coverImgs = state.imageGroups.filter(g=>g.isCover).flatMap(g=>g.files);
+  const mainImgs  = state.imageGroups.filter(g=>!g.isCover).flatMap(g=>g.files);
+  const nPages = (coverImgs.length?1:0) + Math.ceil(mainImgs.length/perPage);
+
+  document.getElementById('summaryRows').innerHTML = `
+    <div class="summary-row"><span class="lbl">Biển kiểm soát</span><span class="val">${state.bks}</span></div>
+    <div class="summary-row"><span class="lbl">Ga-ra / Địa điểm</span><span class="val">${state.gaRa}</span></div>
+    <div class="summary-row"><span class="lbl">Giám định viên</span><span class="val">${state.gdv}</span></div>
+    <div class="summary-row"><span class="lbl">Ngày giám định</span><span class="val">${state.ngay||'(không có)'}</span></div>
+    <div class="summary-row"><span class="lbl">Bố cục</span><span class="val">${state.layout==='doc'?'Dọc — Portrait A4 (2×3)':'Ngang — Landscape A4 (2×2)'}</span></div>
+    <div class="summary-row"><span class="lbl">Ảnh nhận dạng xe (trang 1)</span><span class="val">${coverImgs.length} ảnh</span></div>
+    <div class="summary-row"><span class="lbl">Ảnh hạng mục</span><span class="val">${mainImgs.length} ảnh</span></div>
+    <div class="summary-row"><span class="lbl">Tổng số trang</span><span class="val">${nPages} trang</span></div>`;
+
+  const totalImgs = coverImgs.length + mainImgs.length;
+  document.getElementById('readyMsg').textContent =
+    `${totalImgs} ảnh — ${nPages} trang PDF`;
+}
+
+function resetGenerate() {
+  document.getElementById('stateReady').style.display='block';
+  document.getElementById('stateProgress').style.display='none';
+  document.getElementById('stateDone').style.display='none';
+  document.getElementById('alertErr3').className='alert alert-err';
+  document.getElementById('btnBack3').style.display='';
+  state.pdfBytes = null;
+}
+
+async function startGenerate() {
+  document.getElementById('stateReady').style.display='none';
+  document.getElementById('stateProgress').style.display='block';
+  document.getElementById('btnBack3').style.display='none';
+  document.getElementById('alertErr3').className='alert alert-err';
+  try {
+    await generatePDF();
+    document.getElementById('stateProgress').style.display='none';
+    document.getElementById('stateDone').style.display='block';
+    const safeBks = state.bks.replace(/[^\w\-]/g,'_');
+    state.pdfName = `giam_dinh_${safeBks}_${state.layout}.pdf`;
+    document.getElementById('doneMsg').textContent = state.pdfName;
+    document.getElementById('btnDownload').onclick = downloadPDF;
+  } catch(err) {
+    document.getElementById('stateProgress').style.display='none';
+    document.getElementById('stateReady').style.display='block';
+    document.getElementById('btnBack3').style.display='';
+    const a = document.getElementById('alertErr3');
+    a.textContent = '❌ Lỗi tạo PDF: '+err.message;
+    a.className='alert alert-err show';
+    console.error(err);
+  }
+}
+
+function downloadPDF() {
+  if (!state.pdfBytes) return;
+  const blob = new Blob([state.pdfBytes], {type:'application/pdf'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=state.pdfName; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function resetApp() {
+  state.imageGroups=[]; state.bks=''; state.gaRa=''; state.pdfBytes=null;
+  document.getElementById('groupSection').style.display='none';
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('btn1Next').disabled=true;
+  document.getElementById('excelStatus').style.display='none';
+  document.getElementById('fBks').value=''; document.getElementById('fBks').classList.remove('filled');
+  document.getElementById('fGara').value=''; document.getElementById('fGara').classList.remove('filled');
+  document.getElementById('fGdv').value='';
+  document.getElementById('fNgay').value='';
+  goStep(1);
+}
+
+// ════════════════════════════════════════════════════════
+//  PDF GENERATION
+// ════════════════════════════════════════════════════════
+const MM = 2.8346;  // 1mm in points
+const C = {
+  MARGIN:    8  * MM,
+  HEADER_H:  28 * MM,
+  HEADER_GAP:3  * MM,
+  FOOTER_H:  8  * MM,
+  CAPTION_H: 7  * MM,
+  GAP:       2  * MM,
+  LOGO_SIZE: 23 * MM,
+};
+const BLUE  = PDFLib.rgb(21/255,101/255,192/255);
+const GRAY  = PDFLib.rgb(117/255,117/255,117/255);
+const WHITE = PDFLib.rgb(1,1,1);
+const LGRAY = PDFLib.rgb(189/255,189/255,189/255);
+
+function setProgress(pct, msg) {
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progText').textContent = msg;
+}
+
+async function generatePDF() {
+  const { PDFDocument, StandardFonts } = PDFLib;
+  const isDoc = state.layout==='doc';
+  const [pageW,pageH] = isDoc ? [595,842] : [842,595];
+  const [cols,rows]   = isDoc ? [2,3]     : [2,2];
+  const perPage       = cols*rows;
+
+  setProgress(2,'Đang load font và logo...');
+
+  const pdfDoc = await PDFDocument.create();
+
+  // Load fonts
+  let fontReg, fontBold;
+  try {
+    const [rb, bb] = await Promise.all([
+      fetch('fonts/BeVietnamPro-Regular.ttf').then(r=>{ if(!r.ok) throw new Error(''); return r.arrayBuffer(); }),
+      fetch('fonts/BeVietnamPro-Bold.ttf').then(r=>{ if(!r.ok) throw new Error(''); return r.arrayBuffer(); }),
+    ]);
+    [fontReg, fontBold] = await Promise.all([
+      pdfDoc.embedFont(rb, {subset:true}),
+      pdfDoc.embedFont(bb, {subset:true}),
+    ]);
+  } catch {
+    fontReg  = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
   }
 
-  // Layout card toggle
-  document.querySelectorAll('.layout-card').forEach(card => {
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.layout-card').forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-    });
-  });
-</script>
+  // Load logo
+  let logo = null;
+  try {
+    const lb = await fetch('assets/logo-ptisos.png').then(r=>{ if(!r.ok) throw new Error(''); return r.arrayBuffer(); });
+    logo = await pdfDoc.embedPng(lb);
+  } catch { logo = null; }
 
+  const coverFiles = state.imageGroups.filter(g=>g.isCover).flatMap(g=>g.files.map(f=>({f,cap:g.name})));
+  const mainFiles  = state.imageGroups.filter(g=>!g.isCover).flatMap(g=>g.files.map(f=>({f,cap:g.name})));
+  const total = coverFiles.length + mainFiles.length;
+  let processed = 0;
+
+  // Calculate cell dims
+  const areaX = C.MARGIN;
+  const areaTop = pageH - C.MARGIN - C.HEADER_H - C.HEADER_GAP;
+  const areaW   = pageW - 2*C.MARGIN;
+  const areaH   = areaTop - (C.MARGIN + C.FOOTER_H);
+  const cellW   = (areaW - (cols-1)*C.GAP) / cols;
+  const cellH   = (areaH - (rows-1)*C.GAP) / rows;
+  const imgH    = cellH - C.CAPTION_H;
+
+  async function addPage(chunks, pageNum) {
+    const page = pdfDoc.addPage([pageW,pageH]);
+
+    // Header
+    page.drawRectangle({ x:0, y:pageH-C.MARGIN-C.HEADER_H, width:pageW, height:C.HEADER_H, color:BLUE });
+
+    // Logo
+    if (logo) {
+      const lx = C.MARGIN;
+      const ly = pageH - C.MARGIN - C.HEADER_H/2 - C.LOGO_SIZE/2;
+      page.drawImage(logo, { x:lx, y:ly, width:C.LOGO_SIZE, height:C.LOGO_SIZE });
+    }
+
+    // Header text
+    const textX = C.MARGIN + C.LOGO_SIZE + 3;
+    const textW = pageW - textX - C.MARGIN;
+    const headerBottom = pageH - C.MARGIN - C.HEADER_H;
+    const headerMid = headerBottom + C.HEADER_H/2;
+
+    const line1 = `Giám định chi tiết xe ô tô biển kiểm soát : ${state.bks}`;
+    const line2 = `Địa điểm tại Gara : ${state.gaRa}`;
+    const line3 = state.ngay ? `${state.gdv}  —  Ngày: ${state.ngay}` : state.gdv;
+    const sp = 2;
+    const totalTH = 16+sp+15+sp+14;
+    let ty = headerMid + totalTH/2 - 16;
+
+    function drawCenteredText(text, font, size, y) {
+      let fs = size;
+      let w = font.widthOfTextAtSize(text, fs);
+      while (w > textW && fs > 8) { fs -= 0.5; w = font.widthOfTextAtSize(text, fs); }
+      const cx = textX + (textW - w)/2;
+      page.drawText(text, { x:cx, y, size:fs, font, color:WHITE, maxWidth:textW });
+    }
+
+    drawCenteredText(line1, fontBold, 16, ty); ty -= (16+sp);
+    drawCenteredText(line2, fontReg,  15, ty); ty -= (15+sp);
+    drawCenteredText(line3, fontReg,  14, ty);
+
+    // Footer
+    const fy = C.MARGIN/2;
+    page.drawText('Phòng Giám định và Cứu hộ tại Quảng Ninh', { x:C.MARGIN, y:fy, size:13, font:fontReg, color:GRAY });
+    const pnStr = String(pageNum);
+    const pnW = fontReg.widthOfTextAtSize(pnStr, 13);
+    page.drawText(pnStr, { x:pageW-C.MARGIN-pnW, y:fy, size:13, font:fontReg, color:BLUE });
+
+    // Images
+    for (let idx=0; idx<chunks.length; idx++) {
+      const {f, cap} = chunks[idx];
+      const col = idx % cols;
+      const row = Math.floor(idx / cols);
+      const cellX = areaX + col*(cellW + C.GAP);
+      const cellY = areaTop - (row+1)*cellH - row*C.GAP;
+
+      // Grid border
+      page.drawRectangle({ x:cellX, y:cellY, width:cellW, height:cellH, borderColor:LGRAY, borderWidth:0.5 });
+
+      // Process image
+      try {
+        const imgBytes = await processImage(f, cellW, imgH);
+        const pdfImg = await pdfDoc.embedPng(imgBytes);
+        page.drawImage(pdfImg, { x:cellX, y:cellY+C.CAPTION_H, width:cellW, height:imgH });
+      } catch(e) { console.warn('Ảnh lỗi:', f.name, e); }
+
+      // Caption
+      page.drawRectangle({ x:cellX, y:cellY, width:cellW, height:C.CAPTION_H, color:BLUE });
+      let capSize = 14;
+      let capW = fontReg.widthOfTextAtSize(cap, capSize);
+      while (capW > cellW-4 && capSize > 7) { capSize -= 0.5; capW = fontReg.widthOfTextAtSize(cap, capSize); }
+      const capX = cellX + (cellW - capW)/2;
+      const capY = cellY + (C.CAPTION_H - capSize*0.8)/2;
+      page.drawText(cap, { x:capX, y:capY, size:capSize, font:fontReg, color:WHITE });
+
+      processed++;
+      setProgress(Math.round(5+processed/total*90), `Đang xử lý ảnh ${processed}/${total}: ${f.name.slice(0,40)}`);
+    }
+  }
+
+  let pageNum = 0;
+
+  // Cover page
+  if (coverFiles.length) {
+    pageNum++;
+    setProgress(5, `Đang tạo trang nhận dạng xe...`);
+    await addPage(coverFiles.slice(0, perPage), pageNum);
+  }
+
+  // Main pages
+  const nMain = Math.ceil(mainFiles.length / perPage);
+  for (let i=0; i<nMain; i++) {
+    pageNum++;
+    const chunk = mainFiles.slice(i*perPage, (i+1)*perPage);
+    await addPage(chunk, pageNum);
+  }
+
+  setProgress(98, 'Đang hoàn thiện PDF...');
+  state.pdfBytes = await pdfDoc.save();
+  setProgress(100, 'Hoàn thành!');
+}
+
+// ════════════════════════════════════════════════════════
+//  IMAGE PROCESSING (Canvas)
+// ════════════════════════════════════════════════════════
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload  = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không load được ảnh: '+file.name)); };
+    img.src = url;
+  });
+}
+
+async function processImage(file, targetWpt, targetHpt) {
+  const SCALE = 2;  // render at 2× points for quality
+  const cW = Math.round(targetWpt * SCALE);
+  const cH = Math.round(targetHpt * SCALE);
+
+  const img = await loadImage(file);
+
+  // Step 1: draw to intermediate canvas, applying rotation if portrait
+  const needRotate = img.naturalWidth < img.naturalHeight;
+  const srcW = needRotate ? img.naturalHeight : img.naturalWidth;
+  const srcH = needRotate ? img.naturalWidth  : img.naturalHeight;
+
+  const mid = document.createElement('canvas');
+  mid.width  = srcW;
+  mid.height = srcH;
+  const mctx = mid.getContext('2d');
+  if (needRotate) {
+    mctx.translate(srcW/2, srcH/2);
+    mctx.rotate(-Math.PI/2);
+    mctx.drawImage(img, -img.naturalWidth/2, -img.naturalHeight/2);
+  } else {
+    mctx.drawImage(img, 0, 0);
+  }
+
+  // Step 2: center-crop to target ratio
+  const targetRatio = targetWpt / targetHpt;
+  const imgRatio    = srcW / srcH;
+  let sx, sy, sw, sh;
+  if (imgRatio > targetRatio) {
+    sh = srcH; sw = sh * targetRatio;
+    sx = (srcW - sw)/2; sy = 0;
+  } else {
+    sw = srcW; sh = sw / targetRatio;
+    sx = 0; sy = (srcH - sh)/2;
+  }
+
+  // Step 3: draw cropped + rounded onto final canvas
+  const out = document.createElement('canvas');
+  out.width  = cW;
+  out.height = cH;
+  const ctx = out.getContext('2d');
+  const r = Math.round(cW * 0.04);
+  // Manual rounded rect clip (compatible with all browsers)
+  ctx.beginPath();
+  ctx.moveTo(r,0); ctx.lineTo(cW-r,0);
+  ctx.quadraticCurveTo(cW,0,cW,r);
+  ctx.lineTo(cW,cH-r); ctx.quadraticCurveTo(cW,cH,cW-r,cH);
+  ctx.lineTo(r,cH);    ctx.quadraticCurveTo(0,cH,0,cH-r);
+  ctx.lineTo(0,r);     ctx.quadraticCurveTo(0,0,r,0);
+  ctx.closePath(); ctx.clip();
+  ctx.drawImage(mid, sx, sy, sw, sh, 0, 0, cW, cH);
+
+  return new Promise(resolve => out.toBlob(b => b.arrayBuffer().then(resolve), 'image/png', 0.92));
+}
+</script>
 </body>
 </html>
