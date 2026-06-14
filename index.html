@@ -362,6 +362,17 @@ input[type=file]{display:none}
 
 <script>
 // ════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════
+// Loại bỏ ký tự binary/control khỏi chuỗi, chỉ giữ text đọc được
+function cleanText(s) {
+  return String(s)
+    .replace(/[\x00-\x1F\x7F\x80-\x9F]/g, '')  // control chars
+    .replace(/[^\p{L}\p{N}\p{P}\p{Z}\p{S}]/gu, '') // non-printable unicode
+    .trim();
+}
+
+// ════════════════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════════════════
 const state = {
@@ -418,18 +429,26 @@ document.getElementById('excelInput').addEventListener('change', e => {
     try {
       const wb = XLSX.read(new Uint8Array(ev.target.result), {type:'array'});
       const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, {header:1});
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:false});
       let bks='', gaRa='';
-      for (let i=0;i<Math.min(4,rows.length);i++) {
-        const val = rows[i].find(c=>c&&String(c).trim()&&!String(c).startsWith('Địa chỉ'));
-        if (val) { gaRa=String(val).trim(); break; }
+      for (let i=0;i<Math.min(6,rows.length);i++) {
+        const val = rows[i].find(c => {
+          if (!c) return false;
+          const s = cleanText(String(c));
+          // Bỏ qua nếu là binary (chứa ký tự lạ như JFIF, ICC_PROFILE)
+          if (!s || s.length < 2 || /JFIF|ICC_PROFILE|mntrRGB|acsp/i.test(s)) return false;
+          if (s.startsWith('Địa chỉ') || s.startsWith('STT') || s.startsWith('TT')) return false;
+          // Chỉ chấp nhận chuỗi có ít nhất 2 ký tự chữ bình thường
+          return /[\p{L}\d]/u.test(s);
+        });
+        if (val) { gaRa = cleanText(String(val)).slice(0, 120); break; }
       }
       for (const row of rows.slice(0,20)) {
         for (let i=0;i<row.length;i++) {
           const c=row[i];
           if (c && /Biển số|Biển kiểm soát|Bien so|BKS/i.test(String(c))) {
             for (let j=i+1;j<row.length;j++) {
-              if (row[j]) { bks=String(row[j]).trim(); break; }
+              if (row[j]) { bks = cleanText(String(row[j])).slice(0, 30); break; }
             }
             if (bks) break;
           }
@@ -766,12 +785,23 @@ async function generatePDF() {
     const totalTH = 16+sp+15+sp+14;
     let ty = headerMid + totalTH/2 - 16;
 
-    function drawCenteredText(text, font, size, y) {
+    function drawCenteredText(rawText, font, size, y) {
+      // Sanitize trước khi vẽ
+      let text = cleanText(rawText).replace(/\s+/g,' ').trim();
+      if (!text) return;
       let fs = size;
       let w = font.widthOfTextAtSize(text, fs);
-      while (w > textW && fs > 8) { fs -= 0.5; w = font.widthOfTextAtSize(text, fs); }
-      const cx = textX + (textW - w)/2;
-      page.drawText(text, { x:cx, y, size:fs, font, color:WHITE, maxWidth:textW });
+      // Thu nhỏ font xuống tối thiểu 9pt
+      while (w > textW && fs > 9) { fs -= 0.5; w = font.widthOfTextAtSize(text, fs); }
+      // Vẫn còn tràn → cắt bớt và thêm …
+      if (w > textW) {
+        while (text.length > 1 && font.widthOfTextAtSize(text + '…', fs) > textW)
+          text = text.slice(0, -1);
+        text += '…';
+        w = font.widthOfTextAtSize(text, fs);
+      }
+      const cx = textX + (textW - w) / 2;
+      page.drawText(text, { x: cx, y, size: fs, font, color: WHITE });
     }
 
     drawCenteredText(line1, fontBold, 16, ty); ty -= (16+sp);
