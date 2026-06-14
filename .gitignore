@@ -1,0 +1,16 @@
+# Ảnh tạm và PDF kết xuất
+output/
+renamed/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor
+.vscode/
+*.swp
+
+# Windows
+Thumbs.db
+desktop.ini

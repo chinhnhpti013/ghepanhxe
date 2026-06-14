@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ảnh Giám Định Xe — PTI SOS Quảng Ninh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #1565C0;
+      --blue-dark:   #0D47A1;
+      --blue-light:  #E3F2FD;
+      --blue-mid:    #1976D2;
+      --gray:        #757575;
+      --gray-light:  #F5F5F5;
+      --gray-border: #E0E0E0;
+      --white:       #FFFFFF;
+      --text:        #212121;
+      --radius:      10px;
+      --shadow:      0 2px 12px rgba(21,101,192,.12);
+    }
+
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      color: var(--text);
+      background: var(--gray-light);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: var(--blue);
+      color: var(--white);
+      padding: 0 24px;
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 0;
+    }
+    .header-logo {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 8px;
+      background: var(--white);
+      padding: 4px;
+    }
+    .header-text h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .header-text p {
+      font-size: 0.85rem;
+      opacity: .85;
+      margin-top: 3px;
+    }
+    .header-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.35);
+      color: var(--white);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 900px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+
+    /* ── SECTION TITLE ── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-label .step-num {
+      width: 32px; height: 32px;
+      background: var(--blue);
+      color: var(--white);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .95rem;
+      flex-shrink: 0;
+    }
+    .section-label h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+    }
+    .section-label .subtitle {
+      font-size: .82rem;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--gray-border);
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .card-header {
+      background: var(--blue);
+      color: var(--white);
+      padding: 14px 20px;
+      font-weight: 700;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-body {
+      padding: 20px;
+    }
+
+    /* ── STEPS TIMELINE ── */
+    .timeline {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+    }
+    .timeline-step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+    }
+    .timeline-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: -1px;
+      width: calc(100% - 32px);
+      left: calc(50% + 16px);
+      height: 3px;
+      background: var(--blue-light);
+      z-index: 0;
+    }
+    .timeline-step.done::after { background: var(--blue); }
+    .step-circle {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--blue-light);
+      border: 3px solid var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 10px;
+      font-weight: 700; color: var(--blue);
+      font-size: 1rem;
+      position: relative; z-index: 1;
+    }
+    .timeline-step h3 {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+    }
+    .timeline-step p {
+      font-size: .75rem;
+      color: var(--gray);
+      margin-top: 3px;
+    }
+
+    /* ── FOLDER STRUCTURE ── */
+    .folder-tree {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: .82rem;
+      line-height: 1.8;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      border-radius: 8px;
+      padding: 16px 20px;
+    }
+    .folder-tree .dir  { color: #64B5F6; font-weight: 600; }
+    .folder-tree .file { color: #A5D6A7; }
+    .folder-tree .desc { color: #9E9E9E; }
+    .folder-tree .key  { color: #FFD54F; font-weight: 600; }
+
+    /* ── COMMAND BLOCK ── */
+    .cmd-block {
+      background: #1a1a2e;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .cmd-block code {
+      display: block;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: .85rem;
+      color: #A5D6A7;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .cmd-block .cmd-label {
+      font-size: .72rem;
+      font-weight: 700;
+      color: #64B5F6;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .cmd-block .comment { color: #9E9E9E; }
+    .copy-btn {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #ccc;
+      border-radius: 5px;
+      padding: 3px 10px;
+      font-size: .72rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .2s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,.2); color: #fff; }
+    .copy-btn.copied { color: #A5D6A7; }
+
+    /* ── PARAM TABLE ── */
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+    }
+    .param-table th {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      padding: 8px 14px;
+      text-align: left;
+      font-weight: 700;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .param-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--gray-border);
+      vertical-align: top;
+    }
+    .param-table tr:last-child td { border-bottom: none; }
+    .param-table tr:nth-child(even) td { background: #FAFAFA; }
+    .param-table .param-name {
+      font-family: 'Consolas', monospace;
+      color: var(--blue);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-req {
+      display: inline-block;
+      background: #E53935;
+      color: #fff;
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: .7rem;
+      font-weight: 700;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    .badge-opt {
+      display: inline-block;
+      background: #43A047;
+      color: #fff;
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: .7rem;
+      font-weight: 700;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+
+    /* ── LAYOUT PREVIEW ── */
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .layout-card {
+      border: 2px solid var(--gray-border);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .layout-card:hover, .layout-card.active {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(21,101,192,.12);
+    }
+    .layout-preview {
+      display: inline-grid;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .layout-preview .cell {
+      background: var(--blue-light);
+      border: 1.5px solid var(--blue);
+      border-radius: 3px;
+    }
+    .layout-preview.doc  { grid-template-columns: repeat(2,28px); grid-template-rows: repeat(3,20px); }
+    .layout-preview.ngang { grid-template-columns: repeat(2,36px); grid-template-rows: repeat(2,24px); }
+    .layout-card h4 { font-size: .88rem; font-weight: 700; color: var(--blue-dark); }
+    .layout-card p  { font-size: .78rem; color: var(--gray); margin-top: 4px; }
+
+    /* ── TIPS ── */
+    .tip-box {
+      display: flex;
+      gap: 12px;
+      background: var(--blue-light);
+      border-left: 4px solid var(--blue);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      font-size: .85rem;
+      color: var(--blue-dark);
+    }
+    .tip-box .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .warn-box {
+      background: #FFF8E1;
+      border-left-color: #F57F17;
+      color: #5D4037;
+    }
+    .warn-box .icon { color: #F57F17; }
+
+    /* ── DEPS ── */
+    .dep-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .dep-chip {
+      background: var(--blue-light);
+      border: 1px solid #BBDEFB;
+      color: var(--blue-dark);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: .8rem;
+      font-weight: 600;
+      font-family: 'Consolas', monospace;
+    }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      background: var(--blue-dark);
+      color: rgba(255,255,255,.7);
+      text-align: center;
+      padding: 22px 16px;
+      font-size: .8rem;
+      margin-top: 40px;
+    }
+    .site-footer strong { color: var(--white); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .layout-grid { grid-template-columns: 1fr; }
+      .header-badge { display: none; }
+      .timeline { flex-direction: column; gap: 12px; }
+      .timeline-step::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ SITE HEADER ══ -->
+<header class="site-header">
+  <div class="header-inner">
+    <img src="assets/logo-ptisos.png" alt="PTI SOS" class="header-logo"
+         onerror="this.style.display='none'" />
+    <div class="header-text">
+      <h1>Ảnh Giám Định Xe Theo Tên File</h1>
+      <p>Phòng Giám định và Cứu hộ tại Quảng Ninh — PTI SOS</p>
+    </div>
+    <span class="header-badge">v2.0</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══ TIMELINE ══ -->
+  <div class="timeline">
+    <div class="timeline-step done">
+      <div class="step-circle">1</div>
+      <h3>Chuẩn bị ảnh</h3>
+      <p>Đặt ảnh vào<br/>thư mục input/</p>
+    </div>
+    <div class="timeline-step done">
+      <div class="step-circle">2</div>
+      <h3>Đặt tên file</h3>
+      <p>Chạy<br/>dat_ten_file.py</p>
+    </div>
+    <div class="timeline-step">
+      <div class="step-circle">3</div>
+      <h3>Ghép PDF</h3>
+      <p>Chạy<br/>ghep_anh.py</p>
+    </div>
+  </div>
+
+  <!-- ══ GIỚI THIỆU ══ -->
+  <div class="card">
+    <div class="card-header">📋 Tổng quan</div>
+    <div class="card-body">
+      <p style="font-size:.9rem;line-height:1.7;color:#424242;margin-bottom:12px;">
+        Công cụ tự động ghép ảnh hiện trường xe ô tô thành file <strong>PDF khổ A4 chuẩn</strong>
+        với tiêu đề, logo PTI SOS, caption từng hạng mục và số trang.
+        Quy trình gồm <strong>2 bước</strong>: đặt tên file theo thư mục → ghép ảnh vào khung PDF.
+      </p>
+      <div class="dep-list">
+        <span class="dep-chip">Python 3.10+</span>
+        <span class="dep-chip">Pillow ≥ 10</span>
+        <span class="dep-chip">ReportLab ≥ 4</span>
+        <span class="dep-chip">openpyxl ≥ 3.1</span>
+        <span class="dep-chip">python-docx ≥ 1.1</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CẤU TRÚC THƯ MỤC ══ -->
+  <div class="section-label">
+    <div class="step-num">📁</div>
+    <div>
+      <h2>Cấu trúc thư mục</h2>
+      <div class="subtitle">Đặt ảnh đúng vị trí trước khi chạy</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:28px;">
+    <div class="card-body" style="padding:0;">
+      <div class="folder-tree">
+<span class="key">anh-giam-dinh-vcx-theo-ten-file/</span>
+├── <span class="dir">input/</span>                        <span class="desc">← ảnh gốc + file báo giá</span>
+│   ├── <span class="dir">0.1 Hiện trạng tổng thể xe/</span>  <span class="desc">← ảnh nhận dạng (prefix 0)</span>
+│   ├── <span class="dir">0.2 Số khung xe/</span>
+│   ├── <span class="dir">1. Đèn hậu bên phải vỡ/</span>    <span class="desc">← ảnh hạng mục (prefix 1, 2...)</span>
+│   ├── <span class="dir">2. Hông xe bên phải bẹp xước/</span>
+│   └── <span class="file">Bao_gia.xlsx</span>              <span class="desc">← nguồn BKS + tên ga-ra</span>
+├── <span class="dir">renamed/</span>                      <span class="desc">← ảnh đã đặt tên (tự tạo)</span>
+│   └── <span class="file">mapping.json</span>
+├── <span class="dir">output/</span>                       <span class="desc">← PDF kết xuất</span>
+├── <span class="dir">assets/</span><span class="file">logo-ptisos.png</span>
+├── <span class="dir">fonts/</span><span class="file">BeVietnamPro-*.ttf</span>
+├── <span class="key">dat_ten_file.py</span>               <span class="desc">← Giai đoạn 1</span>
+├── <span class="key">ghep_anh.py</span>                  <span class="desc">← Giai đoạn 2</span>
+├── <span class="file">chay_doc.bat</span>
+└── <span class="file">chay_ngang.bat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GIAI ĐOẠN 1 ══ -->
+  <div class="section-label">
+    <div class="step-num">1</div>
+    <div>
+      <h2>Giai đoạn 1 — Đặt tên file</h2>
+      <div class="subtitle">dat_ten_file.py — Đọc thư mục con, sao chép và đổi tên ảnh</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="tip-box">
+        <span class="icon">ℹ️</span>
+        <div>Thư mục <code style="background:rgba(21,101,192,.1);padding:1px 6px;border-radius:4px;">renamed/</code> sẽ tự động <strong>xóa sạch và tạo lại</strong> mỗi lần chạy — tránh file cũ gây lỗi.</div>
+      </div>
+
+      <div class="cmd-block">
+        <div class="cmd-label">Terminal</div>
+        <button class="copy-btn" onclick="copyCmd(this, 'python dat_ten_file.py')">Sao chép</button>
+        <code>python dat_ten_file.py</code>
+      </div>
+
+      <p style="font-size:.85rem;color:#424242;margin-top:4px;line-height:1.6;">
+        Kết quả: ảnh được sao chép sang <code>renamed/</code> với tên dạng
+        <code>1. Đèn hậu bên phải vỡ_1.jpg</code>, <code>..._2.jpg</code> và
+        file <code>mapping.json</code> lưu ánh xạ tên → caption.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══ GIAI ĐOẠN 2 ══ -->
+  <div class="section-label">
+    <div class="step-num">2</div>
+    <div>
+      <h2>Giai đoạn 2 — Ghép ảnh thành PDF</h2>
+      <div class="subtitle">ghep_anh.py — Tạo file PDF khổ A4 từ ảnh đã đặt tên</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+
+      <!-- Layout preview -->
+      <div class="layout-grid" style="margin-bottom:20px;">
+        <div class="layout-card active">
+          <div class="layout-preview doc">
+            <div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div>
+          </div>
+          <h4>Dọc (Portrait A4)</h4>
+          <p>Grid 2×3 — 6 ảnh/trang<br/><code>--layout doc</code></p>
+        </div>
+        <div class="layout-card">
+          <div class="layout-preview ngang">
+            <div class="cell"></div><div class="cell"></div>
+            <div class="cell"></div><div class="cell"></div>
+          </div>
+          <h4>Ngang (Landscape A4)</h4>
+          <p>Grid 2×2 — 4 ảnh/trang<br/><code>--layout ngang</code></p>
+        </div>
+      </div>
+
+      <!-- Commands -->
+      <div class="cmd-block">
+        <div class="cmd-label">Lệnh cơ bản</div>
+        <button class="copy-btn" onclick="copyCmd(this, 'python ghep_anh.py --gdv \"Nguyễn Văn A\" --layout doc')">Sao chép</button>
+        <code>python ghep_anh.py --gdv "Nguyễn Văn A" --layout doc</code>
+      </div>
+
+      <div class="cmd-block">
+        <div class="cmd-label">Có ngày giám định</div>
+        <button class="copy-btn" onclick="copyCmd(this, 'python ghep_anh.py --gdv \"Trần Thị B\" --layout doc --ngay \"14/06/2026\"')">Sao chép</button>
+        <code>python ghep_anh.py --gdv "Trần Thị B" --layout doc --ngay "14/06/2026"</code>
+      </div>
+
+      <div class="cmd-block">
+        <div class="cmd-label">Truyền BKS và Ga-ra thủ công</div>
+        <button class="copy-btn" onclick="copyCmd(this, 'python ghep_anh.py --gdv \"Lê Văn C\" --layout ngang --bks \"14C-402.84\" --gara \"Gara XYZ\"')">Sao chép</button>
+        <code>python ghep_anh.py --gdv "Lê Văn C" --layout ngang --bks "14C-402.84" --gara "Gara XYZ"</code>
+      </div>
+
+      <!-- Params table -->
+      <table class="param-table" style="margin-top:8px;">
+        <thead>
+          <tr>
+            <th>Tham số</th>
+            <th>Mô tả</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="param-name">--gdv <span class="badge-req">Bắt buộc</span></td>
+            <td>Tên giám định viên, ví dụ: <code>"Nguyễn Văn A"</code></td>
+          </tr>
+          <tr>
+            <td class="param-name">--layout</td>
+            <td><code>doc</code> (mặc định) hoặc <code>ngang</code></td>
+          </tr>
+          <tr>
+            <td class="param-name">--ngay <span class="badge-opt">Tùy chọn</span></td>
+            <td>Ngày giám định, ví dụ: <code>"14/06/2026"</code></td>
+          </tr>
+          <tr>
+            <td class="param-name">--bks <span class="badge-opt">Tùy chọn</span></td>
+            <td>Biển kiểm soát (nếu không có <code>Bao_gia.xlsx</code>)</td>
+          </tr>
+          <tr>
+            <td class="param-name">--gara <span class="badge-opt">Tùy chọn</span></td>
+            <td>Tên ga-ra / địa điểm</td>
+          </tr>
+          <tr>
+            <td class="param-name">--output <span class="badge-opt">Tùy chọn</span></td>
+            <td>Đường dẫn file PDF đầu ra tùy chỉnh</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- ══ CHẠY NHANH ══ -->
+  <div class="section-label">
+    <div class="step-num">⚡</div>
+    <div>
+      <h2>Chạy nhanh (Double-click)</h2>
+      <div class="subtitle">Không cần mở terminal — nhập tên GĐV rồi Enter</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="border:2px solid var(--blue);border-radius:8px;padding:16px;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:8px;">📄</div>
+          <h4 style="color:var(--blue-dark);font-size:.95rem;">chay_doc.bat</h4>
+          <p style="font-size:.8rem;color:var(--gray);margin-top:4px;">Layout dọc — 6 ảnh/trang<br/>Portrait A4</p>
+        </div>
+        <div style="border:2px solid var(--blue);border-radius:8px;padding:16px;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:8px;">📄</div>
+          <h4 style="color:var(--blue-dark);font-size:.95rem;">chay_ngang.bat</h4>
+          <p style="font-size:.8rem;color:var(--gray);margin-top:4px;">Layout ngang — 4 ảnh/trang<br/>Landscape A4</p>
+        </div>
+      </div>
+      <p style="font-size:.82rem;color:#424242;margin-top:14px;line-height:1.6;">
+        Sau khi chạy xong, thư mục <code>output/</code> tự mở. File PDF đặt tên theo biển số và layout,
+        ví dụ: <code>output/giam_dinh_14C-402_84_doc.pdf</code>
+      </p>
+    </div>
+  </div>
+
+  <!-- ══ LÀM LẠI HỒ SƠ MỚI ══ -->
+  <div class="section-label">
+    <div class="step-num">🔄</div>
+    <div>
+      <h2>Làm lại hồ sơ mới</h2>
+      <div class="subtitle">Quy trình reset dữ liệu cho hồ sơ tiếp theo</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="warn-box tip-box">
+        <span class="icon">⚠️</span>
+        <div>Thư mục <code>renamed/</code> tự xóa khi chạy <code>dat_ten_file.py</code>. Cần xóa thủ công file PDF cũ trong <code>output/</code>.</div>
+      </div>
+
+      <div class="cmd-block">
+        <div class="cmd-label">PowerShell</div>
+        <code><span class="comment"># 1. Xóa PDF cũ</span>
+Remove-Item output\*.pdf -Force
+
+<span class="comment"># 2. Đặt ảnh mới vào input/, cập nhật Bao_gia.xlsx nếu cần</span>
+
+<span class="comment"># 3. Chạy 2 bước</span>
+python dat_ten_file.py
+python ghep_anh.py --gdv "Tên GĐV" --layout doc --ngay "DD/MM/YYYY"</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ THIẾT KẾ PDF ══ -->
+  <div class="section-label">
+    <div class="step-num">🎨</div>
+    <div>
+      <h2>Thông số thiết kế PDF</h2>
+      <div class="subtitle">Font, màu sắc, kích thước chuẩn</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body" style="padding:0;">
+      <table class="param-table">
+        <thead>
+          <tr><th>Tham số</th><th>Giá trị</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Font</td><td>Be Vietnam Pro (Regular + Bold)</td></tr>
+          <tr><td>Màu header</td><td><span style="display:inline-block;width:14px;height:14px;background:#1565C0;border-radius:3px;vertical-align:middle;margin-right:6px;"></span><code>#1565C0</code></td></tr>
+          <tr><td>Màu caption</td><td><span style="display:inline-block;width:14px;height:14px;background:#1565C0;border-radius:3px;vertical-align:middle;margin-right:6px;"></span><code>#1565C0</code> nền, chữ trắng</td></tr>
+          <tr><td>Chiều cao header</td><td>28 mm (giảm 20% so với bản gốc 35 mm)</td></tr>
+          <tr><td>Logo PTI SOS</td><td>23 mm × 23 mm, góc trái header</td></tr>
+          <tr><td>Lề trang</td><td>8 mm</td></tr>
+          <tr><td>Khoảng cách ô ảnh</td><td>2 mm</td></tr>
+          <tr><td>Bo góc ảnh</td><td>4% chiều rộng ô ảnh</td></tr>
+          <tr><td>Footer</td><td>Tên phòng (xám trái) + số trang (xanh phải), 13 pt</td></tr>
+          <tr><td>Caption ảnh</td><td>14 pt, tự thu nhỏ nếu tràn</td></tr>
+          <tr><td>Bố cục dọc</td><td>Portrait A4, grid 2×3, 6 ảnh/trang</td></tr>
+          <tr><td>Bố cục ngang</td><td>Landscape A4, grid 2×2, 4 ảnh/trang</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ CÀI ĐẶT ══ -->
+  <div class="section-label">
+    <div class="step-num">📦</div>
+    <div>
+      <h2>Cài đặt dependencies</h2>
+      <div class="subtitle">Chạy một lần duy nhất</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="cmd-block">
+        <div class="cmd-label">pip</div>
+        <button class="copy-btn" onclick="copyCmd(this, 'pip install -r requirements.txt')">Sao chép</button>
+        <code>pip install -r requirements.txt</code>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ SITE FOOTER ══ -->
+<footer class="site-footer">
+  <strong>PTI SOS — Phòng Giám định và Cứu hộ tại Quảng Ninh</strong><br/>
+  <span style="margin-top:4px;display:inline-block;">
+    Công cụ nội bộ — Tạo ảnh giám định xe ô tô chuẩn A4
+  </span>
+</footer>
+
+<script>
+  // Copy button
+  function copyCmd(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Đã chép';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Sao chép';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Layout card toggle
+  document.querySelectorAll('.layout-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.layout-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
