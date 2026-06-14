@@ -756,6 +756,7 @@ async function runOCR(dataUrl, statusEl) {
     });
     const { data: { text } } = await worker.recognize(dataUrl);
     await worker.terminate();
+    console.log('[OCR text]', text);
 
     const bks  = extractBKS(text);
     const gaRa = extractGaRa(text);
