@@ -452,10 +452,11 @@ document.getElementById('folderInput').addEventListener('change', e => {
 
 document.getElementById('excelInput').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
+  console.log('[upload] file:', f.name, f.type);
   const reader = new FileReader();
 
   // Xử lý ảnh JPG/PNG — OCR tự động nhận dạng BKS và ga-ra
-  if (/\.(jpe?g|png)$/i.test(f.name)) {
+  if (/\.(jpe?g|png)$/i.test(f.name) || f.type.startsWith('image/')) {
     reader.onload = ev => {
       const dataUrl = ev.target.result;
       const st = document.getElementById('excelStatus');
