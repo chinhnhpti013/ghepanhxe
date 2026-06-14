@@ -10,6 +10,7 @@
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -156,9 +157,7 @@ input[type=file]{display:none}
 <!-- ── HEADER ── -->
 <header class="hdr">
   <div class="hdr-in">
-    <img src="assets/logo-ptisos.png" alt="PTI SOS" class="hdr-logo"
-         onerror="this.style.display='none';document.getElementById('logo-fb').style.display='flex'"/>
-    <div class="hdr-logo-fb" id="logo-fb" style="display:none">🚗</div>
+
     <div class="hdr-t">
       <h1>Ghép Ảnh Giám Định Xe</h1>
       <p>Phòng Giám định và Cứu hộ tại Quảng Ninh — PTI SOS</p>
@@ -455,14 +454,22 @@ document.getElementById('excelInput').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
   const reader = new FileReader();
 
-  // Xử lý ảnh JPG/PNG — hiển thị preview để nhập tay
+  // Xử lý ảnh JPG/PNG — OCR tự động nhận dạng BKS và ga-ra
   if (/\.(jpe?g|png)$/i.test(f.name)) {
     reader.onload = ev => {
+      const dataUrl = ev.target.result;
       const st = document.getElementById('excelStatus');
       st.style.display = 'block';
-      st.style.color = '#E65100';
-      st.innerHTML = `📷 Đã tải ảnh báo giá — vui lòng nhập BKS và tên ga-ra ở bước tiếp theo.<br>
-        <img src="${ev.target.result}" style="margin-top:8px;max-width:100%;max-height:180px;border-radius:6px;border:1px solid #ddd;">`;
+      st.style.color = '#1565C0';
+      st.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span id="ocrSpinner" style="display:inline-block;width:18px;height:18px;border:3px solid #90CAF9;border-top-color:#1565C0;border-radius:50%;animation:spin .8s linear infinite"></span>
+          <span id="ocrMsg">Đang nhận dạng ảnh báo giá (OCR)...</span>
+        </div>
+        <img src="${dataUrl}" style="max-width:100%;max-height:180px;border-radius:6px;border:1px solid #ddd;display:block">
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
+
+      runOCR(dataUrl, st);
     };
     reader.readAsDataURL(f);
     e.target.value = '';
@@ -729,6 +736,84 @@ function resetApp() {
   document.getElementById('fGdv').value='';
   document.getElementById('fNgay').value='';
   goStep(1);
+}
+
+// ════════════════════════════════════════════════════════
+//  OCR — Nhận dạng ảnh báo giá
+// ════════════════════════════════════════════════════════
+async function runOCR(dataUrl, statusEl) {
+  const msgEl = document.getElementById('ocrMsg');
+  const spinEl = document.getElementById('ocrSpinner');
+  try {
+    // Chạy OCR với tiếng Việt + tiếng Anh
+    const worker = await Tesseract.createWorker(['vie', 'eng'], 1, {
+      logger: m => {
+        if (m.status === 'recognizing text' && msgEl) {
+          msgEl.textContent = `Đang nhận dạng... ${Math.round((m.progress||0)*100)}%`;
+        }
+      }
+    });
+    const { data: { text } } = await worker.recognize(dataUrl);
+    await worker.terminate();
+
+    const bks  = extractBKS(text);
+    const gaRa = extractGaRa(text);
+
+    if (spinEl) spinEl.style.display = 'none';
+    if (msgEl) {
+      if (bks || gaRa) {
+        msgEl.style.color = '#2E7D32';
+        msgEl.innerHTML = `✅ OCR xong — BKS: <b>${bks||'(chưa tìm thấy)'}</b> | Ga-ra: <b>${gaRa||'(chưa tìm thấy)'}</b>`;
+      } else {
+        msgEl.style.color = '#E65100';
+        msgEl.textContent = '⚠️ Không tự nhận dạng được — vui lòng nhập tay ở bước tiếp theo.';
+      }
+    }
+    if (bks)  { state.bks  = bks; }
+    if (gaRa) { state.gaRa = gaRa; }
+
+  } catch (err) {
+    if (spinEl) spinEl.style.display = 'none';
+    if (msgEl) { msgEl.style.color='#C62828'; msgEl.textContent = '❌ OCR lỗi: '+err.message; }
+  }
+}
+
+// Trích xuất biển kiểm soát từ text OCR
+// Hỗ trợ: 29A-123.45, 14C1-402.84, 51G-999.99, v.v.
+function extractBKS(text) {
+  // Chuẩn hóa: chữ thường O → 0, chữ I → 1 trong phần số
+  const normalized = text.replace(/[Oo]/g, '0').replace(/[lI|]/g, '1');
+  // Pattern: 2 số + 1-2 chữ + dấu gạch ngang + 3-4 số + dấu chấm + 2 số
+  const m = normalized.match(/\b(\d{2}[A-Za-z]{1,2}[-\s]?\d{3,4}[.\-]\d{2})\b/);
+  if (!m) return '';
+  // Chuẩn hóa dấu phân cách
+  return m[1].replace(/\s/g,'').toUpperCase();
+}
+
+// Trích xuất tên ga-ra / địa điểm từ text OCR
+function extractGaRa(text) {
+  const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
+
+  // Tìm dòng chứa từ khóa địa điểm
+  const keywords = /ga[\s-]?ra|gara|garage|địa điểm|sửa chữa|cơ sở|trung tâm|auto|ô tô|xe máy/i;
+  for (const line of lines) {
+    if (keywords.test(line)) {
+      // Lấy phần sau dấu ":", "–", "-" nếu có; nếu không lấy cả dòng
+      const m = line.match(/[:–-]\s*(.+)/);
+      const candidate = m ? m[1].trim() : line.trim();
+      if (candidate.length >= 4 && candidate.length <= 120) return candidate;
+    }
+  }
+
+  // Fallback: lấy dòng đầu tiên có từ 3 từ trở lên (thường là tên công ty/gara)
+  for (const line of lines.slice(0, 8)) {
+    const words = line.split(/\s+/).filter(Boolean);
+    if (words.length >= 3 && words.length <= 15 && line.length <= 100
+        && !/^\d/.test(line) && !/[=]{3,}/.test(line)) {
+      return line;
+    }
+  }
+  return '';
 }
 
 // ════════════════════════════════════════════════════════
