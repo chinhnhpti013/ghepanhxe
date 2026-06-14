@@ -604,7 +604,7 @@ function renderGroups(groups) {
     const item = document.createElement('div');
     item.className = 'group-item';
     item.innerHTML = `
-      <img class="group-thumb" src="${thumbUrl}" alt="" onload="URL.revokeObjectURL(this.src)"/>
+      <img class="group-thumb" src="${thumbUrl}" alt="" onload="(window.URL||window.webkitURL).revokeObjectURL(this.src)"/>
       <div class="group-info">
         <div class="group-name">${g.name}</div>
         <div class="group-count">${g.files.length} ảnh</div>
@@ -719,10 +719,11 @@ async function startGenerate() {
 function downloadPDF() {
   if (!state.pdfBytes) return;
   const blob = new Blob([state.pdfBytes], {type:'application/pdf'});
-  const url = URL.createObjectURL(blob);
+  const _URL = window.URL || window.webkitURL;
+  const url = _URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href=url; a.download=state.pdfName; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  setTimeout(()=>_URL.revokeObjectURL(url),1000);
 }
 
 function resetApp() {
@@ -1004,11 +1005,12 @@ async function generatePDF() {
 //  IMAGE PROCESSING (Canvas)
 // ════════════════════════════════════════════════════════
 function loadImage(file) {
+  const _URL = window.URL || window.webkitURL;
   return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
+    const url = _URL.createObjectURL(file);
     const img = new Image();
-    img.onload  = () => { URL.revokeObjectURL(url); resolve(img); };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không load được ảnh: '+file.name)); };
+    img.onload  = () => { _URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = () => { _URL.revokeObjectURL(url); reject(new Error('Không load được ảnh: '+file.name)); };
     img.src = url;
   });
 }
