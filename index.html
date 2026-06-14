@@ -255,6 +255,16 @@ input[type=file]{display:none}
     <div class="card-hd">🚗 Thông tin giám định</div>
     <div class="card-bd">
       <div class="alert alert-err" id="alertErr2"></div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Kiểu bản ảnh giám định<span>*</span></label>
+        <select id="fLoai">
+          <option value="chitiet">Giám định chi tiết xe ô tô — biển kiểm soát</option>
+          <option value="hientruong">Giám định hiện trường xe ô tô — biển kiểm soát</option>
+          <option value="giayto">Giám định giấy tờ xe ô tô — biển kiểm soát</option>
+        </select>
+        <div id="loaiPreview" style="margin-top:6px;padding:7px 12px;background:var(--blue-l);border:1px solid #BBDEFB;border-radius:6px;font-size:.8rem;color:var(--blue-d);font-weight:600"></div>
+      </div>
+
       <div class="form-grid">
         <div class="form-group">
           <label>Biển kiểm soát (BKS)<span>*</span></label>
@@ -382,10 +392,16 @@ function cleanText(s) {
 // ════════════════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════════════════
+const LOAI_MAP = {
+  chitiet:    'Giám định chi tiết xe ô tô biển kiểm soát',
+  hientruong: 'Giám định hiện trường xe ô tô biển kiểm soát',
+  giayto:     'Giám định giấy tờ xe ô tô biển kiểm soát',
+};
+
 const state = {
   step: 1,
   imageGroups: [],   // [{name, files:[File], iscover}] sorted
-  bks: '', gaRa: '', gdv: '', ngay: '', layout: 'doc',
+  bks: '', gaRa: '', gdv: '', ngay: '', layout: 'doc', loai: 'chitiet',
   pdfBytes: null,
   pdfName: ''
 };
@@ -633,9 +649,20 @@ function validateStep1() {
 // ════════════════════════════════════════════════════════
 //  STEP 2 — FORM
 // ════════════════════════════════════════════════════════
+function updateLoaiPreview() {
+  const loai = document.getElementById('fLoai').value;
+  const bks  = document.getElementById('fBks').value.trim() || '{BKS}';
+  document.getElementById('loaiPreview').textContent =
+    `→ Dòng tiêu đề: "${LOAI_MAP[loai]} : ${bks}"`;
+}
+
+document.getElementById('fLoai').addEventListener('change', updateLoaiPreview);
+document.getElementById('fBks').addEventListener('input',   updateLoaiPreview);
+
 function prefillStep2() {
   if (state.bks)  { document.getElementById('fBks').value  = state.bks;  document.getElementById('fBks').classList.add('filled'); }
   if (state.gaRa) { document.getElementById('fGara').value = state.gaRa; document.getElementById('fGara').classList.add('filled'); }
+  updateLoaiPreview();
 }
 
 function selectLayout(v) {
@@ -657,6 +684,7 @@ function validateStep2() {
   state.gaRa = gara;
   state.gdv  = gdv;
   state.ngay = document.getElementById('fNgay').value.trim();
+  state.loai = document.getElementById('fLoai').value;
   return true;
 }
 
@@ -670,7 +698,7 @@ function buildSummary() {
   const nPages = (coverImgs.length?1:0) + Math.ceil(mainImgs.length/perPage);
 
   document.getElementById('summaryRows').innerHTML = `
-    <div class="summary-row"><span class="lbl">Biển kiểm soát</span><span class="val">${state.bks}</span></div>
+    <div class="summary-row"><span class="lbl">Kiểu bản ảnh</span><span class="val">${LOAI_MAP[state.loai]} : ${state.bks}</span></div>
     <div class="summary-row"><span class="lbl">Ga-ra / Địa điểm</span><span class="val">${state.gaRa}</span></div>
     <div class="summary-row"><span class="lbl">Giám định viên</span><span class="val">${state.gdv}</span></div>
     <div class="summary-row"><span class="lbl">Ngày giám định</span><span class="val">${state.ngay||'(không có)'}</span></div>
@@ -737,6 +765,8 @@ function resetApp() {
   document.getElementById('fGara').value=''; document.getElementById('fGara').classList.remove('filled');
   document.getElementById('fGdv').value='';
   document.getElementById('fNgay').value='';
+  document.getElementById('fLoai').value='chitiet';
+  updateLoaiPreview();
   goStep(1);
 }
 
@@ -912,7 +942,7 @@ async function generatePDF() {
     const headerBottom = pageH - C.MARGIN - C.HEADER_H;
     const headerMid = headerBottom + C.HEADER_H/2;
 
-    const line1 = `Giám định chi tiết xe ô tô biển kiểm soát : ${state.bks}`;
+    const line1 = `${LOAI_MAP[state.loai] || LOAI_MAP.chitiet} : ${state.bks}`;
     const line2 = `Địa điểm tại Gara : ${state.gaRa}`;
     const line3 = state.ngay ? `${state.gdv}  —  Ngày: ${state.ngay}` : state.gdv;
     const sp = 2;
