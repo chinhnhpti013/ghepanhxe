@@ -193,16 +193,16 @@ input[type=file]{display:none}
   <div class="card">
     <div class="card-hd">📁 Chọn thư mục ảnh</div>
     <div class="card-bd">
-      <div class="drop-zone" id="dropZone" onclick="document.getElementById('folderInput').click()">
+      <div class="drop-zone" id="dropZone" onclick="pickFolder()">
         <span class="drop-icon">🖼️</span>
         <h3>Kéo thả nhiều thư mục ảnh vào đây</h3>
-        <p>Hoặc nhấn nút bên dưới để duyệt thư mục<br/>
+        <p>Hoặc nhấn nút bên dưới để chọn thư mục<br/>
            <small style="color:#aaa">Hỗ trợ: JPG, PNG, BMP, WEBP — có thể thêm nhiều thư mục</small></p>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-          <button class="btn-upload" onclick="event.stopPropagation();document.getElementById('folderInput').click()">
+          <button class="btn-upload" onclick="event.stopPropagation();pickFolder()">
             📂 Chọn thư mục
           </button>
-          <button class="btn-upload" id="btnAddFolder" style="display:none;background:#2E7D32" onclick="event.stopPropagation();document.getElementById('folderInput').click()">
+          <button class="btn-upload" id="btnAddFolder" style="display:none;background:#2E7D32" onclick="event.stopPropagation();pickFolder()">
             ➕ Thêm thư mục
           </button>
           <button class="btn-upload" id="btnClearFolders" style="display:none;background:#B71C1C" onclick="event.stopPropagation();clearFolders()">
@@ -466,6 +466,54 @@ document.getElementById('folderInput').addEventListener('change', e => {
   e.target.value = '';
 });
 
+// ── pickFolder: dùng showDirectoryPicker nếu trình duyệt hỗ trợ (Chrome/Edge), ──
+//   ngược lại fallback về webkitdirectory input
+async function pickFolder() {
+  if (window.showDirectoryPicker) {
+    try {
+      const handle = await window.showDirectoryPicker({ mode: 'read' });
+      const files = await readDirHandle(handle, handle.name);
+      if (files.length) mergeFiles(files);
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        // Fallback nếu API bị từ chối
+        document.getElementById('folderInput').click();
+      }
+    }
+  } else {
+    document.getElementById('folderInput').click();
+  }
+}
+
+// Đọc đệ quy toàn bộ ảnh từ FileSystemDirectoryHandle
+async function readDirHandle(handle, relBase) {
+  const files = [];
+  for await (const [name, entry] of handle.entries()) {
+    const relPath = relBase + '/' + name;
+    if (entry.kind === 'file') {
+      const ext = name.slice(name.lastIndexOf('.')).toLowerCase();
+      if (!IMAGE_EXTS.has(ext)) continue;
+      const file = await entry.getFile();
+      // Gắn webkitRelativePath giả để mergeFiles/handleFiles dùng được
+      try {
+        Object.defineProperty(file, 'webkitRelativePath', { value: relPath, configurable: true });
+      } catch (_) {
+        // Nếu không gắn được (đã sealed), tạo Proxy wrapper
+        const proxy = new Proxy(file, {
+          get(t, p) { if (p === 'webkitRelativePath') return relPath; const v = t[p]; return typeof v === 'function' ? v.bind(t) : v; }
+        });
+        files.push(proxy);
+        continue;
+      }
+      files.push(file);
+    } else if (entry.kind === 'directory') {
+      const sub = await readDirHandle(entry, relPath);
+      files.push(...sub);
+    }
+  }
+  return files;
+}
+
 document.getElementById('excelInput').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
   console.log('[upload] file:', f.name, f.type);
@@ -537,42 +585,56 @@ document.getElementById('excelInput').addEventListener('change', e => {
   e.target.value='';
 });
 
-// Drag & drop
+// Drag & drop — async để tránh race condition khi kéo thả nhiều thư mục cùng lúc
 const dz = document.getElementById('dropZone');
 ['dragover','dragenter'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
 ['dragleave','dragend'].forEach(ev => dz.addEventListener(ev, () => dz.classList.remove('drag')));
-dz.addEventListener('drop', e => {
+dz.addEventListener('drop', async e => {
   e.preventDefault(); dz.classList.remove('drag');
-  const items = [...e.dataTransfer.items];
-  const files = [];
-  let pending = 0;
-  function scanEntry(entry) {
+  const entries = [...e.dataTransfer.items]
+    .map(item => item.webkitGetAsEntry()).filter(Boolean);
+  if (!entries.length) return;
+
+  // Đọc đệ quy một entry (file hoặc thư mục)
+  async function scanEntry(entry) {
+    const result = [];
     if (entry.isFile) {
-      pending++;
-      entry.file(f => {
+      await new Promise(resolve => entry.file(f => {
         const ext = f.name.slice(f.name.lastIndexOf('.')).toLowerCase();
         if (IMAGE_EXTS.has(ext)) {
-          // Reconstruct webkitRelativePath via fullPath
-          Object.defineProperty(f,'webkitRelativePath',{value:entry.fullPath.replace(/^\//,''),writable:false});
-          files.push(f);
+          try {
+            Object.defineProperty(f, 'webkitRelativePath',
+              { value: entry.fullPath.replace(/^\//, ''), configurable: true });
+          } catch (_) {}
+          result.push(f);
         }
-        if (--pending===0) mergeFiles(files);
-      });
+        resolve();
+      }));
     } else if (entry.isDirectory) {
-      const reader = entry.createReader();
-      function readMore() {
-        pending++;
-        reader.readEntries(entries => {
-          if (!entries.length) { if (--pending===0 && files.length) mergeFiles(files); return; }
-          entries.forEach(scanEntry);
-          if (--pending===0 && files.length) mergeFiles(files);
-          if (entries.length===100) readMore();
-        });
-      }
-      readMore();
+      const allSub = await readDirEntry(entry);
+      result.push(...allSub);
     }
+    return result;
   }
-  items.forEach(item => { const e = item.webkitGetAsEntry(); if (e) scanEntry(e); });
+
+  // Đọc toàn bộ ảnh từ một DirectoryEntry (xử lý batch 100 entries)
+  async function readDirEntry(dirEntry) {
+    const result = [];
+    const reader = dirEntry.createReader();
+    let batch;
+    do {
+      batch = await new Promise((res, rej) => reader.readEntries(res, rej));
+      for (const sub of batch) {
+        const files = await scanEntry(sub);
+        result.push(...files);
+      }
+    } while (batch.length === 100);
+    return result;
+  }
+
+  // Xử lý tất cả entries song song
+  const allFiles = (await Promise.all(entries.map(scanEntry))).flat();
+  if (allFiles.length) mergeFiles(allFiles);
 });
 
 function handleFiles(files) {
