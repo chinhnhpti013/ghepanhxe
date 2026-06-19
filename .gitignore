@@ -1,3 +1,6 @@
+# Biến môi trường (chứa API key)
+.env
+
 # Ảnh tạm và PDF kết xuất
 output/
 renamed/
