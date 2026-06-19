@@ -16,7 +16,7 @@ anh-giam-dinh-vcx-theo-ten-file/
 │   ├── 1. Cốp sau lõm bẹp/       ← ảnh hạng mục (prefix 1, 2, 3...)
 │   ├── 2. Can sau trái bẹp lõm/
 │   ├── Bao_gia.xlsx              ← nguồn BKS + tên ga-ra (nếu có)
-│   └── Bao-gia.jpg               ← hoặc ảnh chụp báo giá (đọc bằng mắt, truyền --bks --gara)
+│   └── Bao-gia.jpg               ← ảnh chụp báo giá → Gemini Vision OCR tự động đọc BKS + ga-ra
 ├── renamed/                      ← ảnh đã đổi tên (do dat_ten_file.py tạo)
 │   └── mapping.json              ← tên file → tên thư mục gốc (caption)
 ├── output/                       ← PDF kết xuất
@@ -101,7 +101,7 @@ Giám định chi tiết xe ô tô biển kiểm soát : {bks}        ← 16pt B
 ```
 
 - `{bks}` và `{ga_ra}` đọc tự động từ `input/Bao_gia.xlsx` → `docs/thong_tin_giam_dinh_xe.xlsx`  
-  Nếu **chỉ có ảnh báo giá** (`Bao-gia.jpg`): đọc bằng mắt rồi truyền `--bks "14C-402.84" --gara "Tên Gara"`
+  Nếu **chỉ có ảnh báo giá** (`Bao-gia.jpg`): Gemini Vision OCR tự động đọc — không cần truyền `--bks`/`--gara` thủ công
 - `{tên giám định viên}` truyền qua tham số `--gdv`
 - `{ngày giám định}` truyền qua tham số `--ngay` (tùy chọn, nếu bỏ qua chỉ hiện tên GĐV)
 

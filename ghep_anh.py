@@ -67,6 +67,89 @@ def register_fonts():
     pdfmetrics.registerFont(TTFont("BVP-Bold", FONT_BOLD))
 
 
+# ── Gemini Vision OCR ─────────────────────────────────────────────────────────
+
+def _load_gemini_api_key() -> str:
+    """Đọc GEMINI_API_KEY từ .env hoặc biến môi trường."""
+    key = os.environ.get("GEMINI_API_KEY", "")
+    if key:
+        return key
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+    if os.path.exists(env_path):
+        with open(env_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("GEMINI_API_KEY="):
+                    return line.split("=", 1)[1].strip().strip("\"'")
+    return ""
+
+
+def _find_bao_gia_images(search_dir: str = "input") -> list:
+    """Tìm ảnh báo giá trong thư mục input (khớp tên chứa 'bao' và 'gia')."""
+    if not os.path.isdir(search_dir):
+        return []
+    img_exts = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+    results = []
+    for fname in os.listdir(search_dir):
+        if os.path.splitext(fname)[1].lower() not in img_exts:
+            continue
+        slug = os.path.splitext(fname)[0].lower().replace("-", "").replace("_", "").replace(" ", "")
+        if "bao" in slug and ("gia" in slug or "giá" in slug):
+            results.append(os.path.join(search_dir, fname))
+    return sorted(results)
+
+
+def ocr_bao_gia_with_gemini(image_path: str) -> tuple:
+    """
+    Dùng Gemini Vision để trích xuất BKS và tên ga-ra từ ảnh báo giá.
+    Trả về (bks, ga_ra). Nếu lỗi hoặc không nhận ra trả về ('', '').
+    """
+    try:
+        from google import genai  # pip install google-genai
+
+        api_key = _load_gemini_api_key()
+        if not api_key:
+            print("  Cảnh báo: Không tìm thấy GEMINI_API_KEY trong .env", file=sys.stderr)
+            return "", ""
+
+        client = genai.Client(api_key=api_key)
+        img = Image.open(image_path).convert("RGB")
+
+        prompt = (
+            "Đây là ảnh báo giá / hợp đồng sửa chữa xe ô tô tại Việt Nam.\n"
+            "Hãy đọc toàn bộ văn bản trong ảnh và trích xuất CHÍNH XÁC:\n"
+            "1. Biển kiểm soát xe (BKS) — thường có dạng: 14C-402.84, 51A-12345, 29B1-123.45, 30F-999.99\n"
+            "2. Tên gara / đơn vị sửa chữa / địa điểm — tên công ty hoặc xưởng.\n\n"
+            "Chỉ trả lời DUY NHẤT JSON sau, không thêm văn bản nào khác:\n"
+            '{"bks": "...", "gara": "..."}\n\n'
+            "Nếu không tìm thấy thông tin nào, để chuỗi rỗng \"\"."
+        )
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[img, prompt],
+        )
+        text = response.text.strip()
+
+        # Tìm và parse khối JSON trong response
+        m = re.search(r'\{[^{}]+\}', text, re.DOTALL)
+        if m:
+            data = json.loads(m.group())
+            bks   = str(data.get("bks",  "")).strip()
+            ga_ra = str(data.get("gara", "")).strip()
+            if bks or ga_ra:
+                print(f"  Gemini OCR → BKS: {bks!r}  |  Ga-ra: {ga_ra!r}")
+            return bks, ga_ra
+
+        print("  Cảnh báo: Gemini không trả về JSON hợp lệ.", file=sys.stderr)
+    except ImportError:
+        print("  Cảnh báo: Chưa cài google-genai. Chạy: pip install google-genai",
+              file=sys.stderr)
+    except Exception as e:
+        print(f"  Lỗi Gemini OCR: {e}", file=sys.stderr)
+    return "", ""
+
+
 # ── Đọc thông tin từ Excel ────────────────────────────────────────────────────
 
 def _read_xlsx_info(path: str):
@@ -102,9 +185,9 @@ def _read_xlsx_info(path: str):
     return bks, ga_ra
 
 
-def get_bks_garage() -> tuple[str, str]:
+def get_bks_garage() -> tuple:
+    # 1. Thử đọc từ file Excel
     candidates = [BAO_GIA_PATH, THONG_TIN_PATH]
-    # Thêm mọi file .xlsx trong input/ vào danh sách ứng viên
     if os.path.isdir("input"):
         for f in os.listdir("input"):
             if f.lower().endswith(".xlsx"):
@@ -116,6 +199,14 @@ def get_bks_garage() -> tuple[str, str]:
             bks, ga_ra = _read_xlsx_info(path)
             if bks or ga_ra:
                 return bks, ga_ra
+
+    # 2. Fallback: OCR ảnh báo giá bằng Gemini Vision
+    for img_path in _find_bao_gia_images():
+        print(f"  Đang OCR ảnh báo giá bằng Gemini: {img_path}")
+        bks, ga_ra = ocr_bao_gia_with_gemini(img_path)
+        if bks or ga_ra:
+            return bks, ga_ra
+
     return "", ""
 
 
@@ -236,12 +327,24 @@ def draw_header(c: Canvas, page_w, page_h, bks: str, ga_ra: str, gdv: str,
     _draw_wrapped(c, line1, text_x, start_y, text_w, 16, WHITE)
 
     start_y -= (16 + spacing)
-    c.setFont("BVP", 15)
-    _draw_wrapped(c, line2, text_x, start_y, text_w, 15, WHITE)
+    _draw_shrink(c, line2, text_x, start_y, text_w, 15, WHITE)
 
     start_y -= (15 + spacing)
     c.setFont("BVP", 14)
     _draw_wrapped(c, line3, text_x, start_y, text_w, 14, WHITE)
+
+
+def _draw_shrink(c: Canvas, text: str, x, y, max_w, font_size, color):
+    """Vẽ text trên 1 dòng duy nhất, tự thu nhỏ font nếu quá rộng."""
+    font = "BVP"
+    fs = font_size
+    while c.stringWidth(text, font, fs) > max_w and fs > 8:
+        fs -= 0.5
+    c.setFillColor(color)
+    c.setFont(font, fs)
+    tw = c.stringWidth(text, font, fs)
+    cx = x + (max_w - tw) / 2
+    c.drawString(cx, y, text)
 
 
 def _draw_wrapped(c: Canvas, text: str, x, y, max_w, font_size, color):
