@@ -10,7 +10,6 @@
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://unpkg.com/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -833,26 +832,58 @@ function resetApp() {
 }
 
 // ════════════════════════════════════════════════════════
-//  OCR — Nhận dạng ảnh báo giá
+//  OCR — Gemini Vision API (nhận dạng ảnh báo giá)
 // ════════════════════════════════════════════════════════
+const GEMINI_KEY = 'AIzaSyAG-83x9ZcigOusWAtcj-tT8Tx2dlMcN4M';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
+
 async function runOCR(dataUrl, statusEl) {
-  const msgEl = document.getElementById('ocrMsg');
+  const msgEl  = document.getElementById('ocrMsg');
   const spinEl = document.getElementById('ocrSpinner');
   try {
-    // Chạy OCR với tiếng Việt + tiếng Anh
-    const worker = await Tesseract.createWorker(['vie', 'eng'], 1, {
-      logger: m => {
-        if (m.status === 'recognizing text' && msgEl) {
-          msgEl.textContent = `Đang nhận dạng... ${Math.round((m.progress||0)*100)}%`;
-        }
-      }
-    });
-    const { data: { text } } = await worker.recognize(dataUrl);
-    await worker.terminate();
-    console.log('[OCR text]', text);
+    if (msgEl) msgEl.textContent = 'Đang gửi ảnh lên Gemini AI...';
 
-    const bks  = extractBKS(text);
-    const gaRa = extractGaRa(text);
+    const base64   = dataUrl.split(',')[1];
+    const mimeType = (dataUrl.match(/data:([^;]+)/) || [])[1] || 'image/jpeg';
+
+    const prompt =
+      'Đây là ảnh báo giá / hợp đồng sửa chữa xe ô tô tại Việt Nam.\n' +
+      'Hãy đọc toàn bộ văn bản trong ảnh và trích xuất CHÍNH XÁC:\n' +
+      '1. Biển kiểm soát xe (BKS) — thường có dạng: 14C-402.84, 51A-12345, 29B1-123.45, 30F-999.99\n' +
+      '2. Tên gara / đơn vị sửa chữa / địa điểm — tên công ty hoặc xưởng.\n\n' +
+      'Chỉ trả lời DUY NHẤT JSON sau, không thêm văn bản nào khác:\n' +
+      '{"bks": "...", "gara": "..."}\n\n' +
+      'Nếu không tìm thấy thông tin nào, để chuỗi rỗng "".';
+
+    const resp = await fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [
+          { inline_data: { mime_type: mimeType, data: base64 } },
+          { text: prompt }
+        ]}]
+      })
+    });
+
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const text = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+    console.log('[Gemini response]', text);
+
+    let bks = '', gaRa = '';
+    const m = text.match(/\{[^{}]+\}/s);
+    if (m) {
+      try {
+        const parsed = JSON.parse(m[0]);
+        bks  = String(parsed.bks  || '').trim();
+        gaRa = String(parsed.gara || '').trim();
+      } catch (_) {}
+    }
 
     if (spinEl) spinEl.style.display = 'none';
     if (msgEl) {
@@ -864,51 +895,14 @@ async function runOCR(dataUrl, statusEl) {
         msgEl.textContent = '⚠️ Không tự nhận dạng được — vui lòng nhập tay ở bước tiếp theo.';
       }
     }
-    if (bks)  { state.bks  = bks; }
-    if (gaRa) { state.gaRa = gaRa; }
+    if (bks)  state.bks  = bks;
+    if (gaRa) state.gaRa = gaRa;
 
   } catch (err) {
     if (spinEl) spinEl.style.display = 'none';
-    if (msgEl) { msgEl.style.color='#C62828'; msgEl.textContent = '❌ OCR lỗi: '+err.message; }
+    if (msgEl) { msgEl.style.color = '#C62828'; msgEl.textContent = '❌ Gemini OCR lỗi: ' + err.message; }
+    console.error('[Gemini OCR error]', err);
   }
-}
-
-// Trích xuất biển kiểm soát từ text OCR
-// Hỗ trợ: 29A-123.45, 14C1-402.84, 51G-999.99, v.v.
-function extractBKS(text) {
-  // Chuẩn hóa: chữ thường O → 0, chữ I → 1 trong phần số
-  const normalized = text.replace(/[Oo]/g, '0').replace(/[lI|]/g, '1');
-  // Pattern: 2 số + 1-2 chữ + separator (ví dụ " - ", "-", " ") + 3-4 số + dấu chấm + 2 số
-  const m = normalized.match(/(\d{2}[A-Za-z]{1,2}[\s\-]{0,3}\d{3,4}[.\-]\d{2})/);
-  if (!m) return '';
-  // Chuẩn hóa: bỏ khoảng trắng, thay dấu chấm thứ nhất bằng dấu gạch ngang
-  return m[1].replace(/\s/g,'').replace(/^(\d{2}[A-Za-z]{1,2})-?(\d{3,4})/, '$1-$2').toUpperCase();
-}
-
-// Trích xuất tên ga-ra / địa điểm từ text OCR
-function extractGaRa(text) {
-  const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
-
-  // Tìm dòng chứa từ khóa địa điểm
-  const keywords = /ga[\s-]?ra|gara|garage|địa điểm|sửa chữa|cơ sở|trung tâm|auto|ô tô|xe máy/i;
-  for (const line of lines) {
-    if (keywords.test(line)) {
-      // Lấy phần sau dấu ":", "–", "-" nếu có; nếu không lấy cả dòng
-      const m = line.match(/[:–-]\s*(.+)/);
-      const candidate = m ? m[1].trim() : line.trim();
-      if (candidate.length >= 4 && candidate.length <= 120) return candidate;
-    }
-  }
-
-  // Fallback: lấy dòng đầu tiên có từ 3 từ trở lên (thường là tên công ty/gara)
-  for (const line of lines.slice(0, 8)) {
-    const words = line.split(/\s+/).filter(Boolean);
-    if (words.length >= 3 && words.length <= 15 && line.length <= 100
-        && !/^\d/.test(line) && !/[=]{3,}/.test(line)) {
-      return line;
-    }
-  }
-  return '';
 }
 
 // ════════════════════════════════════════════════════════
