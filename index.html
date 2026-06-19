@@ -149,18 +149,44 @@ input[type=file]{display:none}
 .empty-state{text-align:center;padding:30px;color:var(--gray)}
 .empty-state .ei{font-size:2.5rem;margin-bottom:8px}
 .empty-state p{font-size:.85rem}
+
+/* ── API KEY MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal-box{background:#fff;border-radius:12px;padding:28px;max-width:480px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.modal-box h2{font-size:1.05rem;font-weight:700;color:var(--blue-d);margin-bottom:6px}
+.modal-box p{font-size:.82rem;color:var(--gray);margin-bottom:16px;line-height:1.5}
+.modal-box input{width:100%;border:1.5px solid var(--gray-b);border-radius:6px;padding:10px 12px;font-size:.88rem;font-family:inherit;margin-bottom:14px;box-sizing:border-box}
+.modal-box input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.1)}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end}
+.btn-settings{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.2s;margin-left:auto;opacity:.85}
+.btn-settings:hover{background:rgba(255,255,255,.15);opacity:1}
 </style>
 </head>
 <body>
 
+<!-- ── API KEY MODAL ── -->
+<div class="modal-overlay hidden" id="keyModal">
+  <div class="modal-box">
+    <h2>🔑 Cài đặt Gemini API Key</h2>
+    <p>Nhập API key từ <strong>Google AI Studio</strong> để sử dụng tính năng OCR đọc ảnh báo giá tự động.<br/>Key được lưu trong trình duyệt, không gửi đi đâu ngoài Google.</p>
+    <input type="text" id="keyInput" placeholder="AIzaSy..." autocomplete="off" spellcheck="false"/>
+    <div style="font-size:.75rem;color:var(--gray);margin-bottom:14px">Lấy key miễn phí tại: <strong>aistudio.google.com/apikey</strong></div>
+    <div class="modal-footer">
+      <button class="btn-back" id="keyModalCancel" onclick="closeKeyModal()">Hủy</button>
+      <button class="btn-next" onclick="saveGeminiKey()">Lưu key</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── HEADER ── -->
 <header class="hdr">
   <div class="hdr-in">
-
     <div class="hdr-t">
       <h1>Ghép Ảnh Giám Định Xe</h1>
       <p>Phòng Giám định và Cứu hộ tại Quảng Ninh — PTI SOS</p>
     </div>
+    <button class="btn-settings" onclick="openKeyModal()" title="Cài đặt Gemini API Key">⚙️</button>
   </div>
 </header>
 
@@ -832,10 +858,35 @@ function resetApp() {
 }
 
 // ════════════════════════════════════════════════════════
+//  API KEY — lưu/đọc từ localStorage
+// ════════════════════════════════════════════════════════
+function getGeminiKey() { return localStorage.getItem('gemini_api_key') || ''; }
+
+function openKeyModal() {
+  document.getElementById('keyInput').value = getGeminiKey();
+  document.getElementById('keyModal').classList.remove('hidden');
+  document.getElementById('keyModalCancel').style.display = getGeminiKey() ? '' : 'none';
+  setTimeout(() => document.getElementById('keyInput').focus(), 50);
+}
+function closeKeyModal() { document.getElementById('keyModal').classList.add('hidden'); }
+function saveGeminiKey() {
+  const k = document.getElementById('keyInput').value.trim();
+  if (!k) { alert('Vui lòng nhập API key!'); return; }
+  localStorage.setItem('gemini_api_key', k);
+  closeKeyModal();
+}
+
+// Hiện modal lần đầu nếu chưa có key
+window.addEventListener('DOMContentLoaded', () => {
+  if (!getGeminiKey()) openKeyModal();
+});
+
+// ════════════════════════════════════════════════════════
 //  OCR — Gemini Vision API (nhận dạng ảnh báo giá)
 // ════════════════════════════════════════════════════════
-const GEMINI_KEY = 'AIzaSyAG-83x9ZcigOusWAtcj-tT8Tx2dlMcN4M';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
+function getGeminiUrl() {
+  return `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${getGeminiKey()}`;
+}
 
 async function runOCR(dataUrl, statusEl) {
   const msgEl  = document.getElementById('ocrMsg');
@@ -855,7 +906,8 @@ async function runOCR(dataUrl, statusEl) {
       '{"bks": "...", "gara": "..."}\n\n' +
       'Nếu không tìm thấy thông tin nào, để chuỗi rỗng "".';
 
-    const resp = await fetch(GEMINI_URL, {
+    if (!getGeminiKey()) { openKeyModal(); throw new Error('Chưa cài đặt Gemini API key'); }
+    const resp = await fetch(getGeminiUrl(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
