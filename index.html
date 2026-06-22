@@ -952,73 +952,114 @@ function getGeminiUrl() {
 async function runOCR(dataUrl, statusEl) {
   const msgEl  = document.getElementById('ocrMsg');
   const spinEl = document.getElementById('ocrSpinner');
-  try {
-    if (msgEl) msgEl.textContent = 'Đang gửi ảnh lên Gemini AI...';
 
-    const base64   = dataUrl.split(',')[1];
-    const mimeType = (dataUrl.match(/data:([^;]+)/) || [])[1] || 'image/jpeg';
+  const base64   = dataUrl.split(',')[1];
+  const mimeType = (dataUrl.match(/data:([^;]+)/) || [])[1] || 'image/jpeg';
+  const prompt =
+    'Đây là ảnh báo giá / hợp đồng sửa chữa xe ô tô tại Việt Nam.\n' +
+    'Hãy đọc toàn bộ văn bản trong ảnh và trích xuất CHÍNH XÁC:\n' +
+    '1. Biển kiểm soát xe (BKS) — thường có dạng: 14C-402.84, 51A-12345, 29B1-123.45, 30F-999.99\n' +
+    '2. Tên gara / đơn vị sửa chữa / địa điểm — tên công ty hoặc xưởng.\n\n' +
+    'Chỉ trả lời DUY NHẤT JSON sau, không thêm văn bản nào khác:\n' +
+    '{"bks": "...", "gara": "..."}\n\n' +
+    'Nếu không tìm thấy thông tin nào, để chuỗi rỗng "".';
 
-    const prompt =
-      'Đây là ảnh báo giá / hợp đồng sửa chữa xe ô tô tại Việt Nam.\n' +
-      'Hãy đọc toàn bộ văn bản trong ảnh và trích xuất CHÍNH XÁC:\n' +
-      '1. Biển kiểm soát xe (BKS) — thường có dạng: 14C-402.84, 51A-12345, 29B1-123.45, 30F-999.99\n' +
-      '2. Tên gara / đơn vị sửa chữa / địa điểm — tên công ty hoặc xưởng.\n\n' +
-      'Chỉ trả lời DUY NHẤT JSON sau, không thêm văn bản nào khác:\n' +
-      '{"bks": "...", "gara": "..."}\n\n' +
-      'Nếu không tìm thấy thông tin nào, để chuỗi rỗng "".';
-
-    if (!getGeminiKey()) { throw new Error('Chưa cấu hình Gemini API key — liên hệ quản trị viên'); }
-    const resp = await fetch(getGeminiUrl(), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [
-          { inline_data: { mime_type: mimeType, data: base64 } },
-          { text: prompt }
-        ]}]
-      })
-    });
-
-    if (!resp.ok) {
-      const errData = await resp.json().catch(() => ({}));
-      const errMsg = errData.error?.message || `HTTP ${resp.status}`;
-      if (resp.status === 401 || resp.status === 403 || errMsg.toLowerCase().includes('credential') || errMsg.toLowerCase().includes('api key')) {
-        throw new Error('Gemini API key không hợp lệ hoặc hết hạn — cần cập nhật key trên Render.com');
-      }
-      throw new Error(errMsg);
-    }
-
-    const data = await resp.json();
-    const text = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
-    console.log('[Gemini response]', text);
-
-    let bks = '', gaRa = '';
-    const m = text.match(/\{[^{}]+\}/s);
-    if (m) {
-      try {
-        const parsed = JSON.parse(m[0]);
-        bks  = String(parsed.bks  || '').trim();
-        gaRa = String(parsed.gara || '').trim();
-      } catch (_) {}
-    }
-
+  if (!getGeminiKey()) {
     if (spinEl) spinEl.style.display = 'none';
-    if (msgEl) {
-      if (bks || gaRa) {
-        msgEl.style.color = '#2E7D32';
-        msgEl.innerHTML = `✅ OCR xong — BKS: <b>${bks||'(chưa tìm thấy)'}</b> | Ga-ra: <b>${gaRa||'(chưa tìm thấy)'}</b>`;
-      } else {
+    if (msgEl) { msgEl.style.color = '#C62828'; msgEl.textContent = '❌ Chưa cấu hình Gemini API key — liên hệ quản trị viên'; }
+    return;
+  }
+
+  const MAX_RETRIES = 3;
+  const RETRY_DELAYS = [3000, 6000, 12000]; // 3s → 6s → 12s
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      if (attempt === 0) {
+        if (msgEl) msgEl.textContent = 'Đang gửi ảnh lên Gemini AI...';
+      }
+
+      const resp = await fetch(getGeminiUrl(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [
+            { inline_data: { mime_type: mimeType, data: base64 } },
+            { text: prompt }
+          ]}]
+        })
+      });
+
+      if (!resp.ok) {
+        const errData = await resp.json().catch(() => ({}));
+        const errMsg = errData.error?.message || `HTTP ${resp.status}`;
+
+        if (resp.status === 401 || resp.status === 403 ||
+            errMsg.toLowerCase().includes('credential') || errMsg.toLowerCase().includes('api key')) {
+          throw Object.assign(new Error('Gemini API key không hợp lệ hoặc hết hạn — cần cập nhật key trên Render.com'), { fatal: true });
+        }
+
+        // Lỗi tạm thời: quá tải (503) hoặc rate limit (429)
+        const isTransient = resp.status === 503 || resp.status === 429 ||
+          errMsg.toLowerCase().includes('high demand') || errMsg.toLowerCase().includes('overloaded') ||
+          errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('try again');
+
+        if (isTransient && attempt < MAX_RETRIES) {
+          const wait = RETRY_DELAYS[attempt];
+          if (msgEl) {
+            msgEl.style.color = '#E65100';
+            msgEl.textContent = `⏳ Gemini đang bận — thử lại lần ${attempt + 1}/${MAX_RETRIES} sau ${wait / 1000}s...`;
+          }
+          await new Promise(r => setTimeout(r, wait));
+          continue;
+        }
+
+        throw new Error(errMsg);
+      }
+
+      const data = await resp.json();
+      const text = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+      console.log('[Gemini response]', text);
+
+      let bks = '', gaRa = '';
+      const m = text.match(/\{[^{}]+\}/s);
+      if (m) {
+        try {
+          const parsed = JSON.parse(m[0]);
+          bks  = String(parsed.bks  || '').trim();
+          gaRa = String(parsed.gara || '').trim();
+        } catch (_) {}
+      }
+
+      if (spinEl) spinEl.style.display = 'none';
+      if (msgEl) {
+        if (bks || gaRa) {
+          msgEl.style.color = '#2E7D32';
+          msgEl.innerHTML = `✅ OCR xong — BKS: <b>${bks||'(chưa tìm thấy)'}</b> | Ga-ra: <b>${gaRa||'(chưa tìm thấy)'}</b>`;
+        } else {
+          msgEl.style.color = '#E65100';
+          msgEl.textContent = '⚠️ Không tự nhận dạng được — vui lòng nhập tay ở bước tiếp theo.';
+        }
+      }
+      if (bks)  state.bks  = bks;
+      if (gaRa) state.gaRa = gaRa;
+      return;
+
+    } catch (err) {
+      if (err.fatal || attempt >= MAX_RETRIES) {
+        if (spinEl) spinEl.style.display = 'none';
+        if (msgEl) { msgEl.style.color = '#C62828'; msgEl.textContent = '❌ Gemini OCR lỗi: ' + err.message; }
+        console.error('[Gemini OCR error]', err);
+        return;
+      }
+      // Lỗi network không tường minh — cũng retry
+      const wait = RETRY_DELAYS[attempt];
+      if (msgEl) {
         msgEl.style.color = '#E65100';
-        msgEl.textContent = '⚠️ Không tự nhận dạng được — vui lòng nhập tay ở bước tiếp theo.';
+        msgEl.textContent = `⏳ Lỗi kết nối — thử lại lần ${attempt + 1}/${MAX_RETRIES} sau ${wait / 1000}s...`;
       }
+      await new Promise(r => setTimeout(r, wait));
     }
-    if (bks)  state.bks  = bks;
-    if (gaRa) state.gaRa = gaRa;
-
-  } catch (err) {
-    if (spinEl) spinEl.style.display = 'none';
-    if (msgEl) { msgEl.style.color = '#C62828'; msgEl.textContent = '❌ Gemini OCR lỗi: ' + err.message; }
-    console.error('[Gemini OCR error]', err);
   }
 }
 
