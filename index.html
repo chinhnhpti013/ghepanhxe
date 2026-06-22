@@ -163,8 +163,6 @@ input[type=file]{display:none}
 .modal-box input{width:100%;border:1.5px solid var(--gray-b);border-radius:6px;padding:10px 12px;font-size:16px;font-family:inherit;margin-bottom:14px;box-sizing:border-box}
 .modal-box input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,.1)}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end}
-.btn-settings{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:4px 8px;border-radius:6px;transition:.2s;margin-left:auto;opacity:.85}
-.btn-settings:hover{background:rgba(255,255,255,.15);opacity:1}
 
 /* ════════════════════════════════════════════════════════
    RESPONSIVE — MOBILE
@@ -249,22 +247,10 @@ input[type=file]{display:none}
   .steps{padding:10px 8px 0}
 }
 </style>
+<!-- Gemini API key được inject lúc build bởi Render.com (build.sh) -->
+<script>window.__GEMINI_KEY__ = '__GEMINI_API_KEY__';</script>
 </head>
 <body>
-
-<!-- ── API KEY MODAL ── -->
-<div class="modal-overlay hidden" id="keyModal">
-  <div class="modal-box">
-    <h2>🔑 Cài đặt Gemini API Key</h2>
-    <p>Nhập API key từ <strong>Google AI Studio</strong> để sử dụng tính năng OCR đọc ảnh báo giá tự động.<br/>Key được lưu trong trình duyệt, không gửi đi đâu ngoài Google.</p>
-    <input type="text" id="keyInput" placeholder="AIzaSy..." autocomplete="off" spellcheck="false"/>
-    <div style="font-size:.75rem;color:var(--gray);margin-bottom:14px">Lấy key miễn phí tại: <strong>aistudio.google.com/apikey</strong></div>
-    <div class="modal-footer">
-      <button class="btn-back" id="keyModalCancel" onclick="closeKeyModal()">Hủy</button>
-      <button class="btn-next" onclick="saveGeminiKey()">Lưu key</button>
-    </div>
-  </div>
-</div>
 
 <!-- ── HEADER ── -->
 <header class="hdr">
@@ -273,7 +259,6 @@ input[type=file]{display:none}
       <h1>Ghép Ảnh Giám Định Xe</h1>
       <p>Phòng Giám định và Cứu hộ tại Quảng Ninh — PTI SOS</p>
     </div>
-    <button class="btn-settings" onclick="openKeyModal()" title="Cài đặt Gemini API Key">⚙️</button>
   </div>
 </header>
 
@@ -951,26 +936,11 @@ function resetApp() {
 // ════════════════════════════════════════════════════════
 //  API KEY — lưu/đọc từ localStorage
 // ════════════════════════════════════════════════════════
-function getGeminiKey() { return localStorage.getItem('gemini_api_key') || ''; }
-
-function openKeyModal() {
-  document.getElementById('keyInput').value = getGeminiKey();
-  document.getElementById('keyModal').classList.remove('hidden');
-  document.getElementById('keyModalCancel').style.display = getGeminiKey() ? '' : 'none';
-  setTimeout(() => document.getElementById('keyInput').focus(), 50);
+function getGeminiKey() {
+  const injected = window.__GEMINI_KEY__;
+  if (injected && injected !== '__GEMINI_API_KEY__') return injected;
+  return '';
 }
-function closeKeyModal() { document.getElementById('keyModal').classList.add('hidden'); }
-function saveGeminiKey() {
-  const k = document.getElementById('keyInput').value.trim();
-  if (!k) { alert('Vui lòng nhập API key!'); return; }
-  localStorage.setItem('gemini_api_key', k);
-  closeKeyModal();
-}
-
-// Hiện modal lần đầu nếu chưa có key
-window.addEventListener('DOMContentLoaded', () => {
-  if (!getGeminiKey()) openKeyModal();
-});
 
 // ════════════════════════════════════════════════════════
 //  OCR — Gemini Vision API (nhận dạng ảnh báo giá)
@@ -997,7 +967,7 @@ async function runOCR(dataUrl, statusEl) {
       '{"bks": "...", "gara": "..."}\n\n' +
       'Nếu không tìm thấy thông tin nào, để chuỗi rỗng "".';
 
-    if (!getGeminiKey()) { openKeyModal(); throw new Error('Chưa cài đặt Gemini API key'); }
+    if (!getGeminiKey()) { throw new Error('Chưa cấu hình Gemini API key — liên hệ quản trị viên'); }
     const resp = await fetch(getGeminiUrl(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1011,7 +981,11 @@ async function runOCR(dataUrl, statusEl) {
 
     if (!resp.ok) {
       const errData = await resp.json().catch(() => ({}));
-      throw new Error(errData.error?.message || `HTTP ${resp.status}`);
+      const errMsg = errData.error?.message || `HTTP ${resp.status}`;
+      if (resp.status === 401 || resp.status === 403 || errMsg.toLowerCase().includes('credential') || errMsg.toLowerCase().includes('api key')) {
+        throw new Error('Gemini API key không hợp lệ hoặc hết hạn — cần cập nhật key trên Render.com');
+      }
+      throw new Error(errMsg);
     }
 
     const data = await resp.json();
