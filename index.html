@@ -320,7 +320,7 @@ input[type=file]{display:none}
 
       <div id="emptyState" class="empty-state" style="display:none">
         <div class="ei">⚠️</div>
-        <p>Không tìm thấy thư mục hạng mục nào.<br/>Hãy chắc chắn thư mục ảnh có cấu trúc <code>0. Tên/</code>, <code>1. Tên/</code>...</p>
+        <p>Không tìm thấy thư mục hạng mục nào.<br/>Hãy chọn thư mục <strong>cha</strong> chứa các thư mục con (mỗi thư mục con là một hạng mục).<br/><small style="color:#aaa">Ví dụ: chọn thư mục <code>input/</code> chứa <code>Số khung xe/</code>, <code>Cốp sau/</code>...</small></p>
       </div>
     </div>
   </div>
@@ -387,7 +387,7 @@ input[type=file]{display:none}
 
       <hr class="divider"/>
 
-      <div class="form-group">
+      <div class="form-group" id="layoutSection">
         <label>Bố cục trang</label>
         <div class="layout-row">
           <label class="layout-opt selected" id="optDoc" onclick="selectLayout('doc')">
@@ -750,17 +750,21 @@ function handleFiles(files) {
   imageFiles.forEach(f => {
     const parts = (f.webkitRelativePath||f.name).split('/');
     const subfolder = parts.length >= 2 ? parts[parts.length-2] : null;
-    if (!subfolder || !/^\d/.test(subfolder)) return;
+    if (!subfolder) return; // bỏ qua ảnh nằm ngay root (không trong thư mục con nào)
     if (!groups[subfolder]) groups[subfolder] = [];
     groups[subfolder].push(f);
   });
 
   if (!Object.keys(groups).length) { showEmpty(); return; }
 
-  // Sort groups by prefix number then name
+  // Sort: thư mục có tiền tố số sắp xếp theo số, còn lại theo thứ tự chữ cái
   const sorted = Object.entries(groups).sort(([a],[b]) => {
-    const na = parseInt(a)||0, nb = parseInt(b)||0;
-    return na!==nb ? na-nb : a.localeCompare(b, 'vi');
+    const na = parseInt(a), nb = parseInt(b);
+    const aNum = !isNaN(na), bNum = !isNaN(nb);
+    if (aNum && bNum) return na - nb;
+    if (aNum) return -1;
+    if (bNum) return 1;
+    return a.localeCompare(b, 'vi');
   }).map(([name, files]) => ({
     name,
     files: files.sort((a,b) => a.name.localeCompare(b.name,'vi',{numeric:true})),
@@ -819,12 +823,17 @@ function updateLoaiPreview() {
     `→ Dòng tiêu đề: "${LOAI_MAP[loai]} : ${bks}"`;
 }
 
-document.getElementById('fLoai').addEventListener('change', updateLoaiPreview);
+function toggleLayoutSection() {
+  const isGiayto = document.getElementById('fLoai').value === 'giayto';
+  document.getElementById('layoutSection').style.display = isGiayto ? 'none' : '';
+}
+document.getElementById('fLoai').addEventListener('change', () => { toggleLayoutSection(); updateLoaiPreview(); });
 document.getElementById('fBks').addEventListener('input',   updateLoaiPreview);
 
 function prefillStep2() {
   if (state.bks)  { document.getElementById('fBks').value  = state.bks;  document.getElementById('fBks').classList.add('filled'); }
   if (state.gaRa) { document.getElementById('fGara').value = state.gaRa; document.getElementById('fGara').classList.add('filled'); }
+  toggleLayoutSection();
   updateLoaiPreview();
 }
 
@@ -854,25 +863,60 @@ function validateStep2() {
 // ════════════════════════════════════════════════════════
 //  STEP 3 — SUMMARY + GENERATE
 // ════════════════════════════════════════════════════════
+function getPrefixNum(name) {
+  const m = name.match(/^(\d+)/);
+  return m ? parseInt(m[1]) : null;
+}
+
 function buildSummary() {
-  const perPage = state.layout==='doc'?6:4;
-  const coverImgs = state.imageGroups.filter(g=>g.isCover).flatMap(g=>g.files);
-  const mainImgs  = state.imageGroups.filter(g=>!g.isCover).flatMap(g=>g.files);
-  const nPages = (coverImgs.length?1:0) + Math.ceil(mainImgs.length/perPage);
+  const loai   = state.loai;
+  const isDoc  = state.layout === 'doc';
+  let totalImgs = 0, nPages = 0, extraRows = '';
+
+  if (loai === 'chitiet') {
+    const perPage   = isDoc ? 6 : 4;
+    const coverImgs = state.imageGroups.filter(g => /^0/.test(g.name)).flatMap(g => g.files);
+    const mainImgs  = state.imageGroups.filter(g => /^\d/.test(g.name) && !/^0/.test(g.name)).flatMap(g => g.files);
+    nPages    = (coverImgs.length ? 1 : 0) + Math.ceil(mainImgs.length / perPage);
+    totalImgs = coverImgs.length + mainImgs.length;
+    extraRows = `
+      <div class="summary-row"><span class="lbl">Bố cục</span><span class="val">${isDoc ? 'Dọc — Portrait A4 (2×3)' : 'Ngang — Landscape A4 (2×2)'}</span></div>
+      <div class="summary-row"><span class="lbl">Ảnh nhận dạng xe (trang 1)</span><span class="val">${coverImgs.length} ảnh</span></div>
+      <div class="summary-row"><span class="lbl">Ảnh hạng mục</span><span class="val">${mainImgs.length} ảnh</span></div>`;
+
+  } else if (loai === 'hientruong') {
+    const perPage = isDoc ? 6 : 4;
+    const allImgs = state.imageGroups.flatMap(g => g.files);
+    nPages    = Math.ceil(allImgs.length / perPage);
+    totalImgs = allImgs.length;
+    extraRows = `
+      <div class="summary-row"><span class="lbl">Bố cục</span><span class="val">${isDoc ? 'Dọc — Portrait A4 (2×3)' : 'Ngang — Landscape A4 (2×2)'}</span></div>
+      <div class="summary-row"><span class="lbl">Ảnh hiện trường</span><span class="val">${totalImgs} ảnh</span></div>`;
+
+  } else if (loai === 'giayto') {
+    const p1Imgs   = state.imageGroups.filter(g => getPrefixNum(g.name) === 1).flatMap(g => g.files);
+    const p23Imgs  = state.imageGroups.filter(g => [2,3].includes(getPrefixNum(g.name))).flatMap(g => g.files);
+    const p456Imgs = state.imageGroups.filter(g => [4,5,6].includes(getPrefixNum(g.name))).flatMap(g => g.files);
+    const p1Pages   = Math.ceil(p1Imgs.length / 4);
+    const p23Pages  = Math.ceil(p23Imgs.length / 2);
+    const p456Pages = p456Imgs.length;
+    nPages    = p1Pages + p23Pages + p456Pages;
+    totalImgs = p1Imgs.length + p23Imgs.length + p456Imgs.length;
+    extraRows = `
+      <div class="summary-row"><span class="lbl">Nhóm 1. (4 ảnh/trang ngang A4)</span><span class="val">${p1Imgs.length} ảnh — ${p1Pages} trang</span></div>
+      <div class="summary-row"><span class="lbl">Nhóm 2., 3. (2 ảnh/trang dọc A4)</span><span class="val">${p23Imgs.length} ảnh — ${p23Pages} trang</span></div>
+      <div class="summary-row"><span class="lbl">Nhóm 4., 5., 6. (1 ảnh/trang dọc A4)</span><span class="val">${p456Imgs.length} ảnh — ${p456Pages} trang</span></div>`;
+  }
 
   document.getElementById('summaryRows').innerHTML = `
-    <div class="summary-row"><span class="lbl">Kiểu bản ảnh</span><span class="val">${LOAI_MAP[state.loai]} : ${state.bks}</span></div>
+    <div class="summary-row"><span class="lbl">Kiểu bản ảnh</span><span class="val">${LOAI_MAP[loai] || LOAI_MAP.chitiet} : ${state.bks}</span></div>
     <div class="summary-row"><span class="lbl">Ga-ra / Địa điểm</span><span class="val">${state.gaRa}</span></div>
     <div class="summary-row"><span class="lbl">Giám định viên</span><span class="val">${state.gdv}</span></div>
-    <div class="summary-row"><span class="lbl">Ngày giám định</span><span class="val">${state.ngay||'(không có)'}</span></div>
-    <div class="summary-row"><span class="lbl">Bố cục</span><span class="val">${state.layout==='doc'?'Dọc — Portrait A4 (2×3)':'Ngang — Landscape A4 (2×2)'}</span></div>
-    <div class="summary-row"><span class="lbl">Ảnh nhận dạng xe (trang 1)</span><span class="val">${coverImgs.length} ảnh</span></div>
-    <div class="summary-row"><span class="lbl">Ảnh hạng mục</span><span class="val">${mainImgs.length} ảnh</span></div>
+    <div class="summary-row"><span class="lbl">Ngày giám định</span><span class="val">${state.ngay || '(không có)'}</span></div>
+    ${extraRows}
     <div class="summary-row"><span class="lbl">Tổng số trang</span><span class="val">${nPages} trang</span></div>`;
 
-  const totalImgs = coverImgs.length + mainImgs.length;
-  document.getElementById('readyMsg').textContent =
-    `${totalImgs} ảnh — ${nPages} trang PDF`;
+  document.getElementById('readyMsg').textContent = `${totalImgs} ảnh — ${nPages} trang PDF`;
 }
 
 function resetGenerate() {
@@ -929,6 +973,7 @@ function resetApp() {
   document.getElementById('fGdv').value='';
   document.getElementById('fNgay').value='';
   document.getElementById('fLoai').value='chitiet';
+  document.getElementById('layoutSection').style.display = '';
   updateLoaiPreview();
   goStep(1);
 }
@@ -1087,101 +1132,81 @@ function setProgress(pct, msg) {
 }
 
 async function generatePDF() {
-  const { PDFDocument, StandardFonts } = PDFLib;
-  const isDoc = state.layout==='doc';
-  const [pageW,pageH] = isDoc ? [595,842] : [842,595];
-  const [cols,rows]   = isDoc ? [2,3]     : [2,2];
-  const perPage       = cols*rows;
-
-  setProgress(2,'Đang load font và logo...');
+  const { PDFDocument } = PDFLib;
+  setProgress(2, 'Đang load font và logo...');
 
   const pdfDoc = await PDFDocument.create();
-
-  // Đăng ký fontkit để hỗ trợ font TTF tùy chỉnh (bắt buộc cho tiếng Việt)
   pdfDoc.registerFontkit(fontkit);
 
-  // Load fonts
   let fontReg, fontBold;
   try {
     const [rb, bb] = await Promise.all([
       fetch('fonts/BeVietnamPro-Regular.ttf').then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.arrayBuffer(); }),
       fetch('fonts/BeVietnamPro-Bold.ttf').then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.arrayBuffer(); }),
     ]);
-    [fontReg, fontBold] = await Promise.all([
-      pdfDoc.embedFont(rb),
-      pdfDoc.embedFont(bb),
-    ]);
+    [fontReg, fontBold] = await Promise.all([pdfDoc.embedFont(rb), pdfDoc.embedFont(bb)]);
   } catch(e) {
-    console.warn('Không load được font TTF, dùng Helvetica:', e);
     throw new Error('Không load được font tiếng Việt. Hãy truy cập qua GitHub Pages thay vì mở file trực tiếp.');
   }
 
-  // Load logo
   let logo = null;
   try {
     const lb = await fetch('assets/logo-ptisos.png').then(r=>{ if(!r.ok) throw new Error(''); return r.arrayBuffer(); });
     logo = await pdfDoc.embedPng(lb);
   } catch { logo = null; }
 
-  const coverFiles = state.imageGroups.filter(g=>g.isCover).flatMap(g=>g.files.map(f=>({f,cap:g.name})));
-  const mainFiles  = state.imageGroups.filter(g=>!g.isCover).flatMap(g=>g.files.map(f=>({f,cap:g.name})));
-  const total = coverFiles.length + mainFiles.length;
-  let processed = 0;
+  const loai  = state.loai;
+  const isDoc = state.layout === 'doc';
+  let processed = 0, total = 1, pageNum = 0;
 
-  // Calculate cell dims
-  const areaX = C.MARGIN;
-  const areaTop = pageH - C.MARGIN - C.HEADER_H - C.HEADER_GAP;
-  const areaW   = pageW - 2*C.MARGIN;
-  const areaH   = areaTop - (C.MARGIN + C.FOOTER_H);
-  const cellW   = (areaW - (cols-1)*C.GAP) / cols;
-  const cellH   = (areaH - (rows-1)*C.GAP) / rows;
-  const imgH    = cellH - C.CAPTION_H;
+  // Đếm tổng ảnh theo loại để tính % tiến độ
+  if (loai === 'chitiet') {
+    total = state.imageGroups.filter(g => /^\d/.test(g.name)).reduce((s,g) => s+g.files.length, 0) || 1;
+  } else if (loai === 'hientruong') {
+    total = state.imageGroups.reduce((s,g) => s+g.files.length, 0) || 1;
+  } else if (loai === 'giayto') {
+    total = state.imageGroups.filter(g => { const n=getPrefixNum(g.name); return n>=1 && n<=6; })
+      .reduce((s,g) => s+g.files.length, 0) || 1;
+  }
 
-  async function addPage(chunks, pageNum) {
-    const page = pdfDoc.addPage([pageW,pageH]);
+  // ── Hàm vẽ 1 trang PDF với grid cols×rows ──
+  async function addPage(chunks, pNum, pageW, pageH, cols, rows) {
+    const areaX  = C.MARGIN;
+    const areaTop= pageH - C.MARGIN - C.HEADER_H - C.HEADER_GAP;
+    const areaW  = pageW - 2*C.MARGIN;
+    const areaH  = areaTop - (C.MARGIN + C.FOOTER_H);
+    const cellW  = (areaW - (cols-1)*C.GAP) / cols;
+    const cellH  = (areaH - (rows-1)*C.GAP) / rows;
+    const imgH   = cellH - C.CAPTION_H;
+
+    const page = pdfDoc.addPage([pageW, pageH]);
 
     // Header
     page.drawRectangle({ x:0, y:pageH-C.MARGIN-C.HEADER_H, width:pageW, height:C.HEADER_H, color:BLUE });
-
-    // Logo
     if (logo) {
-      const lx = C.MARGIN;
-      const ly = pageH - C.MARGIN - C.HEADER_H/2 - C.LOGO_SIZE/2;
-      page.drawImage(logo, { x:lx, y:ly, width:C.LOGO_SIZE, height:C.LOGO_SIZE });
+      page.drawImage(logo, { x:C.MARGIN, y:pageH-C.MARGIN-C.HEADER_H/2-C.LOGO_SIZE/2, width:C.LOGO_SIZE, height:C.LOGO_SIZE });
     }
 
-    // Header text
     const textX = C.MARGIN + C.LOGO_SIZE + 3;
     const textW = pageW - textX - C.MARGIN;
-    const headerBottom = pageH - C.MARGIN - C.HEADER_H;
-    const headerMid = headerBottom + C.HEADER_H/2;
-
-    const line1 = `${LOAI_MAP[state.loai] || LOAI_MAP.chitiet} : ${state.bks}`;
+    const headerMid = (pageH-C.MARGIN-C.HEADER_H) + C.HEADER_H/2;
+    const line1 = `${LOAI_MAP[loai] || LOAI_MAP.chitiet} : ${state.bks}`;
     const line2 = `Địa điểm tại Gara : ${state.gaRa}`;
     const line3 = state.ngay ? `${state.gdv}  —  Ngày: ${state.ngay}` : state.gdv;
     const sp = 2;
-    const totalTH = 16+sp+15+sp+14;
-    let ty = headerMid + totalTH/2 - 16;
+    let ty = headerMid + (16+sp+15+sp+14)/2 - 16;
 
     function drawCenteredText(rawText, font, size, y) {
-      // Sanitize trước khi vẽ
       let text = cleanText(rawText).replace(/\s+/g,' ').trim();
       if (!text) return;
-      let fs = size;
-      let w = font.widthOfTextAtSize(text, fs);
-      // Thu nhỏ font xuống tối thiểu 9pt
+      let fs = size, w = font.widthOfTextAtSize(text, fs);
       while (w > textW && fs > 9) { fs -= 0.5; w = font.widthOfTextAtSize(text, fs); }
-      // Vẫn còn tràn → cắt bớt và thêm …
       if (w > textW) {
-        while (text.length > 1 && font.widthOfTextAtSize(text + '…', fs) > textW)
-          text = text.slice(0, -1);
-        text += '…';
-        w = font.widthOfTextAtSize(text, fs);
+        while (text.length > 1 && font.widthOfTextAtSize(text+'…', fs) > textW) text = text.slice(0,-1);
+        text += '…'; w = font.widthOfTextAtSize(text, fs);
       }
-      const cx = textX + (textW - w) / 2;
-      page.drawText(text, { x: cx, y, size: fs, font, color: WHITE });
+      page.drawText(text, { x: textX+(textW-w)/2, y, size:fs, font, color:WHITE });
     }
-
     drawCenteredText(line1, fontBold, 16, ty); ty -= (16+sp);
     drawCenteredText(line2, fontReg,  15, ty); ty -= (15+sp);
     drawCenteredText(line3, fontReg,  14, ty);
@@ -1189,57 +1214,86 @@ async function generatePDF() {
     // Footer
     const fy = C.MARGIN/2;
     page.drawText('Phòng Giám định và Cứu hộ tại Quảng Ninh', { x:C.MARGIN, y:fy, size:13, font:fontReg, color:GRAY });
-    const pnStr = String(pageNum);
-    const pnW = fontReg.widthOfTextAtSize(pnStr, 13);
+    const pnStr = String(pNum), pnW = fontReg.widthOfTextAtSize(pnStr, 13);
     page.drawText(pnStr, { x:pageW-C.MARGIN-pnW, y:fy, size:13, font:fontReg, color:BLUE });
 
-    // Images
+    // Ảnh trong grid
     for (let idx=0; idx<chunks.length; idx++) {
       const {f, cap} = chunks[idx];
-      const col = idx % cols;
-      const row = Math.floor(idx / cols);
-      const cellX = areaX + col*(cellW + C.GAP);
+      const col  = idx % cols;
+      const row  = Math.floor(idx / cols);
+      const cellX = areaX + col*(cellW+C.GAP);
       const cellY = areaTop - (row+1)*cellH - row*C.GAP;
 
-      // Grid border
       page.drawRectangle({ x:cellX, y:cellY, width:cellW, height:cellH, borderColor:LGRAY, borderWidth:0.5 });
-
-      // Process image
       try {
         const imgBytes = await processImage(f, cellW, imgH);
-        const pdfImg = await pdfDoc.embedPng(imgBytes);
+        const pdfImg   = await pdfDoc.embedPng(imgBytes);
         page.drawImage(pdfImg, { x:cellX, y:cellY+C.CAPTION_H, width:cellW, height:imgH });
       } catch(e) { console.warn('Ảnh lỗi:', f.name, e); }
 
-      // Caption
       page.drawRectangle({ x:cellX, y:cellY, width:cellW, height:C.CAPTION_H, color:BLUE });
-      let capSize = 14;
-      let capW = fontReg.widthOfTextAtSize(cap, capSize);
+      let capSize=14, capW=fontReg.widthOfTextAtSize(cap, capSize);
       while (capW > cellW-4 && capSize > 7) { capSize -= 0.5; capW = fontReg.widthOfTextAtSize(cap, capSize); }
-      const capX = cellX + (cellW - capW)/2;
-      const capY = cellY + (C.CAPTION_H - capSize*0.8)/2;
-      page.drawText(cap, { x:capX, y:capY, size:capSize, font:fontReg, color:WHITE });
+      page.drawText(cap, { x:cellX+(cellW-capW)/2, y:cellY+(C.CAPTION_H-capSize*0.8)/2, size:capSize, font:fontReg, color:WHITE });
 
       processed++;
       setProgress(Math.round(5+processed/total*90), `Đang xử lý ảnh ${processed}/${total}: ${f.name.slice(0,40)}`);
     }
   }
 
-  let pageNum = 0;
+  // ── LOẠI 1: Giám định chi tiết — tiền tố số bắt buộc, prefix 0. = trang bìa ──
+  if (loai === 'chitiet') {
+    const [pageW,pageH] = isDoc ? [595,842] : [842,595];
+    const [cols,rows]   = isDoc ? [2,3]     : [2,2];
+    const perPage = cols*rows;
+    const coverFiles = state.imageGroups.filter(g => /^0/.test(g.name)).flatMap(g => g.files.map(f=>({f,cap:g.name})));
+    const mainFiles  = state.imageGroups.filter(g => /^\d/.test(g.name) && !/^0/.test(g.name)).flatMap(g => g.files.map(f=>({f,cap:g.name})));
 
-  // Cover page
-  if (coverFiles.length) {
-    pageNum++;
-    setProgress(5, `Đang tạo trang nhận dạng xe...`);
-    await addPage(coverFiles.slice(0, perPage), pageNum);
-  }
+    if (coverFiles.length) {
+      pageNum++;
+      setProgress(5, 'Đang tạo trang nhận dạng xe...');
+      await addPage(coverFiles.slice(0, perPage), pageNum, pageW, pageH, cols, rows);
+    }
+    for (let i=0; i<Math.ceil(mainFiles.length/perPage); i++) {
+      pageNum++;
+      await addPage(mainFiles.slice(i*perPage,(i+1)*perPage), pageNum, pageW, pageH, cols, rows);
+    }
 
-  // Main pages
-  const nMain = Math.ceil(mainFiles.length / perPage);
-  for (let i=0; i<nMain; i++) {
-    pageNum++;
-    const chunk = mainFiles.slice(i*perPage, (i+1)*perPage);
-    await addPage(chunk, pageNum);
+  // ── LOẠI 2: Giám định hiện trường — mọi thư mục con đều được nhận, không cần tiền tố số ──
+  } else if (loai === 'hientruong') {
+    const [pageW,pageH] = isDoc ? [595,842] : [842,595];
+    const [cols,rows]   = isDoc ? [2,3]     : [2,2];
+    const perPage = cols*rows;
+    const allFiles = state.imageGroups.flatMap(g => g.files.map(f=>({f,cap:g.name})));
+
+    for (let i=0; i<Math.ceil(allFiles.length/perPage); i++) {
+      pageNum++;
+      await addPage(allFiles.slice(i*perPage,(i+1)*perPage), pageNum, pageW, pageH, cols, rows);
+    }
+
+  // ── LOẠI 3: Giám định giấy tờ xe — layout khác nhau theo tiền tố số ──
+  } else if (loai === 'giayto') {
+    const giaytoGroups = state.imageGroups
+      .map(g => ({...g, pn: getPrefixNum(g.name)}))
+      .filter(g => g.pn >= 1 && g.pn <= 6)
+      .sort((a,b) => a.pn - b.pn);
+
+    for (const group of giaytoGroups) {
+      // Tiền tố 1.  → 4 ảnh/trang, landscape A4 (2×2)
+      // Tiền tố 2-3 → 2 ảnh/trang, portrait A4  (1×2)
+      // Tiền tố 4-6 → 1 ảnh/trang, portrait A4  (1×1)
+      let pageW, pageH, cols, rows;
+      if (group.pn === 1)      { [pageW,pageH]=[842,595]; [cols,rows]=[2,2]; }
+      else if (group.pn <= 3)  { [pageW,pageH]=[595,842]; [cols,rows]=[1,2]; }
+      else                     { [pageW,pageH]=[595,842]; [cols,rows]=[1,1]; }
+      const perPage = cols*rows;
+      const files   = group.files.map(f=>({f, cap:group.name}));
+      for (let i=0; i<Math.ceil(files.length/perPage); i++) {
+        pageNum++;
+        await addPage(files.slice(i*perPage,(i+1)*perPage), pageNum, pageW, pageH, cols, rows);
+      }
+    }
   }
 
   setProgress(98, 'Đang hoàn thiện PDF...');
