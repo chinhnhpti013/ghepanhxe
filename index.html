@@ -1191,7 +1191,7 @@ async function generatePDF() {
     const textW = pageW - textX - C.MARGIN;
     const headerMid = (pageH-C.MARGIN-C.HEADER_H) + C.HEADER_H/2;
     const line1 = `${LOAI_MAP[loai] || LOAI_MAP.chitiet} : ${state.bks}`;
-    const line2 = `Địa điểm tại Gara : ${state.gaRa}`;
+    const line2 = loai === 'chitiet' ? `Địa điểm tại Gara : ${state.gaRa}` : state.gaRa;
     const line3 = state.ngay ? `${state.gdv}  —  Ngày: ${state.ngay}` : state.gdv;
     const sp = 2;
     let ty = headerMid + (16+sp+15+sp+14)/2 - 16;
