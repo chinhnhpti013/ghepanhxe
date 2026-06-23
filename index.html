@@ -984,7 +984,7 @@ function resetApp() {
 function getGeminiKey() {
   const injected = window.__GEMINI_KEY__;
   if (injected && injected !== '__GEMINI_API_KEY__') return injected;
-  return '';
+  return localStorage.getItem('gemini_api_key') || '';
 }
 
 // ════════════════════════════════════════════════════════
@@ -1011,7 +1011,7 @@ async function runOCR(dataUrl, statusEl) {
 
   if (!getGeminiKey()) {
     if (spinEl) spinEl.style.display = 'none';
-    if (msgEl) { msgEl.style.color = '#C62828'; msgEl.textContent = '❌ Chưa cấu hình Gemini API key — liên hệ quản trị viên'; }
+    openApiKeyModal(() => runOCR(dataUrl, statusEl));
     return;
   }
 
@@ -1369,6 +1369,43 @@ async function processImage(file, targetWpt, targetHpt) {
 
   return new Promise(resolve => out.toBlob(b => b.arrayBuffer().then(resolve), 'image/png', 0.92));
 }
+
+// ════════════════════════════════════════════════════════
+//  API KEY MODAL
+// ════════════════════════════════════════════════════════
+let _apiKeyCallback = null;
+function openApiKeyModal(callback) {
+  _apiKeyCallback = callback || null;
+  const inp = document.getElementById('apiKeyInput');
+  inp.value = localStorage.getItem('gemini_api_key') || '';
+  document.getElementById('apiKeyModal').classList.remove('hidden');
+  setTimeout(() => inp.focus(), 100);
+}
+function closeApiKeyModal() {
+  document.getElementById('apiKeyModal').classList.add('hidden');
+  _apiKeyCallback = null;
+}
+function saveApiKeyModal() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) { document.getElementById('apiKeyInput').focus(); return; }
+  localStorage.setItem('gemini_api_key', key);
+  document.getElementById('apiKeyModal').classList.add('hidden');
+  if (_apiKeyCallback) { const cb = _apiKeyCallback; _apiKeyCallback = null; cb(); }
+}
 </script>
+
+<!-- ── API KEY MODAL ── -->
+<div class="modal-overlay hidden" id="apiKeyModal">
+  <div class="modal-box">
+    <h2>🔑 Nhập Gemini API Key</h2>
+    <p>Để nhận dạng ảnh báo giá tự động, cần Gemini API key.<br>Key lưu trong trình duyệt, không gửi ra ngoài.</p>
+    <input type="text" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off" spellcheck="false"
+           onkeydown="if(event.key==='Enter')saveApiKeyModal()"/>
+    <div class="modal-footer">
+      <button class="btn-back" onclick="closeApiKeyModal()">Bỏ qua</button>
+      <button class="btn-next" onclick="saveApiKeyModal()">Lưu và tiếp tục</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
