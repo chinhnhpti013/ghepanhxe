@@ -257,7 +257,7 @@ input[type=file]{display:none}
   <div class="hdr-in">
     <div class="hdr-t">
       <h1>Ghép Ảnh Giám Định Xe</h1>
-      <p>Phòng Giám định và Cứu hộ tại Quảng Ninh — PTI SOS</p>
+      <p>Phòng Cứu hộ & Giám định tại khu vực Quảng Ninh — PTI SOS</p>
     </div>
   </div>
 </header>
@@ -1213,7 +1213,7 @@ async function generatePDF() {
 
     // Footer
     const fy = C.MARGIN/2;
-    page.drawText('Phòng Giám định và Cứu hộ tại Quảng Ninh', { x:C.MARGIN, y:fy, size:13, font:fontReg, color:GRAY });
+    page.drawText('Phòng Cứu hộ & Giám định tại khu vực Quảng Ninh', { x:C.MARGIN, y:fy, size:13, font:fontReg, color:GRAY });
     const pnStr = String(pNum), pnW = fontReg.widthOfTextAtSize(pnStr, 13);
     page.drawText(pnStr, { x:pageW-C.MARGIN-pnW, y:fy, size:13, font:fontReg, color:BLUE });
 

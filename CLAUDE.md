@@ -1,7 +1,7 @@
 # Dự án: Ảnh Giám Định Xe Theo Tên File
 
 ## Mục đích
-Ghép ảnh hiện trường xe ô tô thành file PDF khổ A4 chuẩn cho Phòng Giám định và Cứu hộ tại Quảng Ninh.  
+Ghép ảnh hiện trường xe ô tô thành file PDF khổ A4 chuẩn cho Phòng Cứu hộ & Giám định tại khu vực Quảng Ninh.  
 Quy trình 2 giai đoạn: **đặt tên file** → **ghép ảnh thành PDF**.
 
 ---

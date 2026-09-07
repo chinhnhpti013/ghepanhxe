@@ -379,7 +379,7 @@ def draw_footer(c: Canvas, page_w, page_num: int):
 
     c.setFont("BVP", 13)
     c.setFillColor(GRAY_FOOTER)
-    c.drawString(margin, footer_y, "Phòng Giám định và Cứu hộ tại Quảng Ninh")
+    c.drawString(margin, footer_y, "Phòng Cứu hộ & Giám định tại khu vực Quảng Ninh")
 
     c.setFillColor(BLUE_HEADER)
     page_text = str(page_num)

@@ -1,0 +1,29 @@
+﻿Tạo skill Ảnh giám định theo tên file
+A- Dữ liệu đầu vào 
+1. Các file ảnh định dạng (.jpg), (.png)…được đặt tên theo số và tên hạng mục ô tô
+2. Logic tạo ảnh :
+Claude sẽ tạo các bản ảnh ghép 4 ảnh hoặc 6 ảnh vào khung ảnh theo kích thước khổ giấy A4. Với khung ảnh gồm 4 file ảnh : khung ảnh sẽ đặt ngang, với khung ảnh gồm 6 file ảnh : khung ảnh sẽ đặt dọc.
+Nguyên tắc các ảnh ghép phải được đặt ngang ảnh, không đặt ảnh dọc trong các khung ảnh nhỏ. các ảnh tự động co hoặc dãn vừa khít khung ảnh nhỏ. 
+Các khung ảnh nhỏ có khoảng trắng nhỏ (1-2mm) để tách các ảnh không sát liền kề nhau
+Với khung ảnh không có đủ số lượng ảnh thì dồn ảnh lên trên theo thứ tự từ trên xuống dưới, từ trái qua phải.
+Trình tự ghép ảnh sẽ ưu tiến lấy theo tên file ảnh có số thứ tự từ nhỏ đến lớn, ghép liền liên tục vào khung ảnh cho đủ số lượng khổ ngang hoặc dọc, không ngắt quãng khung ảnh.
+Các ảnh được ghép sẽ bo viền 4 mép góc ảnh tạo cảm giác mềm mại.  
+3. Chữ tiêu đề khung ảnh có logic sau :
+- Tiêu đề là “Giám định chi tiết xe ô tô biển kiểm soát : {bks}”, kích cỡ font 16pt
+xuống dòng :
+“Địa điểm tại {ga_ra}” , kích cỡ font 15pt
+Trong đó : {bks} ánh xạ trong file ảnh Báo giá hoặc Bảng kê/ hoặc biển số xe trong file ảnh dữ liệu
+{ga_ra} ánh xạ trong file ảnh Báo giá hoặc Bảng kê : là dòng chữ ở giữa hoặc bên trái trên cùng của ảnh Báo giá hoặc Bảng kê. Nếu dòng chữ  trên cùng và dòng thứ 2 cùng định dạng font và size thì lấy cả.
+Chữ tiêu đề khung ảnh không được đè lên logopti và tự động xuống dòng nếu tràn dòng, phải được căn chỉnh cân đối về giữa với khoảng cách logo và lề bên phải khung ảnh cả chữ tràn dòng
+- Phía dưới tiêu đề trên có dòng chữ {giam_dinh_vien} do người dùng nhập từ dòng lệnh đầu vào, căn chỉnh về giữa tiêu đề, chuẩn size 14pt
+- Các dòng tiêu đề có spacing trên và dưới là 2pt
+- Chiều cao của toàn bộ tiêu đề không quá 3,5 cm
+4. Logoptisos nằm ở vị trí ngoài cùng bên trái trong tiêu đề của khung ảnh. 
+Kích cỡ logo bằng 2,3cm x 2,3cm.
+Khung ảnh có số page chân trang, không có màu nền chân trang, font size 13pt (thường)
+Bên trái ngoài cùng chân trang, cùng dòng với số page, có dòng chữ nhỏ màu xám : “Phòng Cứu hộ & Giám định tại khu vực Quảng Ninh”, font size 13pt (thường)
+Các chú thích (caption) đầy đủ bên dưới mỗi ảnh, chữ trắng, nền xanh blue, hiển thị đúng font size 14pt (thường)
+Grid View toàn bộ khung ảnh với đường viền nét nhỏ, màu xám
+B. Dữ liệu đầu ra : Các khung ảnh tạo ra sẽ được kết xuất ra thành file (.pdf) cho người dùng dowload được.
+Các font chữ theo font Be Vietnam trong khung ảnh phải đủ dấu tiếng Việt.
+C. Cách sử dụng skill : Người dùng sẽ đưa dữ liệu đầu vào là các file ảnh và ảnh báo giá hoặc bảng kê, yêu cầu prompt : “tạo ảnh giám định dọc – GĐV {tên}” sẽ tạo ra khung gồm 6 ảnh, “tạo ảnh giám định ngang – GĐV {tên}” sẽ tạo ra khung gồm 4 ảnh
