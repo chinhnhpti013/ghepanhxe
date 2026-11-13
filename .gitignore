@@ -5,6 +5,9 @@
 output/
 renamed/
 
+# Ảnh hồ sơ khách hàng (số khung, tem đăng kiểm, báo giá...) — KHÔNG đẩy lên GitHub
+input/
+
 # Python cache
 __pycache__/
 *.pyc
