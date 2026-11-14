@@ -123,6 +123,13 @@ khi mở hồ sơ / bản nháp. Hồ sơ cũ chỉ có `useFileName` → đọc
 **tên giấy tờ theo tiền tố** `GIAYTO_NAMES` (chỉ kiểu `giayto`, và chỉ khi tên hạng mục còn tiền tố
 số hoặc là `UNGROUPED` — đổi tên hạng mục thành tên không có tiền tố thì tên đó thắng) → tên hạng mục.
 
+**Tên hạng mục / tên file làm chú thích phải qua `capName()`** — `lettersOnly()` đổi mọi ký tự
+không phải chữ (chữ số, dấu câu, `_`) thành khoảng trắng rồi gộp lại; rỗng thì giữ tên gốc để
+chú thích không trống. Số thứ tự vẫn do `capLine()` sinh ở đầu, nên `1. Cốp sau lõm bẹp, rách_2`
+→ `5. Cốp sau lõm bẹp rách`. **Không áp dụng** cho `GIAYTO_NAMES` (chứa "A4"/"A5") và cho chú thích
+người dùng tự gõ. Python: `letters_only()` / `cap_name()` gọi trong `load_images_with_captions()`
+(cả `--thuyet-minh hang-muc` và `ten-file`, không áp cho `--captions`).
+
 **Số thứ tự ảnh**: `buildPages()` bọc `buildPagesRaw()` và gán `cell.no` chạy liên tục qua các trang
 (trái→phải, trên→dưới). `capLine(cell)` = `"{no}. {cap}"` dùng cho **cả PDF và preview**;
 `printNoMap()` cho thẻ ảnh bước 1 **hiện đúng số sẽ in**. Python: `build_pages()` bọc
@@ -164,6 +171,12 @@ tập ảnh thay đổi. Mở lại app mà còn bản nháp thì có thanh mờ
 - **Dark mode** (nút 🌙, lưu localStorage, mặc định theo hệ điều hành)
 - Danh sách GĐV lưu localStorage (`pti_gdv_list`) và danh sách **Phòng / Khu vực** (`pti_phong_list`);
   tên mới nhập được tự thêm vào. Phòng/khu vực là dòng in ở **chân mỗi trang bản ảnh** (`footerText()`)
+- Hai ô đó dùng **droplist tự dựng** (`COMBOS`, `openCombo/renderCombo/pickCombo/placeCombo`),
+  **không dùng `<datalist>`** — datalist của trình duyệt luôn lọc theo chữ đang có trong ô nên bấm
+  mũi tên hay ra rỗng (ô Phòng có sẵn tên mặc định). Bấm ▼ hiện **cả danh sách**; gõ trong khi đang
+  mở mới lọc, so sánh **bỏ dấu** (`cmbNorm`). Popup dùng `position:fixed` + `placeCombo()` vì
+  `.card` có `overflow:hidden`; `refreshGdvDatalist()` / `refreshPhongDatalist()` giữ tên cũ nhưng
+  giờ chỉ vẽ lại droplist đang mở
 - Phím tắt: `Ctrl/Cmd+A` chọn tất cả · `Delete` xóa ảnh đã chọn · `Esc` bỏ chọn · `L` bật khoanh chọn · `←` `→` chuyển giữa 2 bước
 - Khi đang xem ảnh lớn: `←` `→` chuyển ảnh · `R` xoay · `Esc` đóng
 
@@ -281,9 +294,9 @@ mỗi trang tự mang khổ giấy riêng nên `giayto` trộn được trang ng
 | Logo PTI SOS | `17mm × 17mm`, góc trái header (vừa trong 20mm) |
 | Ảnh trong ô | **Thu vừa khung (contain), canh giữa, không cắt mép, không tự xoay** |
 | Bo góc ảnh | 4% cạnh ngắn của vùng ảnh vẽ ra · khoảng cách ô `2mm` · lề `8mm` |
-| Footer | Tên **Phòng / Khu vực** do người dùng nhập (xám trái) + số trang (xanh phải), 13pt |
+| Footer | Tên **Phòng / Khu vực** do người dùng nhập (xám trái) + `{trang}/{tổng trang}` (xanh phải), `C.FOOTER_FS` / `FOOTER_FS` = **13 × 2/3 ≈ 8,7pt** |
 | Caption | 14pt, tự thu nhỏ nếu tràn |
-| Tiêu đề header | **căn trái** sát logo · `{loại} : {BKS}` 16pt Bold · `Số HSBT: {mã hồ sơ}` 14pt · `{ga-ra}` 15pt · `{GĐV} — Ngày: {ngày}` 14pt |
+| Tiêu đề header | **căn trái**, cách mép phải logo `C.HEAD_X` / `HEAD_X_MM` = **20mm** · `{loại} : {BKS}` 16pt Bold · `Số HSBT: {mã hồ sơ}` 14pt · `{ga-ra}` 15pt · `{GĐV} — Ngày: {ngày}` 14pt |
 | Thu nhỏ tiêu đề | tự co theo `headerMetrics()` / `fit` để vừa 20mm — bản 4 dòng co còn ~79% |
 | Giãn dòng header | **2 point** (không phải 2mm) — xem bẫy kỹ thuật #5 |
 

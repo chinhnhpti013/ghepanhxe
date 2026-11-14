@@ -487,6 +487,11 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <li><b>Tên hạng mục</b> (tên thư mục) — mặc định cho các kiểu bản ảnh còn lại.</li>
   </ol>
   <p>Dù lấy từ nguồn nào, chú thích in ra cũng luôn <b>bắt đầu bằng số thứ tự ảnh</b>.</p>
+  <p class="note"><b>Chú thích lấy từ tên thư mục hoặc tên file được làm sạch tự động:</b>
+     mọi <b>chữ số và dấu câu</b> bị bỏ, chỉ giữ lại ký tự chữ — vì số thứ tự đã do ứng dụng
+     tự sinh ở đầu chú thích. Ví dụ thư mục <code>1. Cốp sau lõm bẹp, rách</code> →
+     chú thích <code>5. Cốp sau lõm bẹp rách</code>. Tên <b>toàn số</b> thì giữ nguyên để
+     chú thích không bị trống, và chữ bạn <b>tự gõ</b> vào ô dưới ảnh thì không bị làm sạch.</p>
   <h4>Hai công tắc chọn nguồn chú thích</h4>
   <p>Ở thanh công cụ trên danh sách ảnh có 2 công tắc, <b>loại trừ nhau</b> (bật cái này tự tắt cái kia;
      tắt cả hai = chế độ tự động):</p>
@@ -496,9 +501,10 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><td><i>tắt cả hai</i> — tự động</td>
         <td>Kiểu <b>Giấy tờ xe</b>: tên giấy tờ theo tiền tố số · các kiểu khác: tên thư mục</td></tr>
     <tr><td><b>Lấy tên file làm chú thích</b></td>
-        <td>Tên file ảnh (bỏ phần mở rộng)</td></tr>
+        <td>Tên file ảnh (bỏ phần mở rộng, bỏ chữ số và dấu câu)</td></tr>
     <tr><td><b>Lấy tên thư mục làm chú thích</b></td>
-        <td>Tên thư mục / tên hạng mục — kể cả với kiểu Giấy tờ xe (bỏ qua bảng tiền tố)</td></tr>
+        <td>Tên thư mục / tên hạng mục (bỏ chữ số và dấu câu) — kể cả với kiểu Giấy tờ xe
+            (bỏ qua bảng tiền tố)</td></tr>
   </table>
   </div>
 
@@ -595,10 +601,22 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
   </div>
 
   <h3 id="danh-sach">11. Danh sách Giám định viên và Phòng / Khu vực</h3>
+  <p>Hai ô <b>Giám định viên / Thụ lý</b> và <b>Phòng / Khu vực giám định</b> là <b>droplist</b>:
+     vừa gõ tay được, vừa chọn lại tên đã dùng trước đó.</p>
   <ul>
-    <li>Gõ tên mới vào ô <b>Giám định viên</b> hoặc <b>Phòng / Khu vực</b> là tên đó tự được thêm
-        vào danh sách gợi ý cho lần sau.</li>
-    <li>Nút <span class="btn-ex">⚙️</span> bên cạnh mỗi ô để thêm / xóa trong danh sách.</li>
+    <li>Bấm mũi tên <span class="btn-ex">▼</span> trong ô → hiện <b>toàn bộ danh sách đã thêm</b>,
+        kể cả khi trong ô đang có sẵn tên. Tên đang dùng có dấu <b>✓</b> ở đầu dòng.</li>
+    <li>Bấm vào một dòng là điền tên đó vào ô.</li>
+    <li>Đang mở danh sách mà <b>gõ chữ</b> thì danh sách lọc theo chữ vừa gõ,
+        <b>không cần gõ dấu</b> — gõ <i>"hoa"</i> ra <i>"Trần Văn Hòa"</i>,
+        gõ <i>"do quoc"</i> ra <i>"Đỗ Quốc Việt"</i>. Muốn xem lại cả danh sách thì
+        xóa chữ trong ô rồi bấm <span class="btn-ex">▼</span>.</li>
+    <li>Bàn phím: <span class="kbd">↓</span> <span class="kbd">↑</span> chạy giữa các dòng,
+        <span class="kbd">Enter</span> chọn dòng đang sáng, <span class="kbd">Esc</span> đóng danh sách.</li>
+    <li>Gõ tên mới hoàn toàn vào ô thì tên đó <b>tự được thêm vào danh sách</b> khi bạn tạo bản ảnh,
+        nên lần sau chỉ cần chọn lại.</li>
+    <li>Nút <span class="btn-ex">⚙️</span> bên cạnh mỗi ô (hoặc dòng cuối trong droplist)
+        để thêm / xóa tên trong danh sách.</li>
     <li>Danh sách lưu riêng trên từng máy (localStorage của trình duyệt).</li>
   </ul>
 
@@ -613,6 +631,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><td><span class="kbd">L</span></td><td>Bật / tắt chế độ khoanh chọn</td></tr>
     <tr><td><span class="kbd">←</span> <span class="kbd">→</span></td>
         <td>Chuyển giữa bước 1 và bước 2</td></tr>
+    <tr><td><span class="kbd">↓</span> <span class="kbd">↑</span> · <span class="kbd">Enter</span></td>
+        <td>Trong ô <b>GĐV</b> / <b>Phòng</b>: mở danh sách, chạy giữa các dòng và chọn dòng đang sáng</td></tr>
     <tr><td><span class="kbd">Tab</span> / <span class="kbd">Shift</span>+<span class="kbd">Tab</span></td>
         <td>Nhảy sang ô chú thích kế tiếp / trước đó</td></tr>
     <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang xem ảnh kích thước lớn</b></td></tr>
@@ -636,13 +656,14 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><td>Dải tiêu đề</td><td>Cao 20 mm, nền xanh <code>#1565C0</code>, chữ trắng, dán sát mép trên trang</td></tr>
     <tr><td>Logo PTI SOS</td><td>17 × 17 mm, góc trái dải tiêu đề</td></tr>
     <tr><td>Dòng tiêu đề</td>
-        <td>Căn trái sát logo: <b>{kiểu giám định} : {BKS}</b> 16pt đậm · <i>Số HSBT: {mã hồ sơ}</i>
+        <td>Căn trái, cách logo <b>20 mm</b>: <b>{kiểu giám định} : {BKS}</b> 16pt đậm · <i>Số HSBT: {mã hồ sơ}</i>
             14pt · <i>{ga-ra}</i> 15pt · <i>{GĐV} — Ngày: {ngày}</i> 14pt.
             Tự thu nhỏ để vừa dải tiêu đề; dòng Số HSBT chỉ in khi có mã hồ sơ.</td></tr>
     <tr><td>Khung ảnh</td><td>Bo góc mềm, khoảng cách giữa các ô 2 mm, lề trang 8 mm</td></tr>
     <tr><td>Chú thích</td><td>14pt, chữ trắng trên nền xanh dưới mỗi ảnh, tự thu nhỏ nếu dài.
         Bắt đầu bằng <b>số thứ tự ảnh</b> chạy liên tục qua các trang</td></tr>
-    <tr><td>Chân trang</td><td>Tên Phòng / Khu vực (xám, bên trái) + số trang (xanh, bên phải), 13pt</td></tr>
+    <tr><td>Chân trang</td><td>Tên Phòng / Khu vực (xám, bên trái) + <b>số trang / tổng số trang</b>
+        (xanh, bên phải), cỡ chữ <b>8,7pt</b> (2/3 cỡ cũ)</td></tr>
   </table>
   </div>
 </section>

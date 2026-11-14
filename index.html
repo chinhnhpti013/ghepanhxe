@@ -314,6 +314,32 @@ input[type=file]{display:none}
 .fg .hint{font-size:.72rem;color:var(--text-3)}
 .fg .row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 .fg .row input{flex:1;min-width:120px}
+.fg .row .combo{flex:1;min-width:140px}
+
+/* Droplist tự dựng cho ô "Giám định viên" và "Phòng / Khu vực" — bấm ▼ hiện cả danh sách
+   đã thêm (datalist của trình duyệt tự lọc theo chữ đang có trong ô nên hay ra rỗng). */
+.combo{position:relative;display:flex;align-items:center}
+.combo>input{padding-right:36px!important}
+.combo-ar{position:absolute;right:4px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+  border:none;border-radius:var(--r-xs);background:transparent;color:var(--text-2);
+  font-size:.72rem;line-height:1;cursor:pointer;transition:var(--t)}
+.combo-ar:hover{background:var(--brand-soft);color:var(--brand)}
+.combo.open .combo-ar{background:var(--brand);color:#fff}
+:root[data-theme="dark"] .combo.open .combo-ar{color:#07121F}
+.combo-pop{position:fixed;z-index:80;max-height:252px;overflow:auto;background:var(--surface);
+  border:1.5px solid var(--border-s);border-radius:var(--r-sm);box-shadow:var(--sh-3);padding:5px}
+.combo-hd{font-size:.7rem;font-weight:700;color:var(--text-3);text-transform:uppercase;
+  letter-spacing:.03em;padding:4px 9px 6px}
+.combo-it{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-xs);
+  font-size:.86rem;color:var(--text);cursor:pointer;line-height:1.32;transition:var(--t)}
+.combo-it:hover,.combo-it.on{background:var(--brand-soft);color:var(--brand-d)}
+:root[data-theme="dark"] .combo-it:hover,:root[data-theme="dark"] .combo-it.on{color:var(--brand-soft)}
+.combo-it .ci{flex:none;width:14px;text-align:center;color:var(--brand);font-size:.8rem}
+.combo-it.cur{font-weight:700}
+.combo-no{padding:12px 10px;font-size:.8rem;color:var(--text-3);text-align:center;line-height:1.45}
+.combo-ft{border-top:1px solid var(--border);margin-top:5px;padding-top:5px}
+.combo-ft button{width:100%;justify-content:center}
 .pill-note{padding:8px 12px;background:var(--brand-soft);border:1px solid var(--brand);
   border-radius:var(--r-xs);font-size:.79rem;color:var(--brand);font-weight:600;line-height:1.45}
 
@@ -605,16 +631,24 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
             <div class="fg">
               <label>Giám định viên / Thụ lý <span class="req">*</span></label>
               <div class="row">
-                <input type="text" id="fGdv" list="gdvList" placeholder="Chọn hoặc nhập tên GĐV"/>
-                <datalist id="gdvList"></datalist>
+                <div class="combo" id="fGdvCombo">
+                  <input type="text" id="fGdv" placeholder="Chọn hoặc nhập tên GĐV" autocomplete="off"/>
+                  <button type="button" class="combo-ar" onclick="toggleCombo('fGdv')"
+                          title="Xem danh sách Giám định viên đã thêm">▼</button>
+                  <div class="combo-pop hidden" id="fGdvPop"></div>
+                </div>
                 <button class="btn btn-n btn-icon" onclick="openGdvMgr()" title="Quản lý danh sách GĐV">⚙️</button>
               </div>
             </div>
             <div class="fg">
               <label>Phòng / Khu vực giám định <span class="req">*</span></label>
               <div class="row">
-                <input type="text" id="fPhong" list="phongList" placeholder="Chọn hoặc nhập tên mã Phòng/khu vực giám định"/>
-                <datalist id="phongList"></datalist>
+                <div class="combo" id="fPhongCombo">
+                  <input type="text" id="fPhong" placeholder="Chọn hoặc nhập tên mã Phòng/khu vực giám định" autocomplete="off"/>
+                  <button type="button" class="combo-ar" onclick="toggleCombo('fPhong')"
+                          title="Xem danh sách Phòng / Khu vực đã thêm">▼</button>
+                  <div class="combo-pop hidden" id="fPhongPop"></div>
+                </div>
                 <button class="btn btn-n btn-icon" onclick="openPhongMgr()" title="Quản lý danh sách Phòng/khu vực">⚙️</button>
               </div>
               <span class="hint">In ở chân mỗi trang bản ảnh</span>
@@ -983,7 +1017,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-14c';
+const APP_BUILD   = '2026-11-14d';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô biển kiểm soát',
@@ -1056,6 +1090,18 @@ function cleanText(s) {
     .trim();
 }
 const baseName = n => n.replace(/\.[^.]+$/, '');
+/** Tên thư mục / tên file khi dùng làm chú thích: bỏ chữ số và dấu câu, chỉ giữ ký tự chữ.
+ *  "1. Cốp sau lõm bẹp, rách_2" → "Cốp sau lõm bẹp rách".
+ *  Số thứ tự in ở đầu chú thích vẫn do capLine() tự sinh.
+ *  Giữ khớp với letters_only() trong ghep_anh.py. */
+function lettersOnly(s) {
+  return String(s == null ? '' : s)
+    .replace(/[^\p{L}\p{M}\s]+/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+/** lettersOnly() nhưng không bao giờ trả về rỗng (tên toàn số thì giữ nguyên) */
+const capName = s => lettersOnly(s) || String(s == null ? '' : s).trim();
 function getPrefixNum(name) { const m = String(name).match(/^(\d+)/); return m ? parseInt(m[1]) : null; }
 /** Tiền tố số của tên ảnh / tên thư mục → [chính, phụ] (phụ = 0 nếu không có); null nếu không có tiền tố.
  *  Chỉ nhận 1–2 chữ số để tên máy ảnh kiểu "20261114_123.jpg" không bị hiểu là tiền tố.
@@ -1196,9 +1242,8 @@ const GDV_KEY = 'pti_gdv_list';
 const getGdvList = () => { try { return JSON.parse(localStorage.getItem(GDV_KEY)) || []; } catch { return []; } };
 const setGdvList = a => localStorage.setItem(GDV_KEY, JSON.stringify(a));
 
-function refreshGdvDatalist() {
-  $('gdvList').innerHTML = getGdvList().map(n => `<option value="${esc(n)}"></option>`).join('');
-}
+/** Danh sách GĐV đổi → vẽ lại droplist nếu đang mở */
+function refreshGdvDatalist() { if (comboCur === 'fGdv') renderCombo('fGdv'); }
 function openGdvMgr() { renderGdvMgr(); openOverlay('gdvModal'); setTimeout(() => $('gdvNew').focus(), 80); }
 function renderGdvMgr() {
   const list = getGdvList();
@@ -1243,9 +1288,8 @@ function getPhongList() {
 }
 const setPhongList = a => localStorage.setItem(PHONG_KEY, JSON.stringify(a));
 
-function refreshPhongDatalist() {
-  $('phongList').innerHTML = getPhongList().map(n => `<option value="${esc(n)}"></option>`).join('');
-}
+/** Danh sách Phòng / khu vực đổi → vẽ lại droplist nếu đang mở */
+function refreshPhongDatalist() { if (comboCur === 'fPhong') renderCombo('fPhong'); }
 function openPhongMgr() { renderPhongMgr(); openOverlay('phongModal'); setTimeout(() => $('phongNew').focus(), 80); }
 function renderPhongMgr() {
   const list = getPhongList();
@@ -1277,6 +1321,123 @@ function usePhong(i) {
 }
 /** Dòng chữ in ở chân mỗi trang bản ảnh */
 function footerText() { return $('fPhong').value.trim() || PHONG_DEFAULT; }
+
+// ════════════════════════════════════════════════════════
+//  DROPLIST CHO Ô "GIÁM ĐỊNH VIÊN" VÀ "PHÒNG / KHU VỰC"
+//  Bấm ▼ → hiện TOÀN BỘ danh sách đã thêm (không lọc theo chữ đang có trong ô).
+//  Tự dựng thay cho <datalist> vì datalist của trình duyệt luôn lọc theo nội dung ô
+//  nên khi ô đã có sẵn tên thì bấm mũi tên thường không thấy gì.
+// ════════════════════════════════════════════════════════
+const COMBOS = {
+  fGdv:   { getList: () => getGdvList(),   mgr: () => openGdvMgr(),
+            title: 'Giám định viên đã thêm',      mgrLbl: '⚙️ Quản lý danh sách GĐV' },
+  fPhong: { getList: () => getPhongList(), mgr: () => openPhongMgr(),
+            title: 'Phòng / Khu vực đã thêm',     mgrLbl: '⚙️ Quản lý danh sách Phòng / Khu vực' },
+};
+let comboCur  = null;   // id ô đang mở droplist
+let comboQ    = null;   // null = hiện cả danh sách · chuỗi = đang lọc theo chữ vừa gõ
+let comboIdx  = -1;     // dòng đang được chọn bằng bàn phím
+let comboShow = [];     // các tên đang hiển thị
+
+/** Bỏ dấu + hạ chữ thường để tìm "chinh" ra "Chính", "hoa" ra "Hòa" */
+const cmbNorm = t => String(t == null ? '' : t).normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().trim();
+
+function renderCombo(id) {
+  const c = COMBOS[id], pop = $(id + 'Pop'), cur = $(id).value.trim();
+  const all = c.getList();
+  const q = comboQ == null ? '' : cmbNorm(comboQ);
+  comboShow = q ? all.filter(n => cmbNorm(n).includes(q)) : all.slice();
+  if (comboIdx >= comboShow.length) comboIdx = -1;
+
+  const body = comboShow.length
+    ? `<div class="combo-hd">${esc(c.title)} (${all.length})</div>` + comboShow.map((n, i) =>
+        `<div class="combo-it${i === comboIdx ? ' on' : ''}${n === cur ? ' cur' : ''}"
+              onclick="pickCombo('${id}', ${i})"><span class="ci">${n === cur ? '✓' : ''}</span>
+          <span>${esc(n)}</span></div>`).join('')
+    : `<div class="combo-no">${all.length
+        ? 'Không có tên nào khớp “' + esc(comboQ) + '”.<br>Xóa chữ trong ô rồi bấm ▼ để xem cả danh sách.'
+        : 'Chưa có tên nào trong danh sách.<br>Gõ tên vào ô — tên sẽ được tự thêm khi tạo bản ảnh.'}</div>`;
+
+  pop.innerHTML = body +
+    `<div class="combo-ft"><button class="btn btn-n btn-sm" onclick="comboMgr('${id}')">${esc(c.mgrLbl)}</button></div>`;
+}
+
+/** Đặt droplist ngay dưới ô nhập — dùng position:fixed để không bị thẻ .card (overflow:hidden) cắt */
+function placeCombo(id) {
+  const r = $(id).getBoundingClientRect(), pop = $(id + 'Pop');
+  const h = pop.offsetHeight || 0, below = window.innerHeight - r.bottom - 10;
+  pop.style.width = r.width + 'px';
+  pop.style.left  = r.left + 'px';
+  if (below < Math.min(h, 160) && r.top > below) pop.style.top = (r.top - h - 5) + 'px';
+  else                                           pop.style.top = (r.bottom + 5) + 'px';
+}
+
+function openCombo(id) {
+  if (comboCur && comboCur !== id) closeCombo();
+  comboCur = id; comboQ = null; comboIdx = -1;      // mở bằng mũi tên = hiện cả danh sách
+  renderCombo(id);
+  $(id + 'Pop').classList.remove('hidden');
+  $(id + 'Combo').classList.add('open');
+  placeCombo(id);
+}
+function closeCombo() {
+  if (!comboCur) return;
+  $(comboCur + 'Pop').classList.add('hidden');
+  $(comboCur + 'Combo').classList.remove('open');
+  comboCur = null; comboQ = null; comboIdx = -1; comboShow = [];
+}
+function toggleCombo(id) {
+  const open = comboCur === id;
+  closeCombo();
+  if (!open) { openCombo(id); $(id).focus(); }
+}
+function pickCombo(id, i) {
+  const v = comboShow[i];
+  if (v == null) return;
+  closeCombo();
+  $(id).value = v;
+  $(id).dispatchEvent(new Event('input'));   // chạy đúng các việc như khi gõ tay
+  $(id).focus();
+}
+function comboMgr(id) { const c = COMBOS[id]; closeCombo(); c.mgr(); }
+
+Object.keys(COMBOS).forEach(id => {
+  const el = $(id);
+  // Gõ trong khi droplist đang mở → lọc theo chữ vừa gõ
+  el.addEventListener('input', () => {
+    if (comboCur !== id) return;
+    comboQ = el.value.trim(); comboIdx = -1;
+    renderCombo(id); placeCombo(id);
+  });
+  el.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (comboCur !== id) { openCombo(id); return; }
+      if (!comboShow.length) return;
+      comboIdx = e.key === 'ArrowDown'
+        ? (comboIdx + 1) % comboShow.length
+        : (comboIdx <= 0 ? comboShow.length : comboIdx) - 1;
+      renderCombo(id);
+      const on = $(id + 'Pop').querySelector('.combo-it.on');
+      if (on) on.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter' && comboCur === id && comboIdx >= 0) {
+      e.preventDefault(); pickCombo(id, comboIdx);
+    } else if (e.key === 'Escape' && comboCur === id) {
+      e.preventDefault(); e.stopPropagation(); closeCombo();
+    }
+  });
+  el.addEventListener('blur', () => setTimeout(() => {
+    // rời ô mà không bấm vào droplist thì đóng lại
+    if (comboCur === id && !$(id + 'Pop').contains(document.activeElement)) closeCombo();
+  }, 160));
+});
+
+document.addEventListener('mousedown', e => {
+  if (comboCur && !e.target.closest('#' + comboCur + 'Combo')) closeCombo();
+});
+window.addEventListener('scroll', () => { if (comboCur) placeCombo(comboCur); }, true);
+window.addEventListener('resize', () => { if (comboCur) placeCombo(comboCur); });
 
 // ════════════════════════════════════════════════════════
 //  INDEXEDDB — HỒ SƠ LƯU TRÊN MÁY
@@ -1743,19 +1904,20 @@ function normalizeCaption(input) {
   return v.replace(SENTENCE_START, (_, b, ch) => b + ch.toLocaleUpperCase('vi-VN'));
 }
 /** Chú thích mặc định của một ảnh (khi ảnh chưa có chú thích riêng).
- *  capSrc 'file'   → tên file ảnh
- *  capSrc 'folder' → tên thư mục / tên hạng mục
+ *  capSrc 'file'   → tên file ảnh (đã bỏ chữ số và dấu câu)
+ *  capSrc 'folder' → tên thư mục / tên hạng mục (đã bỏ chữ số và dấu câu)
  *  capSrc 'auto'   → kiểu giấy tờ xe: tên giấy tờ theo tiền tố; còn lại: tên hạng mục.
  *  Tên hạng mục do người dùng tự đặt (đã bỏ tiền tố số) được ưu tiên hơn bảng tiền tố,
  *  để nút đổi tên hạng mục vẫn có tác dụng. */
 function defaultCapOf(it, g) {
-  if (state.capSrc === 'file')   return baseName(it.file.name);
-  if (state.capSrc === 'folder') return g.name;
+  if (state.capSrc === 'file')   return capName(baseName(it.file.name));
+  if (state.capSrc === 'folder') return capName(g.name);
   if ($('fLoai').value === 'giayto') {
     const nm = giaytoName(prefixOf(it, g));
+    // Tên trong bảng GIAYTO_NAMES giữ nguyên (có "A4", "A5" — không được bỏ chữ số)
     if (nm && (g.name === UNGROUPED || getPrefixPair(g.name))) return nm;
   }
-  return g.name;
+  return capName(g.name);
 }
 
 // ──────── Render gallery ────────
@@ -2396,8 +2558,10 @@ const C = {
   CAPTION_H:  7  * MM,
   GAP:        2  * MM,
   LOGO:       17 * MM,   // vừa trong header 20mm
+  HEAD_X:     20 * MM,   // khoảng cách từ mép phải logo tới chữ tiêu đề
   HEAD_PAD:   2,         // chừa trên/dưới khối chữ header (point)
   LINE_SP:    2,         // giãn dòng header (point)
+  FOOTER_FS:  13 * 2 / 3,// cỡ chữ chân trang = 2/3 cỡ cũ (13pt)
 };
 
 // Tỉ lệ ascender / descender ước lượng của Be Vietnam Pro
@@ -2749,7 +2913,7 @@ function renderPreview() {
       <div class="pv-page" style="width:${px(p.w)};height:${px(p.h)}">
       <div class="pvh" style="height:${px(C.HEADER_H)};padding-left:${px(C.MARGIN)}">
         ${logoSrc ? `<img class="pvh-logo" src="${esc(logoSrc)}" style="width:${px(C.LOGO)};height:${px(C.LOGO)}" alt=""/>` : ''}
-        <div class="pvh-t" style="margin-left:${px(4)};margin-right:${px(C.MARGIN)}">
+        <div class="pvh-t" style="margin-left:${px(C.HEAD_X)};margin-right:${px(C.MARGIN)}">
           ${hLines.map(l => `<div style="font-size:${px(l.size * hFit)}${l.bold ? ';font-weight:700' : ''}">${esc(l.text)}</div>`).join('')}
         </div>
       </div>
@@ -2757,8 +2921,8 @@ function renderPreview() {
            grid-template-columns:repeat(${p.cols},1fr);grid-template-rows:repeat(${p.rows},${px(cellH)});gap:${px(C.GAP)}">
         ${cells.join('')}
       </div>
-      <div class="pvf" style="height:${px(C.FOOTER_H)};margin:0 ${px(C.MARGIN)};font-size:${px(13)}">
-        <span>${esc(footerText())}</span><span class="pn">${pi+1}</span>
+      <div class="pvf" style="height:${px(C.FOOTER_H)};margin:0 ${px(C.MARGIN)};font-size:${px(C.FOOTER_FS)}">
+        <span>${esc(footerText())}</span><span class="pn">${pi+1}/${pages.length}</span>
       </div>
       </div>
     </div>`;
@@ -2905,7 +3069,7 @@ async function generatePDF(opts) {
     if (logo) page.drawImage(logo, {
       x: C.MARGIN, y: P.h - C.HEADER_H/2 - C.LOGO/2, width: C.LOGO, height: C.LOGO });
 
-    const textX = C.MARGIN + C.LOGO + 4;
+    const textX = C.MARGIN + C.LOGO + C.HEAD_X;
     const textW = P.w - textX - C.MARGIN;
     const headerMid = P.h - C.HEADER_H / 2;
     const { fit, visH } = headerMetrics(hLines);
@@ -2931,9 +3095,10 @@ async function generatePDF(opts) {
 
     // ── Footer ──
     const fy = C.MARGIN / 2;
-    page.drawText(footerText(), { x: C.MARGIN, y: fy, size: 13, font: fontReg, color: GRAY() });
-    const pn = String(pi + 1), pnW = fontReg.widthOfTextAtSize(pn, 13);
-    page.drawText(pn, { x: P.w - C.MARGIN - pnW, y: fy, size: 13, font: fontReg, color: BLUE() });
+    const ffs = C.FOOTER_FS;
+    page.drawText(footerText(), { x: C.MARGIN, y: fy, size: ffs, font: fontReg, color: GRAY() });
+    const pn = `${pi + 1}/${pages.length}`, pnW = fontReg.widthOfTextAtSize(pn, ffs);
+    page.drawText(pn, { x: P.w - C.MARGIN - pnW, y: fy, size: ffs, font: fontReg, color: BLUE() });
 
     // ── Lưới ảnh ──
     for (let idx = 0; idx < P.cells.length; idx++) {

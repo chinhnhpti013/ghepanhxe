@@ -35,6 +35,7 @@ import math
 import os
 import re
 import sys
+import unicodedata
 
 import io as _bytesio
 from PIL import Image, ImageDraw, ImageOps
@@ -75,6 +76,8 @@ MARGIN_MM     = 8           # lề xung quanh
 CORNER_RADIUS_PCT = 0.04    # bo góc = 4% cạnh ngắn của vùng ảnh vẽ ra
 HEAD_PAD      = 2           # chừa trên/dưới khối chữ header (point)
 HEAD_LINE_SP  = 2           # giãn dòng header (point)
+HEAD_X_MM     = 20          # khoảng cách từ mép phải logo tới chữ tiêu đề
+FOOTER_FS     = 13 * 2 / 3  # cỡ chữ chân trang = 2/3 cỡ cũ (13pt)
 ASC, DESC     = 0.78, 0.22  # tỉ lệ ascender / descender của Be Vietnam Pro
 
 # ── Fonts ─────────────────────────────────────────────────────────────────────
@@ -248,6 +251,24 @@ def normalize_caption(text: str) -> str:
     return _SENTENCE_START.sub(lambda m: m.group(1) + m.group(2).upper(), value)
 
 
+def letters_only(text: str) -> str:
+    """Bỏ chữ số và dấu câu trong tên thư mục / tên file, chỉ giữ ký tự chữ.
+
+    "1. Cốp sau lõm bẹp, rách_2" → "Cốp sau lõm bẹp rách".
+    Số thứ tự in ở đầu chú thích vẫn do build_pages() tự sinh.
+    Giữ khớp với lettersOnly() trong index.html.
+    """
+    out = []
+    for ch in str("" if text is None else text):
+        out.append(ch if (ch.isalpha() or ch.isspace() or unicodedata.combining(ch)) else " ")
+    return re.sub(r"\s+", " ", "".join(out)).strip()
+
+
+def cap_name(text: str) -> str:
+    """letters_only() nhưng không trả về rỗng (tên toàn số thì giữ nguyên)."""
+    return letters_only(text) or str("" if text is None else text).strip()
+
+
 def load_images_with_captions(renamed_dir: str = RENAMED_DIR,
                               thuyet_minh: str = "hang-muc",
                               captions_file: str = ""):
@@ -257,6 +278,7 @@ def load_images_with_captions(renamed_dir: str = RENAMED_DIR,
 
     thuyet_minh   : "hang-muc" dùng tên thư mục gốc (mapping.json);
                     "ten-file" dùng tên file ảnh (bỏ phần mở rộng).
+                    Cả 2 nguồn đều đi qua cap_name() — bỏ chữ số và dấu câu.
     captions_file : JSON ghi đè từng ảnh, mỗi mục nhận 1 trong 2 dạng:
                       "tên file": "chú thích riêng"
                       "tên file": {"cap": "chú thích", "rot": 90}
@@ -304,6 +326,8 @@ def load_images_with_captions(renamed_dir: str = RENAMED_DIR,
             continue
         if thuyet_minh == "ten-file":
             caption = os.path.splitext(fname)[0]
+        # Tên hạng mục / tên file: bỏ chữ số và dấu câu, chỉ giữ ký tự chữ
+        caption = cap_name(caption)
         rot = 0
         ov = overrides.get(fname)
         if isinstance(ov, dict):
@@ -476,7 +500,7 @@ def draw_header(c: Canvas, page_w, page_h, bks: str, ga_ra: str, gdv: str,
                     preserveAspectRatio=True, mask="auto")
 
     # Vùng chữ tiêu đề (bên phải logo)
-    text_x = margin + logo_size + 4
+    text_x = margin + logo_size + _pts(HEAD_X_MM)
     text_w = page_w - text_x - margin
     c.setFillColor(WHITE)
 
@@ -562,17 +586,20 @@ def _draw_wrapped(c: Canvas, text: str, x, y, max_w, font_size, color):
         y -= font_size + _pts(1)
 
 
-def draw_footer(c: Canvas, page_w, page_num: int, phong: str = ""):
-    """Vẽ footer: tên Phòng/khu vực bên trái, số trang bên phải."""
+def draw_footer(c: Canvas, page_w, page_num: int, phong: str = "", total_pages: int = 0):
+    """Vẽ footer: tên Phòng/khu vực bên trái, "số trang/tổng số trang" bên phải.
+
+    Cỡ chữ FOOTER_FS = 2/3 của 13pt — giữ khớp hằng `C.FOOTER_FS` của index.html.
+    """
     margin  = _pts(MARGIN_MM)
     footer_y = margin / 2
 
-    c.setFont("BVP", 13)
+    c.setFont("BVP", FOOTER_FS)
     c.setFillColor(GRAY_FOOTER)
     c.drawString(margin, footer_y, phong or PHONG_DEFAULT)
 
     c.setFillColor(BLUE_HEADER)
-    page_text = str(page_num)
+    page_text = f"{page_num}/{total_pages}" if total_pages else str(page_num)
     c.drawRightString(page_w - margin, footer_y, page_text)
 
 
@@ -684,7 +711,7 @@ def create_pdf(pages: list, gdv: str, bks: str, ga_ra: str, output_path: str,
         page_w, page_h = pg["size"]
         c.setPageSize(pg["size"])
         draw_header(c, page_w, page_h, bks, ga_ra, gdv, ngay, loai, ma_ho_so)
-        draw_footer(c, page_w, i + 1, phong)
+        draw_footer(c, page_w, i + 1, phong, len(pages))
         draw_image_grid(c, page_w, page_h, pg["cells"], pg["cols"], pg["rows"])
         total_imgs += len(pg["cells"])
         if i < len(pages) - 1:
