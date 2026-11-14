@@ -510,38 +510,58 @@ def draw_header(c: Canvas, page_w, page_h, bks: str, ga_ra: str, gdv: str,
     text_w = page_w - text_x - margin
     c.setFillColor(WHITE)
 
-    # Các dòng tiêu đề: (các đoạn chữ, cỡ chữ, in đậm)
+    # Các dòng tiêu đề: (các đoạn chữ, cỡ chữ, in đậm, nhóm co chữ)
     prefix_loai = LOAI_GD_MAP.get(loai, LOAI_GD_MAP["chitiet"])
     # Dòng 1 — {loại} : {BKS} kèm Ngày giám định ở cuối
     d1 = f"{prefix_loai} : {bks}"
-    lines = [([f"{d1}  -  Ngày: {ngay}" if ngay else d1], 15, True)]
-    # Dòng 2 — Số HSBT (chỉ khi có mã hồ sơ) nối liền tên GĐV, cách nhau HEAD_SEG_MM
+    lines = [([f"{d1}  -  Ngày: {ngay}" if ngay else d1], 15, True, None)]
+    # Dòng 2 — Số HSBT (chỉ khi có mã hồ sơ) nối liền tên GĐV, cách nhau HEAD_SEG_MM.
+    # Nhóm "b": dòng 2 và dòng 3 cùng cỡ chữ và CO CHUNG về cỡ nhỏ nhất của hai dòng.
     segs = ([f"Số HSBT: {ma_ho_so}"] if ma_ho_so else [])
     segs.append(gdv)
-    lines.append((segs, 14, False))
+    lines.append((segs, 14, False, "b"))
     # Chỉ loại "chitiet" mới có tiền tố "Địa điểm tại Gara"
-    lines.append(([f"Địa điểm tại Gara : {ga_ra}" if loai == "chitiet" else ga_ra], 15, False))
+    lines.append(([f"Địa điểm tại Gara : {ga_ra}" if loai == "chitiet" else ga_ra], 14, False, "b"))
 
     # Canh giữa dọc trong header.
     # spacing tính bằng POINT (không phải mm) cho khớp hằng `C.LINE_SP` của index.html.
-    # Header chỉ còn 20mm (~56.7pt); khối 3 dòng (15+14+15) vừa khung nên fit = 1,
+    # Header chỉ còn 20mm (~56.7pt); khối 3 dòng (15+14+14) vừa khung nên fit = 1,
     # nhưng vẫn giữ công thức co vì số dòng thay đổi theo dữ liệu.
     spacing = HEAD_LINE_SP
     # Chiều cao THỊ GIÁC = khoảng cách giữa các baseline + đỉnh chữ dòng đầu
     # + nét thòng dòng cuối. Chỉ cộng cỡ chữ thì nét thòng dòng cuối sẽ lòi khỏi nền xanh.
-    span    = sum(sz + spacing for _, sz, _ in lines[:-1])
+    span    = sum(sz + spacing for _, sz, _, _ in lines[:-1])
     raw_vis = span + ASC * lines[0][1] + DESC * lines[-1][1]
     fit     = min(1.0, (header_h - 2 * HEAD_PAD) / raw_vis)
     spacing *= fit
     start_y = (top_y - header_h / 2) + (raw_vis * fit) / 2 - ASC * lines[0][1] * fit
 
     seg_gap = _pts(HEAD_SEG_MM)
-    for segs, size, bold in lines:
-        size *= fit
-        c.setFont("BVP-Bold" if bold else "BVP", size)
-        _draw_left(c, segs, text_x, start_y, text_w, size, WHITE, bold, seg_gap)
-        # Chỉ trừ cỡ chữ dòng hiện tại + spacing — xem CLAUDE.md
-        start_y -= (size + spacing)
+    # Đo trước từng dòng để tìm cỡ chữ vừa bề ngang (giống `prep` trong index.html)
+    prepared = []
+    for segs, size, bold, grp in lines:
+        font  = "BVP-Bold" if bold else "BVP"
+        parts = [" ".join(p.split()) for p in segs if p and p.strip()]
+        gaps_w = seg_gap * max(0, len(parts) - 1)
+        fs = size * fit
+        while parts and sum(c.stringWidth(p, font, fs) for p in parts) + gaps_w > text_w and fs > 6:
+            fs -= 0.5
+        prepared.append({"parts": parts, "font": font, "bold": bold,
+                         "size": size, "grp": grp, "fs": fs})
+    # Các dòng cùng nhóm co chung về cỡ nhỏ nhất của nhóm
+    grp_fs = {}
+    for r in prepared:
+        if r["grp"]:
+            grp_fs[r["grp"]] = min(grp_fs.get(r["grp"], r["fs"]), r["fs"])
+    for r in prepared:
+        if r["grp"]:
+            r["fs"] = grp_fs[r["grp"]]
+
+    for r in prepared:
+        c.setFont(r["font"], r["fs"])
+        _draw_left(c, r["parts"], text_x, start_y, text_w, r["fs"], WHITE, r["bold"], seg_gap)
+        # Bước dòng theo cỡ KHAI BÁO (không theo cỡ đã co) + spacing — xem CLAUDE.md
+        start_y -= (r["size"] * fit + spacing)
 
 
 def _draw_left(c: Canvas, text, x, y, max_w, font_size, color, bold=False, gap=0.0):

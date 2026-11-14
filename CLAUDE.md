@@ -388,9 +388,10 @@ mỗi trang tự mang khổ giấy riêng nên `giayto` trộn được trang ng
 | Bo góc ảnh | 4% cạnh ngắn của vùng ảnh vẽ ra · khoảng cách ô `2mm` · lề `8mm` |
 | Footer | Tên **Phòng / Khu vực** do người dùng nhập (xám trái) + `{trang}/{tổng trang}` (xanh phải), `C.FOOTER_FS` / `FOOTER_FS` = **13 × 2/3 ≈ 8,7pt** |
 | Caption | 14pt, tự thu nhỏ nếu tràn |
-| Tiêu đề header | **căn trái**, cách mép phải logo `C.HEAD_X` / `HEAD_X_MM` = **12mm** · **3 dòng**: ① `{loại} : {BKS}  -  Ngày: {ngày}` 15pt Bold · ② `Số HSBT: {mã hồ sơ}` + **cách 10mm** + `{GĐV}` (cùng một dòng, 14pt) · ③ `{ga-ra}` 15pt |
+| Tiêu đề header | **căn trái**, cách mép phải logo `C.HEAD_X` / `HEAD_X_MM` = **12mm** · **3 dòng**: ① `{loại} : {BKS}  -  Ngày: {ngày}` 15pt Bold · ② `Số HSBT: {mã hồ sơ}` + **cách 10mm** + `{GĐV}` (cùng một dòng, 14pt) · ③ `{ga-ra}` 14pt |
 | Khoảng cách 2 đoạn trên dòng 2 | `C.SEG_GAP` / `HEAD_SEG_MM` = **10mm** — giữ nguyên khi dòng bị co |
-| Thu nhỏ tiêu đề | tự co theo `headerMetrics()` / `fit` để vừa 20mm — khối 3 dòng (15+14+15) cao ~48pt nên `fit` = 1 (không co theo chiều dọc). Riêng **dòng 1 trên A4 dọc luôn dài hơn vùng chữ** nên `drawLeft()` / `_draw_left()` tự hạ cỡ chữ (chitiet ~14,5pt · hientruong/xacminh ~13,5pt). **Đừng giảm `HEAD_X` để chữa**: muốn giữ đủ 15pt thì `chitiet` cần `HEAD_X` ≤ 4,7mm, còn `hientruong`/`xacminh` cần số âm — tự co là bắt buộc. A4 ngang thì luôn đủ 15pt |
+| Thu nhỏ tiêu đề | tự co theo `headerMetrics()` / `fit` để vừa 20mm — khối 3 dòng (15+14+14) cao ~47,8pt nên `fit` = 1 (không co theo chiều dọc). Riêng **dòng 1 trên A4 dọc luôn dài hơn vùng chữ** nên tự hạ cỡ chữ (chitiet ~14,5pt · hientruong/xacminh ~13,5pt). **Đừng giảm `HEAD_X` để chữa**: muốn giữ đủ 15pt thì `chitiet` cần `HEAD_X` ≤ 4,7mm, còn `hientruong`/`xacminh` cần số âm — tự co là bắt buộc. A4 ngang thì luôn đủ 15pt |
+| Dòng 2 & 3 co chung | hai dòng mang `grp:'b'` (web) / nhóm `"b"` (Python) → **luôn cùng một cỡ chữ**: đo riêng từng dòng rồi lấy **cỡ nhỏ nhất** của nhóm. Ga-ra dài làm cả dòng Số HSBT/GĐV nhỏ theo, và ngược lại |
 | Giãn dòng header | **2 point** (không phải 2mm) — xem bẫy kỹ thuật #5 |
 
 ### Bẫy kỹ thuật đã gặp — đừng lặp lại
@@ -418,8 +419,11 @@ mỗi trang tự mang khổ giấy riêng nên `giayto` trộn được trang ng
 6. **Đoạn "Số HSBT" chỉ in khi có mã hồ sơ**, nên số dòng/đoạn của header thay đổi theo dữ liệu —
    `draw_header()` và `headerLines()` phải tính chiều cao khối động rồi mới canh giữa, không hard-code.
    Mỗi dòng header là một **danh sách đoạn** (`segs` / tuple `(segs, size, bold)`), cách nhau
-   `C.SEG_GAP` = 10mm; `drawLeft()` (web) / `_draw_left()` (Python) đo tổng bề rộng **cả dòng**
-   (gồm khoảng cách) rồi mới thu nhỏ, và chỉ cắt bớt **đoạn cuối** nếu vẫn tràn.
+   `C.SEG_GAP` = 10mm. Việc dựng header chia 2 bước: **đo trước** (`prep` / `prepared`) để tìm cỡ
+   chữ vừa bề ngang của từng dòng — tính cả khoảng cách giữa các đoạn — rồi các dòng cùng nhóm
+   lấy cỡ nhỏ nhất, **sau đó mới vẽ** (`drawLeft()` / `_draw_left()`, chỉ cắt bớt **đoạn cuối**
+   nếu vẫn tràn). Bước xuống dòng vẫn dùng **cỡ khai báo**, không dùng cỡ đã co, để khối chữ
+   giữ đúng chiều cao mà `headerMetrics()` đã tính.
 7. **`loadThumbs()` bỏ qua ảnh có `offsetParent` rỗng**, nên phải hiện thẻ gallery (`display:''`)
    TRƯỚC khi gọi nó, nếu không ảnh đại diện hạng mục sẽ trắng cho tới lần render sau.
 8. **Chiều cao khối chữ header phải tính theo kích thước THỊ GIÁC**, không phải tổng cỡ chữ:

@@ -1175,7 +1175,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-14m';
+const APP_BUILD   = '2026-11-14n';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -3353,7 +3353,9 @@ function buildPagesRaw() {
  * Các dòng in trên header mỗi trang PDF — **3 dòng**:
  *   1. {loại giám định} : {BKS}  -  Ngày: {ngày}                       15pt đậm
  *   2. Số HSBT: {mã hồ sơ}  ·10mm·  {GĐV}                              14pt
- *   3. {ga-ra}                                                         15pt
+ *   3. {ga-ra}                                                         14pt
+ * Dòng 2 và 3 mang `grp:'b'` → luôn **cùng một cỡ chữ**: dòng nào phải co cho vừa
+ * bề ngang thì dòng kia co theo.
  * Mỗi dòng gồm 1–2 **đoạn** (`segs`) nằm trên cùng baseline, cách nhau `gap`.
  * @param ph true = chế độ xem trước: điền chỗ trống bằng {…} thay vì bỏ qua
  * @returns {{size:number,bold:boolean,gap?:number,segs:{text:string,ph?:boolean}[]}[]}
@@ -3377,17 +3379,19 @@ function headerLines(ph) {
   if (maHs)    segs.push({ text: `Số HSBT: ${maHs}` });
   else if (ph) segs.push({ text: 'Số HSBT: {mã hồ sơ}', ph: true });
   segs.push({ text: gdv });
-  out.push({ size: 14, bold: false, gap: C.SEG_GAP, segs });
+  // `grp:'b'` — dòng 2 và dòng 3 cùng cỡ chữ và CO CHUNG về cỡ nhỏ nhất của hai dòng
+  out.push({ size: 14, bold: false, gap: C.SEG_GAP, grp: 'b', segs });
 
-  out.push({ size: 15, bold: false,
+  out.push({ size: 14, bold: false, grp: 'b',
              segs: [{ text: loai === 'chitiet' ? `Địa điểm tại Gara : ${gara}` : gara }] });
   return out;
 }
 
 /**
  * Thu nhỏ dòng tiêu đề của preview A4 cho khớp cách `drawLeft()` co chữ khi dựng PDF:
- * PDF giảm cỡ chữ cho vừa bề rộng (khoảng cách 15mm giữ nguyên), còn CSS thì chỉ biết
+ * PDF giảm cỡ chữ cho vừa bề rộng (khoảng cách giữa 2 đoạn giữ nguyên), còn CSS thì chỉ biết
  * cắt bớt bằng dấu "…" — nên phải tự đo rồi hạ `font-size`.
+ * Các dòng cùng `data-grp` (dòng 2 & 3) sau khi đo xong sẽ lấy chung cỡ nhỏ nhất.
  * Header mọi trang giống nhau nên chỉ đo trang ĐẦU của mỗi khổ giấy rồi áp cho các trang sau
  * (trang ngang rộng hơn trang dọc nên phải tách theo bề rộng).
  */
@@ -3405,6 +3409,16 @@ function fitPvHeaders(host) {
         d.style.fontSize = fs + 'px';
       }
       sizes.push(fs);
+    });
+    // Dòng cùng nhóm co chung về cỡ nhỏ nhất (giống `grpFs` khi dựng PDF)
+    const gmin = {};
+    divs.forEach((d, i) => {
+      const g = d.dataset.grp;
+      if (g) gmin[g] = Math.min(gmin[g] ?? Infinity, sizes[i]);
+    });
+    divs.forEach((d, i) => {
+      const g = d.dataset.grp;
+      if (g) { sizes[i] = gmin[g]; d.style.fontSize = sizes[i] + 'px'; }
     });
     byW.set(pg.style.width, sizes);
   });
@@ -3534,7 +3548,7 @@ function renderPreview() {
       <div class="pvh" style="height:${px(C.HEADER_H)};padding-left:${px(C.MARGIN)}">
         ${logoSrc ? `<img class="pvh-logo" src="${esc(logoSrc)}" style="width:${px(C.LOGO)};height:${px(C.LOGO)}" alt=""/>` : ''}
         <div class="pvh-t" style="margin-left:${px(C.HEAD_X)};margin-right:${px(C.MARGIN)}">
-          ${hLines.map(l => `<div style="font-size:${px(l.size * hFit)}${l.bold ? ';font-weight:700' : ''}">${headerLineHTML(l, px(C.SEG_GAP))}</div>`).join('')}
+          ${hLines.map(l => `<div${l.grp ? ` data-grp="${l.grp}"` : ''} style="font-size:${px(l.size * hFit)}${l.bold ? ';font-weight:700' : ''}">${headerLineHTML(l, px(C.SEG_GAP))}</div>`).join('')}
         </div>
       </div>
       <div class="pv-grid" style="margin:${px(C.HEADER_GAP)} ${px(C.MARGIN)} 0;height:${px(areaH)};
@@ -3700,31 +3714,41 @@ async function generatePDF(opts) {
     // Mỗi bước chỉ trừ (font size dòng hiện tại + spacing) — xem CLAUDE.md
     let ty = headerMid + visH / 2 - ASC * hLines[0].size * fit;
 
-    // Vẽ 1 dòng header: 1–2 đoạn chữ cùng baseline, cách nhau `gap`;
-    // tự thu nhỏ cả dòng rồi cắt bớt đoạn cuối nếu vẫn tràn
-    const drawLeft = (l, font, size, y) => {
+    // Đo trước từng dòng (1–2 đoạn chữ cùng baseline, cách nhau `gap`) rồi tìm cỡ chữ vừa bề ngang
+    const prep = hLines.map(l => {
+      const font  = l.bold ? fontBold : fontReg;
       const gap   = l.gap || 0;
       const parts = l.segs.map(s => cleanText(s.text).replace(/\s+/g, ' ').trim()).filter(Boolean);
-      if (!parts.length) return;
-      const gapsW = gap * (parts.length - 1);
+      const gapsW = gap * Math.max(0, parts.length - 1);
       const wAt   = fs => parts.reduce((s, t) => s + font.widthOfTextAtSize(t, fs), 0) + gapsW;
-      let fs = size;
-      while (wAt(fs) > textW && fs > 6) fs -= 0.5;
-      if (wAt(fs) > textW) {
-        const room = textW - (wAt(fs) - font.widthOfTextAtSize(parts[parts.length - 1], fs));
+      let fs = l.size * fit;
+      while (parts.length && wAt(fs) > textW && fs > 6) fs -= 0.5;
+      return { l, font, gap, parts, wAt, fs };
+    });
+    // Các dòng cùng `grp` (dòng 2 & 3) co chung về cỡ nhỏ nhất của nhóm
+    const grpFs = {};
+    prep.forEach(p => { if (p.l.grp) grpFs[p.l.grp] = Math.min(grpFs[p.l.grp] ?? Infinity, p.fs); });
+    prep.forEach(p => { if (p.l.grp) p.fs = grpFs[p.l.grp]; });
+
+    // Vẽ 1 dòng với cỡ chữ đã chốt; vẫn cắt bớt đoạn cuối nếu cỡ chung làm dòng tràn
+    const drawLeft = (p, y) => {
+      if (!p.parts.length) return;
+      const parts = p.parts.slice(), fs = p.fs;
+      if (p.wAt(fs) > textW) {
+        const room = textW - (p.wAt(fs) - p.font.widthOfTextAtSize(parts[parts.length - 1], fs));
         let last = parts[parts.length - 1];
-        while (last.length > 1 && font.widthOfTextAtSize(last + '…', fs) > room) last = last.slice(0, -1);
+        while (last.length > 1 && p.font.widthOfTextAtSize(last + '…', fs) > room) last = last.slice(0, -1);
         parts[parts.length - 1] = last + '…';
       }
       let x = textX;
       for (const t of parts) {
-        page.drawText(t, { x, y, size: fs, font, color: WHITE() });
-        x += font.widthOfTextAtSize(t, fs) + gap;
+        page.drawText(t, { x, y, size: fs, font: p.font, color: WHITE() });
+        x += p.font.widthOfTextAtSize(t, fs) + p.gap;
       }
     };
-    hLines.forEach(l => {
-      drawLeft(l, l.bold ? fontBold : fontReg, l.size * fit, ty);
-      ty -= (l.size * fit + sp);
+    prep.forEach(p => {
+      drawLeft(p, ty);
+      ty -= (p.l.size * fit + sp);   // bước dòng theo cỡ KHAI BÁO, không theo cỡ đã co
     });
 
     // ── Footer ──
