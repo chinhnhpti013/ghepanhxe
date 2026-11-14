@@ -177,6 +177,14 @@ tập ảnh thay đổi. Mở lại app mà còn bản nháp thì có thanh mờ
   mở mới lọc, so sánh **bỏ dấu** (`cmbNorm`). Popup dùng `position:fixed` + `placeCombo()` vì
   `.card` có `overflow:hidden`; `refreshGdvDatalist()` / `refreshPhongDatalist()` giữ tên cũ nhưng
   giờ chỉ vẽ lại droplist đang mở
+  - **Hai bẫy đã sửa, đừng lặp lại:** (1) dự án **không có rule `.hidden` chung** (chỉ `.viewer.hidden`
+    và `.ov.hidden`), nên popup cần rule riêng `.combo-pop.hidden{display:none}` — thiếu nó thì
+    droplist lúc đóng vẫn hiện ra một ô rỗng nhỏ bo tròn ở đáy màn hình (do `position:fixed`), và
+    `pickCombo()` bấm vào không ăn vì `comboShow` đã bị `closeCombo()` xóa rỗng.
+    (2) Bấm ▼ khi con trỏ đang ở trong ô sẽ `blur` ô **trước** khi `click` chạy → lệnh đóng hẹn giờ
+    160ms của handler `blur` sẽ đóng ngay droplist vừa mở. Phải giữ `comboBlurT` và
+    `clearTimeout(comboBlurT)` ở đầu `openCombo()`; lần mở đầu tiên không dính lỗi này nên triệu
+    chứng là "chỉ chọn được 1 lần"
 - Phím tắt: `Ctrl/Cmd+A` chọn tất cả · `Delete` xóa ảnh đã chọn · `Esc` bỏ chọn · `L` bật khoanh chọn · `←` `→` chuyển giữa 2 bước
 - Khi đang xem ảnh lớn: `←` `→` chuyển ảnh · `R` xoay · `Esc` đóng
 
