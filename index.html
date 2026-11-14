@@ -18,24 +18,31 @@
 
 /* ════════ DESIGN TOKENS ════════ */
 :root{
+  /* Màu IN ẤN (nền header + caption của PDF) — KHÔNG đổi, để bản in giữ nguyên nhận diện */
   --brand:#1565C0; --brand-d:#0D47A1; --brand-m:#1976D2; --brand-soft:#E3F2FD;
   --green:#2E7D32; --green-soft:#E8F5E9;
   --red:#C62828;   --red-soft:#FFEBEE;
-  --amber:#E65100; --amber-soft:#FFF8E1;
+  --amber:#9A6700; --amber-soft:#FFF6DA;
 
-  --bg:#F4F6FA;
+  /* ── XANH NHẠT: nền trang, đầu thẻ, khung dữ liệu ── */
+  --sky:#DCEBFA; --sky-2:#EFF6FE; --sky-b:#C7DEF5;
+  /* ── VÀNG NHẠT: thanh công cụ, vùng kéo thả, khối tóm tắt, ghi chú ── */
+  --sand:#FFFCF2; --sand-2:#FFF6DC; --sand-b:#EBD9A8; --sand-tx:#7A5B0B;
+
+  --bg:#E9F2FB;
+  --bg-grad:linear-gradient(180deg,#E2EEFB 0,#F0F7FD 460px,#EDF4FB 100%);
   --surface:#FFFFFF;
-  --surface-2:#F8FAFC;
-  --border:#E2E8F0;
-  --border-s:#CBD5E1;
-  --text:#111827;
-  --text-2:#475569;
-  --text-3:#94A3B8;
+  --surface-2:#F4F9FE;
+  --border:#D9E7F6;
+  --border-s:#B8D2EC;
+  --text:#102A43;
+  --text-2:#44607C;
+  --text-3:#5A7691;
 
-  --r:14px; --r-sm:9px; --r-xs:6px;
-  --sh-1:0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.05);
-  --sh-2:0 4px 6px -1px rgba(15,23,42,.07), 0 2px 4px -2px rgba(15,23,42,.05);
-  --sh-3:0 12px 24px -8px rgba(21,101,192,.18), 0 4px 8px -4px rgba(15,23,42,.08);
+  --r:16px; --r-sm:11px; --r-xs:8px;
+  --sh-1:0 1px 2px rgba(16,42,67,.05), 0 1px 3px rgba(16,42,67,.05);
+  --sh-2:0 4px 8px -2px rgba(16,42,67,.09), 0 2px 4px -2px rgba(16,42,67,.06);
+  --sh-3:0 14px 28px -10px rgba(21,101,192,.22), 0 4px 10px -4px rgba(16,42,67,.10);
   --ring:0 0 0 3px rgba(21,101,192,.16);
   --t:.18s cubic-bezier(.4,0,.2,1);
 }
@@ -43,16 +50,20 @@
   --brand:#5B9DF0; --brand-d:#8FC0FA; --brand-m:#4A8FE8; --brand-soft:#16293F;
   --green:#6BBF73; --green-soft:#14271A;
   --red:#F2847E;   --red-soft:#2C1618;
-  --amber:#F0A95C; --amber-soft:#2A2113;
+  --amber:#E8BE6A; --amber-soft:#2E2614;
 
-  --bg:#0B0F15;
-  --surface:#141A22;
-  --surface-2:#1B222C;
-  --border:#263142;
-  --border-s:#36445A;
+  --sky:#101C29; --sky-2:#16263A; --sky-b:#2A4460;
+  --sand:#221D11; --sand-2:#2A2416; --sand-b:#4A3E22; --sand-tx:#E8C877;
+
+  --bg:#0B1017;
+  --bg-grad:linear-gradient(180deg,#0A121C 0,#0C141E 460px,#0B1017 100%);
+  --surface:#141D28;
+  --surface-2:#1A2432;
+  --border:#263546;
+  --border-s:#36495F;
   --text:#E6EDF5;
-  --text-2:#A3B2C4;
-  --text-3:#6B7C92;
+  --text-2:#A3B6C9;
+  --text-3:#6D8299;
 
   --sh-1:0 1px 2px rgba(0,0,0,.4);
   --sh-2:0 4px 10px rgba(0,0,0,.45);
@@ -62,13 +73,15 @@
 
 html{-webkit-text-size-adjust:100%}
 body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);background:var(--bg);
+  background-image:var(--bg-grad);background-attachment:fixed;
   min-height:100vh;min-height:100dvh;line-height:1.55;-webkit-font-smoothing:antialiased;
   display:flex;flex-direction:column}
 ::selection{background:var(--brand);color:#fff}
 
 /* ════════ APP BAR ════════ */
 .appbar{background:linear-gradient(135deg,#0D47A1 0%,#1565C0 55%,#1976D2 100%);color:#fff;
-  position:sticky;top:0;z-index:60;padding-top:env(safe-area-inset-top);box-shadow:var(--sh-2)}
+  position:sticky;top:0;z-index:60;padding-top:env(safe-area-inset-top);box-shadow:var(--sh-2);
+  border-bottom:3px solid #F2C86A}
 :root[data-theme="dark"] .appbar{background:linear-gradient(135deg,#0A1A2E 0%,#102B47 55%,#16395C 100%)}
 .appbar-in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
 /* Logo để nền trong suốt, hiện thẳng trên nền xanh như trong bản ảnh PDF */
@@ -91,7 +104,7 @@ body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);backgro
 /* ════════ STEPPER ════════ */
 .stepper-wrap{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;
   top:0;z-index:50;box-shadow:var(--sh-1)}
-.stepper{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:4px}
+.stepper{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:4px}
 .stp{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:none;
   font-family:inherit;padding:4px 6px;border-radius:var(--r-sm);transition:var(--t)}
 .stp:hover:not(:disabled){background:var(--surface-2)}
@@ -112,38 +125,39 @@ body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);backgro
 /* ════════ LAYOUT ════════ */
 /* padding-bottom = chiều cao thanh nút cố định (61px) + khoảng hở, để dòng chữ
    cuối trang nằm sát ngay trên thanh nút mà không bị nó che */
-main{max-width:1180px;margin:22px auto 0;padding:0 20px calc(77px + env(safe-area-inset-bottom));
+main{max-width:1180px;margin:26px auto 0;padding:0 20px calc(77px + env(safe-area-inset-bottom));
   flex:1;display:flex;flex-direction:column}
 .panel{display:none;animation:fade .24s ease}
 .panel.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-.cols{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+.cols{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start}
 @media(max-width:980px){.cols{grid-template-columns:1fr}}
 .sticky-side{position:sticky;top:86px}
 @media(max-width:980px){.sticky-side{position:static}}
 
 /* ════════ CARD ════════ */
 .card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh-1);
-  border:1px solid var(--border);margin-bottom:18px;overflow:hidden}
-.card-hd{padding:13px 18px;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:9px;
-  background:var(--surface-2);border-bottom:1px solid var(--border);color:var(--text)}
-.card-hd .ico{font-size:1.05rem;line-height:1}
+  border:1px solid var(--sky-b);margin-bottom:20px;overflow:hidden}
+.card-hd{padding:14px 20px;font-weight:700;font-size:.92rem;display:flex;align-items:center;gap:10px;
+  background:linear-gradient(180deg,var(--sky-2) 0,var(--sky) 100%);
+  border-bottom:1px solid var(--sky-b);color:var(--brand-d);letter-spacing:-.01em}
+.card-hd .ico{font-size:1.1rem;line-height:1}
 .card-hd .sp{flex:1}
-.card-bd{padding:18px}
-.card-bd.tight{padding:14px}
+.card-bd{padding:20px}
+.card-bd.tight{padding:16px}
 /* Giới hạn bề ngang khối form để các ô nhập không kéo dài hết màn hình */
 .card-bd.narrow{max-width:960px}
 
 /* ════════ DROP ZONE — bố cục ngang cho gọn ════════ */
-.dz{border:2px dashed var(--border-s);border-radius:var(--r);padding:12px 16px;
-  cursor:pointer;transition:var(--t);background:var(--surface-2);
-  display:flex;align-items:center;gap:14px;text-align:left}
+.dz{border:2px dashed var(--sand-b);border-radius:var(--r);padding:14px 18px;
+  cursor:pointer;transition:var(--t);background:var(--sand-2);
+  display:flex;align-items:center;gap:15px;text-align:left}
 .dz:hover,.dz.drag{border-color:var(--brand);background:var(--brand-soft)}
 .dz.drag{transform:scale(1.008)}
 .dz-ico{font-size:1.7rem;display:block;line-height:1;flex-shrink:0}
 .dz-main{flex:1;min-width:0}
 .dz h3{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:1px}
-.dz p{font-size:.76rem;color:var(--text-3);line-height:1.4}
+.dz p{font-size:.76rem;color:var(--text-2);line-height:1.45}
 .dz-btns{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;justify-content:flex-end}
 input[type=file]{display:none}
 
@@ -173,8 +187,8 @@ input[type=file]{display:none}
 :root[data-theme="dark"] .btn.on{color:#07121F}
 
 /* ════════ TOOLBAR / CHIPS ════════ */
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:11px 14px;
-  background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:14px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;padding:12px 15px;
+  background:var(--sand);border:1px solid var(--sand-b);border-radius:var(--r-sm);margin-bottom:16px}
 .toolbar .sp{flex:1;min-width:6px}
 .chip{display:inline-flex;align-items:center;gap:5px;border-radius:30px;padding:3px 11px;
   font-size:.72rem;font-weight:700;border:1px solid transparent;white-space:nowrap}
@@ -195,11 +209,14 @@ input[type=file]{display:none}
 .sw input:checked + .sw-t::after{transform:translateX(18px)}
 
 /* ════════ GROUP (accordion) ════════ */
-.grp{border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:11px;overflow:hidden;
-  background:var(--surface)}
-.grp-hd{display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(--surface-2);
+.grp{border:1px solid var(--sky-b);border-radius:var(--r-sm);margin-bottom:13px;overflow:hidden;
+  background:var(--surface);box-shadow:var(--sh-1)}
+.grp-hd{display:flex;align-items:center;gap:12px;padding:11px 14px;
+  background:linear-gradient(180deg,var(--sky-2) 0,var(--sky) 100%);
   cursor:pointer;transition:var(--t)}
 .grp-hd:hover{background:var(--brand-soft)}
+/* Nhóm ảnh nhận dạng xe (tiền tố 0.) dùng nền vàng nhạt cho dễ nhận ra */
+.grp.is-cover .grp-hd{background:linear-gradient(180deg,var(--sand) 0,var(--sand-2) 100%)}
 .grp-cv{width:3px;align-self:stretch;border-radius:3px;background:var(--brand);flex-shrink:0}
 .grp.is-cover .grp-cv{background:var(--green)}
 .grp-th{width:50px;height:38px;object-fit:cover;border-radius:var(--r-xs);flex-shrink:0;
@@ -209,11 +226,11 @@ input[type=file]{display:none}
 .grp-ct{font-size:.74rem;color:var(--text-3);margin-top:1px}
 .grp-caret{color:var(--text-3);font-size:.8rem;transition:var(--t);flex-shrink:0}
 .grp.open .grp-caret{transform:rotate(180deg)}
-.grp-bd{display:none;padding:12px 13px;border-top:1px solid var(--border)}
+.grp-bd{display:none;padding:14px;border-top:1px solid var(--sky-b)}
 .grp.open .grp-bd{display:block}
 
 /* ════════ THUMB GRID — thẻ ảnh có ô chú thích riêng ════════ */
-.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:12px;position:relative}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(202px,1fr));gap:14px;position:relative}
 .th{position:relative;border-radius:var(--r-sm);border:2px solid var(--border);background:var(--surface);
   transition:var(--t);display:flex;flex-direction:column;overflow:hidden}
 .th:hover{border-color:var(--brand-m);box-shadow:var(--sh-2)}
@@ -226,17 +243,22 @@ input[type=file]{display:none}
 /* Xoay 90°/270°: hoán đổi khung trước khi xoay để khung sau khi xoay vẫn khớp ô 4:3
    (chiều rộng = 3/4 ô, chiều cao = 4/3 ô) */
 .th-img.q img{width:75%;height:133.3333%}
-.th.sel .th-img::after{content:'✓';position:absolute;top:6px;right:6px;width:21px;height:21px;
-  border-radius:50%;background:var(--brand);color:#fff;font-size:.7rem;font-weight:700;
-  display:flex;align-items:center;justify-content:center;z-index:3;box-shadow:var(--sh-2)}
-:root[data-theme="dark"] .th.sel .th-img::after{color:#07121F}
+/* Ô tick chọn ảnh — LUÔN hiện (kể cả khi chưa chọn) để nhìn là biết chọn được,
+   nhờ vậy không cần chế độ "khoanh chọn" và dùng được cả trên điện thoại */
+.th-ck{position:absolute;top:6px;right:6px;width:25px;height:25px;border-radius:7px;
+  border:2px solid #fff;background:rgba(255,255,255,.80);color:rgba(0,0,0,.22);
+  font-size:.78rem;font-weight:700;line-height:1;display:flex;align-items:center;
+  justify-content:center;z-index:4;cursor:pointer;transition:var(--t);box-shadow:var(--sh-2)}
+.th-ck:hover{background:#fff;border-color:var(--brand);color:var(--brand-m);transform:scale(1.08)}
+.th.sel .th-ck{background:var(--brand);border-color:#fff;color:#fff}
+:root[data-theme="dark"] .th.sel .th-ck{color:#07121F}
 .th-n{position:absolute;top:6px;left:6px;min-width:22px;height:22px;padding:0 6px;border-radius:30px;
   background:var(--green);color:#fff;font-size:.68rem;font-weight:700;display:flex;
   align-items:center;justify-content:center;z-index:2;box-shadow:var(--sh-1)}
 :root[data-theme="dark"] .th-n{color:#07121F}
 .th-rot{position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.66);color:#fff;font-size:.62rem;
   font-weight:700;padding:1px 7px;border-radius:30px;z-index:2}
-.th-acts{display:flex;gap:4px;padding:6px;background:var(--surface-2);border-top:1px solid var(--border)}
+.th-acts{display:flex;gap:5px;padding:7px;background:var(--sky-2);border-top:1px solid var(--border)}
 .th-acts button{flex:1;min-width:0;height:30px;border-radius:var(--r-xs);border:1px solid var(--border-s);
   background:var(--surface);color:var(--text-2);font-size:.86rem;cursor:pointer;font-family:inherit;
   display:flex;align-items:center;justify-content:center;transition:var(--t);line-height:1;padding:0}
@@ -251,9 +273,14 @@ input[type=file]{display:none}
 .th-ta::placeholder{color:var(--text-3);font-style:italic}
 .th-ta:focus{outline:none;background:var(--brand-soft);box-shadow:inset 0 0 0 2px var(--brand)}
 .th-ta.has-val{font-weight:600}
-.marquee{position:absolute;border:1.5px solid var(--brand);background:rgba(21,101,192,.14);
-  pointer-events:none;z-index:9;border-radius:3px}
-.thumbs.lasso .th-img{cursor:crosshair}
+/* Ô tick của hạng mục — 3 trạng thái: trống · một phần (–) · cả nhóm (✓) */
+.grp-ck{width:23px;height:23px;flex-shrink:0;border-radius:6px;border:2px solid var(--border-s);
+  background:var(--surface);color:transparent;font-size:.76rem;font-weight:700;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.grp-ck:hover{border-color:var(--brand);color:var(--brand-m)}
+.grp-ck.some{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
+.grp-ck.all{background:var(--brand);border-color:var(--brand);color:#fff}
+:root[data-theme="dark"] .grp-ck.all{color:#07121F}
 
 /* ════════ XEM ẢNH LỚN ════════ */
 .viewer{position:fixed;inset:0;background:rgba(6,10,16,.92);z-index:980;display:flex;
@@ -283,12 +310,12 @@ input[type=file]{display:none}
 
 /* ════════ FORM ════════ */
 .one-col{display:block}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:600px){.fgrid{grid-template-columns:1fr}}
-.fgrid3{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:15px}
+.fgrid3{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px}
 @media(max-width:760px){.fgrid3{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.fgrid3{grid-template-columns:1fr}}
-.lay-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.lay-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
 @media(max-width:760px){.lay-wrap{grid-template-columns:1fr}}
 .lay-wrap > div{display:flex;flex-direction:column;gap:6px}
 
@@ -306,12 +333,12 @@ input[type=file]{display:none}
 .title-prev .tp-mute{opacity:.5;font-style:italic}
 .title-prev .tp-n{padding:6px 13px;border-top:1px dashed var(--brand);
   font-size:.72rem;color:var(--text-2);text-align:left}
-.fg{display:flex;flex-direction:column;gap:6px}
+.fg{display:flex;flex-direction:column;gap:7px}
 .fg.span2{grid-column:1/-1}
 .fg label{font-size:.78rem;font-weight:700;color:var(--text-2);display:flex;align-items:center;gap:4px}
 .fg label .req{color:var(--red)}
 .fg input,.fg select,.fg textarea{border:1.5px solid var(--border-s);border-radius:var(--r-xs);
-  padding:9px 12px;font-size:.9rem;font-family:inherit;color:var(--text);background:var(--surface);
+  padding:10px 12px;font-size:.9rem;font-family:inherit;color:var(--text);background:var(--surface);
   transition:var(--t);width:100%}
 .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--brand);box-shadow:var(--ring)}
 .fg input.ok{border-color:var(--green);background:var(--green-soft)}
@@ -372,21 +399,21 @@ input[type=file]{display:none}
 :root[data-theme="dark"] .cnt.sel{color:#07121F}
 
 /* ════════ SUMMARY ════════ */
-.sum{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px}
-.sum h3{font-size:.86rem;font-weight:700;color:var(--brand);margin-bottom:9px;
-  padding-bottom:8px;border-bottom:1px solid var(--border)}
+.sum{background:var(--sand);border:1px solid var(--sand-b);border-radius:var(--r-sm);padding:16px 18px}
+.sum h3{font-size:.88rem;font-weight:700;color:var(--brand-d);margin-bottom:10px;
+  padding-bottom:9px;border-bottom:1px solid var(--sand-b)}
 .sum-r{display:flex;justify-content:space-between;gap:12px;font-size:.81rem;padding:3.5px 0}
 .sum-r .l{color:var(--text-3);flex-shrink:0}
 .sum-r .v{font-weight:700;color:var(--text);text-align:right;word-break:break-word}
-.sum-r.big{border-top:1px solid var(--border);margin-top:7px;padding-top:9px;font-size:.88rem}
+.sum-r.big{border-top:1px solid var(--sand-b);margin-top:8px;padding-top:10px;font-size:.88rem}
 .sum-r.big .v{color:var(--brand)}
 
 /* ════════ PREVIEW ════════ */
-.pv-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:10px 14px;
-  background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:14px}
+.pv-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:11px 15px;
+  background:var(--sand);border:1px solid var(--sand-b);border-radius:var(--r-sm);margin-bottom:16px}
 .pv-bar .sp{flex:1}
-.pv-scroll{max-height:72vh;overflow-y:auto;background:var(--bg);border:1px solid var(--border);
-  border-radius:var(--r-sm);padding:16px;display:flex;flex-direction:column;align-items:center;gap:20px}
+.pv-scroll{max-height:72vh;overflow-y:auto;background:var(--sky);border:1px solid var(--sky-b);
+  border-radius:var(--r-sm);padding:18px;display:flex;flex-direction:column;align-items:center;gap:20px}
 .pv-item{display:flex;flex-direction:column;align-items:center;gap:7px;flex-shrink:0}
 .pv-page{background:#fff;box-shadow:var(--sh-3);position:relative;flex-shrink:0;overflow:hidden;
   display:flex;flex-direction:column;color:#111;border-radius:2px}
@@ -430,23 +457,28 @@ input[type=file]{display:none}
 .alert-e{background:var(--red-soft);border-color:var(--red);color:var(--red)}
 .alert-o{background:var(--green-soft);border-color:var(--green);color:var(--green)}
 .alert-i{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
+/* Khối mẹo 💡 — nền vàng nhạt để nổi trên nền xanh nhạt của trang */
+.tipbox{background:var(--sand-2);border:1px solid var(--sand-b);border-radius:var(--r-sm);
+  padding:11px 15px;margin-bottom:16px}
+.tipbox .hint{font-size:.78rem;line-height:1.65;color:var(--sand-tx)}
+.tipbox .hint b{color:var(--sand-tx)}
 .empty{text-align:center;padding:26px 18px;color:var(--text-2)}
 .empty .ei{font-size:2.3rem;margin-bottom:7px;line-height:1;display:block}
 .empty p{font-size:.84rem;line-height:1.6}
 /* Gợi ý "chưa có ảnh" dạng một dòng ngang, gọn hơn nhiều so với khối căn giữa */
 #emptyState{display:flex;align-items:flex-start;gap:10px;text-align:left;
-  padding:11px 13px;margin-top:11px;background:var(--amber-soft);
-  border:1px solid var(--amber);border-radius:var(--r-sm)}
+  padding:12px 14px;margin-top:12px;background:var(--sand-2);
+  border:1px solid var(--sand-b);border-radius:var(--r-sm)}
 #emptyState .ei{font-size:1.1rem;margin:0;flex-shrink:0;line-height:1.5}
 #emptyState p{font-size:.78rem;line-height:1.5;color:var(--text-2)}
-.empty code{background:var(--surface-2);border:1px solid var(--border);padding:1px 5px;
+.empty code{background:var(--sky-2);border:1px solid var(--sky-b);padding:1px 5px;
   border-radius:4px;font-size:.78rem;color:var(--brand)}
 hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
 
 /* ════════ NÚT HƯỚNG DẪN + MODAL HƯỚNG DẪN ════════ */
 .ab-btn-h{position:relative;width:auto;min-width:38px;padding:0 12px;font-size:.84rem;font-weight:700;letter-spacing:.01em}
-.ab-btn-h::after{content:'';position:absolute;top:-2px;right:-2px;width:8px;height:8px;
-  border-radius:50%;background:var(--amber);border:2px solid var(--brand-d);
+.ab-btn-h::after{content:'';position:absolute;top:-2px;right:-2px;width:9px;height:9px;
+  border-radius:50%;background:#FFC94D;border:2px solid var(--brand-d);
   opacity:0;transition:var(--t)}
 .ab-btn-h.new::after{opacity:1}
 .mdl.full{max-width:1000px;height:92vh;max-height:92vh;padding:17px 18px 18px}
@@ -462,7 +494,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
   justify-content:center;padding:16px;backdrop-filter:blur(3px);animation:fade .15s}
 .ov.hidden{display:none}
 .mdl{background:var(--surface);border-radius:var(--r);padding:24px;max-width:520px;width:100%;
-  box-shadow:var(--sh-3);border:1px solid var(--border);max-height:88vh;display:flex;flex-direction:column}
+  box-shadow:var(--sh-3);border:1px solid var(--sky-b);max-height:88vh;display:flex;flex-direction:column}
 .mdl.wide{max-width:760px}
 .mdl h2{font-size:1.02rem;font-weight:700;color:var(--text);margin-bottom:5px;display:flex;align-items:center;gap:8px}
 .mdl > p{font-size:.81rem;color:var(--text-2);margin-bottom:15px;line-height:1.5}
@@ -473,8 +505,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
 .mdl-f{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 
 /* ════════ RECORD LIST ════════ */
-.rec{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--border);
-  border-radius:var(--r-sm);margin-bottom:9px;background:var(--surface-2);transition:var(--t)}
+.rec{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--sky-b);
+  border-radius:var(--r-sm);margin-bottom:10px;background:var(--sky-2);transition:var(--t)}
 .rec:hover{border-color:var(--brand);box-shadow:var(--sh-1)}
 .rec-i{flex:1;min-width:0}
 .rec-t{font-size:.87rem;font-weight:700;color:var(--text)}
@@ -493,7 +525,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
 
 /* ════════ ACTION BAR ════════ */
 .actbar{position:fixed;bottom:0;left:0;right:0;z-index:70;background:var(--surface);
-  border-top:1px solid var(--border);box-shadow:0 -4px 14px rgba(15,23,42,.08);
+  border-top:1px solid var(--sky-b);box-shadow:0 -4px 16px rgba(16,42,67,.09);
   padding:11px 20px calc(11px + env(safe-area-inset-bottom))}
 .actbar-in{max-width:1180px;margin:0 auto;display:flex;gap:11px;align-items:center}
 .actbar-in .sp{flex:1}
@@ -535,6 +567,8 @@ main > .foot{margin-top:auto}
   .thumbs{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
   .th-acts button{height:34px;font-size:.8rem}
   .th-ta{font-size:16px;min-height:56px}
+  .th-ck{width:30px;height:30px;font-size:.9rem}   /* ngón tay cần vùng bấm lớn hơn */
+  .grp-ck{width:27px;height:27px}
   .viewer-img{max-height:62vh}
   .lay-row{gap:9px}
   .lay{padding:10px 7px}
@@ -776,16 +810,16 @@ main > .foot{margin-top:auto}
           </div>
 
           <div class="toolbar">
-            <button class="btn btn-n btn-sm" id="btnLasso" onclick="toggleLasso()" title="Kéo chuột để khoanh vùng chọn nhiều ảnh">⬚ Khoanh chọn</button>
-            <button class="btn btn-n btn-sm" onclick="selectAllImgs()">☑️ Chọn tất cả</button>
-            <button class="btn btn-n btn-sm" onclick="clearSel()">✖️ Bỏ chọn</button>
+            <button class="btn btn-n btn-sm" id="btnSelAll" onclick="toggleSelectAll()"
+                    title="Chọn toàn bộ ảnh của mọi hạng mục (Ctrl/Cmd + A)">☑️ Chọn tất cả</button>
             <span class="sp"></span>
             <button class="btn btn-o btn-sm" id="btnBulkCap" onclick="openBulkCap()" disabled>✍️ Chú thích gộp</button>
             <button class="btn btn-r btn-sm" id="btnDelSel" onclick="deleteSelected()" disabled>🗑️ Xóa ảnh đã chọn</button>
           </div>
-          <div class="fg" style="margin-bottom:12px">
-            <span class="hint">💡 Nhấp <b>vào ảnh</b> để chọn · <b>Ctrl/Cmd + nhấp</b> chọn thêm · <b>Shift + nhấp</b> chọn dải ·
-              bật <b>Khoanh chọn</b> rồi kéo chuột trên vùng ảnh.<br/>
+          <div class="fg tipbox">
+            <span class="hint">💡 Bấm <b>ô vuông ☐ ở góc trên-phải mỗi ảnh</b> để chọn ảnh đó ·
+              <b>Shift + bấm ô vuông</b> chọn cả dải · ô vuông cạnh <b>tên hạng mục</b> chọn/bỏ cả nhóm.
+              Chọn ảnh để dùng <b>Chú thích gộp</b> hoặc <b>Xóa nhiều ảnh</b>.<br/>
               Gõ thẳng vào ô dưới mỗi ảnh để đặt chú thích riêng (<b>Tab</b> sang ô kế tiếp, bỏ trống = dùng mặc định).
               Nút trên thẻ ảnh: 🖼️ thay ảnh · ↻ xoay 90° · ＋ chèn ảnh sau · 👁 xem lớn · 🗑 xóa.</span>
           </div>
@@ -1028,7 +1062,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-14e';
+const APP_BUILD   = '2026-11-14g';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô biển kiểm soát',
@@ -1178,7 +1212,6 @@ const state = {
   lastSelId: null,     // mốc cho Shift+click
   capSrc:'auto',       // nguồn chú thích mặc định: 'auto' | 'file' | 'folder'
   useFileName: false,  // = (capSrc === 'file') — giữ cho hồ sơ/bản nháp bản cũ
-  lasso: false,
   maHs:'', bks:'', gaRa:'', gdv:'', ngay:'',
   layout:'doc', perPage:6, loai:'chitiet',
   pdfBytes:null, pdfName:'', smallBytes:null,
@@ -1959,6 +1992,8 @@ function renderGroups() {
     return `<div class="grp ${g.open ? 'open' : ''} ${isCover ? 'is-cover' : ''}" data-g="${g.id}">
       <div class="grp-hd" onclick="toggleGroup('${g.id}')">
         <span class="grp-cv"></span>
+        <span class="grp-ck" data-gck="${g.id}" onclick="event.stopPropagation();toggleGroupSel('${g.id}')"
+              title="Chọn / bỏ chọn cả hạng mục">✓</span>
         <img class="grp-th" data-thumb="${g.items[0] ? g.items[0].id : ''}" alt=""/>
         <div class="grp-i">
           <div class="grp-nm">${esc(g.name)}</div>
@@ -1971,13 +2006,11 @@ function renderGroups() {
       </div>
       <div class="grp-bd">
         <div class="toolbar" style="margin-bottom:11px;padding:8px 11px">
-          <button class="btn btn-n btn-sm" onclick="selectGroup('${g.id}',true)">Chọn cả nhóm</button>
-          <button class="btn btn-n btn-sm" onclick="selectGroup('${g.id}',false)">Bỏ chọn nhóm</button>
-          <span class="sp"></span>
           <button class="btn btn-o btn-sm" onclick="appendToGroup('${g.id}')">➕ Thêm ảnh vào nhóm</button>
+          <span class="sp"></span>
           <button class="btn btn-r btn-sm" onclick="clearGroupCaps('${g.id}')">↺ Xóa chú thích riêng</button>
         </div>
-        <div class="thumbs ${state.lasso ? 'lasso' : ''}" data-g="${g.id}">
+        <div class="thumbs" data-g="${g.id}">
           ${g.items.map(it => {
             const def = defaultCapOf(it, g);
             const pno = noMap.get(it.id) || '';
@@ -1986,6 +2019,7 @@ function renderGroups() {
             return `<div class="th ${state.sel.has(it.id) ? 'sel' : ''}" data-id="${it.id}">
               <div class="th-img ${quarter ? 'q' : ''}" title="${esc(it.file.name)}">
                 <span class="th-n" title="Số thứ tự ảnh in trên bản ảnh">${pno}</span>
+                <span class="th-ck" title="Chọn ảnh này (Shift + bấm để chọn cả dải)">✓</span>
                 <img data-thumb="${it.id}" alt="" style="transform:translate(-50%,-50%) rotate(${rot}deg)"/>
                 ${rot ? `<span class="th-rot">↻ ${rot}°</span>` : ''}
               </div>
@@ -2013,7 +2047,7 @@ function renderGroups() {
   $('btnClearAll').style.display = '';
   $('chipSrc').textContent = `${totalImgs()} ảnh · ${state.groups.length} hạng mục`;
   $('chipSrc').className = 'chip chip-g';
-  updateToggleAllLabel(); updateSelUI(); updateActionBar(); updateSummaries();
+  updateToggleAllLabel(); paintSel(); updateActionBar(); updateSummaries();
 }
 
 function loadThumbs() {
@@ -2092,23 +2126,59 @@ function appendToGroup(gid) { _addTargetGroup = gid; $('insertFile').click(); }
 
 // ──────── Chọn ảnh ────────
 function updateSelUI() {
-  const n = state.sel.size;
+  const n = state.sel.size, tot = totalImgs();
   $('chipSel').textContent = n ? `${n} ảnh đã chọn` : '0 ảnh đã chọn';
   $('chipSel').className = 'chip ' + (n ? 'chip-b' : 'chip-n');
   $('btnBulkCap').disabled = !n;
   $('btnDelSel').disabled = !n;
   $('btnBulkCap').innerHTML = `✍️ Chú thích gộp (${n})`;
+  $('btnDelSel').innerHTML = n ? `🗑️ Xóa ${n} ảnh đã chọn` : '🗑️ Xóa ảnh đã chọn';
+  // Một nút duy nhất, tự đổi nhãn: chọn hết rồi thì chính nó là nút bỏ chọn
+  const allSel = tot > 0 && n >= tot, b = $('btnSelAll');
+  b.innerHTML = allSel ? `✖️ Bỏ chọn (${n})` : `☑️ Chọn tất cả${tot ? ` (${tot})` : ''}`;
+  b.title = allSel ? 'Bỏ chọn toàn bộ ảnh (Esc)' : 'Chọn toàn bộ ảnh của mọi hạng mục (Ctrl/Cmd + A)';
+  b.classList.toggle('on', allSel);
+}
+// Ô tick hạng mục: trống (chưa chọn) · "–" (chọn một phần) · "✓" (chọn cả nhóm)
+function paintGroupChecks() {
+  state.groups.forEach(g => {
+    const el = document.querySelector(`.grp-ck[data-gck="${g.id}"]`); if (!el) return;
+    const n = g.items.filter(it => state.sel.has(it.id)).length;
+    const all = n > 0 && n === g.items.length;
+    el.classList.toggle('all', all);
+    el.classList.toggle('some', n > 0 && !all);
+    el.textContent = all || !n ? '✓' : '–';
+    el.title = all ? `Bỏ chọn ${g.items.length} ảnh của hạng mục này`
+                   : `Chọn cả ${g.items.length} ảnh của hạng mục này`;
+  });
 }
 function paintSel() {
   document.querySelectorAll('.th').forEach(el => el.classList.toggle('sel', state.sel.has(el.dataset.id)));
+  paintGroupChecks();
   updateSelUI();
 }
 function clearSel() { state.sel.clear(); state.lastSelId = null; paintSel(); }
 function selectAllImgs() { allItems().forEach(({ it }) => state.sel.add(it.id)); paintSel(); toast(`Đã chọn ${state.sel.size} ảnh`); }
+function toggleSelectAll() {
+  const tot = totalImgs();
+  if (!tot) { toast('Chưa có ảnh nào.'); return; }
+  if (state.sel.size >= tot) { clearSel(); toast('Đã bỏ chọn toàn bộ ảnh'); }
+  else selectAllImgs();
+}
 function selectGroup(gid, on) {
   const g = state.groups.find(x => x.id === gid); if (!g) return;
   g.items.forEach(it => on ? state.sel.add(it.id) : state.sel.delete(it.id));
   paintSel();
+}
+function toggleGroupSel(gid) {
+  const g = state.groups.find(x => x.id === gid); if (!g || !g.items.length) return;
+  selectGroup(gid, !g.items.every(it => state.sel.has(it.id)));
+}
+// Chọn cả dải từ mốc Shift gần nhất tới ảnh vừa bấm
+function selRangeTo(id) {
+  const flat = allItems().map(x => x.it.id);
+  const a = flat.indexOf(state.lastSelId), b = flat.indexOf(id);
+  if (a > -1 && b > -1) flat.slice(Math.min(a, b), Math.max(a, b) + 1).forEach(x => state.sel.add(x));
 }
 
 // ──────── Sự kiện trên thẻ ảnh ────────
@@ -2125,6 +2195,17 @@ $('groupList').addEventListener('click', e => {
     else if (act === 'del') deleteOne(id);
     return;
   }
+  // Ô tick ở góc ảnh — cách chọn chính: bấm = thêm/bớt, Shift + bấm = chọn cả dải
+  const ck = e.target.closest('.th-ck');
+  if (ck) {
+    e.stopPropagation();
+    const id = ck.closest('.th').dataset.id;
+    if (e.shiftKey && state.lastSelId) selRangeTo(id);
+    else state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id);
+    state.lastSelId = id;
+    paintSel();
+    return;
+  }
   const imgBox = e.target.closest('.th-img');
   if (!imgBox) return;
   const id = imgBox.closest('.th').dataset.id;
@@ -2132,9 +2213,7 @@ $('groupList').addEventListener('click', e => {
     state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id);
     state.lastSelId = id;
   } else if (e.shiftKey && state.lastSelId) {
-    const flat = allItems().map(x => x.it.id);
-    const a = flat.indexOf(state.lastSelId), b = flat.indexOf(id);
-    if (a > -1 && b > -1) flat.slice(Math.min(a, b), Math.max(a, b) + 1).forEach(x => state.sel.add(x));
+    selRangeTo(id);
   } else {
     const only = state.sel.size === 1 && state.sel.has(id);
     state.sel.clear();
@@ -2168,48 +2247,6 @@ $('groupList').addEventListener('keydown', e => {
   const target = fields[fields.indexOf(ta) + (e.shiftKey ? -1 : 1)];
   if (target) { e.preventDefault(); target.focus(); target.select(); }
 });
-
-// ──────── Khoanh chọn (marquee) ────────
-function toggleLasso() {
-  state.lasso = !state.lasso;
-  $('btnLasso').classList.toggle('on', state.lasso);
-  document.querySelectorAll('.thumbs').forEach(el => el.classList.toggle('lasso', state.lasso));
-  toast(state.lasso ? 'Khoanh chọn: BẬT — kéo chuột trên vùng ảnh để chọn' : 'Khoanh chọn: TẮT');
-}
-(function initLasso() {
-  let box = null, host = null, sx = 0, sy = 0;
-  $('groupList').addEventListener('mousedown', e => {
-    if (!state.lasso || e.button !== 0) return;
-    if (!e.target.closest('.th-img')) return;      // chỉ kéo trên vùng ảnh
-    host = e.target.closest('.thumbs'); if (!host) return;
-    e.preventDefault();
-    if (!(e.ctrlKey || e.metaKey || e.shiftKey)) state.sel.clear();
-    const r = host.getBoundingClientRect();
-    sx = e.clientX - r.left; sy = e.clientY - r.top;
-    box = document.createElement('div'); box.className = 'marquee';
-    host.appendChild(box); moveBox(e);
-  });
-  function moveBox(e) {
-    if (!box || !host) return;
-    const r = host.getBoundingClientRect();
-    const cx = Math.max(0, Math.min(e.clientX - r.left, r.width));
-    const cy = Math.max(0, Math.min(e.clientY - r.top, r.height));
-    const x = Math.min(sx, cx), y = Math.min(sy, cy), w = Math.abs(cx - sx), h = Math.abs(cy - sy);
-    Object.assign(box.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
-    host.querySelectorAll('.th').forEach(el => {
-      const b = el.getBoundingClientRect();
-      const ex = b.left - r.left, ey = b.top - r.top;
-      if (ex < x + w && ex + b.width > x && ey < y + h && ey + b.height > y) state.sel.add(el.dataset.id);
-      el.classList.toggle('sel', state.sel.has(el.dataset.id));
-    });
-    updateSelUI();
-  }
-  document.addEventListener('mousemove', e => { if (box) moveBox(e); });
-  document.addEventListener('mouseup', () => {
-    if (!box) return;
-    box.remove(); box = null; host = null; paintSel();
-  });
-})();
 
 // ──────── Thao tác từng ảnh ────────
 function rotateItem(id) {
@@ -3369,7 +3406,7 @@ function resetApp() {
   if (!confirm('Làm bản ảnh mới? Ảnh và thông tin hiện tại sẽ bị xóa khỏi màn hình (hồ sơ đã lưu vẫn còn).')) return;
   clearPvCache();
   Object.assign(state, {
-    groups: [], capSrc: 'auto', useFileName: false, lasso: false,
+    groups: [], capSrc: 'auto', useFileName: false,
     pdfBytes: null, pdfName: '', smallBytes: null,
     maHs:'', bks:'', gaRa:'', gdv:'', ngay:'', recId: null,
   });
@@ -3380,7 +3417,7 @@ function resetApp() {
   $('fPhong').value = getPhongList()[0] || PHONG_DEFAULT;
   $('fLoai').value = 'chitiet';
   syncCapSrcSwitches();
-  $('btnLasso').classList.remove('on');
+  updateSelUI();
   $('cardGallery').style.display = 'none';
   $('emptyState').style.display = 'none';
   $('btnClearAll').style.display = 'none';
@@ -3487,7 +3524,6 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && k === 'a' && state.step === 1 && totalImgs()) { e.preventDefault(); selectAllImgs(); }
   else if (k === 'delete' && state.step === 1 && state.sel.size) { e.preventDefault(); deleteSelected(); }
   else if (k === 'escape' && state.sel.size) clearSel();
-  else if (k === 'l' && state.step === 1) toggleLasso();
   else if (e.key === 'ArrowRight' && state.step < 2) goStep(2);
   else if (e.key === 'ArrowLeft'  && state.step > 1) goStep(1);
 });

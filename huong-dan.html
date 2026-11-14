@@ -9,11 +9,14 @@
   --brand:#1565C0; --brand-d:#0D47A1; --brand-soft:#E3F2FD;
   --green:#2E7D32; --green-soft:#E8F5E9;
   --red:#C62828;   --red-soft:#FFEBEE;
-  --amber:#E65100; --amber-soft:#FFF8E1;
-  --bg:#F4F6FA; --surface:#FFFFFF; --surface-2:#F8FAFC;
-  --border:#E2E8F0; --border-s:#CBD5E1;
-  --text:#111827; --text-2:#475569; --text-3:#94A3B8;
-  --r:14px; --r-sm:9px; --r-xs:6px;
+  --amber:#9A6700; --amber-soft:#FFF6DA;
+  --sky:#DCEBFA; --sky-2:#EFF6FE; --sky-b:#C7DEF5;
+  --sand:#FFFCF2; --sand-2:#FFF6DC; --sand-b:#EBD9A8; --sand-tx:#7A5B0B;
+  --bg:#E9F2FB; --bg-grad:linear-gradient(180deg,#E2EEFB 0,#F0F7FD 460px,#EDF4FB 100%);
+  --surface:#FFFFFF; --surface-2:#F4F9FE;
+  --border:#D9E7F6; --border-s:#B8D2EC;
+  --text:#102A43; --text-2:#44607C; --text-3:#5A7691;
+  --r:16px; --r-sm:11px; --r-xs:8px;
   --sh-1:0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.05);
   --sh-2:0 4px 6px -1px rgba(15,23,42,.07), 0 2px 4px -2px rgba(15,23,42,.05);
 }
@@ -22,32 +25,40 @@
     --brand:#5CA8F5; --brand-d:#90C7FF; --brand-soft:#15314F;
     --green:#81C784; --green-soft:#17331C;
     --red:#EF9A9A;   --red-soft:#3A1718;
-    --amber:#FFB74D; --amber-soft:#3A2A10;
-    --bg:#0B1220; --surface:#121C2B; --surface-2:#18243A;
-    --border:#243246; --border-s:#33455E;
-    --text:#E8EEF7; --text-2:#AFC0D6; --text-3:#6B7C92;
+    --amber:#E8BE6A; --amber-soft:#2E2614;
+    --sky:#101C29; --sky-2:#16263A; --sky-b:#2A4460;
+    --sand:#221D11; --sand-2:#2A2416; --sand-b:#4A3E22; --sand-tx:#E8C877;
+    --bg:#0B1017; --bg-grad:linear-gradient(180deg,#0A121C 0,#0C141E 460px,#0B1017 100%);
+    --surface:#141D28; --surface-2:#1A2432;
+    --border:#263546; --border-s:#36495F;
+    --text:#E6EDF5; --text-2:#A3B6C9; --text-3:#6D8299;
   }
 }
 :root[data-theme="dark"]{
   --brand:#5CA8F5; --brand-d:#90C7FF; --brand-soft:#15314F;
   --green:#81C784; --green-soft:#17331C;
   --red:#EF9A9A;   --red-soft:#3A1718;
-  --amber:#FFB74D; --amber-soft:#3A2A10;
-  --bg:#0B1220; --surface:#121C2B; --surface-2:#18243A;
-  --border:#243246; --border-s:#33455E;
-  --text:#E8EEF7; --text-2:#AFC0D6; --text-3:#6B7C92;
+  --amber:#E8BE6A; --amber-soft:#2E2614;
+  --sky:#101C29; --sky-2:#16263A; --sky-b:#2A4460;
+  --sand:#221D11; --sand-2:#2A2416; --sand-b:#4A3E22; --sand-tx:#E8C877;
+  --bg:#0B1017; --bg-grad:linear-gradient(180deg,#0A121C 0,#0C141E 460px,#0B1017 100%);
+  --surface:#141D28; --surface-2:#1A2432;
+  --border:#263546; --border-s:#36495F;
+  --text:#E6EDF5; --text-2:#A3B6C9; --text-3:#6D8299;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  background:var(--bg); color:var(--text); font-size:15px; line-height:1.62;
+  background:var(--bg); background-image:var(--bg-grad); background-attachment:fixed;
+  color:var(--text); font-size:15px; line-height:1.62;
   -webkit-text-size-adjust:100%;
 }
 
 /* ════════ LAYOUT ════════ */
 .wrap{max-width:1180px;margin:0 auto;padding:0 16px 80px;display:grid;
   grid-template-columns:252px minmax(0,1fr);gap:28px;align-items:start}
-.hd{background:linear-gradient(135deg,var(--brand-d),var(--brand));color:#fff;padding:26px 0 24px;margin-bottom:26px}
+.hd{background:linear-gradient(135deg,var(--brand-d),var(--brand));color:#fff;padding:26px 0 24px;
+  margin-bottom:26px;border-bottom:3px solid #F2C86A}
 .hd-in{max-width:1180px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:15px;flex-wrap:wrap}
 .hd-ico{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.17);display:flex;
   align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
@@ -60,7 +71,7 @@ body{
 .hd .btn-w:hover{background:rgba(255,255,255,.26)}
 
 /* ════════ MỤC LỤC ════════ */
-nav{position:sticky;top:16px;background:var(--surface);border:1px solid var(--border);
+nav{position:sticky;top:16px;background:var(--surface);border:1px solid var(--sky-b);
   border-radius:var(--r);padding:15px 13px;box-shadow:var(--sh-1);max-height:calc(100vh - 32px);overflow-y:auto}
 nav h2{font-size:.72rem;text-transform:uppercase;letter-spacing:.7px;color:var(--text-3);
   font-weight:700;margin-bottom:9px;padding:0 6px}
@@ -73,8 +84,8 @@ nav .nav-g{margin-top:11px;padding-top:9px;border-top:1px solid var(--border)}
 
 /* ════════ NỘI DUNG ════════ */
 main{min-width:0}
-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
-  padding:22px 24px;margin-bottom:20px;box-shadow:var(--sh-1);scroll-margin-top:16px}
+section{background:var(--surface);border:1px solid var(--sky-b);border-radius:var(--r);
+  padding:24px 26px;margin-bottom:22px;box-shadow:var(--sh-1);scroll-margin-top:16px}
 h2.sec{font-size:1.1rem;font-weight:800;color:var(--brand);padding-bottom:11px;margin-bottom:15px;
   border-bottom:2px solid var(--brand-soft);display:flex;align-items:center;gap:9px}
 h3{font-size:.97rem;font-weight:700;margin:21px 0 8px;color:var(--text);scroll-margin-top:16px}
@@ -95,7 +106,7 @@ a{color:var(--brand)}
 
 table{width:100%;border-collapse:collapse;margin-bottom:13px;font-size:.85rem}
 th,td{border:1px solid var(--border);padding:7px 10px;text-align:left;vertical-align:top}
-th{background:var(--surface-2);font-weight:700;color:var(--text);font-size:.81rem}
+th{background:var(--sky-2);font-weight:700;color:var(--brand-d);font-size:.81rem}
 td{color:var(--text-2)}
 .tbl-wrap{overflow-x:auto;margin-bottom:13px}
 .tbl-wrap table{margin-bottom:0;min-width:520px}
@@ -104,7 +115,7 @@ td{color:var(--text-2)}
   border:1px solid;line-height:1.55}
 .note{background:var(--brand-soft);border-color:var(--brand);color:var(--text)}
 .warn{background:var(--red-soft);border-color:var(--red);color:var(--text)}
-.tip{background:var(--green-soft);border-color:var(--green);color:var(--text)}
+.tip{background:var(--sand-2);border-color:var(--sand-b);color:var(--text)}
 .note b,.warn b,.tip b{color:var(--text)}
 
 .steps{counter-reset:s;list-style:none;margin-left:0}
@@ -115,15 +126,15 @@ td{color:var(--text-2)}
 .kbd{display:inline-block;background:var(--surface);border:1px solid var(--border-s);
   border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:.78rem;font-weight:600;
   color:var(--text);font-family:inherit;white-space:nowrap}
-.btn-ex{display:inline-block;background:var(--surface-2);border:1px solid var(--border-s);
+.btn-ex{display:inline-block;background:var(--sand-2);border:1px solid var(--sand-b);
   border-radius:6px;padding:1px 8px;font-size:.82rem;font-weight:600;color:var(--text);white-space:nowrap}
 
 .card-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(224px,1fr));gap:12px;margin-bottom:13px}
-.mini{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px}
+.mini{background:var(--sky-2);border:1px solid var(--sky-b);border-radius:var(--r-sm);padding:13px 15px}
 .mini h4{margin:0 0 5px;font-size:.86rem;color:var(--brand)}
 .mini p{font-size:.82rem;margin:0}
 
-.faq{border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:9px;background:var(--surface-2);
+.faq{border:1px solid var(--sky-b);border-radius:var(--r-sm);margin-bottom:10px;background:var(--sky-2);
   overflow:hidden}
 .faq summary{padding:10px 14px;cursor:pointer;font-weight:700;font-size:.88rem;color:var(--text)}
 .faq summary:hover{color:var(--brand)}
@@ -240,6 +251,30 @@ td{color:var(--text-2)}
   </ol>
   <p>Các biểu tượng ở góc <b>trên cùng bên phải</b>: <span class="btn-ex">🗂️</span> hồ sơ đã lưu ·
      <span class="btn-ex">🌙</span> chế độ sáng/tối · <span class="btn-ex">Help</span> mở lại bản hướng dẫn này.</p>
+
+  <h4>Đọc giao diện theo màu</h4>
+  <p>Giao diện dùng <b>2 màu nền</b> để bạn nhận ra ngay vai trò của từng khối:</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:26%">Màu</th><th>Nghĩa</th></tr>
+    <tr><td><b>Xanh nhạt</b></td>
+        <td>Nền trang, <b>thanh tiêu đề mỗi thẻ</b> và tiêu đề mỗi hạng mục ảnh —
+            đây là khung chứa dữ liệu. Ô nhập liệu luôn <b>nền trắng</b> nằm trong khung xanh.</td></tr>
+    <tr><td><b>Vàng nhạt</b></td>
+        <td>Những khối <b>bạn cần để ý hoặc thao tác</b>: vùng kéo thả ảnh, thanh công cụ chọn ảnh,
+            thanh công cụ xem trước, khối tóm tắt ở bước 2 và các ghi chú 💡.</td></tr>
+    <tr><td><b>Vàng nhạt ở tiêu đề hạng mục</b></td>
+        <td>Hạng mục <b>ảnh nhận dạng xe</b> (thư mục có tiền tố <code>0.</code>) — nhóm này được
+            in ra <b>trang đầu riêng</b> khi chọn kiểu <i>chi tiết thiệt hại</i>.</td></tr>
+    <tr><td><b>Xanh đậm</b></td>
+        <td>Màu in thật trên file PDF — thấy ở khối <i>Xem trước tiêu đề bản in</i>
+            và trong phần xem trước trang A4.</td></tr>
+  </table>
+  </div>
+  <div class="tip">
+    💡 Màu nền chỉ là giao diện làm việc, <b>không ảnh hưởng tới file PDF</b>. Bản in luôn giữ
+    header và chú thích màu xanh <code>#1565C0</code> theo mẫu của Phòng.
+  </div>
 
   <h3 id="thong-tin">2. Thẻ "Thông tin giám định"</h3>
   <p>Các ô có dấu <b style="color:var(--red)">*</b> là bắt buộc. Nội dung các ô này được in lên
@@ -450,14 +485,20 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 
   <h3 id="quan-ly-anh">7. Chọn và chỉnh từng ảnh</h3>
   <h4>Chọn ảnh</h4>
+  <p>Chọn ảnh là bước chuẩn bị cho <b>2 việc làm hàng loạt</b>:
+     <b>chú thích gộp</b> và <b>xóa nhiều ảnh cùng lúc</b>. Ảnh đang chọn có viền xanh,
+     ô tick sáng màu, và số ảnh đang chọn hiện ở nhãn <i>"… ảnh đã chọn"</i>.</p>
   <ul>
-    <li><b>Nhấp vào vùng ảnh</b> để chọn một ảnh.</li>
-    <li><span class="kbd">Ctrl</span> (máy Mac: <span class="kbd">Cmd</span>) + nhấp — chọn thêm từng ảnh.</li>
-    <li><span class="kbd">Shift</span> + nhấp — chọn cả dải từ ảnh chọn trước đó tới ảnh vừa nhấp.</li>
-    <li><span class="btn-ex">⬚ Khoanh chọn</span> (hoặc phím <span class="kbd">L</span>) rồi kéo
-        chuột trên vùng ảnh để quét chọn nhiều ảnh.</li>
-    <li><span class="btn-ex">☑️ Chọn tất cả</span> / <span class="btn-ex">✖️ Bỏ chọn</span>.
-        Số ảnh đang chọn hiện ở nhãn <i>"… ảnh đã chọn"</i>.</li>
+    <li>Bấm <b>ô vuông ☐ ở góc trên-phải mỗi ảnh</b> để chọn ảnh đó; bấm lần nữa để bỏ chọn.</li>
+    <li><span class="kbd">Shift</span> + bấm ô vuông — chọn <b>cả dải</b> từ ảnh chọn trước đó
+        tới ảnh vừa bấm (chạy xuyên nhiều hạng mục).</li>
+    <li>Ô vuông cạnh <b>tên hạng mục</b> — chọn / bỏ chọn cả hạng mục. Nó hiện <b>✓</b> khi
+        cả nhóm đang được chọn và <b>–</b> khi chỉ chọn một phần.</li>
+    <li><span class="btn-ex">☑️ Chọn tất cả</span> — chọn toàn bộ ảnh của mọi hạng mục. Khi đã
+        chọn hết, chính nút đó đổi thành <span class="btn-ex">✖️ Bỏ chọn</span>.</li>
+    <li>Nhấp vào <b>vùng ảnh</b> cũng chọn ảnh đó —
+        <span class="kbd">Ctrl</span> (máy Mac: <span class="kbd">Cmd</span>) + nhấp chọn thêm,
+        <span class="kbd">Shift</span> + nhấp chọn cả dải.</li>
   </ul>
   <h4>Năm nút trên mỗi thẻ ảnh</h4>
   <div class="tbl-wrap">
@@ -632,7 +673,6 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
         <td>Chọn tất cả ảnh (ở bước 1)</td></tr>
     <tr><td><span class="kbd">Delete</span></td><td>Xóa các ảnh đang chọn</td></tr>
     <tr><td><span class="kbd">Esc</span></td><td>Bỏ chọn ảnh · đóng hộp thoại · đóng xem ảnh lớn</td></tr>
-    <tr><td><span class="kbd">L</span></td><td>Bật / tắt chế độ khoanh chọn</td></tr>
     <tr><td><span class="kbd">←</span> <span class="kbd">→</span></td>
         <td>Chuyển giữa bước 1 và bước 2</td></tr>
     <tr><td><span class="kbd">↓</span> <span class="kbd">↑</span> · <span class="kbd">Enter</span></td>

@@ -112,7 +112,14 @@ dùng chung một luật `GIAYTO_RULES`. Đường dẫn ảnh có hậu tố `#
 ### Chi tiết phần ảnh (bước 1)
 - Kéo thả / chọn thư mục (File System Access API, fallback `webkitdirectory`) hoặc chọn ảnh lẻ
 - Mỗi **thư mục con = một hạng mục**; ảnh lẻ vào nhóm `Ảnh chưa phân loại`
-- Chọn ảnh: nhấp **vào vùng ảnh** · Ctrl/Cmd+nhấp · Shift+nhấp chọn dải · **khoanh chọn** kéo chuột
+- Chọn ảnh: **ô tick `.th-ck` luôn hiện ở góc trên-phải mỗi thẻ ảnh** (bấm = thêm/bớt,
+  Shift+bấm = chọn dải qua `selRangeTo()`) · **ô tick 3 trạng thái `.grp-ck`** ở tiêu đề hạng mục
+  (`toggleGroupSel()` / `paintGroupChecks()`: trống · `–` một phần · `✓` cả nhóm) ·
+  nhấp vùng ảnh / Ctrl+nhấp / Shift+nhấp vẫn chọn như cũ. Một nút duy nhất `#btnSelAll`
+  (`toggleSelectAll()`) tự đổi nhãn **Chọn tất cả (n) ⇄ Bỏ chọn (n)** trong `updateSelUI()`.
+  **Đã bỏ hẳn chế độ khoanh chọn (marquee) và phím `L`** — nó là một *mode* vô hình, chỉ chạy bằng
+  `mousedown` nên không dùng được trên cảm ứng; ô tick hiện sẵn tự nói lên là ảnh chọn được.
+  Vùng chọn chỉ phục vụ **2 việc**: chú thích gộp và xóa nhiều ảnh
 - Mỗi thẻ ảnh có 5 nút: 🖼️ **thay ảnh** (giữ nguyên vị trí + chú thích) · ↻ **xoay 90°** ·
   ＋ **chèn ảnh ngay sau** · 👁 **xem kích thước lớn** · 🗑 **xóa**
 - **Ô nhập chú thích ngay dưới mỗi ảnh** — gõ trực tiếp, `Tab`/`Shift+Tab` sang ô kế tiếp,
@@ -173,6 +180,36 @@ tập ảnh thay đổi. Mở lại app mà còn bản nháp thì có thanh mờ
 - Hồ sơ lưu kèm `cap` và `rot` của từng ảnh; khi mở lại dùng đường dẫn giả
   `{chỉ số nhóm}/{tên hạng mục}/{tên file}` để vẫn thêm/bớt ảnh tiếp được
 
+### Hệ màu giao diện — xanh nhạt + vàng nhạt
+
+Toàn bộ giao diện chạy bằng **design token** ở đầu `<style>`; muốn đổi màu thì sửa token,
+**không sửa rải rác từng rule**. Bảng token tồn tại ở **cả `index.html` và `huong-dan.html`**
+(trang hướng dẫn tự chứa CSS) nên **đổi màu phải đổi ở cả 2 file**, kể cả 3 khối của
+`huong-dan.html`: `:root`, `@media (prefers-color-scheme: dark) :root:not([data-theme="light"])`
+và `:root[data-theme="dark"]`.
+
+| Nhóm token | Giá trị sáng | Dùng ở đâu |
+|---|---|---|
+| `--brand` `--brand-d` `--brand-m` `--brand-soft` | `#1565C0` `#0D47A1` `#1976D2` `#E3F2FD` | **Màu in của PDF** — giữ nguyên, đừng đổi theo giao diện |
+| `--sky` `--sky-2` `--sky-b` | `#DCEBFA` `#EFF6FE` `#C7DEF5` | Nền trang · `.card-hd` · `.grp-hd` · `.th-acts` · `.rec` · `.pv-scroll` · viền thẻ |
+| `--sand` `--sand-2` `--sand-b` `--sand-tx` | `#FFFCF2` `#FFF6DC` `#EBD9A8` `#7A5B0B` | `.toolbar` · `.dz` · `.sum` · `.pv-bar` · `.tipbox` · `#emptyState` · `.grp.is-cover .grp-hd` |
+| `--bg-grad` | chuyển sắc xanh dọc trang | `body{background-image}` + `background-attachment:fixed` |
+| `--r` `--r-sm` `--r-xs` | `16px` `11px` `8px` | bo góc (đã nới từ 14/9/6) |
+
+**Quy ước đọc màu** (giải thích cho người dùng ở `huong-dan.html` mục 1):
+xanh nhạt = khung chứa dữ liệu · ô nhập liệu luôn **nền trắng** trong khung xanh ·
+vàng nhạt = khối cần thao tác hoặc cần để ý · `.grp.is-cover` (hạng mục tiền tố `0.`) nền vàng ·
+xanh đậm = màu sẽ in ra PDF (khối `#loaiPreview` và preview trang A4).
+
+**Độ tương phản**: mọi cặp chữ/nền đã kiểm ≥ 4.5:1 (WCAG AA). Đáng chú ý —
+`--text-3` phải là `#5A7691` (4.74:1 trên trắng); giá trị xám-xanh nhạt hơn như `#89A2BB`
+chỉ đạt 2.6:1 nên **không dùng cho chữ**. `--amber` đã đổi từ cam `#E65100` sang vàng-nâu
+`#9A6700` để đọc được trên nền vàng nhạt.
+
+**Vạch vàng `#F2C86A`** dày 3px ở đáy `.appbar` (và `.hd` của trang hướng dẫn) là điểm nhấn
+duy nhất dùng màu vàng đậm — chấm "hướng dẫn mới" trên nút `Help` dùng `#FFC94D` cho nổi trên
+nền xanh của appbar (trước đây dùng `var(--amber)`, sau khi đổi sang vàng-nâu thì bị tối).
+
 ### Khác
 - **Dark mode** (nút 🌙, lưu localStorage, mặc định theo hệ điều hành)
 - Danh sách GĐV lưu localStorage (`pti_gdv_list`) và danh sách **Phòng / Khu vực** (`pti_phong_list`);
@@ -191,7 +228,7 @@ tập ảnh thay đổi. Mở lại app mà còn bản nháp thì có thanh mờ
     160ms của handler `blur` sẽ đóng ngay droplist vừa mở. Phải giữ `comboBlurT` và
     `clearTimeout(comboBlurT)` ở đầu `openCombo()`; lần mở đầu tiên không dính lỗi này nên triệu
     chứng là "chỉ chọn được 1 lần"
-- Phím tắt: `Ctrl/Cmd+A` chọn tất cả · `Delete` xóa ảnh đã chọn · `Esc` bỏ chọn · `L` bật khoanh chọn · `←` `→` chuyển giữa 2 bước
+- Phím tắt: `Ctrl/Cmd+A` chọn tất cả · `Delete` xóa ảnh đã chọn · `Esc` bỏ chọn · `←` `→` chuyển giữa 2 bước
 - Khi đang xem ảnh lớn: `←` `→` chuyển ảnh · `R` xoay · `Esc` đóng
 
 ---
