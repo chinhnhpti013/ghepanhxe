@@ -288,14 +288,15 @@ td{color:var(--text-2)}
         <td>Chọn 1 trong 3 kiểu — quyết định tiêu đề in ra và cách chia trang. Xem mục
             <a href="#kieu-ban-anh">Kiểu bản ảnh</a>.</td></tr>
     <tr><td>Số HSBT / Mã hồ sơ</td>
-        <td>Ví dụ <code>XCG.2026.001234</code>. Nếu để trống thì dòng "Số HSBT" <b>không được in</b>
+        <td>Ví dụ <code>XCG.2026.001234</code>. In ở <b>dòng 2</b> của tiêu đề, trước tên giám định viên.
+            Nếu để trống thì đoạn "Số HSBT" <b>không được in</b>
             và tên file PDF lấy theo biển kiểm soát.</td></tr>
     <tr><td><b>Biển kiểm soát *</b></td>
         <td>Ví dụ <code>14C-402.84</code>. In ở dòng tiêu đề lớn nhất.</td></tr>
     <tr><td>Ngày giám định</td>
         <td>Bấm vào ô chọn ngày hoặc nút <span class="btn-ex">Hôm nay</span>; nút
-            <span class="btn-ex">Xóa</span> để bỏ trống. In cùng dòng với tên giám định viên
-            dạng <code>DD/MM/YYYY</code>. Để trống thì không in ngày.</td></tr>
+            <span class="btn-ex">Xóa</span> để bỏ trống. In ở <b>cuối dòng tiêu đề thứ nhất</b>,
+            ngay sau biển kiểm soát, dạng <code>- Ngày: DD/MM/YYYY</code>. Để trống thì không in ngày.</td></tr>
     <tr><td><b>Tên ga-ra / Địa điểm *</b></td>
         <td>Ví dụ <code>Gara Toyota Quảng Ninh</code>. Với kiểu <i>chi tiết thiệt hại</i>, dòng này
             in thành <code>Địa điểm tại Gara : …</code>; hai kiểu còn lại in thẳng nội dung bạn nhập.</td></tr>
@@ -328,18 +329,18 @@ td{color:var(--text-2)}
     <tr><th style="width:30%">Kiểu</th><th>Tiêu đề in ra</th><th>Cách chia trang</th></tr>
     <tr>
       <td><b>Ảnh giám định chi tiết thiệt hại</b></td>
-      <td><i>Giám định chi tiết xe ô tô biển kiểm soát : {BKS}</i></td>
+      <td><i>Giám định chi tiết xe ô tô BKS : {BKS} - Ngày: {ngày}</i></td>
       <td>Ảnh của hạng mục bắt đầu bằng số <code>0</code> (ảnh nhận dạng xe: số khung, tem đăng kiểm,
           tổng thể xe) được xếp ra <b>trang đầu riêng</b>; các hạng mục còn lại ghép liên tục.</td>
     </tr>
     <tr>
       <td><b>Ảnh giám định hiện trường / Xác minh hiện trường</b></td>
-      <td><i>Giám định hiện trường xe ô tô biển kiểm soát : {BKS}</i></td>
+      <td><i>Giám định hiện trường xe ô tô BKS : {BKS} - Ngày: {ngày}</i></td>
       <td>Toàn bộ ảnh ghép liên tục theo thứ tự hạng mục.</td>
     </tr>
     <tr>
       <td><b>Ảnh và file Giấy tờ xe (jpg, pdf…)</b></td>
-      <td><i>Giám định giấy tờ xe ô tô biển kiểm soát : {BKS}</i></td>
+      <td><i>Giám định giấy tờ xe ô tô BKS : {BKS} - Ngày: {ngày}</i></td>
       <td><b>Bố cục tự động theo tiền tố số</b> của tên ảnh — một file PDF có thể trộn cả trang
           ngang và trang dọc. Xem mục <a href="#tien-to">Tiền tố giấy tờ xe</a>.</td>
     </tr>
@@ -763,9 +764,13 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><td>Dải tiêu đề</td><td>Cao 20 mm, nền xanh <code>#1565C0</code>, chữ trắng, dán sát mép trên trang</td></tr>
     <tr><td>Logo PTI SOS</td><td>17 × 17 mm, góc trái dải tiêu đề</td></tr>
     <tr><td>Dòng tiêu đề</td>
-        <td>Căn trái, cách logo <b>20 mm</b>: <b>{kiểu giám định} : {BKS}</b> 16pt đậm · <i>Số HSBT: {mã hồ sơ}</i>
-            14pt · <i>{ga-ra}</i> 15pt · <i>{GĐV} — Ngày: {ngày}</i> 14pt.
-            Tự thu nhỏ để vừa dải tiêu đề; dòng Số HSBT chỉ in khi có mã hồ sơ.</td></tr>
+        <td>Căn trái, cách logo <b>12 mm</b>, gồm <b>3 dòng</b>:<br>
+            1 · <b>{kiểu giám định} : {BKS} - Ngày: {ngày}</b> 15pt đậm<br>
+            2 · <i>Số HSBT: {mã hồ sơ}</i> &nbsp;—&nbsp; cách <b>10 mm</b> &nbsp;—&nbsp;
+            <i>{GĐV}</i> (cùng một dòng, 14pt)<br>
+            3 · <i>{ga-ra}</i> 15pt.<br>
+            Tự thu nhỏ để vừa dải tiêu đề; đoạn Số HSBT chỉ in khi có mã hồ sơ
+            (khi đó dòng 2 chỉ còn tên giám định viên).</td></tr>
     <tr><td>Khung ảnh</td><td>Bo góc mềm, khoảng cách giữa các ô 2 mm, lề trang 8 mm</td></tr>
     <tr><td>Chú thích</td><td>14pt, chữ trắng trên nền xanh dưới mỗi ảnh, tự thu nhỏ nếu dài.
         Bắt đầu bằng <b>số thứ tự ảnh</b> chạy liên tục qua các trang</td></tr>

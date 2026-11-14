@@ -76,7 +76,8 @@ MARGIN_MM     = 8           # lề xung quanh
 CORNER_RADIUS_PCT = 0.04    # bo góc = 4% cạnh ngắn của vùng ảnh vẽ ra
 HEAD_PAD      = 2           # chừa trên/dưới khối chữ header (point)
 HEAD_LINE_SP  = 2           # giãn dòng header (point)
-HEAD_X_MM     = 20          # khoảng cách từ mép phải logo tới chữ tiêu đề
+HEAD_X_MM     = 12          # khoảng cách từ mép phải logo tới chữ tiêu đề
+HEAD_SEG_MM   = 10          # khoảng cách giữa 2 đoạn chữ trên cùng một dòng header
 FOOTER_FS     = 13 * 2 / 3  # cỡ chữ chân trang = 2/3 cỡ cũ (13pt)
 ASC, DESC     = 0.78, 0.22  # tỉ lệ ascender / descender của Be Vietnam Pro
 
@@ -360,10 +361,10 @@ def _pts(mm_val):
 
 
 LOAI_GD_MAP = {
-    "chitiet":    "Giám định chi tiết xe ô tô biển kiểm soát",
-    "hientruong": "Giám định hiện trường xe ô tô biển kiểm soát",
-    "giayto":     "Giám định giấy tờ xe ô tô biển kiểm soát",
-    "xacminh":    "Ảnh xác minh hiện trường xe ô tô biển kiểm soát",
+    "chitiet":    "Giám định chi tiết xe ô tô BKS",
+    "hientruong": "Giám định hiện trường xe ô tô BKS",
+    "giayto":     "Giám định giấy tờ xe ô tô BKS",
+    "xacminh":    "Ảnh xác minh hiện trường xe ô tô BKS",
 }
 
 # Số ảnh trên mỗi trang → (cols, rows). Giữ khớp với GRID trong index.html.
@@ -480,7 +481,12 @@ def draw_header(c: Canvas, page_w, page_h, bks: str, ga_ra: str, gdv: str,
                 ngay: str = "", loai: str = "chitiet", ma_ho_so: str = ""):
     """Vẽ header: logo trái + khối tiêu đề căn giữa bên phải logo.
 
-    Số dòng thay đổi theo dữ liệu (dòng "Số HSBT" chỉ in khi có mã hồ sơ),
+    Khối tiêu đề gồm **3 dòng** (khớp `headerLines()` của index.html):
+      1. {loại giám định} : {BKS}  -  Ngày: {ngày}                   15pt đậm
+      2. Số HSBT: {mã hồ sơ}  ·10mm·  {GĐV}                          14pt
+      3. {ga-ra}                                                     15pt
+    Dòng 2 gồm 2 **đoạn** nằm trên cùng baseline, cách nhau `HEAD_SEG_MM`.
+    Số đoạn/dòng thay đổi theo dữ liệu (đoạn "Số HSBT" chỉ in khi có mã hồ sơ),
     nên chiều cao khối chữ được tính động rồi mới canh giữa theo chiều dọc.
     """
     logo_size = _pts(LOGO_SIZE_MM)
@@ -504,18 +510,22 @@ def draw_header(c: Canvas, page_w, page_h, bks: str, ga_ra: str, gdv: str,
     text_w = page_w - text_x - margin
     c.setFillColor(WHITE)
 
-    # Các dòng tiêu đề: (nội dung, cỡ chữ, in đậm)
+    # Các dòng tiêu đề: (các đoạn chữ, cỡ chữ, in đậm)
     prefix_loai = LOAI_GD_MAP.get(loai, LOAI_GD_MAP["chitiet"])
-    lines = [(f"{prefix_loai} : {bks}", 16, True)]
-    if ma_ho_so:
-        lines.append((f"Số HSBT: {ma_ho_so}", 14, False))
+    # Dòng 1 — {loại} : {BKS} kèm Ngày giám định ở cuối
+    d1 = f"{prefix_loai} : {bks}"
+    lines = [([f"{d1}  -  Ngày: {ngay}" if ngay else d1], 15, True)]
+    # Dòng 2 — Số HSBT (chỉ khi có mã hồ sơ) nối liền tên GĐV, cách nhau HEAD_SEG_MM
+    segs = ([f"Số HSBT: {ma_ho_so}"] if ma_ho_so else [])
+    segs.append(gdv)
+    lines.append((segs, 14, False))
     # Chỉ loại "chitiet" mới có tiền tố "Địa điểm tại Gara"
-    lines.append((f"Địa điểm tại Gara : {ga_ra}" if loai == "chitiet" else ga_ra, 15, False))
-    lines.append((f"{gdv}  —  Ngày: {ngay}" if ngay else gdv, 14, False))
+    lines.append(([f"Địa điểm tại Gara : {ga_ra}" if loai == "chitiet" else ga_ra], 15, False))
 
     # Canh giữa dọc trong header.
     # spacing tính bằng POINT (không phải mm) cho khớp hằng `C.LINE_SP` của index.html.
-    # Header chỉ còn 20mm (~56.7pt) nên khối 4 dòng (65pt) phải thu nhỏ theo `fit`.
+    # Header chỉ còn 20mm (~56.7pt); khối 3 dòng (15+14+15) vừa khung nên fit = 1,
+    # nhưng vẫn giữ công thức co vì số dòng thay đổi theo dữ liệu.
     spacing = HEAD_LINE_SP
     # Chiều cao THỊ GIÁC = khoảng cách giữa các baseline + đỉnh chữ dòng đầu
     # + nét thòng dòng cuối. Chỉ cộng cỡ chữ thì nét thòng dòng cuối sẽ lòi khỏi nền xanh.
@@ -525,27 +535,48 @@ def draw_header(c: Canvas, page_w, page_h, bks: str, ga_ra: str, gdv: str,
     spacing *= fit
     start_y = (top_y - header_h / 2) + (raw_vis * fit) / 2 - ASC * lines[0][1] * fit
 
-    for text, size, bold in lines:
+    seg_gap = _pts(HEAD_SEG_MM)
+    for segs, size, bold in lines:
         size *= fit
         c.setFont("BVP-Bold" if bold else "BVP", size)
-        _draw_left(c, text, text_x, start_y, text_w, size, WHITE, bold)
+        _draw_left(c, segs, text_x, start_y, text_w, size, WHITE, bold, seg_gap)
         # Chỉ trừ cỡ chữ dòng hiện tại + spacing — xem CLAUDE.md
         start_y -= (size + spacing)
 
 
-def _draw_left(c: Canvas, text: str, x, y, max_w, font_size, color, bold=False):
-    """Vẽ 1 dòng căn TRÁI tại x, tự thu nhỏ rồi cắt bớt nếu vẫn quá rộng."""
-    font = "BVP-Bold" if bold else "BVP"
+def _draw_left(c: Canvas, text, x, y, max_w, font_size, color, bold=False, gap=0.0):
+    """Vẽ 1 dòng căn TRÁI tại x, tự thu nhỏ rồi cắt bớt nếu vẫn quá rộng.
+
+    `text` nhận 1 chuỗi, hoặc danh sách nhiều **đoạn** nằm trên cùng baseline
+    và cách nhau `gap` point (dòng "Số HSBT … GĐV" của header).
+    """
+    font  = "BVP-Bold" if bold else "BVP"
+    parts = [text] if isinstance(text, str) else list(text)
+    parts = [" ".join(p.split()) for p in parts if p and p.strip()]
+    if not parts:
+        return
+    gaps_w = gap * (len(parts) - 1)
+
+    def width_at(fs):
+        return sum(c.stringWidth(p, font, fs) for p in parts) + gaps_w
+
     fs = font_size
-    while c.stringWidth(text, font, fs) > max_w and fs > 6:
+    while width_at(fs) > max_w and fs > 6:
         fs -= 0.5
-    if c.stringWidth(text, font, fs) > max_w:
-        while len(text) > 1 and c.stringWidth(text + "…", font, fs) > max_w:
-            text = text[:-1]
-        text += "…"
+    if width_at(fs) > max_w:
+        # Vẫn tràn: cắt bớt đoạn cuối
+        room = max_w - (width_at(fs) - c.stringWidth(parts[-1], font, fs))
+        last = parts[-1]
+        while len(last) > 1 and c.stringWidth(last + "…", font, fs) > room:
+            last = last[:-1]
+        parts[-1] = last + "…"
+
     c.setFillColor(color)
     c.setFont(font, fs)
-    c.drawString(x, y, text)
+    cx = x
+    for p in parts:
+        c.drawString(cx, y, p)
+        cx += c.stringWidth(p, font, fs) + gap
 
 
 def _draw_shrink(c: Canvas, text: str, x, y, max_w, font_size, color):

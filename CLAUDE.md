@@ -278,10 +278,10 @@ nền xanh của appbar (trước đây dùng `var(--amber)`, sau khi đổi san
 
 | Kiểu (`--loai`) | Tiêu đề header | Phân trang |
 |---|---|---|
-| `chitiet` | Giám định chi tiết xe ô tô biển kiểm soát | Ảnh prefix `0.` ra **trang đầu riêng**, sau đó ảnh hạng mục ghép liên tục |
-| `hientruong` | Giám định hiện trường xe ô tô biển kiểm soát | Toàn bộ ảnh ghép liên tục |
-| `giayto` | Giám định giấy tờ xe ô tô biển kiểm soát | **Bố cục tự động theo tiền tố số** — trộn được trang ngang và dọc trong cùng file |
-| `xacminh` | Ảnh xác minh hiện trường xe ô tô biển kiểm soát | Toàn bộ ảnh ghép liên tục |
+| `chitiet` | Giám định chi tiết xe ô tô BKS | Ảnh prefix `0.` ra **trang đầu riêng**, sau đó ảnh hạng mục ghép liên tục |
+| `hientruong` | Giám định hiện trường xe ô tô BKS | Toàn bộ ảnh ghép liên tục |
+| `giayto` | Giám định giấy tờ xe ô tô BKS | **Bố cục tự động theo tiền tố số** — trộn được trang ngang và dọc trong cùng file |
+| `xacminh` | Ảnh xác minh hiện trường xe ô tô BKS | Toàn bộ ảnh ghép liên tục |
 
 > Droplist của web app chỉ còn **3 lựa chọn**: `chitiet` · `hientruong` (gộp hiện trường + xác minh
 > hiện trường) · `giayto`. Kiểu `xacminh` chỉ còn dùng cho luồng Python (`--loai xacminh`) và cho
@@ -306,7 +306,7 @@ Bố cục tự động của `giayto` — đọc tiền tố `{chính}.{phụ}`
 - Tên giấy tờ theo tiền tố (`GIAYTO_NAMES` / bảng trên) chỉ dùng làm **chú thích mặc định cho
   ảnh chưa thuộc hạng mục nào**; ảnh nằm trong thư mục có tên thì vẫn lấy tên thư mục.
 
-Chỉ `chitiet` có dòng 2 là `Địa điểm tại Gara : {ga_ra}`; 3 loại còn lại in thẳng `{ga_ra}`.
+Chỉ `chitiet` có dòng 3 là `Địa điểm tại Gara : {ga_ra}`; 3 loại còn lại in thẳng `{ga_ra}`.
 
 ### Số ảnh trên mỗi trang → lưới (cols × rows)
 
@@ -388,8 +388,9 @@ mỗi trang tự mang khổ giấy riêng nên `giayto` trộn được trang ng
 | Bo góc ảnh | 4% cạnh ngắn của vùng ảnh vẽ ra · khoảng cách ô `2mm` · lề `8mm` |
 | Footer | Tên **Phòng / Khu vực** do người dùng nhập (xám trái) + `{trang}/{tổng trang}` (xanh phải), `C.FOOTER_FS` / `FOOTER_FS` = **13 × 2/3 ≈ 8,7pt** |
 | Caption | 14pt, tự thu nhỏ nếu tràn |
-| Tiêu đề header | **căn trái**, cách mép phải logo `C.HEAD_X` / `HEAD_X_MM` = **20mm** · `{loại} : {BKS}` 16pt Bold · `Số HSBT: {mã hồ sơ}` 14pt · `{ga-ra}` 15pt · `{GĐV} — Ngày: {ngày}` 14pt |
-| Thu nhỏ tiêu đề | tự co theo `headerMetrics()` / `fit` để vừa 20mm — bản 4 dòng co còn ~79% |
+| Tiêu đề header | **căn trái**, cách mép phải logo `C.HEAD_X` / `HEAD_X_MM` = **12mm** · **3 dòng**: ① `{loại} : {BKS}  -  Ngày: {ngày}` 15pt Bold · ② `Số HSBT: {mã hồ sơ}` + **cách 10mm** + `{GĐV}` (cùng một dòng, 14pt) · ③ `{ga-ra}` 15pt |
+| Khoảng cách 2 đoạn trên dòng 2 | `C.SEG_GAP` / `HEAD_SEG_MM` = **10mm** — giữ nguyên khi dòng bị co |
+| Thu nhỏ tiêu đề | tự co theo `headerMetrics()` / `fit` để vừa 20mm — khối 3 dòng (15+14+15) cao ~48pt nên `fit` = 1 (không co theo chiều dọc). Riêng **dòng 1 trên A4 dọc luôn dài hơn vùng chữ** nên `drawLeft()` / `_draw_left()` tự hạ cỡ chữ (chitiet ~14,5pt · hientruong/xacminh ~13,5pt). **Đừng giảm `HEAD_X` để chữa**: muốn giữ đủ 15pt thì `chitiet` cần `HEAD_X` ≤ 4,7mm, còn `hientruong`/`xacminh` cần số âm — tự co là bắt buộc. A4 ngang thì luôn đủ 15pt |
 | Giãn dòng header | **2 point** (không phải 2mm) — xem bẫy kỹ thuật #5 |
 
 ### Bẫy kỹ thuật đã gặp — đừng lặp lại
@@ -411,11 +412,14 @@ mỗi trang tự mang khổ giấy riêng nên `giayto` trộn được trang ng
    Hai bên phải cho **cùng một kết quả**: ô 272,1 × 220,2pt → ảnh 3:4 ra 165,1 × 220,2pt,
    ảnh 4:3 ra 272,1 × 204,1pt. Thẻ ảnh bước 1 (`.th-img img`) và ô preview (`.pv-img img`)
    dùng `object-fit:contain` / `fill` trên nền trắng cho khớp bản in.
-5. **Giãn dòng header phải tính bằng point, không phải mm.** Header cao 28mm ≈ 79,4pt;
-   khối 4 dòng (16+14+15+14) với giãn 2pt cao 65pt — vừa khung. Nếu dùng `_pts(2)` (2mm ≈ 5,7pt)
-   thì khối cao 76pt và dòng cuối thò xuống dưới nền xanh.
-6. **Dòng "Số HSBT" chỉ in khi có mã hồ sơ**, nên số dòng header thay đổi theo dữ liệu —
-   `draw_header()` và `headerLines()` phải tính chiều cao khối động rồi mới canh giữa, không hard-code 3 dòng.
+5. **Giãn dòng header phải tính bằng point, không phải mm.** Khối 3 dòng (15+14+15) với giãn 2pt
+   cao ~48pt — vừa khung 20mm (≈56,7pt). Nếu dùng `_pts(2)` (2mm ≈ 5,7pt) thì khối phình thêm
+   ~7pt và dòng cuối thò xuống dưới nền xanh.
+6. **Đoạn "Số HSBT" chỉ in khi có mã hồ sơ**, nên số dòng/đoạn của header thay đổi theo dữ liệu —
+   `draw_header()` và `headerLines()` phải tính chiều cao khối động rồi mới canh giữa, không hard-code.
+   Mỗi dòng header là một **danh sách đoạn** (`segs` / tuple `(segs, size, bold)`), cách nhau
+   `C.SEG_GAP` = 10mm; `drawLeft()` (web) / `_draw_left()` (Python) đo tổng bề rộng **cả dòng**
+   (gồm khoảng cách) rồi mới thu nhỏ, và chỉ cắt bớt **đoạn cuối** nếu vẫn tràn.
 7. **`loadThumbs()` bỏ qua ảnh có `offsetParent` rỗng**, nên phải hiện thẻ gallery (`display:''`)
    TRƯỚC khi gọi nó, nếu không ảnh đại diện hạng mục sẽ trắng cho tới lần render sau.
 8. **Chiều cao khối chữ header phải tính theo kích thước THỊ GIÁC**, không phải tổng cỡ chữ:

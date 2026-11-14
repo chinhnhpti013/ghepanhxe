@@ -1175,13 +1175,13 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-14j';
+const APP_BUILD   = '2026-11-14m';
 
 const LOAI_MAP = {
-  chitiet:    'Giám định chi tiết xe ô tô biển kiểm soát',
-  hientruong: 'Giám định hiện trường xe ô tô biển kiểm soát',
-  giayto:     'Giám định giấy tờ xe ô tô biển kiểm soát',
-  xacminh:    'Ảnh xác minh hiện trường xe ô tô biển kiểm soát',
+  chitiet:    'Giám định chi tiết xe ô tô BKS',
+  hientruong: 'Giám định hiện trường xe ô tô BKS',
+  giayto:     'Giám định giấy tờ xe ô tô BKS',
+  xacminh:    'Ảnh xác minh hiện trường xe ô tô BKS',
 };
 const LOAI_LBL = {
   chitiet:'Ảnh giám định chi tiết thiệt hại',
@@ -3090,9 +3090,10 @@ const C = {
   CAPTION_H:  7  * MM,
   GAP:        2  * MM,
   LOGO:       17 * MM,   // vừa trong header 20mm
-  HEAD_X:     20 * MM,   // khoảng cách từ mép phải logo tới chữ tiêu đề
+  HEAD_X:     12 * MM,   // khoảng cách từ mép phải logo tới chữ tiêu đề
   HEAD_PAD:   2,         // chừa trên/dưới khối chữ header (point)
   LINE_SP:    2,         // giãn dòng header (point)
+  SEG_GAP:    10 * MM,   // khoảng cách giữa 2 đoạn chữ trên cùng một dòng header
   FOOTER_FS:  13 * 2 / 3,// cỡ chữ chân trang = 2/3 cỡ cũ (13pt)
 };
 
@@ -3101,7 +3102,8 @@ const ASC = 0.78, DESC = 0.22;
 
 /**
  * Hệ số thu nhỏ + chiều cao THỊ GIÁC của khối chữ header.
- * Header chỉ còn 20mm (≈56,7pt) nên bản 4 dòng phải co lại.
+ * Header chỉ còn 20mm (≈56,7pt); khối 3 dòng (15+14+15) vừa khung nên `fit` = 1,
+ * nhưng vẫn giữ công thức co vì số dòng thay đổi theo dữ liệu.
  * Phải tính theo đỉnh chữ dòng đầu và nét thòng dòng cuối — nếu chỉ cộng cỡ chữ
  * thì nét thòng (g, y, ă…) của dòng cuối sẽ lòi ra ngoài nền xanh.
  */
@@ -3133,12 +3135,12 @@ function onLoaiChange() {
 }
 function updateLoaiPreview() {
   const lines = headerLines(true);
-  const cls = l => l.size >= 16 ? 'tp-l1' : l.size >= 15 ? 'tp-l2' : 'tp-l3';
+  const cls = l => l.bold ? 'tp-l1' : l.size >= 15 ? 'tp-l2' : 'tp-l3';
   const noHs = !$('fMaHs').value.trim();
   $('loaiPreview').innerHTML =
     '<div class="tp-h">🖨️ Tiêu đề in trên đầu mỗi trang bản ảnh</div>' +
     '<div class="tp-b">' +
-      lines.map(l => `<div class="${cls(l)}${l.ph ? ' tp-mute' : ''}">${esc(l.text)}</div>`).join('') +
+      lines.map(l => `<div class="${cls(l)}">${headerLineHTML(l, '10mm')}</div>`).join('') +
     '</div>' +
     (noHs ? '<div class="tp-n">⚠️ Chưa nhập Số HSBT — dòng này sẽ không được in.</div>' : '');
 }
@@ -3348,9 +3350,13 @@ function buildPagesRaw() {
 }
 
 /**
- * Các dòng in trên header mỗi trang PDF.
+ * Các dòng in trên header mỗi trang PDF — **3 dòng**:
+ *   1. {loại giám định} : {BKS}  -  Ngày: {ngày}                       15pt đậm
+ *   2. Số HSBT: {mã hồ sơ}  ·10mm·  {GĐV}                              14pt
+ *   3. {ga-ra}                                                         15pt
+ * Mỗi dòng gồm 1–2 **đoạn** (`segs`) nằm trên cùng baseline, cách nhau `gap`.
  * @param ph true = chế độ xem trước: điền chỗ trống bằng {…} thay vì bỏ qua
- * @returns {{text:string,size:number,bold:boolean,ph?:boolean}[]}
+ * @returns {{size:number,bold:boolean,gap?:number,segs:{text:string,ph?:boolean}[]}[]}
  */
 function headerLines(ph) {
   const loai = $('fLoai').value;
@@ -3361,13 +3367,57 @@ function headerLines(ph) {
   const maHs = $('fMaHs').value.trim();
   const ngay = $('fNgay').value.trim();
 
-  const out = [{ text: `${LOAI_MAP[loai]} : ${bks}`, size: 16, bold: true }];
-  // Dòng Số HSBT chỉ in khi có Mã hồ sơ
-  if (maHs)    out.push({ text: `Số HSBT: ${maHs}`, size: 14, bold: false });
-  else if (ph) out.push({ text: 'Số HSBT: {mã hồ sơ}', size: 14, bold: false, ph: true });
-  out.push({ text: loai === 'chitiet' ? `Địa điểm tại Gara : ${gara}` : gara, size: 15, bold: false });
-  out.push({ text: ngay ? `${gdv}  —  Ngày: ${ngay}` : gdv, size: 14, bold: false });
+  // Dòng 1 — {loại} : {BKS} kèm Ngày giám định ở cuối
+  const d1 = `${LOAI_MAP[loai]} : ${bks}`;
+  const out = [{ size: 15, bold: true, segs: [{ text: ngay ? `${d1}  -  Ngày: ${ngay}` : d1 }] }];
+
+  // Dòng 2 — Số HSBT nối liền tên GĐV, cách nhau C.SEG_GAP.
+  // Đoạn Số HSBT chỉ in khi có Mã hồ sơ (preview thì hiện mờ chỗ trống)
+  const segs = [];
+  if (maHs)    segs.push({ text: `Số HSBT: ${maHs}` });
+  else if (ph) segs.push({ text: 'Số HSBT: {mã hồ sơ}', ph: true });
+  segs.push({ text: gdv });
+  out.push({ size: 14, bold: false, gap: C.SEG_GAP, segs });
+
+  out.push({ size: 15, bold: false,
+             segs: [{ text: loai === 'chitiet' ? `Địa điểm tại Gara : ${gara}` : gara }] });
   return out;
+}
+
+/**
+ * Thu nhỏ dòng tiêu đề của preview A4 cho khớp cách `drawLeft()` co chữ khi dựng PDF:
+ * PDF giảm cỡ chữ cho vừa bề rộng (khoảng cách 15mm giữ nguyên), còn CSS thì chỉ biết
+ * cắt bớt bằng dấu "…" — nên phải tự đo rồi hạ `font-size`.
+ * Header mọi trang giống nhau nên chỉ đo trang ĐẦU của mỗi khổ giấy rồi áp cho các trang sau
+ * (trang ngang rộng hơn trang dọc nên phải tách theo bề rộng).
+ */
+function fitPvHeaders(host) {
+  const byW = new Map();
+  host.querySelectorAll('.pv-page').forEach(pg => {
+    const divs = pg.querySelectorAll('.pvh-t > div');
+    const done = byW.get(pg.style.width);
+    if (done) { divs.forEach((d, i) => { if (done[i] != null) d.style.fontSize = done[i] + 'px'; }); return; }
+    const sizes = [];
+    divs.forEach(d => {
+      let fs = parseFloat(d.style.fontSize) || 0;
+      for (let i = 0; i < 40 && fs > 2 && d.scrollWidth > d.clientWidth + 0.5; i++) {
+        fs *= 0.97;
+        d.style.fontSize = fs + 'px';
+      }
+      sizes.push(fs);
+    });
+    byW.set(pg.style.width, sizes);
+  });
+}
+
+/**
+ * HTML của một dòng header: các đoạn chữ nối nhau, cách nhau bằng ô trống `gapCss`.
+ * Dùng chung cho khối xem trước tiêu đề (#loaiPreview) và preview trang A4.
+ */
+function headerLineHTML(l, gapCss) {
+  return l.segs.filter(s => s.text).map((s, i) =>
+    (i ? `<span style="display:inline-block;width:${gapCss}"></span>` : '') +
+    `<span${s.ph ? ' class="tp-mute"' : ''}>${esc(s.text)}</span>`).join('');
 }
 
 // ════════════════════════════════════════════════════════
@@ -3484,7 +3534,7 @@ function renderPreview() {
       <div class="pvh" style="height:${px(C.HEADER_H)};padding-left:${px(C.MARGIN)}">
         ${logoSrc ? `<img class="pvh-logo" src="${esc(logoSrc)}" style="width:${px(C.LOGO)};height:${px(C.LOGO)}" alt=""/>` : ''}
         <div class="pvh-t" style="margin-left:${px(C.HEAD_X)};margin-right:${px(C.MARGIN)}">
-          ${hLines.map(l => `<div style="font-size:${px(l.size * hFit)}${l.bold ? ';font-weight:700' : ''}">${esc(l.text)}</div>`).join('')}
+          ${hLines.map(l => `<div style="font-size:${px(l.size * hFit)}${l.bold ? ';font-weight:700' : ''}">${headerLineHTML(l, px(C.SEG_GAP))}</div>`).join('')}
         </div>
       </div>
       <div class="pv-grid" style="margin:${px(C.HEADER_GAP)} ${px(C.MARGIN)} 0;height:${px(areaH)};
@@ -3497,6 +3547,7 @@ function renderPreview() {
       </div>
     </div>`;
   }).join('');
+  fitPvHeaders(host);
 
   // Nạp ảnh preview theo tầm nhìn — dùng đúng hàm xử lý của PDF nên khung ảnh khớp 100%
   _pvObserver = new IntersectionObserver(async entries => {
@@ -3649,19 +3700,30 @@ async function generatePDF(opts) {
     // Mỗi bước chỉ trừ (font size dòng hiện tại + spacing) — xem CLAUDE.md
     let ty = headerMid + visH / 2 - ASC * hLines[0].size * fit;
 
-    const drawLeft = (raw, font, size, y) => {
-      let text = cleanText(raw).replace(/\s+/g, ' ').trim();
-      if (!text) return;
-      let fs = size, w = font.widthOfTextAtSize(text, fs);
-      while (w > textW && fs > 6) { fs -= 0.5; w = font.widthOfTextAtSize(text, fs); }
-      if (w > textW) {
-        while (text.length > 1 && font.widthOfTextAtSize(text + '…', fs) > textW) text = text.slice(0, -1);
-        text += '…';
+    // Vẽ 1 dòng header: 1–2 đoạn chữ cùng baseline, cách nhau `gap`;
+    // tự thu nhỏ cả dòng rồi cắt bớt đoạn cuối nếu vẫn tràn
+    const drawLeft = (l, font, size, y) => {
+      const gap   = l.gap || 0;
+      const parts = l.segs.map(s => cleanText(s.text).replace(/\s+/g, ' ').trim()).filter(Boolean);
+      if (!parts.length) return;
+      const gapsW = gap * (parts.length - 1);
+      const wAt   = fs => parts.reduce((s, t) => s + font.widthOfTextAtSize(t, fs), 0) + gapsW;
+      let fs = size;
+      while (wAt(fs) > textW && fs > 6) fs -= 0.5;
+      if (wAt(fs) > textW) {
+        const room = textW - (wAt(fs) - font.widthOfTextAtSize(parts[parts.length - 1], fs));
+        let last = parts[parts.length - 1];
+        while (last.length > 1 && font.widthOfTextAtSize(last + '…', fs) > room) last = last.slice(0, -1);
+        parts[parts.length - 1] = last + '…';
       }
-      page.drawText(text, { x: textX, y, size: fs, font, color: WHITE() });
+      let x = textX;
+      for (const t of parts) {
+        page.drawText(t, { x, y, size: fs, font, color: WHITE() });
+        x += font.widthOfTextAtSize(t, fs) + gap;
+      }
     };
     hLines.forEach(l => {
-      drawLeft(l.text, l.bold ? fontBold : fontReg, l.size * fit, ty);
+      drawLeft(l, l.bold ? fontBold : fontReg, l.size * fit, ty);
       ty -= (l.size * fit + sp);
     });
 
