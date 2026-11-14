@@ -28,7 +28,6 @@ anh-giam-dinh-vcx-theo-ten-file/
 ├── dat_ten_file.py               ← Giai đoạn 1 (Python)
 ├── ghep_anh.py                   ← Giai đoạn 2 (Python)
 ├── chay_doc.bat / chay_ngang.bat ← chạy nhanh bằng double-click
-├── build.sh                      ← (không còn tác dụng) inject GEMINI_API_KEY cho web app
 └── requirements.txt
 ```
 
@@ -56,7 +55,8 @@ mỗi lần cập nhật hướng dẫn** để người dùng thấy nhắc.
 
 > **Web app không có OCR báo giá.** BKS và tên ga-ra nhập tay ở đầu bước 1.
 > Gemini Vision OCR và đọc `Bao_gia.xlsx` **chỉ còn ở luồng Python** (`get_bks_garage()` trong `ghep_anh.py`).
-> `build.sh` / biến `GEMINI_API_KEY` trên Render không còn tác dụng với web app.
+> Web app **không cần bước build** nào — `index.html` không còn placeholder khóa API,
+> nên biến `GEMINI_API_KEY` và script inject khóa (`build.sh`) đã được **xóa khỏi dự án**.
 
 ### Quy trình 2 bước
 
