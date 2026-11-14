@@ -1062,7 +1062,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-14g';
+const APP_BUILD   = '2026-11-14h';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô biển kiểm soát',
@@ -1322,15 +1322,29 @@ function useGdv(i) {
 //  DANH SÁCH PHÒNG / KHU VỰC (in ở chân mỗi trang bản ảnh)
 // ════════════════════════════════════════════════════════
 const PHONG_KEY = 'pti_phong_list';
-const PHONG_DEFAULT = 'Phòng Cứu hộ & Giám định tại khu vực Quảng Ninh';
+// Phòng / khu vực dùng ở lần gần nhất — tự điền lại cho các phiên làm việc sau.
+// KHÔNG có "phòng mặc định" cài sẵn: lần đầu dùng app thì ô này để trống.
+const PHONG_LAST_KEY = 'pti_phong_last';
 function getPhongList() {
   try {
     const a = JSON.parse(localStorage.getItem(PHONG_KEY));
     if (Array.isArray(a) && a.length) return a;
   } catch (_) {}
-  return [PHONG_DEFAULT];           // lần đầu: gợi ý sẵn tên phòng mặc định
+  return [];
 }
-const setPhongList = a => localStorage.setItem(PHONG_KEY, JSON.stringify(a));
+const setPhongList = a => { try { localStorage.setItem(PHONG_KEY, JSON.stringify(a)); } catch (_) {} };
+/** Tên Phòng / khu vực đã dùng lần gần nhất (rỗng nếu chưa từng dùng) */
+function getLastPhong() {
+  try { return localStorage.getItem(PHONG_LAST_KEY) || ''; } catch (_) { return ''; }
+}
+/** Ghi nhớ Phòng / khu vực đang nhập để phiên sau tự điền lại + thêm vào droplist */
+function rememberPhong() {
+  const v = $('fPhong').value.trim();
+  if (!v) return;
+  try { localStorage.setItem(PHONG_LAST_KEY, v); } catch (_) {}
+  const list = getPhongList();
+  if (!list.includes(v)) { list.push(v); setPhongList(list); refreshPhongDatalist(); }
+}
 
 /** Danh sách Phòng / khu vực đổi → vẽ lại droplist nếu đang mở */
 function refreshPhongDatalist() { if (comboCur === 'fPhong') renderCombo('fPhong'); }
@@ -1357,14 +1371,17 @@ function addPhong() {
 function delPhong(i) {
   const list = getPhongList(); const n = list[i];
   list.splice(i,1); setPhongList(list);
+  // Bỏ nhớ nếu vừa xóa đúng tên đang được nhớ, kẻo phiên sau lại tự điền tên đã xóa
+  if (getLastPhong() === n) { try { localStorage.removeItem(PHONG_LAST_KEY); } catch (_) {} }
   refreshPhongDatalist(); renderPhongMgr(); toast('Đã xóa "' + n + '"');
 }
 function usePhong(i) {
   $('fPhong').value = getPhongList()[i];
+  rememberPhong();
   closeModal('phongModal'); updateSummaries(); scheduleDraftSave(false);
 }
 /** Dòng chữ in ở chân mỗi trang bản ảnh */
-function footerText() { return $('fPhong').value.trim() || PHONG_DEFAULT; }
+function footerText() { return $('fPhong').value.trim(); }
 
 // ════════════════════════════════════════════════════════
 //  DROPLIST CHO Ô "GIÁM ĐỊNH VIÊN" VÀ "PHÒNG / KHU VỰC"
@@ -1447,6 +1464,7 @@ function pickCombo(id, i) {
   closeCombo();
   $(id).value = v;
   $(id).dispatchEvent(new Event('input'));   // chạy đúng các việc như khi gõ tay
+  if (id === 'fPhong') rememberPhong();      // bấm droplist không sinh 'change'
   $(id).focus();
 }
 function comboMgr(id) { const c = COMBOS[id]; closeCombo(); c.mgr(); }
@@ -1654,7 +1672,7 @@ async function loadRecord(id) {
     const i = r.info || {};
     $('fMaHs').value = i.maHs || ''; $('fBks').value = i.bks || '';
     $('fGara').value = i.gaRa || ''; $('fGdv').value = i.gdv || '';
-    $('fPhong').value = i.phong || PHONG_DEFAULT;
+    $('fPhong').value = i.phong || getLastPhong();
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
     syncNgayPicker();
     state.layout = i.layout || 'doc';
@@ -1800,7 +1818,7 @@ async function restoreDraft() {
     const i = meta.info || {};
     $('fMaHs').value = i.maHs || ''; $('fBks').value = i.bks || '';
     $('fGara').value = i.gaRa || ''; $('fGdv').value = i.gdv || '';
-    $('fPhong').value = i.phong || PHONG_DEFAULT;
+    $('fPhong').value = i.phong || getLastPhong();
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
     syncNgayPicker();
     state.layout  = i.layout || 'doc';
@@ -2793,8 +2811,7 @@ function validateInfo() {
   // Ghi nhớ tên GĐV / Phòng mới vào danh sách gợi ý
   const list = getGdvList();
   if (gdv && !list.includes(gdv)) { list.push(gdv); setGdvList(list); refreshGdvDatalist(); }
-  const plist = getPhongList();
-  if (phong && !plist.includes(phong)) { plist.push(phong); setPhongList(plist); refreshPhongDatalist(); }
+  rememberPhong();   // ghi nhớ Phòng / khu vực + tự thêm vào droplist cho phiên sau
   return true;
 }
 
@@ -2950,6 +2967,8 @@ function updateSummaries() {
 
 ['fMaHs','fBks','fGara','fGdv','fPhong'].forEach(id =>
   $(id).addEventListener('input', () => { updateLoaiPreview(); updateSummaries(); scheduleDraftSave(false); }));
+// Gõ tay xong rời ô Phòng → ghi nhớ cho phiên sau ('change' chỉ nổ khi giá trị đổi thật)
+$('fPhong').addEventListener('change', rememberPhong);
 // Đổi kiểu bản ảnh → vẽ lại gallery: chú thích mặc định của ảnh chưa phân loại
 // lấy theo tiền tố giấy tờ nên placeholder phải cập nhật theo
 $('fLoai').addEventListener('change', () => {
@@ -3414,7 +3433,7 @@ function resetApp() {
   clearDraftStores().catch(() => {});
   setDraftBar('off', 'Bản nháp tự lưu sẽ bật khi có ảnh.', false);
   ['fMaHs','fBks','fGara','fGdv','fNgay','fNgayPick'].forEach(id => { $(id).value = ''; $(id).classList.remove('ok'); });
-  $('fPhong').value = getPhongList()[0] || PHONG_DEFAULT;
+  $('fPhong').value = getLastPhong();
   $('fLoai').value = 'chitiet';
   syncCapSrcSwitches();
   updateSelUI();
@@ -3539,7 +3558,7 @@ document.addEventListener('keydown', e => {
   }
   refreshGdvDatalist();
   refreshPhongDatalist();
-  if (!$('fPhong').value) $('fPhong').value = getPhongList()[0] || PHONG_DEFAULT;
+  if (!$('fPhong').value) $('fPhong').value = getLastPhong();
   state.perPage = PERPAGE_DEFAULT.doc;
   selectLayout('doc', true);
   onLoaiChange();

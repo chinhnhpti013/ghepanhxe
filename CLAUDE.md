@@ -214,9 +214,15 @@ nền xanh của appbar (trước đây dùng `var(--amber)`, sau khi đổi san
 - **Dark mode** (nút 🌙, lưu localStorage, mặc định theo hệ điều hành)
 - Danh sách GĐV lưu localStorage (`pti_gdv_list`) và danh sách **Phòng / Khu vực** (`pti_phong_list`);
   tên mới nhập được tự thêm vào. Phòng/khu vực là dòng in ở **chân mỗi trang bản ảnh** (`footerText()`)
+- **Không có "phòng mặc định"** (hằng `PHONG_DEFAULT` đã bỏ) — lần đầu dùng app thì ô Phòng
+  **để trống**. Thay vào đó `pti_phong_last` nhớ tên dùng lần gần nhất: `rememberPhong()` ghi
+  (gọi từ sự kiện `change` của `#fPhong`, từ `pickCombo()` vì bấm droplist **không** sinh `change`,
+  từ `usePhong()` và từ `startGenerate()`) · `getLastPhong()` đọc khi khởi tạo, khi `resetApp()`
+  và khi mở hồ sơ/bản nháp **không có** `phong`. `delPhong()` xóa luôn bộ nhớ nếu xóa đúng tên
+  đang được nhớ, kẻo phiên sau lại tự điền tên vừa xóa
 - Hai ô đó dùng **droplist tự dựng** (`COMBOS`, `openCombo/renderCombo/pickCombo/placeCombo`),
   **không dùng `<datalist>`** — datalist của trình duyệt luôn lọc theo chữ đang có trong ô nên bấm
-  mũi tên hay ra rỗng (ô Phòng có sẵn tên mặc định). Bấm ▼ hiện **cả danh sách**; gõ trong khi đang
+  mũi tên hay ra rỗng (ô Phòng thường đã có tên được nhớ từ phiên trước). Bấm ▼ hiện **cả danh sách**; gõ trong khi đang
   mở mới lọc, so sánh **bỏ dấu** (`cmbNorm`). Popup dùng `position:fixed` + `placeCombo()` vì
   `.card` có `overflow:hidden`; `refreshGdvDatalist()` / `refreshPhongDatalist()` giữ tên cũ nhưng
   giờ chỉ vẽ lại droplist đang mở
