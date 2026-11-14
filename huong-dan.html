@@ -191,6 +191,7 @@ td{color:var(--text-2)}
     <a class="lv2" href="#tien-to">5. Tiền tố giấy tờ xe</a>
     <a class="lv2" href="#nap-anh">6. Nạp ảnh</a>
     <a class="lv2" href="#nap-pdf">6b. Nạp file PDF</a>
+    <a class="lv2" href="#chup-anh">6c. Chụp ảnh bằng camera</a>
     <a class="lv2" href="#quan-ly-anh">7. Quản lý ảnh</a>
     <a class="lv2" href="#thuyet-minh">8. Chú thích</a>
     <a class="lv2" href="#xuat-pdf">9. Xem trước &amp; xuất PDF</a>
@@ -218,9 +219,10 @@ td{color:var(--text-2)}
 
   <h3>Dùng ngay trên trình duyệt</h3>
   <p>Chỉ cần mở <b>địa chỉ web</b> là dùng được, <b>không phải cài đặt gì</b>. Ứng dụng nhận ảnh
-     JPG / PNG / BMP / WEBP và <b>file PDF</b> (kiểu giấy tờ xe); có xem trước đúng như bản in,
-     sửa chú thích từng ảnh, tự đánh số thứ tự ảnh và lưu hồ sơ lại để mở sau. Dùng được trên
-     máy tính, máy tính bảng và điện thoại.</p>
+     JPG / PNG / BMP / WEBP, <b>file PDF</b> (kiểu giấy tờ xe) và <b>ảnh chụp trực tiếp bằng
+     camera</b> điện thoại hay webcam; có xem trước đúng như bản in, sửa chú thích từng ảnh,
+     tự đánh số thứ tự ảnh và lưu hồ sơ lại để mở sau. Dùng được trên máy tính, máy tính bảng
+     và điện thoại.</p>
 
   <div class="note">
     🔒 <b>Toàn bộ ảnh được xử lý ngay trên máy của bạn.</b> Web app không tải ảnh, thông tin
@@ -428,12 +430,14 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
   </div>
 
   <h3 id="nap-anh">6. Nạp ảnh vào bản ảnh</h3>
-  <p>Có 3 cách, dùng được nhiều lần và trộn với nhau:</p>
+  <p>Có 4 cách, dùng được nhiều lần và trộn với nhau:</p>
   <ol class="steps">
     <li><b>Kéo thả</b> thư mục hoặc ảnh vào khung có nét đứt.</li>
     <li>Bấm <span class="btn-ex">📂 Chọn thư mục</span> rồi chọn <b>thư mục cha</b> chứa các
         thư mục con.</li>
     <li>Bấm <span class="btn-ex">🖼️ Chọn ảnh</span> để chọn từng ảnh lẻ.</li>
+    <li>Bấm <span class="btn-ex">📷 Chụp ảnh</span> để <b>chụp thẳng bằng camera</b> điện thoại
+        hoặc webcam — xem mục <a href="#chup-anh">6c</a>.</li>
   </ol>
   <p><b>Mỗi thư mục con = một hạng mục</b>, tên thư mục được dùng làm chú thích mặc định cho
      mọi ảnh trong đó. Ảnh lẻ không thuộc thư mục nào vào nhóm <code>Ảnh chưa phân loại</code>.</p>
@@ -482,6 +486,56 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
   <div class="tip">
     💡 Trang PDF sau khi chuyển thành ảnh được lưu kèm hồ sơ / bản nháp, nên lần sau mở lại
     <b>không cần nạp PDF và không cần mạng</b> nữa.
+  </div>
+
+  <h3 id="chup-anh">6c. Chụp ảnh bằng camera (điện thoại / webcam)</h3>
+  <p>Đang ở hiện trường mà chưa có ảnh trong máy thì bấm <span class="btn-ex">📷 Chụp ảnh</span>
+     ở khung <b>Nguồn ảnh</b> (trên điện thoại nút này nằm đầu hàng). Màn hình chụp mở ra,
+     ảnh chụp <b>vào thẳng bản ảnh</b> — không phải lưu ra thư viện rồi chọn lại.</p>
+  <ol class="steps">
+    <li>Chọn <b>hạng mục</b> sẽ nhận ảnh ở ô trên cùng: một hạng mục đã có,
+        <code>Ảnh chưa phân loại</code>, hoặc <b>➕ Hạng mục mới…</b> rồi gõ tên
+        (gõ cả tiền tố số nếu cần, vd. <code>1. Cốp sau lõm bẹp</code> hay
+        <code>1.1 Đăng ký xe</code>).</li>
+    <li>Ngắm và bấm <b>nút tròn trắng</b> (hoặc phím <span class="kbd">Space</span>) để chụp.
+        Chụp bao nhiêu ảnh liên tiếp cũng được, tất cả vào cùng hạng mục đang chọn.</li>
+    <li>Ảnh vừa chụp hiện thành dải nhỏ phía dưới. Chụp lỗi thì bấm dấu <b>✕</b> trên ảnh đó
+        để bỏ ngay.</li>
+    <li>Muốn đổi hạng mục giữa lúc chụp: chọn lại ở ô trên, rồi chụp tiếp.</li>
+    <li>Xong thì bấm <span class="btn-ex">✓ Xong</span> (hoặc <span class="kbd">Esc</span>).</li>
+  </ol>
+  <p>Trong màn hình chụp còn có:</p>
+  <ul>
+    <li><span class="btn-ex">🔄</span> đổi camera trước / sau (hoặc chuyển giữa các webcam).</li>
+    <li><span class="btn-ex">🔆</span> bật đèn flash — chỉ hiện khi camera cho phép
+        (thường là camera sau của điện thoại Android).</li>
+    <li>Dòng số kiểu <code>4032×3024</code> cạnh tên màn hình là <b>kích thước ảnh sẽ chụp</b>.
+        Nếu nó chuyển vàng và ghi <i>nét thấp</i> thì ảnh có thể bị rỗ khi in A4 — hãy dùng
+        nút <span class="btn-ex">📱 Camera máy</span>.</li>
+    <li><span class="btn-ex">📱 Camera máy</span> mở <b>ứng dụng camera của chính thiết bị</b>:
+        ảnh nét nhất vì dùng đủ cảm biến, có lấy nét và HDR. Chụp xong bấm <i>Dùng ảnh này</i>,
+        ảnh sẽ vào đúng hạng mục đang chọn. Dùng cách này khi cần chụp giấy tờ có chữ nhỏ.</li>
+  </ul>
+  <p>Ảnh chụp được <b>đặt tên theo hạng mục</b> — <code>{tên hạng mục}_{thứ tự}.jpg</code>,
+     vd. <code>1.1 Đăng ký xe_1.jpg</code> — nên <b>tiền tố số vẫn được nhận đúng</b>: bố cục
+     trang và chú thích mặc định chạy y như ảnh chọn từ máy. Ảnh chụp vào
+     <code>Ảnh chưa phân loại</code> có tên <code>Anh chup_1.jpg</code>, <code>Anh chup_2.jpg</code>…</p>
+  <p>Mỗi hạng mục trong danh sách ảnh cũng có nút <span class="btn-ex">📷 Chụp thêm</span> —
+     mở thẳng màn hình chụp với hạng mục đó đã được chọn sẵn, tiện khi xem lại thấy thiếu ảnh.</p>
+  <div class="note">
+    ℹ️ Ảnh chụp được xử lý <b>hoàn toàn trên máy</b> như mọi nguồn ảnh khác: xoay, thay, chèn,
+    sửa chú thích, lưu vào hồ sơ và bản nháp tự lưu. Không có gì gửi lên mạng.
+  </div>
+  <div class="warn">
+    ⚠️ Khung ngắm trong app <b>chỉ chạy khi trang mở bằng <code>https://</code> hoặc
+    <code>localhost</code></b> — đây là quy định của trình duyệt. Nếu bạn mở app bằng địa chỉ
+    LAN kiểu <code>http://192.168.1.5:8000</code> thì màn hình chụp sẽ báo điều này; vẫn chụp
+    được bình thường bằng nút <span class="btn-ex">📱 Camera máy</span>.
+  </div>
+  <div class="tip">
+    💡 Lần đầu bấm chụp, trình duyệt hỏi quyền dùng camera — chọn <b>Cho phép</b>. Nếu bấm nhầm
+    <i>Chặn</i>, bấm biểu tượng ổ khóa / camera trên thanh địa chỉ để cho phép lại, rồi bấm
+    <b>↻ Thử lại</b> trong màn hình chụp.
   </div>
 
   <h3 id="quan-ly-anh">7. Chọn và chỉnh từng ảnh</h3>
@@ -685,6 +739,9 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
         <td>Trong ô <b>GĐV</b> / <b>Phòng</b>: mở danh sách, chạy giữa các dòng và chọn dòng đang sáng</td></tr>
     <tr><td><span class="kbd">Tab</span> / <span class="kbd">Shift</span>+<span class="kbd">Tab</span></td>
         <td>Nhảy sang ô chú thích kế tiếp / trước đó</td></tr>
+    <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang ở màn hình chụp ảnh</b></td></tr>
+    <tr><td><span class="kbd">Space</span> · <span class="kbd">Enter</span></td><td>Chụp một ảnh</td></tr>
+    <tr><td><span class="kbd">Esc</span></td><td>Đóng màn hình chụp</td></tr>
     <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang xem ảnh kích thước lớn</b></td></tr>
     <tr><td><span class="kbd">←</span> <span class="kbd">→</span></td><td>Ảnh trước / ảnh sau</td></tr>
     <tr><td><span class="kbd">R</span></td><td>Xoay ảnh 90°</td></tr>
@@ -753,6 +810,18 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><td>Nạp PDF báo "Không đọc được file PDF"</td>
         <td>Kiểm tra mạng (lần đầu cần tải thư viện đọc PDF), và PDF có bị đặt mật khẩu hay
             không. PDF chỉ chứa ảnh scan vẫn đọc được bình thường.</td></tr>
+    <tr><td>Bấm <span class="btn-ex">📷 Chụp ảnh</span> mà không thấy khung ngắm</td>
+        <td>Đọc dòng chữ hiện trên màn hình chụp. Thường là: chưa cho phép quyền camera
+            (cho phép lại ở biểu tượng ổ khóa trên thanh địa chỉ rồi bấm <b>↻ Thử lại</b>),
+            trang không mở bằng <code>https://</code>, hoặc camera đang bị ứng dụng khác dùng.
+            Trong mọi trường hợp vẫn chụp được bằng <span class="btn-ex">📱 Camera máy</span>.</td></tr>
+    <tr><td>Ảnh chụp trong app bị mờ / rỗ khi in</td>
+        <td>Xem dòng kích thước ở góc trên màn hình chụp. Webcam máy tính thường chỉ cho
+            640×480 — quá thấp để in A4. Hãy chụp bằng <span class="btn-ex">📱 Camera máy</span>
+            trên điện thoại, hoặc giảm số ảnh mỗi trang.</td></tr>
+    <tr><td>Chụp xong không thấy ảnh đâu</td>
+        <td>Ảnh vào hạng mục ghi ở ô <b>Ảnh chụp vào hạng mục</b> của màn hình chụp — mặc định là
+            <code>Ảnh chưa phân loại</code>, nằm ở cuối danh sách hạng mục.</td></tr>
     <tr><td>Tạo PDF rất chậm hoặc trình duyệt treo</td>
         <td>Hồ sơ quá nhiều ảnh dung lượng lớn. Hãy chia thành nhiều bản ảnh, đóng các tab khác,
             và dùng máy tính thay vì điện thoại khi hồ sơ trên ~80 ảnh.</td></tr>
@@ -775,8 +844,17 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 
   <details class="faq">
     <summary>Dùng được trên điện thoại / máy tính bảng không?</summary>
-    <div class="faq-b"><p>Được — mở cùng địa chỉ web rồi bấm <b>Chọn ảnh</b> để lấy ảnh từ thư viện.
-      Chọn cả thư mục thì nên làm trên máy tính. Hồ sơ nhiều ảnh nên làm trên máy tính cho nhanh.</p></div>
+    <div class="faq-b"><p>Được — mở cùng địa chỉ web rồi bấm <b>📷 Chụp ảnh</b> để chụp tại
+      hiện trường, hoặc <b>🖼️ Chọn ảnh</b> để lấy ảnh có sẵn trong thư viện. Chọn cả thư mục thì
+      nên làm trên máy tính. Hồ sơ nhiều ảnh nên làm trên máy tính cho nhanh.</p></div>
+  </details>
+
+  <details class="faq">
+    <summary>Chụp ảnh bằng điện thoại rồi ghép luôn được không?</summary>
+    <div class="faq-b"><p>Được. Bấm <b>📷 Chụp ảnh</b> ở khung Nguồn ảnh, chọn hạng mục rồi chụp
+      liên tiếp — ảnh vào thẳng bản ảnh, không cần lưu ra thư viện rồi chọn lại. Cần ảnh nét
+      nhất (giấy tờ chữ nhỏ) thì bấm <b>📱 Camera máy</b> để chụp bằng ứng dụng camera của máy.
+      Xem mục <a href="#chup-anh">6c</a>.</p></div>
   </details>
 
   <details class="faq">

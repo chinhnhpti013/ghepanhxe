@@ -300,6 +300,69 @@ input[type=file]{display:none}
   align-items:center;justify-content:center}
 .viewer-x:hover{background:rgba(255,255,255,.3)}
 
+/* ════════ CHỤP ẢNH BẰNG CAMERA ════════ */
+/* Lớp phủ nền đen như .viewer — dùng màu cố định, không theo sáng/tối,
+   vì khung ngắm phải tối để nhìn rõ ảnh thật của camera. */
+.cam{position:fixed;inset:0;z-index:985;background:#05080C;color:#fff;display:flex;
+  flex-direction:column;animation:fade .15s}
+.cam.hidden{display:none}
+.cam-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:calc(9px + env(safe-area-inset-top)) 13px 9px;
+  background:rgba(8,14,22,.92);border-bottom:1px solid rgba(255,255,255,.1)}
+.cam-top .sp{flex:1;min-width:4px}
+.cam-ttl{font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:7px}
+.cam-res{font-size:.71rem;font-weight:600;opacity:.75;white-space:nowrap}
+.cam-res.low{color:#FFC94D;opacity:1}
+.cam-ic{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.13);color:#fff;font-size:1.1rem;cursor:pointer;font-family:inherit;
+  line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--t)}
+.cam-ic:hover{background:rgba(255,255,255,.27)}
+.cam-ic:active{transform:scale(.94)}
+.cam-ic.on{background:#F2C86A;border-color:#F2C86A;color:#1A1403}
+.cam-grp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 13px;
+  background:rgba(8,14,22,.92);border-bottom:1px solid rgba(255,255,255,.1)}
+.cam-grp label{font-size:.76rem;font-weight:600;opacity:.82;white-space:nowrap}
+.cam-grp select,.cam-grp input{flex:1 1 170px;min-width:0;font-family:inherit;font-size:16px;
+  padding:8px 10px;border-radius:var(--r-xs);color:#fff;
+  border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.1)}
+.cam-grp select:focus,.cam-grp input:focus{outline:none;border-color:#F2C86A}
+.cam-grp select option{background:#16263A;color:#fff}
+.cam-grp input::placeholder{color:rgba(255,255,255,.5)}
+/* Khung ngắm: object-fit contain để ảnh thấy trên màn hình đúng bằng ảnh sẽ chụp */
+.cam-view{flex:1;min-height:0;position:relative;background:#000;overflow:hidden}
+.cam-view video{width:100%;height:100%;object-fit:contain;display:block}
+.cam-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:13px;text-align:center;padding:22px;background:rgba(5,8,12,.93)}
+.cam-msg.hidden{display:none}
+.cam-msg b{font-size:.96rem}
+.cam-msg p{font-size:.82rem;line-height:1.6;max-width:440px;opacity:.88}
+.cam-msg code{background:rgba(255,255,255,.14);padding:1px 5px;border-radius:5px;font-size:.92em}
+.cam-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.cam-flash.go{animation:camflash .3s ease-out}
+@keyframes camflash{from{opacity:.85}to{opacity:0}}
+.cam-strip{display:flex;align-items:center;gap:7px;padding:8px 11px;overflow-x:auto;
+  background:rgba(8,14,22,.92);border-top:1px solid rgba(255,255,255,.1)}
+.cam-strip:empty{display:none}
+.cam-sh{position:relative;flex-shrink:0;width:54px;height:54px;border-radius:8px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.24);background:#000}
+.cam-sh img{width:100%;height:100%;object-fit:cover;display:block}
+.cam-sh button{position:absolute;top:1px;right:1px;width:20px;height:20px;border-radius:50%;
+  border:none;background:rgba(5,8,12,.78);color:#fff;font-size:.72rem;cursor:pointer;
+  font-family:inherit;line-height:1;display:flex;align-items:center;justify-content:center}
+.cam-sh button:hover{background:#C62828}
+.cam-bar{display:flex;align-items:center;gap:11px;background:rgba(8,14,22,.96);
+  border-top:1px solid rgba(255,255,255,.12);
+  padding:12px 14px calc(12px + env(safe-area-inset-bottom))}
+.cam-bar .sp{flex:1;min-width:4px}
+.cam-side{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:96px}
+.cam-side .btn{width:100%}
+.cam-n{font-size:.71rem;opacity:.78;text-align:center;line-height:1.3}
+.cam-shoot{width:70px;height:70px;border-radius:50%;flex-shrink:0;cursor:pointer;
+  border:4px solid rgba(255,255,255,.92);background:#fff;transition:transform .12s;
+  box-shadow:0 0 0 3px rgba(5,8,12,.75) inset}
+.cam-shoot:active:not(:disabled){transform:scale(.9)}
+.cam-shoot:disabled{opacity:.4;cursor:not-allowed}
+
 /* ════════ TRẠNG THÁI BẢN NHÁP ════════ */
 .draft-bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:9px 13px;
   background:var(--green-soft);border:1px solid var(--green);border-radius:var(--r-sm);
@@ -563,6 +626,11 @@ main > .foot{margin-top:auto}
   .btn-icon{min-height:32px;width:32px}
   .btn-lg{padding:13px 22px;font-size:.93rem}
   .dz-btns .btn{flex:1 1 calc(50% - 5px)}
+  /* Trên điện thoại, chụp ảnh là việc hay làm nhất → đưa lên đầu và tô đậm */
+  #btnCam{order:-1;background:var(--brand);color:#fff;border-color:var(--brand)}
+  .cam-ttl .cam-lbl{display:none}
+  .cam-side{min-width:80px}
+  .cam-shoot{width:64px;height:64px}
   .fg input,.fg select{font-size:16px;min-height:44px}
   .thumbs{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
   .th-acts button{height:34px;font-size:.8rem}
@@ -757,14 +825,18 @@ main > .foot{margin-top:auto}
           <div class="dz" id="dropZone" onclick="pickFolder()">
             <span class="dz-ico">🖼️</span>
             <div class="dz-main">
-              <h3><span class="d-desk">Kéo thả thư mục hoặc ảnh vào đây</span><span class="d-mob" style="display:none">Chọn thư mục hoặc ảnh</span></h3>
+              <h3><span class="d-desk">Kéo thả thư mục hoặc ảnh vào đây</span><span class="d-mob" style="display:none">Chụp ảnh hoặc chọn ảnh có sẵn</span></h3>
               <p><span class="d-desk">Mỗi thư mục con = một hạng mục · </span><span id="dzFmt">JPG ·
-                PNG · BMP · WEBP</span> — thêm được nhiều lần</p>
+                PNG · BMP · WEBP</span> — thêm được nhiều lần<br>
+                <span class="d-desk">Không có ảnh sẵn? Bấm </span><strong>📷 Chụp ảnh</strong><span class="d-desk"> để chụp
+                thẳng bằng camera điện thoại / webcam</span><span class="d-mob" style="display:none"> để chụp bằng camera</span></p>
             </div>
             <div class="dz-btns">
               <button class="btn btn-p btn-sm" onclick="event.stopPropagation();pickFolder()">📂 Chọn thư mục</button>
               <button class="btn btn-o btn-sm" id="btnPickImg"
                       onclick="event.stopPropagation();document.getElementById('imgInput').click()">🖼️ Chọn ảnh</button>
+              <button class="btn btn-o btn-sm" id="btnCam"
+                      onclick="event.stopPropagation();openCamera()">📷 Chụp ảnh</button>
               <button class="btn btn-n btn-sm" id="btnClearAll" style="display:none"
                       onclick="event.stopPropagation();clearFolders()">🗑️ Xóa tất cả</button>
             </div>
@@ -773,6 +845,8 @@ main > .foot{margin-top:auto}
           <input type="file" id="imgInput" multiple accept="image/*"/>
           <input type="file" id="replaceFile" accept="image/*"/>
           <input type="file" id="insertFile" multiple accept="image/*"/>
+          <!-- capture="environment" → mở thẳng ứng dụng camera (camera sau) trên điện thoại -->
+          <input type="file" id="camInput" accept="image/*" capture="environment" multiple/>
 
           <div id="emptyState" class="empty" style="display:none">
             <span class="ei">⚠️</span>
@@ -1026,6 +1100,46 @@ main > .foot{margin-top:auto}
   </div>
 </div>
 
+<!-- ════════ CHỤP ẢNH BẰNG CAMERA ════════ -->
+<div class="cam hidden" id="camModal">
+  <div class="cam-top">
+    <span class="cam-ttl">📷 <span class="cam-lbl">Chụp ảnh giám định</span></span>
+    <span class="cam-res" id="camRes"></span>
+    <span class="sp"></span>
+    <button class="cam-ic" id="camTorch" style="display:none" onclick="camToggleTorch()"
+            title="Bật / tắt đèn flash">🔦</button>
+    <button class="cam-ic" id="camSwitch" style="display:none" onclick="camSwitchDev()"
+            title="Đổi sang camera khác (trước / sau)">🔄</button>
+    <button class="cam-ic" onclick="closeCamera()" title="Đóng (Esc)">✕</button>
+  </div>
+  <div class="cam-grp">
+    <label for="camGrp">Ảnh chụp vào hạng mục</label>
+    <select id="camGrp" onchange="onCamGrpChange()"></select>
+    <input type="text" id="camGrpNew" style="display:none" autocomplete="off"
+           placeholder="Tên hạng mục mới — vd. 1. Cốp sau lõm bẹp"/>
+  </div>
+  <div class="cam-view">
+    <video id="camVideo" playsinline muted autoplay onloadedmetadata="camUpdateInfo()"></video>
+    <div class="cam-msg hidden" id="camMsg"></div>
+    <div class="cam-flash" id="camFlash"></div>
+  </div>
+  <div class="cam-strip" id="camStrip"></div>
+  <div class="cam-bar">
+    <div class="cam-side">
+      <button class="btn btn-n btn-sm" onclick="useNativeCam()"
+              title="Chụp bằng ứng dụng camera của thiết bị — ảnh nét nhất, chạy được cả khi trang mở bằng http">📱 Camera máy</button>
+      <span class="cam-n" id="camCount">chưa chụp ảnh</span>
+    </div>
+    <span class="sp"></span>
+    <button class="cam-shoot" id="camShoot" onclick="camShoot()" title="Chụp ảnh (Space)"></button>
+    <span class="sp"></span>
+    <div class="cam-side">
+      <button class="btn btn-g btn-sm" onclick="closeCamera()">✓ Xong</button>
+      <span class="cam-n">Space để chụp</span>
+    </div>
+  </div>
+</div>
+
 <!-- ════════ MODAL: ĐỔI TÊN NHÓM ════════ -->
 <div class="ov hidden" id="grpModal">
   <div class="mdl">
@@ -1062,7 +1176,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-14h';
+const APP_BUILD   = '2026-11-14i';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô biển kiểm soát',
@@ -2025,6 +2139,7 @@ function renderGroups() {
       <div class="grp-bd">
         <div class="toolbar" style="margin-bottom:11px;padding:8px 11px">
           <button class="btn btn-o btn-sm" onclick="appendToGroup('${g.id}')">➕ Thêm ảnh vào nhóm</button>
+          <button class="btn btn-o btn-sm" onclick="openCamera('${g.id}')">📷 Chụp thêm</button>
           <span class="sp"></span>
           <button class="btn btn-r btn-sm" onclick="clearGroupCaps('${g.id}')">↺ Xóa chú thích riêng</button>
         </div>
@@ -2535,6 +2650,347 @@ async function intakeFiles(files) {
   if (nFail)  toast(`Không đọc được ${nFail} file PDF — kiểm tra mạng (thư viện pdf.js) hoặc file bị khóa`, 'e');
   if (nPage)  toast(`Đã chuyển ${pdfs.length - nFail} file PDF thành ${nPage} ảnh trang`, 'o');
   return out;
+}
+
+// ════════════════════════════════════════════════════════
+//  CHỤP ẢNH BẰNG CAMERA (điện thoại / webcam)
+//  Hai đường dùng chung một hộp thoại #camModal:
+//   (1) Xem trực tiếp bằng getUserMedia — chụp liên tiếp nhiều ảnh vào cùng
+//       một hạng mục, thấy ngay dải ảnh vừa chụp, xóa lại được ảnh xấu.
+//       CHỈ chạy khi trang mở bằng https:// hoặc localhost (yêu cầu của trình duyệt).
+//   (2) "Camera máy" — <input capture> mở thẳng ứng dụng camera của thiết bị:
+//       ảnh nét nhất (dùng đủ cảm biến, có lấy nét / HDR) và chạy cả khi trang
+//       mở bằng http trong mạng LAN.
+//  Ảnh chụp được ĐẶT TÊN theo nếp của dat_ten_file.py — {tên hạng mục}_{thứ tự}.jpg
+//  — nên tiền tố số của hạng mục vẫn quyết định bố cục và chú thích như ảnh chọn từ máy,
+//  và mọi ảnh đều đi qua intakeFiles() như mọi nguồn ảnh khác.
+//  Ảnh KHÔNG bị lật gương (kể cả camera trước) để chữ trên giấy tờ còn đọc được.
+// ════════════════════════════════════════════════════════
+const CAM_JPEG_Q = .94;    // chất lượng JPEG của ảnh chụp
+const CAM_IDEAL  = 4096;   // xin độ phân giải cao nhất mà camera cho phép
+const CAM_MIN_PX = 1280;   // cạnh dài dưới mức này thì cảnh báo in A4 sẽ rỗ
+
+let camStream = null, camTrack = null, camDevs = [], camDevId = null;
+let camFacing = 'environment', camTorchOn = false, camBusy = false;
+let camShots = [];            // ảnh chụp trong lần mở này: {id, url} — url thu hồi khi đóng
+let camAdded = 0;             // số ảnh đã thêm vào bản ảnh trong lần mở này
+let _camLastSrc = null;       // hạng mục dùng lần gần nhất
+let _camNativeSrc = null;     // hạng mục đích khi bấm "Camera máy"
+
+/** '__un__' cho nhóm ảnh chưa phân loại, còn lại dùng chính src của hạng mục */
+const camTok = src => (!src || src === UNGROUPED) ? '__un__' : src;
+
+/** Mở hộp chụp ảnh. gid = id hạng mục muốn chụp thêm vào (bỏ trống = hỏi trong hộp) */
+async function openCamera(gid) {
+  const g0 = gid ? state.groups.find(x => x.id === gid) : null;
+  camBuildGroupSel(camTok(g0 ? g0.src : _camLastSrc));
+  // thu hồi url còn sót (ảnh chụp xong SAU khi hộp đã đóng vẫn kịp vào camShots)
+  camShots.forEach(sh => { try { (window.URL || window.webkitURL).revokeObjectURL(sh.url); } catch (_) {} });
+  camShots = []; camAdded = 0; camRenderStrip();
+  camTorchOn = false; $('camTorch').classList.remove('on');
+  $('camTorch').style.display = 'none'; $('camSwitch').style.display = 'none';
+  $('camRes').textContent = '';
+  $('camModal').classList.remove('hidden');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    camShowMsg('Trình duyệt không xem được camera trực tiếp',
+      'Bấm <b>📱 Camera máy</b> ở dưới để chụp bằng ứng dụng camera của thiết bị.', false);
+    return;
+  }
+  if (!window.isSecureContext) {
+    camShowMsg('Trang không mở bằng HTTPS',
+      'Trình duyệt chỉ cho xem camera trực tiếp khi trang mở bằng <code>https://</code> hoặc ' +
+      '<code>localhost</code> — mở bằng địa chỉ LAN kiểu <code>http://192.168.…</code> thì không được.<br>' +
+      'Bấm <b>📱 Camera máy</b> để chụp bằng ứng dụng camera của thiết bị.', false);
+    return;
+  }
+  await camStart();
+}
+
+/** Bật dòng hình. devId = camera cụ thể (khi đổi camera), bỏ trống = theo camFacing */
+async function camStart(devId) {
+  camStop();
+  camShowMsg('Đang bật camera…', 'Chọn <b>Cho phép</b> khi trình duyệt hỏi quyền dùng camera.', false);
+  const hi = { width: { ideal: CAM_IDEAL }, height: { ideal: CAM_IDEAL } };
+  // thử lần lượt từ ràng buộc chặt xuống lỏng — camera yếu vẫn bật được
+  const tries = devId
+    ? [{ ...hi, deviceId: { exact: devId } }, { deviceId: { exact: devId } }]
+    : [{ ...hi, facingMode: { ideal: camFacing } }, { facingMode: camFacing }, true];
+  let err = null;
+  // Chạy 2 lượt: camera vừa bị nhả (đóng hộp rồi mở lại ngay, hoặc vừa dùng camera
+  // hệ thống) có thể còn "đang bị dùng" — chờ một nhịp rồi thử lại trước khi báo lỗi.
+  for (let pass = 0; pass < 2; pass++) {
+    for (const v of tries) {
+      try { camStream = await navigator.mediaDevices.getUserMedia({ video: v, audio: false }); err = null; break; }
+      catch (e) { err = e; }
+    }
+    if (camStream || !err || err.name !== 'NotReadableError') break;
+    await new Promise(r => setTimeout(r, 450));
+  }
+  if (!camStream) { camFail(err); return; }
+  camDevId = devId || null;
+  camTrack = camStream.getVideoTracks()[0] || null;
+  const v = $('camVideo');
+  v.srcObject = camStream;
+  try { await v.play(); } catch (_) {}
+  camHideMsg();
+  camUpdateInfo();
+  camListDevs();
+}
+
+/** Tắt dòng hình và nhả camera — phải gọi khi đóng hộp, kẻo đèn camera sáng mãi */
+function camStop() {
+  if (camTorchOn && camTrack) {
+    try { camTrack.applyConstraints({ advanced: [{ torch: false }] }); } catch (_) {}
+  }
+  camTorchOn = false;
+  $('camTorch').classList.remove('on');
+  if (camStream) camStream.getTracks().forEach(t => { try { t.stop(); } catch (_) {} });
+  camStream = null; camTrack = null;
+  const v = $('camVideo');
+  try { v.pause(); } catch (_) {}
+  v.srcObject = null;
+}
+
+function closeCamera() {
+  camStop();
+  camShots.forEach(sh => { try { (window.URL || window.webkitURL).revokeObjectURL(sh.url); } catch (_) {} });
+  camShots = [];
+  $('camModal').classList.add('hidden');
+  if (camAdded) toast(`Đã thêm ${camAdded} ảnh vừa chụp`, 'o');
+  camAdded = 0;
+}
+
+function camShowMsg(ttl, html, retry) {
+  $('camMsg').innerHTML = `<b>${ttl}</b><p>${html}</p>` +
+    (retry === false ? '' : '<button class="btn btn-o btn-sm" onclick="camStart()">↻ Thử lại</button>');
+  $('camMsg').classList.remove('hidden');
+  $('camShoot').disabled = true;
+}
+function camHideMsg() { $('camMsg').classList.add('hidden'); $('camShoot').disabled = false; }
+
+function camFail(err) {
+  console.error('Camera:', err);
+  const n = (err && err.name) || '';
+  let ttl, body;
+  if (n === 'NotAllowedError' || n === 'SecurityError') {
+    ttl  = 'Chưa được phép dùng camera';
+    body = 'Bấm biểu tượng ổ khóa / camera trên thanh địa chỉ, chọn <b>Cho phép</b> cho trang này, rồi bấm <b>Thử lại</b>.';
+  } else if (n === 'NotFoundError' || n === 'OverconstrainedError') {
+    ttl  = 'Không tìm thấy camera nào';
+    body = 'Thiết bị không có camera, hoặc camera đang bị tắt trong cài đặt hệ thống.';
+  } else if (n === 'NotReadableError' || n === 'AbortError') {
+    ttl  = 'Camera đang bị ứng dụng khác dùng';
+    body = 'Đóng ứng dụng đang mở camera (Zoom, Teams, Camera…) rồi bấm <b>Thử lại</b>.';
+  } else {
+    ttl  = 'Không bật được camera';
+    body = esc(String((err && err.message) || n || 'Lỗi không rõ'));
+  }
+  camShowMsg(ttl, body + '<br>Hoặc bấm <b>📱 Camera máy</b> để chụp bằng ứng dụng camera của thiết bị.');
+}
+
+/** Hiện độ phân giải ảnh sẽ chụp + bật nút đèn flash nếu camera có */
+function camUpdateInfo() {
+  const v = $('camVideo'), el = $('camRes');
+  const w = v.videoWidth, h = v.videoHeight;
+  if (!w || !h) { el.textContent = ''; el.classList.remove('low'); return; }
+  const low = Math.max(w, h) < CAM_MIN_PX;
+  el.textContent = `${w}×${h}${low ? ' · nét thấp' : ''}`;
+  el.classList.toggle('low', low);
+  el.title = low
+    ? `Camera chỉ cho ${w}×${h} — in A4 có thể bị rỗ. Nên dùng nút "📱 Camera máy".`
+    : `Ảnh chụp ra sẽ có kích thước ${w}×${h} điểm`;
+  let caps = {};
+  try { caps = (camTrack && camTrack.getCapabilities) ? (camTrack.getCapabilities() || {}) : {}; } catch (_) {}
+  $('camTorch').style.display = caps.torch ? '' : 'none';
+}
+
+async function camListDevs() {
+  try {
+    const ds = await navigator.mediaDevices.enumerateDevices();
+    camDevs = ds.filter(d => d.kind === 'videoinput');
+  } catch (_) { camDevs = []; }
+  $('camSwitch').style.display = camDevs.length > 1 ? '' : 'none';
+}
+
+/** Đổi camera: có danh sách thiết bị thì xoay vòng, không thì lật trước/sau */
+async function camSwitchDev() {
+  if (camDevs.length > 1) {
+    let cur = camDevId;
+    if (!cur) { try { cur = camTrack.getSettings().deviceId; } catch (_) {} }
+    const i = camDevs.findIndex(d => d.deviceId === cur);
+    await camStart(camDevs[(i + 1 + camDevs.length) % camDevs.length].deviceId);
+  } else {
+    camFacing = camFacing === 'environment' ? 'user' : 'environment';
+    await camStart();
+  }
+}
+
+async function camToggleTorch() {
+  if (!camTrack) return;
+  const want = !camTorchOn;
+  try {
+    await camTrack.applyConstraints({ advanced: [{ torch: want }] });
+    camTorchOn = want;
+    $('camTorch').classList.toggle('on', camTorchOn);
+  } catch (e) { toast('Camera này không bật được đèn flash', 'e'); }
+}
+
+// ──────── Hạng mục đích ────────
+function camBuildGroupSel(val) {
+  const sel = $('camGrp');
+  const opts = [`<option value="__un__">${esc(UNGROUPED)}</option>`];
+  state.groups.forEach(g => {
+    if (g.src === UNGROUPED) return;
+    opts.push(`<option value="${esc(g.src)}">${esc(g.name)} (${g.items.length} ảnh)</option>`);
+  });
+  opts.push('<option value="__new__">➕ Hạng mục mới…</option>');
+  sel.innerHTML = opts.join('');
+  sel.value = [...sel.options].some(o => o.value === val) ? val : '__un__';
+  onCamGrpChange();
+}
+function onCamGrpChange() {
+  const isNew = $('camGrp').value === '__new__';
+  $('camGrpNew').style.display = isNew ? '' : 'none';
+  if (isNew) setTimeout(() => $('camGrpNew').focus(), 60);
+}
+/** Hạng mục sẽ nhận ảnh — tạo mới nếu cần. null = người dùng chưa nhập tên hạng mục mới */
+function camTargetGroup() {
+  const v = $('camGrp').value;
+  const src = v === '__new__' ? $('camGrpNew').value.trim() : (v === '__un__' ? UNGROUPED : v);
+  if (!src) return null;
+  const old = state.groups.find(x => x.src === src);
+  const g = old || ensureGroup(src);
+  if (!old) sortGroupsOrder();
+  _camLastSrc = src;
+  if (v === '__new__') { $('camGrpNew').value = ''; camBuildGroupSel(camTok(src)); }
+  return g;
+}
+/** Tên file kế tiếp cho ảnh chụp vào hạng mục g — `used` dùng chung cho cả loạt ảnh */
+function camNextName(g, used, ext) {
+  const base = g.src === UNGROUPED ? 'Anh chup' : g.src;
+  let n = used.size + 1, nm;
+  do { nm = `${base}_${n}${ext}`; n++; } while (used.has(nm));
+  used.add(nm);
+  return nm;
+}
+function camRenamed(f, nm) {
+  try { return new File([f], nm, { type: f.type || 'image/jpeg', lastModified: f.lastModified }); }
+  catch (_) { return f; }
+}
+/** Thêm ảnh vừa chụp vào hạng mục đích (qua intakeFiles như mọi nguồn ảnh khác) */
+async function addCapturedFiles(files, g) {
+  const fs = (await intakeFiles(files)).filter(isImage);
+  if (!fs.length) return [];
+  const items = fs.map(f => mkItem(f, `__cam/${g.src}/${++_pathSeq}_${f.name}`));
+  items.forEach(it => g.items.push(it));
+  g.open = true;
+  camAdded += items.length;
+  renderGroups(); clearPvCache(); scheduleDraftSave(true);
+  return items;
+}
+
+// ──────── Chụp ────────
+async function camShoot() {
+  const v = $('camVideo');
+  if (camBusy || !camStream || !v.videoWidth) return;
+  const g = camTargetGroup();
+  if (!g) { toast('Nhập tên hạng mục mới trước khi chụp', 'e'); $('camGrpNew').focus(); return; }
+  camBusy = true; $('camShoot').disabled = true;
+  try {
+    const cv = document.createElement('canvas');
+    cv.width = v.videoWidth; cv.height = v.videoHeight;
+    cv.getContext('2d').drawImage(v, 0, 0, cv.width, cv.height);
+    // Nháy trắng NGAY khi bắt được khung hình — nén JPEG ảnh 8–12MP mất cả giây,
+    // chờ nén xong mới nháy thì bấm xong tưởng là máy không nhận.
+    const fl = $('camFlash');
+    fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+    $('camCount').textContent = 'đang lưu ảnh…';
+    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', CAM_JPEG_Q));
+    cv.width = cv.height = 0;                    // giải phóng bộ nhớ canvas
+    if (!blob) throw new Error('toBlob trả về rỗng');
+    const used = new Set(g.items.map(it => it.file.name));
+    const f = new File([blob], camNextName(g, used, '.jpg'), { type: 'image/jpeg' });
+    const items = await addCapturedFiles([f], g);
+    if (!items.length) throw new Error('không thêm được ảnh');
+    camPushShot(items[0]);
+  } catch (err) {
+    console.error('Chụp ảnh:', err);
+    toast('Không chụp được ảnh — thử lại', 'e');
+    deleteEmptyGroup(g);          // hạng mục vừa tạo mà chưa nhận được ảnh nào
+  } finally {
+    camBusy = false;
+    $('camShoot').disabled = !camStream;
+    camRenderStrip();                            // trả lại dòng đếm "n ảnh đã chụp"
+  }
+}
+
+function camPushShot(it) {
+  camShots.unshift({ id: it.id, url: (window.URL || window.webkitURL).createObjectURL(it.file) });
+  camRenderStrip();
+}
+function camRenderStrip() {
+  $('camStrip').innerHTML = camShots.map(sh =>
+    `<div class="cam-sh"><img src="${sh.url}" alt=""/>` +
+    `<button onclick="camUndo('${sh.id}')" title="Xóa ảnh này khỏi bản ảnh">✕</button></div>`).join('');
+  $('camCount').textContent = camAdded ? `${camAdded} ảnh đã chụp` : 'chưa chụp ảnh';
+}
+/** Bỏ một ảnh vừa chụp (chụp lỗi) — xóa khỏi bản ảnh luôn */
+function camUndo(id) {
+  const i = camShots.findIndex(sh => sh.id === id);
+  if (i >= 0) {
+    try { (window.URL || window.webkitURL).revokeObjectURL(camShots[i].url); } catch (_) {}
+    camShots.splice(i, 1);
+  }
+  if (findItem(id)) { deleteOne(id); camAdded = Math.max(0, camAdded - 1); }
+  camBuildGroupSel($('camGrp').value);
+  camRenderStrip();
+}
+
+// ──────── Camera hệ thống (<input capture>) ────────
+function useNativeCam() {
+  const g = camTargetGroup();
+  if (!g) { toast('Nhập tên hạng mục mới trước khi chụp', 'e'); $('camGrpNew').focus(); return; }
+  _camNativeSrc = g.src;
+  camStop();                                   // nhả camera, kẻo ứng dụng camera không mở được
+  camShowMsg('Đang chụp bằng camera hệ thống',
+    `Ảnh chụp sẽ vào hạng mục <b>${esc(g.name)}</b>. Chụp xong bấm <b>Dùng ảnh này</b> trên máy.<br>` +
+    'Muốn quay về khung ngắm trong app thì bấm <b>Thử lại</b>.');
+  $('camInput').click();
+}
+
+$('camInput').addEventListener('change', async e => {
+  const raw = [...e.target.files]; e.target.value = '';
+  const src = _camNativeSrc; _camNativeSrc = null;
+  if (!raw.length) return;
+  const g = (src && state.groups.find(x => x.src === src)) || ensureGroup(src || UNGROUPED);
+  const used = new Set(g.items.map(it => it.file.name));
+  // Đặt lại tên theo nếp {hạng mục}_{thứ tự} để tiền tố số và chú thích nhận đúng.
+  // File lạ đuôi (vd. .heic) để nguyên tên cho intakeFiles() báo lỗi đúng chỗ.
+  const files = raw.map(f => {
+    const ex = extOf(f.name);
+    return IMAGE_EXTS.has(ex) ? camRenamed(f, camNextName(g, used, ex)) : f;
+  });
+  const items = await addCapturedFiles(files, g);
+  if (!items.length) {
+    toast('Ảnh từ camera không ở dạng JPG/PNG — kiểm tra cài đặt định dạng ảnh của máy', 'e');
+    deleteEmptyGroup(g);
+    return;
+  }
+  if ($('camModal').classList.contains('hidden')) {
+    toast(`Đã thêm ${items.length} ảnh vừa chụp`, 'o');
+    camAdded = 0;
+  } else {
+    items.forEach(camPushShot);
+  }
+});
+
+/** Dọn hạng mục vừa tạo mà không nhận được ảnh nào */
+function deleteEmptyGroup(g) {
+  const i = state.groups.indexOf(g);
+  if (i >= 0 && !g.items.length) {
+    state.groups.splice(i, 1);
+    state.groups.length ? renderGroups() : showEmpty();
+  }
 }
 
 // ════════════════════════════════════════════════════════
@@ -3530,6 +3986,14 @@ async function processImage(file, targetWpt, targetHpt, scale, rot, jpegQ) {
 //  PHÍM TẮT
 // ════════════════════════════════════════════════════════
 document.addEventListener('keydown', e => {
+  // Đang chụp ảnh: Space/Enter = chụp, Esc = đóng (bỏ qua khi con trỏ ở trong ô nhập)
+  if (!$('camModal').classList.contains('hidden')) {
+    // ô nhập và nút đang được chọn thì để trình duyệt tự xử lý (Enter trên nút = bấm nút)
+    if (/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.target.tagName)) return;
+    if (e.key === 'Escape') { e.preventDefault(); closeCamera(); }
+    else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); camShoot(); }
+    return;
+  }
   // Đang xem ảnh lớn: ←/→ chuyển ảnh, R xoay
   if (!$('viewer').classList.contains('hidden')) {
     if (e.key === 'ArrowLeft')  { e.preventDefault(); viewerStep(-1); }

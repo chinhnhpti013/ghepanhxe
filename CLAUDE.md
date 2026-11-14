@@ -94,6 +94,38 @@ Nút **Tiếp tục** luôn bấm được; thiếu gì thì báo đúng chỗ �
 
 ---
 
+### Nguồn ảnh từ camera (`#camModal`)
+Nút `📷 Chụp ảnh` ở `.dz-btns` (trên ≤700px có `order:-1` + tô màu `--brand` vì ngoài hiện trường
+đây là việc hay làm nhất) và nút `📷 Chụp thêm` ở thanh công cụ mỗi hạng mục đều gọi
+`openCamera(gid?)`. Lớp phủ `.cam` dùng **màu cố định tối**, không theo token sáng/tối, vì khung
+ngắm phải tối mới nhìn rõ hình camera — nên **đổi hệ màu không phải sửa khối này**.
+
+Hai đường chụp dùng chung một hộp thoại:
+- **Khung ngắm trong app** — `camStart()` xin `getUserMedia` với `{width/height: {ideal: CAM_IDEAL}}`,
+  thử lần lượt từ ràng buộc chặt xuống lỏng (`deviceId` → `facingMode` → `true`) và **chạy 2 lượt**
+  (lượt 2 sau 450ms) vì camera vừa bị nhả ở lần mở trước thường còn báo `NotReadableError`.
+  `camShoot()` vẽ `videoWidth × videoHeight` ra canvas rồi `toBlob('image/jpeg', CAM_JPEG_Q)`.
+  **Nháy trắng `.cam-flash` phải chạy NGAY khi bắt được khung hình**, không chờ `toBlob` —
+  nén ảnh 8–12MP mất hơn 1 giây, nháy sau thì người dùng tưởng máy không nhận.
+  `camUpdateInfo()` hiện kích thước ảnh sẽ chụp và cảnh báo vàng khi cạnh dài < `CAM_MIN_PX`
+  (in A4 sẽ rỗ); nút đèn flash chỉ hiện khi `track.getCapabilities().torch`.
+  **`closeCamera()`/`camStop()` phải `track.stop()`**, kẻo đèn camera sáng mãi sau khi đóng hộp.
+- **`📱 Camera máy`** — `useNativeCam()` nhả camera rồi bấm `#camInput`
+  (`<input capture="environment">`). Ảnh nét nhất (đủ cảm biến, có lấy nét/HDR) và là **đường duy
+  nhất chạy được khi trang mở bằng `http://` trong mạng LAN** — `getUserMedia` đòi
+  `isSecureContext` (https hoặc localhost), nên `openCamera()` kiểm tra trước và báo rõ cho
+  người dùng thay vì để trình duyệt im lặng từ chối.
+
+**Ảnh chụp được đặt tên theo nếp của `dat_ten_file.py`** — `{tên hạng mục}_{thứ tự}.jpg`
+(`camNextName()`, nhóm `UNGROUPED` → `Anh chup_{n}.jpg`) — nhờ vậy **tiền tố số của hạng mục vẫn
+quyết định bố cục và chú thích** y như ảnh chọn từ máy. Ô `#camGrp` chọn hạng mục đích, value là
+**`g.src`** (không phải `g.id`) nên dựng lại droplist sau khi xóa ảnh/nhóm vẫn đúng;
+`__new__` mở ô `#camGrpNew` để gõ tên mới (kèm tiền tố nếu cần), `camTargetGroup()` trả `null`
+khi chưa gõ tên và `deleteEmptyGroup()` dọn hạng mục vừa tạo mà chụp lỗi. `_camLastSrc` nhớ hạng
+mục dùng lần gần nhất. `addCapturedFiles()` vẫn đi qua **`intakeFiles()`** như mọi nguồn ảnh khác,
+rồi `mkItem(f, '__cam/{src}/{seq}_{tên}')`. Dải `#camStrip` hiện ảnh vừa chụp, dấu ✕ gọi
+`camUndo()` → `deleteOne()` để bỏ ngay ảnh chụp lỗi.
+
 ### Nguồn ảnh nhận file PDF (chỉ kiểu `giayto`)
 `extAccepted()` / `pdfAllowed()` mở thêm đuôi `.pdf` khi `fLoai === 'giayto'`; `onLoaiChange()`
 đổi `accept` của 4 input file, nhãn `#dzFmt` và nhãn `#btnPickImg`.
@@ -110,7 +142,8 @@ vào hồ sơ/bản nháp dưới dạng ảnh nên mở lại không cần pdf.
 dùng chung một luật `GIAYTO_RULES`. Đường dẫn ảnh có hậu tố `#p{n}` để không trùng `it.path`.
 
 ### Chi tiết phần ảnh (bước 1)
-- Kéo thả / chọn thư mục (File System Access API, fallback `webkitdirectory`) hoặc chọn ảnh lẻ
+- Kéo thả / chọn thư mục (File System Access API, fallback `webkitdirectory`), chọn ảnh lẻ,
+  hoặc **chụp thẳng bằng camera** (`📷 Chụp ảnh` → `#camModal`, xem mục riêng bên dưới)
 - Mỗi **thư mục con = một hạng mục**; ảnh lẻ vào nhóm `Ảnh chưa phân loại`
 - Chọn ảnh: **ô tick `.th-ck` luôn hiện ở góc trên-phải mỗi thẻ ảnh** (bấm = thêm/bớt,
   Shift+bấm = chọn dải qua `selRangeTo()`) · **ô tick 3 trạng thái `.grp-ck`** ở tiêu đề hạng mục
@@ -236,6 +269,8 @@ nền xanh của appbar (trước đây dùng `var(--amber)`, sau khi đổi san
     chứng là "chỉ chọn được 1 lần"
 - Phím tắt: `Ctrl/Cmd+A` chọn tất cả · `Delete` xóa ảnh đã chọn · `Esc` bỏ chọn · `←` `→` chuyển giữa 2 bước
 - Khi đang xem ảnh lớn: `←` `→` chuyển ảnh · `R` xoay · `Esc` đóng
+- Khi đang ở màn hình chụp: `Space` / `Enter` chụp · `Esc` đóng. Nhánh này nằm **đầu** handler
+  phím tắt và bỏ qua cả `BUTTON` (không chỉ ô nhập), kẻo `Enter` trên nút *Xong* vừa chụp vừa đóng
 
 ---
 
