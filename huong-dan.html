@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Hướng dẫn sử dụng — Tiện ích ghép ảnh giám định</title>
+<style>
+:root{
+  --brand:#1565C0; --brand-d:#0D47A1; --brand-soft:#E3F2FD;
+  --green:#2E7D32; --green-soft:#E8F5E9;
+  --red:#C62828;   --red-soft:#FFEBEE;
+  --amber:#E65100; --amber-soft:#FFF8E1;
+  --bg:#F4F6FA; --surface:#FFFFFF; --surface-2:#F8FAFC;
+  --border:#E2E8F0; --border-s:#CBD5E1;
+  --text:#111827; --text-2:#475569; --text-3:#94A3B8;
+  --r:14px; --r-sm:9px; --r-xs:6px;
+  --sh-1:0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.05);
+  --sh-2:0 4px 6px -1px rgba(15,23,42,.07), 0 2px 4px -2px rgba(15,23,42,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --brand:#5CA8F5; --brand-d:#90C7FF; --brand-soft:#15314F;
+    --green:#81C784; --green-soft:#17331C;
+    --red:#EF9A9A;   --red-soft:#3A1718;
+    --amber:#FFB74D; --amber-soft:#3A2A10;
+    --bg:#0B1220; --surface:#121C2B; --surface-2:#18243A;
+    --border:#243246; --border-s:#33455E;
+    --text:#E8EEF7; --text-2:#AFC0D6; --text-3:#6B7C92;
+  }
+}
+:root[data-theme="dark"]{
+  --brand:#5CA8F5; --brand-d:#90C7FF; --brand-soft:#15314F;
+  --green:#81C784; --green-soft:#17331C;
+  --red:#EF9A9A;   --red-soft:#3A1718;
+  --amber:#FFB74D; --amber-soft:#3A2A10;
+  --bg:#0B1220; --surface:#121C2B; --surface-2:#18243A;
+  --border:#243246; --border-s:#33455E;
+  --text:#E8EEF7; --text-2:#AFC0D6; --text-3:#6B7C92;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg); color:var(--text); font-size:15px; line-height:1.62;
+  -webkit-text-size-adjust:100%;
+}
+
+/* ════════ LAYOUT ════════ */
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 80px;display:grid;
+  grid-template-columns:252px minmax(0,1fr);gap:28px;align-items:start}
+.hd{background:linear-gradient(135deg,var(--brand-d),var(--brand));color:#fff;padding:26px 0 24px;margin-bottom:26px}
+.hd-in{max-width:1180px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+.hd-ico{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.17);display:flex;
+  align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.hd h1{font-size:1.32rem;font-weight:800;letter-spacing:-.2px}
+.hd p{font-size:.86rem;opacity:.9;margin-top:3px}
+.hd-sp{flex:1}
+.hd .btn-w{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.28);
+  border-radius:var(--r-sm);padding:8px 14px;font-size:.82rem;font-weight:600;cursor:pointer;
+  font-family:inherit;text-decoration:none;display:inline-block}
+.hd .btn-w:hover{background:rgba(255,255,255,.26)}
+
+/* ════════ MỤC LỤC ════════ */
+nav{position:sticky;top:16px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:15px 13px;box-shadow:var(--sh-1);max-height:calc(100vh - 32px);overflow-y:auto}
+nav h2{font-size:.72rem;text-transform:uppercase;letter-spacing:.7px;color:var(--text-3);
+  font-weight:700;margin-bottom:9px;padding:0 6px}
+nav a{display:block;padding:6px 8px;border-radius:var(--r-xs);color:var(--text-2);
+  text-decoration:none;font-size:.83rem;line-height:1.35;border-left:2px solid transparent}
+nav a:hover{background:var(--surface-2);color:var(--brand)}
+nav a.lv2{padding-left:19px;font-size:.79rem}
+nav a.on{background:var(--brand-soft);color:var(--brand);font-weight:700;border-left-color:var(--brand)}
+nav .nav-g{margin-top:11px;padding-top:9px;border-top:1px solid var(--border)}
+
+/* ════════ NỘI DUNG ════════ */
+main{min-width:0}
+section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:22px 24px;margin-bottom:20px;box-shadow:var(--sh-1);scroll-margin-top:16px}
+h2.sec{font-size:1.1rem;font-weight:800;color:var(--brand);padding-bottom:11px;margin-bottom:15px;
+  border-bottom:2px solid var(--brand-soft);display:flex;align-items:center;gap:9px}
+h3{font-size:.97rem;font-weight:700;margin:21px 0 8px;color:var(--text);scroll-margin-top:16px}
+h3:first-of-type{margin-top:4px}
+h4{font-size:.88rem;font-weight:700;margin:15px 0 6px;color:var(--text-2)}
+p{margin-bottom:10px;color:var(--text-2)}
+ul,ol{margin:0 0 11px 21px;color:var(--text-2)}
+li{margin-bottom:5px}
+li>ul,li>ol{margin-top:5px;margin-bottom:4px}
+b,strong{color:var(--text);font-weight:700}
+code{background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;
+  font-family:"Cascadia Code",Consolas,"SF Mono",Menlo,monospace;font-size:.84em;color:var(--brand);
+  white-space:nowrap}
+pre{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:13px 15px;overflow-x:auto;margin-bottom:12px}
+pre code{background:none;border:none;padding:0;white-space:pre;color:var(--text)}
+a{color:var(--brand)}
+
+table{width:100%;border-collapse:collapse;margin-bottom:13px;font-size:.85rem}
+th,td{border:1px solid var(--border);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:700;color:var(--text);font-size:.81rem}
+td{color:var(--text-2)}
+.tbl-wrap{overflow-x:auto;margin-bottom:13px}
+.tbl-wrap table{margin-bottom:0;min-width:520px}
+
+.note,.warn,.tip{border-radius:var(--r-sm);padding:11px 14px;margin:12px 0;font-size:.86rem;
+  border:1px solid;line-height:1.55}
+.note{background:var(--brand-soft);border-color:var(--brand);color:var(--text)}
+.warn{background:var(--red-soft);border-color:var(--red);color:var(--text)}
+.tip{background:var(--green-soft);border-color:var(--green);color:var(--text)}
+.note b,.warn b,.tip b{color:var(--text)}
+
+.steps{counter-reset:s;list-style:none;margin-left:0}
+.steps>li{counter-increment:s;position:relative;padding-left:35px;margin-bottom:11px}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;
+  border-radius:50%;background:var(--brand);color:#fff;font-size:.78rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center}
+.kbd{display:inline-block;background:var(--surface);border:1px solid var(--border-s);
+  border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:.78rem;font-weight:600;
+  color:var(--text);font-family:inherit;white-space:nowrap}
+.btn-ex{display:inline-block;background:var(--surface-2);border:1px solid var(--border-s);
+  border-radius:6px;padding:1px 8px;font-size:.82rem;font-weight:600;color:var(--text);white-space:nowrap}
+
+.card-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(224px,1fr));gap:12px;margin-bottom:13px}
+.mini{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px}
+.mini h4{margin:0 0 5px;font-size:.86rem;color:var(--brand)}
+.mini p{font-size:.82rem;margin:0}
+
+.faq{border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:9px;background:var(--surface-2);
+  overflow:hidden}
+.faq summary{padding:10px 14px;cursor:pointer;font-weight:700;font-size:.88rem;color:var(--text)}
+.faq summary:hover{color:var(--brand)}
+.faq[open] summary{border-bottom:1px solid var(--border)}
+.faq-b{padding:12px 14px}
+.faq-b p:last-child,.faq-b ul:last-child{margin-bottom:0}
+
+.foot{text-align:center;color:var(--text-3);font-size:.79rem;padding:4px 16px 0}
+
+@media (max-width:900px){
+  .wrap{grid-template-columns:1fr;gap:18px}
+  nav{position:static;max-height:none}
+  nav a.lv2{display:none}
+  section{padding:18px 16px}
+}
+@media print{
+  .hd{background:none;color:#000;border-bottom:2px solid #000}
+  .hd-ico,.hd .btn-w{display:none}
+  nav{display:none}
+  .wrap{display:block;max-width:none;padding:0}
+  section{break-inside:avoid;box-shadow:none;border:none;padding:0 0 14px;margin-bottom:14px}
+  body{font-size:11pt;background:#fff}
+  .faq{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="hd">
+  <div class="hd-in">
+    <div class="hd-ico">📖</div>
+    <div>
+      <h1>Hướng dẫn sử dụng — Tiện ích ghép ảnh giám định</h1>
+      <p>Phòng Cứu hộ &amp; Giám định tại khu vực Quảng Ninh · PTI SOS</p>
+    </div>
+    <span class="hd-sp"></span>
+    <button class="btn-w" onclick="window.print()">🖨️ In / Lưu PDF</button>
+    <a class="btn-w" href="index.html" target="_top">← Về ứng dụng</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ════════ MỤC LỤC ════════ -->
+<nav id="toc">
+  <h2>Mục lục</h2>
+  <a href="#gioi-thieu">Giới thiệu</a>
+  <div class="nav-g">
+    <a href="#web">A · Dùng web app</a>
+    <a class="lv2" href="#mo-app">1. Mở ứng dụng</a>
+    <a class="lv2" href="#thong-tin">2. Thông tin giám định</a>
+    <a class="lv2" href="#kieu-ban-anh">3. Kiểu bản ảnh</a>
+    <a class="lv2" href="#bo-cuc">4. Bố cục trang</a>
+    <a class="lv2" href="#tien-to">5. Tiền tố giấy tờ xe</a>
+    <a class="lv2" href="#nap-anh">6. Nạp ảnh</a>
+    <a class="lv2" href="#nap-pdf">6b. Nạp file PDF</a>
+    <a class="lv2" href="#quan-ly-anh">7. Quản lý ảnh</a>
+    <a class="lv2" href="#thuyet-minh">8. Chú thích</a>
+    <a class="lv2" href="#xuat-pdf">9. Xem trước &amp; xuất PDF</a>
+    <a class="lv2" href="#xuat-jpg">9b. Tải PDF nén &amp; ảnh JPG</a>
+    <a class="lv2" href="#ho-so">10. Hồ sơ &amp; bản nháp</a>
+    <a class="lv2" href="#danh-sach">11. Danh sách GĐV / Phòng</a>
+    <a class="lv2" href="#phim-tat">12. Phím tắt</a>
+  </div>
+  <div class="nav-g">
+    <a href="#thiet-ke">B · Thông số bản ảnh</a>
+    <a href="#su-co">C · Xử lý sự cố</a>
+    <a href="#faq">D · Câu hỏi thường gặp</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section id="gioi-thieu">
+  <h2 class="sec">🚗 Giới thiệu</h2>
+  <p><b>Tiện ích ghép ảnh giám định</b> dùng để ghép ảnh hiện trường, ảnh chi tiết thiệt hại và
+     ảnh giấy tờ xe ô tô thành <b>file PDF khổ A4</b> chuẩn của Phòng Cứu hộ &amp; Giám định
+     tại khu vực Quảng Ninh: có logo PTI SOS, tiêu đề biển kiểm soát, số HSBT, tên ga-ra,
+     tên giám định viên, chú thích từng ảnh và số trang.</p>
+
+  <h3>Dùng ngay trên trình duyệt</h3>
+  <p>Chỉ cần mở <b>địa chỉ web</b> là dùng được, <b>không phải cài đặt gì</b>. Ứng dụng nhận ảnh
+     JPG / PNG / BMP / WEBP và <b>file PDF</b> (kiểu giấy tờ xe); có xem trước đúng như bản in,
+     sửa chú thích từng ảnh, tự đánh số thứ tự ảnh và lưu hồ sơ lại để mở sau. Dùng được trên
+     máy tính, máy tính bảng và điện thoại.</p>
+
+  <div class="note">
+    🔒 <b>Toàn bộ ảnh được xử lý ngay trên máy của bạn.</b> Web app không tải ảnh, thông tin
+    hồ sơ hay file PDF lên internet. Hồ sơ "lưu trên máy" nằm trong bộ nhớ của chính trình duyệt
+    (IndexedDB) — xóa dữ liệu trình duyệt là mất, nên <b>file PDF quan trọng phải tải xuống và lưu lại</b>.
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section id="web">
+  <h2 class="sec">🌐 A · Các bước sử dụng</h2>
+
+  <h3 id="mo-app">1. Mở ứng dụng</h3>
+  <p>Mở ứng dụng bằng <b>địa chỉ web</b> (link GitHub Pages / Render mà đơn vị cấp, hoặc
+     <code>http://localhost:8000</code> nếu tự chạy máy chủ nội bộ).</p>
+  <div class="warn">
+    ⚠️ <b>Không mở bằng cách nhấp đôi vào file <code>index.html</code></b> (đường dẫn
+    <code>file:///…</code>). Khi đó trình duyệt chặn việc nạp font tiếng Việt và logo, PDF sẽ
+    thiếu dấu hoặc không tạo được. Nếu cần chạy tại máy, mở thư mục dự án rồi gõ:
+    <pre><code>python -m http.server 8000</code></pre>
+    sau đó vào <code>http://localhost:8000</code>.
+  </div>
+  <p>Ứng dụng có <b>2 bước</b>, chuyển qua lại bằng thanh bước ở trên hoặc nút
+     <span class="btn-ex">Tiếp tục →</span> / <span class="btn-ex">← Quay lại</span> ở cuối màn hình:</p>
+  <ol class="steps">
+    <li><b>Lập bản ảnh</b> — nhập thông tin giám định và nạp, sắp xếp, đặt chú thích cho ảnh.</li>
+    <li><b>Xem &amp; Xuất</b> — xem trước từng trang A4 rồi tạo và tải file PDF.</li>
+  </ol>
+  <p>Các biểu tượng ở góc <b>trên cùng bên phải</b>: <span class="btn-ex">🗂️</span> hồ sơ đã lưu ·
+     <span class="btn-ex">🌙</span> chế độ sáng/tối · <span class="btn-ex">Help</span> mở lại bản hướng dẫn này.</p>
+
+  <h3 id="thong-tin">2. Thẻ "Thông tin giám định"</h3>
+  <p>Các ô có dấu <b style="color:var(--red)">*</b> là bắt buộc. Nội dung các ô này được in lên
+     <b>đầu mỗi trang</b> bản ảnh, trừ Phòng/Khu vực được in ở <b>chân trang</b>.</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:27%">Ô nhập</th><th>Ý nghĩa &amp; cách nhập</th></tr>
+    <tr><td><b>Kiểu bản ảnh giám định *</b></td>
+        <td>Chọn 1 trong 3 kiểu — quyết định tiêu đề in ra và cách chia trang. Xem mục
+            <a href="#kieu-ban-anh">Kiểu bản ảnh</a>.</td></tr>
+    <tr><td>Số HSBT / Mã hồ sơ</td>
+        <td>Ví dụ <code>XCG.2026.001234</code>. Nếu để trống thì dòng "Số HSBT" <b>không được in</b>
+            và tên file PDF lấy theo biển kiểm soát.</td></tr>
+    <tr><td><b>Biển kiểm soát *</b></td>
+        <td>Ví dụ <code>14C-402.84</code>. In ở dòng tiêu đề lớn nhất.</td></tr>
+    <tr><td>Ngày giám định</td>
+        <td>Bấm vào ô chọn ngày hoặc nút <span class="btn-ex">Hôm nay</span>; nút
+            <span class="btn-ex">Xóa</span> để bỏ trống. In cùng dòng với tên giám định viên
+            dạng <code>DD/MM/YYYY</code>. Để trống thì không in ngày.</td></tr>
+    <tr><td><b>Tên ga-ra / Địa điểm *</b></td>
+        <td>Ví dụ <code>Gara Toyota Quảng Ninh</code>. Với kiểu <i>chi tiết thiệt hại</i>, dòng này
+            in thành <code>Địa điểm tại Gara : …</code>; hai kiểu còn lại in thẳng nội dung bạn nhập.</td></tr>
+    <tr><td><b>Giám định viên *</b></td>
+        <td>Chọn trong danh sách đã lưu hoặc gõ tên mới — tên mới tự được thêm vào danh sách
+            cho lần sau.</td></tr>
+    <tr><td><b>Phòng / Khu vực giám định *</b></td>
+        <td>In ở <b>chân mỗi trang</b> (góc trái). Mặc định là
+            <i>Phòng Cứu hộ &amp; Giám định tại khu vực Quảng Ninh</i>.</td></tr>
+    <tr><td>Bố cục trang + Số ảnh/trang</td>
+        <td>A4 dọc hay ngang và số ảnh mỗi trang. Xem mục <a href="#bo-cuc">Bố cục trang</a>.</td></tr>
+  </table>
+  </div>
+  <div class="tip">
+    💡 Khối <b>"Tiêu đề in trên đầu mỗi trang bản ảnh"</b> ở cuối thẻ cho xem trước ngay các dòng
+    sẽ được in, cập nhật theo từng chữ bạn gõ. Chỗ còn thiếu hiện mờ dạng <code>{BKS}</code>,
+    <code>{ga-ra}</code>…
+  </div>
+  <p>Nút <span class="btn-ex">Tiếp tục →</span> luôn bấm được: nếu còn thiếu, ứng dụng báo đúng ô
+     đang thiếu và tự cuộn tới ô đó.</p>
+
+  <h3 id="kieu-ban-anh">3. Ba kiểu bản ảnh</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:30%">Kiểu</th><th>Tiêu đề in ra</th><th>Cách chia trang</th></tr>
+    <tr>
+      <td><b>Ảnh giám định chi tiết thiệt hại</b></td>
+      <td><i>Giám định chi tiết xe ô tô biển kiểm soát : {BKS}</i></td>
+      <td>Ảnh của hạng mục bắt đầu bằng số <code>0</code> (ảnh nhận dạng xe: số khung, tem đăng kiểm,
+          tổng thể xe) được xếp ra <b>trang đầu riêng</b>; các hạng mục còn lại ghép liên tục.</td>
+    </tr>
+    <tr>
+      <td><b>Ảnh giám định hiện trường / Xác minh hiện trường</b></td>
+      <td><i>Giám định hiện trường xe ô tô biển kiểm soát : {BKS}</i></td>
+      <td>Toàn bộ ảnh ghép liên tục theo thứ tự hạng mục.</td>
+    </tr>
+    <tr>
+      <td><b>Ảnh và file Giấy tờ xe (jpg, pdf…)</b></td>
+      <td><i>Giám định giấy tờ xe ô tô biển kiểm soát : {BKS}</i></td>
+      <td><b>Bố cục tự động theo tiền tố số</b> của tên ảnh — một file PDF có thể trộn cả trang
+          ngang và trang dọc. Xem mục <a href="#tien-to">Tiền tố giấy tờ xe</a>.</td>
+    </tr>
+  </table>
+  </div>
+
+  <h3 id="bo-cuc">4. Bố cục trang và số ảnh mỗi trang</h3>
+  <p>Chọn <b>A4 Dọc</b> hoặc <b>A4 Ngang</b>, sau đó chọn số ảnh mỗi trang. Lưới tương ứng:</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:22%">Khổ giấy</th><th>Số ảnh mỗi trang (cột × hàng)</th></tr>
+    <tr><td><b>A4 Dọc</b></td>
+        <td>1 (1×1) · 2 (1×2) · 3 (1×3) · 4 (2×2) · <b>6 (2×3) — mặc định</b> · 8 (2×4) · 9 (3×3) · 12 (3×4)</td></tr>
+    <tr><td><b>A4 Ngang</b></td>
+        <td>1 (1×1) · 2 (2×1) · <b>4 (2×2) — mặc định</b> · 6 (3×2) · 8 (4×2) · 9 (3×3)</td></tr>
+  </table>
+  </div>
+  <ul>
+    <li><b>Ảnh luôn được hiện đủ, không bị cắt mép.</b> Ảnh được thu vừa khung ô và canh giữa,
+        giữ nguyên tỷ lệ — nên ảnh dọc trong ô ngang (hoặc ngược lại) sẽ có khoảng trắng hai bên,
+        đó là bình thường. Không có chi tiết nào bị cắt mất.</li>
+    <li><b>Chiều ảnh in ra đúng như bạn thấy trên màn hình.</b> Ứng dụng không tự xoay ảnh;
+        muốn đổi chiều thì bấm nút <span class="btn-ex">↻</span> trên thẻ ảnh (hoặc phím
+        <span class="kbd">R</span> khi xem ảnh lớn) — thẻ ảnh, preview và file PDF luôn cùng một chiều.</li>
+    <li>Muốn ảnh <b>to và kín ô</b> hơn thì giảm số ảnh mỗi trang, hoặc chọn khổ giấy có tỷ lệ ô
+        gần với tỷ lệ ảnh (ảnh ngang → A4 ngang, ảnh dọc → nhiều ảnh/trang A4 dọc).</li>
+    <li>Ảnh ít chi tiết (tổng thể xe, giấy tờ) nên để <b>ít ảnh mỗi trang</b>; ảnh cận cảnh vết
+        xước có thể để 6–9 ảnh/trang.</li>
+    <li>Với kiểu <b>Giấy tờ xe</b>, lựa chọn này chỉ áp dụng cho <b>ảnh không có tiền tố số</b>.</li>
+  </ul>
+
+  <h3 id="tien-to">5. Tiền tố số cho kiểu "Ảnh và file Giấy tờ xe"</h3>
+  <p>Khi chọn kiểu này, ứng dụng <b>tự nhận tiền tố số</b> ở đầu tên ảnh (nếu tên ảnh không có
+     tiền tố thì lấy tiền tố của <b>tên thư mục</b> chứa ảnh) để chọn khổ giấy và số ảnh mỗi trang
+     cho phù hợp với cỡ giấy tờ thật:</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:15%">Tiền tố</th><th style="width:45%">Loại giấy tờ</th><th>Bố cục trang</th></tr>
+    <tr><td><code>1.1</code> – <code>1.4</code></td>
+        <td>Đăng ký xe mặt trước / mặt sau · Bằng lái mặt trước / mặt sau</td>
+        <td>4 ảnh/trang <b>A4 ngang</b> (2×2)</td></tr>
+    <tr><td><code>1.5</code> – <code>1.6</code></td>
+        <td>Căn cước công dân lái xe (2 mặt)</td>
+        <td>4 ảnh/trang <b>A4 ngang</b> (2×2)</td></tr>
+    <tr><td><code>2.1</code> – <code>2.4</code></td>
+        <td>Giấy chứng nhận đăng kiểm khổ A5 (2 mặt) · Giấy chứng nhận bảo hiểm khổ A5 (2 mặt)</td>
+        <td>2 ảnh/trang <b>A4 dọc</b> (1×2)</td></tr>
+    <tr><td><code>3.1</code> – <code>3.6</code></td>
+        <td>Ảnh xác minh bằng lái</td>
+        <td>4 ảnh/trang <b>A4 dọc</b> (2×2)</td></tr>
+    <tr><td><code>4</code> trở lên</td>
+        <td>Giấy chứng nhận bảo hiểm A4 (<code>4</code>) · Xác minh thanh toán phí bảo hiểm
+            (<code>5</code>) · Giấy chứng nhận kiểm định XCG A4 (<code>6</code>) ·
+            Biên bản bàn giao xe mới (<code>7</code>) · Giấy xác nhận quyền thụ hưởng Ngân hàng
+            (<code>8</code>)</td>
+        <td>1 ảnh/trang <b>A4 dọc</b></td></tr>
+    <tr><td><i>không có tiền tố</i></td>
+        <td>Giấy tờ khác — chú thích nhập tay</td>
+        <td>Dùng <b>bố cục bạn chọn</b> ở thẻ thông tin</td></tr>
+  </table>
+  </div>
+
+  <h4>Cách đặt tên để ứng dụng nhận đúng</h4>
+  <p>Đặt tiền tố ở <b>đầu tên file</b> hoặc <b>đầu tên thư mục</b>, phần sau viết tự do:</p>
+  <pre><code>1.1 Dang ky xe mat truoc.jpg      → 4 ảnh/trang A4 ngang
+1.5_cccd_mat_truoc.jpg            → 4 ảnh/trang A4 ngang
+2.3 Bao hiem A5 mat truoc.jpg     → 2 ảnh/trang A4 dọc
+3.2 Xac minh bang lai.jpg         → 4 ảnh/trang A4 dọc
+6 Kiem dinh XCG.jpg               → 1 ảnh/trang A4 dọc
+hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
+  <ul>
+    <li><b>Ảnh cùng bố cục được dồn chung trang</b>, kể cả khi ở khác thư mục. Nhờ vậy
+        <code>1.1</code> → <code>1.4</code> mỗi loại một ảnh vẫn nằm gọn trên <b>một</b> trang
+        4 ảnh/trang ngang, <code>1.5</code>/<code>1.6</code> ghép tiếp vào trang sau.</li>
+    <li>Thứ tự trang theo tiền tố nhỏ đến lớn; ảnh <b>không có tiền tố</b> xếp xuống cuối file.</li>
+    <li>Tiền tố chỉ nhận <b>1–2 chữ số</b> — để tên ảnh do máy ảnh/điện thoại tự đặt như
+        <code>20261114_083012.jpg</code> không bị hiểu nhầm là tiền tố.</li>
+    <li><b>Chú thích tự động theo tên giấy tờ ở bảng trên</b> — ảnh có tiền tố
+        <code>1.3</code> được in chú thích <i>"Bằng lái mặt trước"</i> mà không phải gõ gì.
+        Muốn chữ khác thì gõ thẳng vào ô dưới ảnh, hoặc đổi tên hạng mục thành tên
+        <b>không có tiền tố số</b> (lúc đó tên hạng mục được ưu tiên).</li>
+    <li>File <b>PDF</b> cũng nhận tiền tố theo cách này — xem mục
+        <a href="#nap-pdf">Nạp file PDF</a>.</li>
+  </ul>
+  <div class="note">
+    ℹ️ Khi chọn kiểu <b>Giấy tờ xe</b>, bảng tiền tố này cũng hiện ngay trong ứng dụng,
+    ngay dưới phần chọn bố cục.
+  </div>
+
+  <h3 id="nap-anh">6. Nạp ảnh vào bản ảnh</h3>
+  <p>Có 3 cách, dùng được nhiều lần và trộn với nhau:</p>
+  <ol class="steps">
+    <li><b>Kéo thả</b> thư mục hoặc ảnh vào khung có nét đứt.</li>
+    <li>Bấm <span class="btn-ex">📂 Chọn thư mục</span> rồi chọn <b>thư mục cha</b> chứa các
+        thư mục con.</li>
+    <li>Bấm <span class="btn-ex">🖼️ Chọn ảnh</span> để chọn từng ảnh lẻ.</li>
+  </ol>
+  <p><b>Mỗi thư mục con = một hạng mục</b>, tên thư mục được dùng làm chú thích mặc định cho
+     mọi ảnh trong đó. Ảnh lẻ không thuộc thư mục nào vào nhóm <code>Ảnh chưa phân loại</code>.</p>
+  <p>Cấu trúc thư mục nên dùng:</p>
+  <pre><code>Ho so 14C-402.84/
+├── 0. So khung xe/          ← ảnh nhận dạng xe (ra trang đầu riêng)
+├── 1. Cop sau lom bep/      ← hạng mục thiệt hại
+├── 2. Den pha nut vo/
+└── 3. Tai xe phai lom rach/</code></pre>
+  <ul>
+    <li>Định dạng nhận được: <b>JPG · JPEG · PNG · BMP · WEBP</b>, và thêm <b>PDF</b>
+        khi chọn kiểu <i>Ảnh và file Giấy tờ xe</i>.</li>
+    <li>Các hạng mục tự sắp theo số ở đầu tên thư mục; nhóm <code>Ảnh chưa phân loại</code> xếp cuối.</li>
+    <li>Nút <span class="btn-ex">🗑️ Xóa tất cả</span> xóa sạch ảnh đang nạp để làm lại từ đầu.</li>
+    <li>Bấm vào tiêu đề một hạng mục để mở/đóng; nút <span class="btn-ex">Mở tất cả</span> ở
+        góc thẻ mở hết. Nút <span class="btn-ex">📝</span> đổi tên hạng mục (đổi luôn chú thích
+        mặc định của cả nhóm), <span class="btn-ex">🗑️</span> xóa cả hạng mục,
+        <span class="btn-ex">➕ Thêm ảnh vào nhóm</span> bổ sung ảnh vào cuối nhóm.</li>
+  </ul>
+
+  <h3 id="nap-pdf">6b. Nạp file PDF (chỉ kiểu "Ảnh và file Giấy tờ xe")</h3>
+  <p>Khi chọn kiểu <b>Ảnh và file Giấy tờ xe (jpg, pdf…)</b>, khung nguồn ảnh tự mở thêm định dạng
+     <b>PDF</b>: nút đổi thành <span class="btn-ex">🖼️ Chọn ảnh / PDF</span> và hộp chọn file cho
+     chọn cả <code>.pdf</code>. Kéo thả file PDF hoặc cả thư mục có PDF cũng được.</p>
+  <ul>
+    <li><b>Mỗi trang PDF được chuyển thành một ảnh</b> ngay khi nạp. Từ đó trở đi trang PDF được
+        đối xử y như ảnh thường: chọn, xoay, thay, chèn, sửa chú thích, xem trước và ghép vào
+        bản ảnh chung — PDF và ảnh JPG/PNG nằm lẫn nhau trong cùng một file kết xuất.</li>
+    <li>Tên ảnh giữ theo tên file PDF kèm số trang, nên <b>tiền tố số vẫn được nhận đúng</b>.</li>
+    <li>PDF <b>nhiều trang</b> mà tên có tiền tố đầy đủ dạng <code>{chính}.{phụ}</code> thì
+        trang sau nhận <b>tiền tố phụ kế tiếp</b> — rất tiện cho giấy tờ 2 mặt:</li>
+  </ul>
+  <pre><code>1.1 Dang ky xe.pdf   (2 trang) → "Đăng ký xe mặt trước"  +  "Đăng ký xe mặt sau"
+2.1 Dang kiem A5.pdf (2 trang) → "…đăng kiểm A5 mặt trước" + "…đăng kiểm A5 mặt sau"
+1.1 Giay to xe.pdf   (6 trang) → 1.1 … 1.6: đăng ký 2 mặt, bằng lái 2 mặt, CCCD 2 mặt
+4 Bao hiem A4.pdf    (3 trang) → cả 3 trang: "Giấy chứng nhận bảo hiểm A4", mỗi trang 1 tờ A4</code></pre>
+  <div class="note">
+    ℹ️ Việc tăng tiền tố phụ <b>chỉ đổi chú thích</b>, không đổi bố cục: mọi tiền tố cùng số
+    đầu (<code>1.x</code>, <code>2.x</code>, <code>3.x</code>) luôn dùng chung một bố cục trang.
+  </div>
+  <div class="warn">
+    ⚠️ Lần đầu nạp PDF cần <b>có mạng</b> để tải thư viện đọc PDF. PDF <b>bị đặt mật khẩu</b>
+    không đọc được — hãy bỏ mật khẩu trước. PDF nhiều trang, nhiều hình nặng thì việc chuyển
+    sang ảnh có thể mất vài giây mỗi file.
+  </div>
+  <div class="tip">
+    💡 Trang PDF sau khi chuyển thành ảnh được lưu kèm hồ sơ / bản nháp, nên lần sau mở lại
+    <b>không cần nạp PDF và không cần mạng</b> nữa.
+  </div>
+
+  <h3 id="quan-ly-anh">7. Chọn và chỉnh từng ảnh</h3>
+  <h4>Chọn ảnh</h4>
+  <ul>
+    <li><b>Nhấp vào vùng ảnh</b> để chọn một ảnh.</li>
+    <li><span class="kbd">Ctrl</span> (máy Mac: <span class="kbd">Cmd</span>) + nhấp — chọn thêm từng ảnh.</li>
+    <li><span class="kbd">Shift</span> + nhấp — chọn cả dải từ ảnh chọn trước đó tới ảnh vừa nhấp.</li>
+    <li><span class="btn-ex">⬚ Khoanh chọn</span> (hoặc phím <span class="kbd">L</span>) rồi kéo
+        chuột trên vùng ảnh để quét chọn nhiều ảnh.</li>
+    <li><span class="btn-ex">☑️ Chọn tất cả</span> / <span class="btn-ex">✖️ Bỏ chọn</span>.
+        Số ảnh đang chọn hiện ở nhãn <i>"… ảnh đã chọn"</i>.</li>
+  </ul>
+  <h4>Năm nút trên mỗi thẻ ảnh</h4>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:13%">Nút</th><th>Tác dụng</th></tr>
+    <tr><td><b>🖼️</b></td><td><b>Thay ảnh</b> — chọn file khác thay vào <b>đúng vị trí đó</b>,
+        giữ nguyên chú thích đã nhập. Dùng khi chụp lại ảnh rõ hơn.</td></tr>
+    <tr><td><b>↻</b></td><td><b>Xoay 90°</b> mỗi lần bấm (0° → 90° → 180° → 270°). Góc xoay được
+        áp dụng vào file PDF và được lưu cùng hồ sơ.</td></tr>
+    <tr><td><b>＋</b></td><td><b>Chèn ảnh ngay sau</b> ảnh này — giữ đúng trình tự bạn muốn,
+        không phải nạp lại cả thư mục.</td></tr>
+    <tr><td><b>👁</b></td><td><b>Xem ảnh kích thước lớn</b>. Trong chế độ xem lớn:
+        <span class="kbd">←</span> <span class="kbd">→</span> chuyển ảnh ·
+        <span class="kbd">R</span> xoay · <span class="kbd">Esc</span> đóng.</td></tr>
+    <tr><td><b>🗑</b></td><td><b>Xóa</b> ảnh khỏi bản ảnh (không xóa file gốc trên máy).</td></tr>
+  </table>
+  </div>
+  <p>Xóa nhiều ảnh cùng lúc: chọn các ảnh rồi bấm
+     <span class="btn-ex">🗑️ Xóa ảnh đã chọn</span> hoặc phím <span class="kbd">Delete</span>.</p>
+
+  <h3 id="thuyet-minh">8. Chú thích ảnh</h3>
+  <p>Chú thích là dòng chữ trắng trên nền xanh ở dưới mỗi ảnh trong file PDF.
+     Thứ tự ưu tiên khi lấy nội dung:</p>
+  <ol class="steps">
+    <li><b>Chú thích riêng</b> — chữ bạn gõ vào ô ngay dưới ảnh, luôn thắng mọi trường hợp.</li>
+    <li><b>Theo công tắc bạn chọn</b> — tên file ảnh hoặc tên thư mục (xem bảng ngay dưới).</li>
+    <li><b>Tên giấy tờ theo tiền tố</b> — khi không bật công tắc nào và đang dùng kiểu
+        <i>Giấy tờ xe</i>, chú thích lấy theo bảng <a href="#tien-to">Tiền tố giấy tờ xe</a>.
+        Nếu bạn đã đổi tên hạng mục thành tên <b>không còn tiền tố số</b> thì tên hạng mục
+        đó được ưu tiên.</li>
+    <li><b>Tên hạng mục</b> (tên thư mục) — mặc định cho các kiểu bản ảnh còn lại.</li>
+  </ol>
+  <p>Dù lấy từ nguồn nào, chú thích in ra cũng luôn <b>bắt đầu bằng số thứ tự ảnh</b>.</p>
+  <h4>Hai công tắc chọn nguồn chú thích</h4>
+  <p>Ở thanh công cụ trên danh sách ảnh có 2 công tắc, <b>loại trừ nhau</b> (bật cái này tự tắt cái kia;
+     tắt cả hai = chế độ tự động):</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:34%">Công tắc</th><th>Chú thích mặc định lấy từ</th></tr>
+    <tr><td><i>tắt cả hai</i> — tự động</td>
+        <td>Kiểu <b>Giấy tờ xe</b>: tên giấy tờ theo tiền tố số · các kiểu khác: tên thư mục</td></tr>
+    <tr><td><b>Lấy tên file làm chú thích</b></td>
+        <td>Tên file ảnh (bỏ phần mở rộng)</td></tr>
+    <tr><td><b>Lấy tên thư mục làm chú thích</b></td>
+        <td>Tên thư mục / tên hạng mục — kể cả với kiểu Giấy tờ xe (bỏ qua bảng tiền tố)</td></tr>
+  </table>
+  </div>
+
+  <h4>Số thứ tự ảnh</h4>
+  <p>Mỗi ảnh được <b>đánh số tự động</b> và số này in ở <b>đầu chú thích</b> trên bản ảnh,
+     ví dụ <i>"7. Cản trước phải xước"</i>. Số chạy theo đúng thứ tự đọc —
+     <b>từ trái qua phải, từ trên xuống dưới</b> — và <b>liên tục qua các trang</b>
+     (trang 1 hết số 6 thì trang 2 bắt đầu từ 7), kể cả khi file trộn trang ngang và trang dọc.
+     Số hiện trên góc mỗi thẻ ảnh ở bước 1 <b>chính là số sẽ in ra</b>, nên đối chiếu được ngay.</p>
+
+  <ul>
+    <li>Gõ trực tiếp vào ô dưới ảnh; <span class="kbd">Tab</span> /
+        <span class="kbd">Shift</span>+<span class="kbd">Tab</span> nhảy sang ô kế tiếp.
+        <b>Để trống = dùng chú thích mặc định</b> (đang hiện mờ trong ô).</li>
+    <li><span class="btn-ex">✍️ Chú thích gộp</span> — đặt cùng một chú thích cho tất cả ảnh
+        đang chọn, có xem trước trước khi áp dụng.</li>
+    <li><span class="btn-ex">↺ Xóa chú thích riêng</span> trong mỗi hạng mục — trả cả nhóm
+        về chú thích mặc định.</li>
+    <li><b>Tự sửa chính tả (AutoCorrect):</b> khi rời ô nhập, ứng dụng bỏ khoảng trắng thừa và
+        viết hoa chữ đầu câu (sau dấu <code>.</code> <code>!</code> <code>?</code> <code>…</code>).
+        Ví dụ <i>"cản trước  phải xước. nứt nhẹ"</i> → <i>"Cản trước phải xước. Nứt nhẹ"</i>.</li>
+    <li>Chú thích quá dài sẽ <b>tự thu nhỏ cỡ chữ</b> cho vừa ô; nên viết ngắn gọn 1–2 dòng.</li>
+  </ul>
+
+  <h3 id="xuat-pdf">9. Bước 2 — Xem trước và xuất PDF</h3>
+  <ol class="steps">
+    <li>Bấm <span class="btn-ex">Tiếp tục →</span> để sang bước 2. Khung <b>Preview bản ảnh</b>
+        dựng đúng tỷ lệ A4, đúng tiêu đề, đúng cách cắt ảnh và chú thích <b>y như file PDF</b>.
+        Dùng <span class="btn-ex">➖</span> <span class="btn-ex">➕</span> để thu nhỏ / phóng to,
+        <span class="btn-ex">🔄 Dựng lại preview</span> nếu vừa sửa gì ở bước 1.</li>
+    <li>Đối chiếu thẻ <b>Tóm tắt</b>: kiểu bản ảnh, mã hồ sơ, BKS, ga-ra, GĐV, phòng, ngày,
+        bố cục, số ảnh và số trang.</li>
+    <li>Bấm <span class="btn-ex">⚡ Tạo file PDF</span> và chờ thanh tiến trình chạy xong.</li>
+    <li>Bấm <span class="btn-ex">⬇️ Tải file gốc (PDF)</span>. Tên file dạng
+        <code>BanAnh_{kiểu}_{mã hồ sơ hoặc BKS}.pdf</code>. Dung lượng file hiện ngay dưới
+        dòng thông báo. Xem thêm <a href="#xuat-jpg">PDF nén &amp; ảnh JPG</a>.</li>
+    <li>Nếu cần: <span class="btn-ex">💾 Lưu hồ sơ</span> để mở lại sau, hoặc
+        <span class="btn-ex">🔄 Làm bản ảnh mới</span> để bắt đầu hồ sơ khác.</li>
+  </ol>
+  <div class="tip">
+    💡 Sửa gì ở bước 1 (thêm ảnh, đổi chú thích, xoay ảnh) thì <b>tạo lại PDF</b> để file mới
+    có thay đổi đó.
+  </div>
+
+  <h3 id="xuat-jpg">9b. Tải PDF nén &amp; xuất file ảnh JPG</h3>
+  <p>Sau khi tạo PDF xong, thẻ <b>Xuất PDF</b> có 3 lựa chọn tải về:</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:32%">Nút</th><th>Kết quả</th></tr>
+    <tr><td><span class="btn-ex">⬇️ Tải file gốc (PDF)</span></td>
+        <td>Bản <b>nét nhất</b> — ảnh không mất dữ liệu. Dùng để lưu hồ sơ, in ấn.
+            File tên <code>BanAnh_….pdf</code>.</td></tr>
+    <tr><td><span class="btn-ex">🗜️ Tải PDF nén &lt; 10MB</span></td>
+        <td>Ứng dụng <b>tự nén cho tới khi file dưới 10MB</b>: hạ dần độ phân giải ảnh và nén
+            JPEG qua tối đa 6 mức, <b>dừng ngay ở mức đầu tiên</b> đạt dưới 10MB nên chất lượng
+            giữ được cao nhất có thể. Bố cục, chú thích, số thứ tự giữ nguyên.
+            File tên <code>BanAnh_…_nen.pdf</code>.</td></tr>
+    <tr><td><span class="btn-ex">🖼️ Tải file ảnh JPG</span></td>
+        <td>Mỗi trang bản ảnh thành <b>một file <code>.jpg</code></b> (150 DPI), dựng lại từ
+            chính file PDF nên <b>giống hệt bản in</b>. Một trang → tải thẳng
+            <code>…_trang01.jpg</code>; nhiều trang → gói trong một file
+            <code>…_anh_jpg.zip</code>.</td></tr>
+  </table>
+  </div>
+  <div class="note">
+    ℹ️ Dòng chữ nhỏ dưới các nút luôn cho biết <b>dung lượng</b> file vừa tạo. Nếu nén hết 6 mức
+    mà vẫn trên 10MB (hồ sơ rất nhiều ảnh), ứng dụng báo rõ và bạn nên chia thành nhiều bản ảnh.
+  </div>
+  <div class="warn">
+    ⚠️ Xuất ảnh JPG cần <b>có mạng ở lần đầu</b> (tải thư viện đọc PDF). Nén PDF chạy lại toàn bộ
+    phần dựng ảnh nên hồ sơ nhiều ảnh có thể mất vài chục giây — thanh chữ trên nút cho biết
+    đang ở mức nén thứ mấy.
+  </div>
+
+  <h3 id="ho-so">10. Hồ sơ lưu trên máy &amp; bản nháp tự lưu</h3>
+  <h4>Bản nháp tự lưu</h4>
+  <p>Mọi thay đổi được <b>tự lưu sau khoảng 1,5 giây</b> vào bộ nhớ trình duyệt. Nếu máy tắt đột
+     ngột hoặc đóng tab, lần mở lại sẽ có thanh mời <span class="btn-ex">↩️ Mở bản nháp</span> /
+     <span class="btn-ex">🗑️ Xóa nháp</span>. Mỗi máy/trình duyệt chỉ giữ <b>một</b> bản nháp —
+     bản nháp mới ghi đè bản cũ.</p>
+  <h4>Hồ sơ lưu tay</h4>
+  <ul>
+    <li>Bấm <span class="btn-ex">💾 Lưu hồ sơ</span>, đặt tên dễ nhớ (ví dụ
+        <i>14C-402.84 — Gara Toyota</i>) rồi lưu. Hồ sơ gồm toàn bộ thông tin, ảnh, chú thích
+        riêng và góc xoay.</li>
+    <li>Biểu tượng <span class="btn-ex">🗂️</span> ở góc trên bên phải — danh sách hồ sơ đã lưu,
+        tìm theo <b>mã hồ sơ, BKS, tên ga-ra hoặc tên GĐV</b>, mở lại hoặc xóa.</li>
+    <li>Mở lại hồ sơ xong vẫn thêm / bớt / thay ảnh và sửa chú thích bình thường.</li>
+  </ul>
+  <div class="warn">
+    ⚠️ Hồ sơ và bản nháp nằm trong bộ nhớ của <b>chính trình duyệt trên máy này</b>. Xóa dữ liệu
+    trình duyệt, dùng chế độ ẩn danh, đổi máy hoặc đổi trình duyệt là <b>không còn</b>. Đây không
+    phải nơi lưu trữ hồ sơ chính thức — file PDF phải tải xuống và lưu theo quy định của phòng.
+  </div>
+
+  <h3 id="danh-sach">11. Danh sách Giám định viên và Phòng / Khu vực</h3>
+  <ul>
+    <li>Gõ tên mới vào ô <b>Giám định viên</b> hoặc <b>Phòng / Khu vực</b> là tên đó tự được thêm
+        vào danh sách gợi ý cho lần sau.</li>
+    <li>Nút <span class="btn-ex">⚙️</span> bên cạnh mỗi ô để thêm / xóa trong danh sách.</li>
+    <li>Danh sách lưu riêng trên từng máy (localStorage của trình duyệt).</li>
+  </ul>
+
+  <h3 id="phim-tat">12. Phím tắt</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:30%">Phím</th><th>Tác dụng</th></tr>
+    <tr><td><span class="kbd">Ctrl</span>/<span class="kbd">Cmd</span> + <span class="kbd">A</span></td>
+        <td>Chọn tất cả ảnh (ở bước 1)</td></tr>
+    <tr><td><span class="kbd">Delete</span></td><td>Xóa các ảnh đang chọn</td></tr>
+    <tr><td><span class="kbd">Esc</span></td><td>Bỏ chọn ảnh · đóng hộp thoại · đóng xem ảnh lớn</td></tr>
+    <tr><td><span class="kbd">L</span></td><td>Bật / tắt chế độ khoanh chọn</td></tr>
+    <tr><td><span class="kbd">←</span> <span class="kbd">→</span></td>
+        <td>Chuyển giữa bước 1 và bước 2</td></tr>
+    <tr><td><span class="kbd">Tab</span> / <span class="kbd">Shift</span>+<span class="kbd">Tab</span></td>
+        <td>Nhảy sang ô chú thích kế tiếp / trước đó</td></tr>
+    <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang xem ảnh kích thước lớn</b></td></tr>
+    <tr><td><span class="kbd">←</span> <span class="kbd">→</span></td><td>Ảnh trước / ảnh sau</td></tr>
+    <tr><td><span class="kbd">R</span></td><td>Xoay ảnh 90°</td></tr>
+    <tr><td><span class="kbd">Esc</span></td><td>Đóng</td></tr>
+  </table>
+  </div>
+  <p>Phím tắt không hoạt động khi con trỏ đang ở trong một ô nhập chữ — bấm
+     <span class="kbd">Esc</span> để rời ô trước.</p>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section id="thiet-ke">
+  <h2 class="sec">📐 B · Thông số bản ảnh xuất ra</h2>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:30%">Thành phần</th><th>Thông số</th></tr>
+    <tr><td>Khổ giấy</td><td>A4 dọc hoặc A4 ngang (kiểu <i>Giấy tờ xe</i> trộn được cả hai trong một file)</td></tr>
+    <tr><td>Phông chữ</td><td>Be Vietnam Pro (Regular + Bold) — hỗ trợ đầy đủ dấu tiếng Việt</td></tr>
+    <tr><td>Dải tiêu đề</td><td>Cao 20 mm, nền xanh <code>#1565C0</code>, chữ trắng, dán sát mép trên trang</td></tr>
+    <tr><td>Logo PTI SOS</td><td>17 × 17 mm, góc trái dải tiêu đề</td></tr>
+    <tr><td>Dòng tiêu đề</td>
+        <td>Căn trái sát logo: <b>{kiểu giám định} : {BKS}</b> 16pt đậm · <i>Số HSBT: {mã hồ sơ}</i>
+            14pt · <i>{ga-ra}</i> 15pt · <i>{GĐV} — Ngày: {ngày}</i> 14pt.
+            Tự thu nhỏ để vừa dải tiêu đề; dòng Số HSBT chỉ in khi có mã hồ sơ.</td></tr>
+    <tr><td>Khung ảnh</td><td>Bo góc mềm, khoảng cách giữa các ô 2 mm, lề trang 8 mm</td></tr>
+    <tr><td>Chú thích</td><td>14pt, chữ trắng trên nền xanh dưới mỗi ảnh, tự thu nhỏ nếu dài.
+        Bắt đầu bằng <b>số thứ tự ảnh</b> chạy liên tục qua các trang</td></tr>
+    <tr><td>Chân trang</td><td>Tên Phòng / Khu vực (xám, bên trái) + số trang (xanh, bên phải), 13pt</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section id="su-co">
+  <h2 class="sec">🛠️ C · Xử lý sự cố</h2>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:38%">Hiện tượng</th><th>Cách xử lý</th></tr>
+    <tr><td>Chữ tiếng Việt trong PDF bị mất dấu, hoặc bấm tạo PDF thì báo lỗi</td>
+        <td>Gần như chắc chắn do mở ứng dụng bằng <code>file:///…</code>. Hãy mở qua địa chỉ web
+            (<code>http://…</code>) — xem mục <a href="#mo-app">Mở ứng dụng</a>.</td></tr>
+    <tr><td>Logo PTI SOS không hiện</td>
+        <td>Thiếu file <code>assets/logo-ptisos.png</code>, hoặc lại đang mở bằng
+            <code>file:///…</code>.</td></tr>
+    <tr><td>Chọn thư mục mà không thấy ảnh nào</td>
+        <td>Chọn <b>thư mục cha</b> chứa các thư mục con, không chọn từng thư mục con. Kiểm tra
+            định dạng ảnh có nằm trong JPG/JPEG/PNG/BMP/WEBP.</td></tr>
+    <tr><td>Ảnh đại diện hạng mục bị trắng</td>
+        <td>Mở hạng mục đó ra (bấm vào tiêu đề nhóm) hoặc bấm
+            <span class="btn-ex">Mở tất cả</span>, ảnh sẽ hiện.</td></tr>
+    <tr><td>Ảnh có khoảng trắng hai bên trong ô</td>
+        <td>Đúng như thiết kế: ảnh được hiện <b>đủ, không cắt</b> nên tỷ lệ ảnh khác tỷ lệ ô thì
+            còn chỗ trắng. Muốn ảnh kín hơn: giảm số ảnh mỗi trang, đổi khổ giấy cho gần tỷ lệ ảnh,
+            hoặc cắt sẵn ảnh rồi thay vào bằng nút <span class="btn-ex">🖼️</span>.</td></tr>
+    <tr><td>Ảnh in ra khác chiều so với trên màn hình</td>
+        <td>Không còn xảy ra từ bản 14/11/2026 — ứng dụng chỉ dùng góc xoay bạn chọn bằng nút
+            <span class="btn-ex">↻</span>. Nếu hồ sơ cũ bị lệch, mở lại hồ sơ, xoay cho đúng rồi
+            tạo PDF lại.</td></tr>
+    <tr><td>Giấy tờ xe xếp sai bố cục trang</td>
+        <td>Kiểm tra tiền tố ở đầu tên file / tên thư mục đúng theo bảng
+            <a href="#tien-to">Tiền tố giấy tờ xe</a>, và tiền tố chỉ có 1–2 chữ số.</td></tr>
+    <tr><td>Chọn file mà không thấy file PDF trong hộp chọn</td>
+        <td>Phải chọn kiểu bản ảnh <b>Ảnh và file Giấy tờ xe (jpg, pdf…)</b> trước; các kiểu
+            khác chỉ nhận ảnh.</td></tr>
+    <tr><td>Nạp PDF báo "Không đọc được file PDF"</td>
+        <td>Kiểm tra mạng (lần đầu cần tải thư viện đọc PDF), và PDF có bị đặt mật khẩu hay
+            không. PDF chỉ chứa ảnh scan vẫn đọc được bình thường.</td></tr>
+    <tr><td>Tạo PDF rất chậm hoặc trình duyệt treo</td>
+        <td>Hồ sơ quá nhiều ảnh dung lượng lớn. Hãy chia thành nhiều bản ảnh, đóng các tab khác,
+            và dùng máy tính thay vì điện thoại khi hồ sơ trên ~80 ảnh.</td></tr>
+    <tr><td>Mở lại máy thì mất hồ sơ đã lưu</td>
+        <td>Hồ sơ lưu trong bộ nhớ trình duyệt của <b>máy đó</b>. Kiểm tra có đang dùng
+            chế độ ẩn danh, đổi trình duyệt, hoặc đã xóa dữ liệu trình duyệt không.</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
+<section id="faq">
+  <h2 class="sec">❓ D · Câu hỏi thường gặp</h2>
+
+  <details class="faq">
+    <summary>Ảnh của tôi có bị tải lên mạng không?</summary>
+    <div class="faq-b"><p>Không. Web app đọc ảnh và dựng PDF ngay trong trình duyệt trên máy bạn.
+      Hồ sơ "lưu trên máy" cũng nằm trong bộ nhớ trình duyệt, không gửi đi đâu.</p></div>
+  </details>
+
+  <details class="faq">
+    <summary>Dùng được trên điện thoại / máy tính bảng không?</summary>
+    <div class="faq-b"><p>Được — mở cùng địa chỉ web rồi bấm <b>Chọn ảnh</b> để lấy ảnh từ thư viện.
+      Chọn cả thư mục thì nên làm trên máy tính. Hồ sơ nhiều ảnh nên làm trên máy tính cho nhanh.</p></div>
+  </details>
+
+  <details class="faq">
+    <summary>Có cần mạng internet không?</summary>
+    <div class="faq-b"><p>Cần mạng ở lần mở trang để tải thư viện dựng PDF. Sau khi trang đã mở xong,
+      việc ghép ảnh và tạo PDF không dùng mạng — trừ lần đầu bấm
+      <b>🖼️ Tải file ảnh JPG</b> (cần tải thêm thư viện đọc PDF).</p></div>
+  </details>
+
+  <details class="faq">
+    <summary>Hai người khác nhau mở cùng một link có thấy hồ sơ của nhau không?</summary>
+    <div class="faq-b"><p>Không. Hồ sơ, bản nháp, danh sách GĐV và Phòng đều lưu riêng trên
+      từng máy / từng trình duyệt.</p></div>
+  </details>
+
+  <details class="faq">
+    <summary>Gửi bản ảnh qua email mà file PDF quá nặng thì làm sao?</summary>
+    <div class="faq-b"><p>Bấm <b>🗜️ Tải PDF nén &lt; 10MB</b> — ứng dụng tự nén về dưới 10MB mà vẫn
+      giữ chất lượng cao nhất có thể. Nếu bên nhận cần ảnh rời, dùng <b>🖼️ Tải file ảnh JPG</b>.</p></div>
+  </details>
+
+  <details class="faq">
+    <summary>Muốn một ảnh chiếm cả trang thì làm sao?</summary>
+    <div class="faq-b"><p>Chọn số ảnh mỗi trang là <b>1</b>. Riêng kiểu <i>Giấy tờ xe</i>, mọi ảnh có
+      tiền tố từ <code>4</code> trở lên đã tự chiếm cả trang A4 dọc.</p></div>
+  </details>
+
+  <details class="faq">
+    <summary>Bản ảnh in ra cần kẹp theo thứ tự khác thì sửa thế nào?</summary>
+    <div class="faq-b"><p>Đổi số ở đầu tên thư mục hạng mục (thứ tự hạng mục theo số này), hoặc dùng
+      nút <b>＋</b> để chèn ảnh vào đúng vị trí mong muốn trong nhóm.</p></div>
+  </details>
+
+  <details class="faq">
+    <summary>Ảnh giấy tờ đang là file PDF thì nạp được không?</summary>
+    <div class="faq-b"><p>Được, với kiểu <b>Ảnh và file Giấy tờ xe (jpg, pdf…)</b>. Mỗi trang PDF
+      tự chuyển thành một ảnh và ghép chung bản ảnh với các ảnh JPG/PNG khác — xem mục
+      <a href="#nap-pdf">Nạp file PDF</a>. Đặt tên file PDF theo tiền tố ở bảng
+      <a href="#tien-to">Tiền tố giấy tờ xe</a> để có chú thích và bố cục đúng.</p></div>
+  </details>
+
+  <details class="faq">
+    <summary>Kiểu "Ảnh xác minh hiện trường" cũ biến đâu rồi?</summary>
+    <div class="faq-b"><p>Đã gộp vào <b>Ảnh giám định hiện trường / Xác minh hiện trường</b> vì cách
+      chia trang giống nhau. Hồ sơ cũ lưu theo kiểu xác minh khi mở lại sẽ tự chuyển sang kiểu gộp này.</p></div>
+  </details>
+</section>
+
+<div class="foot">
+  Tiện ích ghép ảnh giám định · Phòng Cứu hộ &amp; Giám định tại khu vực Quảng Ninh
+</div>
+
+</main>
+</div>
+
+<script>
+// Đồng bộ sáng/tối với ứng dụng: huong-dan.html?theme=dark|light
+(function initTheme() {
+  try {
+    const q = new URLSearchParams(location.search).get('theme');
+    const t = q || localStorage.getItem('pti_theme');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) { /* bỏ qua — vẫn chạy theo cài đặt hệ điều hành */ }
+})();
+
+// In ra giấy thì mở sẵn mọi câu hỏi thường gặp (thẻ details đóng sẽ không được in)
+window.addEventListener('beforeprint',
+  () => document.querySelectorAll('details').forEach(d => d.open = true));
+
+// Đánh dấu mục đang xem trong mục lục
+(function initToc() {
+  const links = [...document.querySelectorAll('#toc a[href^="#"]')];
+  const targets = links
+    .map(a => ({ a, el: document.getElementById(a.getAttribute('href').slice(1)) }))
+    .filter(x => x.el);
+  if (!targets.length || !('IntersectionObserver' in window)) return;
+  const seen = new Set();
+  const mark = () => {
+    let cur = null;
+    for (const t of targets) if (seen.has(t.el.id)) { cur = t; break; }
+    links.forEach(a => a.classList.remove('on'));
+    if (cur) cur.a.classList.add('on');
+  };
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => e.isIntersecting ? seen.add(e.target.id) : seen.delete(e.target.id));
+    mark();
+  }, { rootMargin: '-10% 0px -70% 0px' });
+  targets.forEach(t => io.observe(t.el));
+})();
+</script>
+</body>
+</html>

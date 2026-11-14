@@ -208,17 +208,18 @@ input[type=file]{display:none}
 .grp-bd{display:none;padding:12px 13px;border-top:1px solid var(--border)}
 .grp.open .grp-bd{display:block}
 
-/* ════════ THUMB GRID — thẻ ảnh có ô thuyết minh riêng ════════ */
+/* ════════ THUMB GRID — thẻ ảnh có ô chú thích riêng ════════ */
 .thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:12px;position:relative}
 .th{position:relative;border-radius:var(--r-sm);border:2px solid var(--border);background:var(--surface);
   transition:var(--t);display:flex;flex-direction:column;overflow:hidden}
 .th:hover{border-color:var(--brand-m);box-shadow:var(--sh-2)}
 .th.sel{border-color:var(--brand);box-shadow:var(--ring)}
-.th-img{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--surface-2);
+/* Nền trắng + object-fit:contain để thẻ ảnh hiện ĐỦ ảnh y như trong bản in */
+.th-img{position:relative;aspect-ratio:4/3;overflow:hidden;background:#fff;
   cursor:pointer;user-select:none;display:block}
-.th-img img{position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:cover;
+.th-img img{position:absolute;top:50%;left:50%;width:100%;height:100%;object-fit:contain;
   display:block;pointer-events:none;transition:transform .2s}
-/* Xoay 90°/270°: hoán đổi khung trước khi xoay để ảnh vẫn phủ kín ô 4:3
+/* Xoay 90°/270°: hoán đổi khung trước khi xoay để khung sau khi xoay vẫn khớp ô 4:3
    (chiều rộng = 3/4 ô, chiều cao = 4/3 ô) */
 .th-img.q img{width:75%;height:133.3333%}
 .th.sel .th-img::after{content:'✓';position:absolute;top:6px;right:6px;width:21px;height:21px;
@@ -365,8 +366,8 @@ input[type=file]{display:none}
 .pvh-t div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.26}
 .pv-grid{display:grid;flex:1;min-height:0}
 .pv-cell{border:.5px solid #BDBDBD;display:flex;flex-direction:column;overflow:hidden;position:relative;background:#fff}
-.pv-img{flex:1;min-height:0;overflow:hidden;background:#F1F5F9;display:block;position:relative}
-.pv-img img{width:100%;height:100%;object-fit:cover;display:block}
+.pv-img{flex:1;min-height:0;overflow:hidden;background:#fff;display:block;position:relative}
+.pv-img img{width:100%;height:100%;object-fit:fill;display:block}
 .pv-img.ph::after{content:'…';position:absolute;inset:0;display:flex;align-items:center;
   justify-content:center;color:#CBD5E1;font-size:1.3rem}
 .pv-cap{background:#1565C0;color:#fff;text-align:center;flex-shrink:0;display:flex;
@@ -408,6 +409,20 @@ input[type=file]{display:none}
 .empty code{background:var(--surface-2);border:1px solid var(--border);padding:1px 5px;
   border-radius:4px;font-size:.78rem;color:var(--brand)}
 hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
+
+/* ════════ NÚT HƯỚNG DẪN + MODAL HƯỚNG DẪN ════════ */
+.ab-btn-h{position:relative;width:auto;min-width:38px;padding:0 12px;font-size:.84rem;font-weight:700;letter-spacing:.01em}
+.ab-btn-h::after{content:'';position:absolute;top:-2px;right:-2px;width:8px;height:8px;
+  border-radius:50%;background:var(--amber);border:2px solid var(--brand-d);
+  opacity:0;transition:var(--t)}
+.ab-btn-h.new::after{opacity:1}
+.mdl.full{max-width:1000px;height:92vh;max-height:92vh;padding:17px 18px 18px}
+.gd-hd{display:flex;align-items:center;gap:9px;margin-bottom:11px;flex-wrap:wrap}
+.gd-hd h2{margin:0}
+.gd-hd a.btn{text-decoration:none}
+.gd-frame{flex:1;min-height:0;border:1px solid var(--border);border-radius:var(--r-sm);
+  overflow:hidden;background:var(--surface-2)}
+.gd-frame iframe{width:100%;height:100%;border:none;display:block}
 
 /* ════════ MODAL ════════ */
 .ov{position:fixed;inset:0;background:rgba(8,14,22,.62);z-index:900;display:flex;align-items:center;
@@ -461,6 +476,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
   .ab-txt h1{font-size:.93rem}
   .ab-txt p{font-size:.68rem}
   .ab-btn{width:34px;height:34px;font-size:.95rem}
+  .ab-btn-h{width:auto;min-width:34px;padding:0 10px;font-size:.78rem}
   .stepper{padding:9px 12px;gap:2px}
   .stp{gap:7px;padding:3px}
   .stp-dot{width:26px;height:26px;font-size:.75rem}
@@ -519,6 +535,8 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
     <div class="ab-acts">
       <button class="ab-btn" id="btnRecords" onclick="openRecords()" title="Hồ sơ đã lưu">🗂️</button>
       <button class="ab-btn" id="btnTheme" onclick="toggleTheme()" title="Chế độ sáng / tối">🌙</button>
+      <button class="ab-btn ab-btn-h" id="btnGuide" onclick="openGuide()"
+              title="Hướng dẫn sử dụng (F1)">Help</button>
     </div>
   </div>
 </header>
@@ -553,10 +571,9 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
           <div class="fg" style="margin-bottom:13px">
             <label>Kiểu bản ảnh giám định <span class="req">*</span></label>
             <select id="fLoai" style="max-width:460px">
-              <option value="chitiet">Bản ảnh chi tiết thiệt hại</option>
-              <option value="hientruong">Bản ảnh hiện trường</option>
-              <option value="giayto">Giấy tờ có liên quan</option>
-              <option value="xacminh">Ảnh xác minh hiện trường</option>
+              <option value="chitiet">Ảnh giám định chi tiết thiệt hại</option>
+              <option value="hientruong">Ảnh giám định hiện trường/Xác minh hiện trường</option>
+              <option value="giayto">Ảnh và file Giấy tờ xe (jpg, pdf...)</option>
             </select>
           </div>
 
@@ -624,12 +641,30 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
                 <div class="cnt-row" id="cntRow"></div>
               </div>
             </div>
+            <span class="hint" id="layoutHint" style="display:none">
+              Chỉ áp dụng cho giấy tờ <strong>không có tiền tố số</strong> — các tiền tố trong danh sách
+              dưới đây tự chọn khổ giấy và số ảnh mỗi trang.
+            </span>
           </div>
 
           <div class="alert alert-i show" id="giaytoNote" style="display:none">
-            ℹ️ <strong>Giấy tờ có liên quan</strong> dùng bố cục tự động theo tiền tố số của thư mục:
-            <code>1.</code> → 4 ảnh/trang A4 ngang · <code>2.</code>–<code>3.</code> → 2 ảnh/trang A4 dọc ·
-            <code>4.</code>–<code>6.</code> → 1 ảnh/trang A4 dọc.
+            ℹ️ <strong>Ảnh và file Giấy tờ xe</strong> — bố cục từng trang <strong>tự nhận theo tiền tố số</strong>
+            của tên ảnh (không có thì lấy tiền tố tên thư mục); ảnh cùng bố cục được dồn chung trang:
+            <br>
+            <code>1.1</code>–<code>1.6</code> đăng ký xe, bằng lái, căn cước công dân
+            → <strong>4 ảnh/trang A4 ngang</strong> ·
+            <code>2.x</code> đăng kiểm, bảo hiểm khổ A5 → <strong>2 ảnh/trang A4 dọc</strong> ·
+            <code>3.x</code> xác minh bằng lái → <strong>4 ảnh/trang A4 dọc</strong> ·
+            <code>4</code> trở lên (bảo hiểm A4, kiểm định, biên bản bàn giao, xác nhận ngân hàng…)
+            → <strong>1 ảnh/trang A4 dọc</strong>.
+            <br>
+            Giấy tờ khác <strong>không có tiền tố</strong> thì nhập tay chú thích và dùng
+            <strong>bố cục chọn ở trên</strong>.
+            <br>
+            Kiểu này nhận thêm <strong>file PDF</strong> — mỗi trang PDF thành một ảnh;
+            PDF nhiều trang tên <code>1.1 …</code> thì trang sau nhận tiền tố kế tiếp
+            (<code>1.2</code>, <code>1.3</code>…). <strong>Chú thích tự lấy theo tên giấy tờ
+            của tiền tố</strong>, gõ vào ô dưới ảnh để ghi đè.
           </div>
 
           <div class="title-prev" id="loaiPreview"></div>
@@ -645,11 +680,13 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
             <span class="dz-ico">🖼️</span>
             <div class="dz-main">
               <h3><span class="d-desk">Kéo thả thư mục hoặc ảnh vào đây</span><span class="d-mob" style="display:none">Chọn thư mục hoặc ảnh</span></h3>
-              <p><span class="d-desk">Mỗi thư mục con = một hạng mục · </span>JPG · PNG · BMP · WEBP — thêm được nhiều lần</p>
+              <p><span class="d-desk">Mỗi thư mục con = một hạng mục · </span><span id="dzFmt">JPG ·
+                PNG · BMP · WEBP</span> — thêm được nhiều lần</p>
             </div>
             <div class="dz-btns">
               <button class="btn btn-p btn-sm" onclick="event.stopPropagation();pickFolder()">📂 Chọn thư mục</button>
-              <button class="btn btn-o btn-sm" onclick="event.stopPropagation();document.getElementById('imgInput').click()">🖼️ Chọn ảnh</button>
+              <button class="btn btn-o btn-sm" id="btnPickImg"
+                      onclick="event.stopPropagation();document.getElementById('imgInput').click()">🖼️ Chọn ảnh</button>
               <button class="btn btn-n btn-sm" id="btnClearAll" style="display:none"
                       onclick="event.stopPropagation();clearFolders()">🗑️ Xóa tất cả</button>
             </div>
@@ -669,7 +706,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
       </div>
 
       <div class="card" id="cardGallery" style="display:none">
-        <div class="card-hd"><span class="ico">🎞️</span>Quản lý ảnh &amp; thuyết minh<span class="sp"></span>
+        <div class="card-hd"><span class="ico">🎞️</span>Quản lý ảnh &amp; chú thích<span class="sp"></span>
           <button class="btn btn-n btn-sm" onclick="toggleAllGroups()" id="btnToggleAll">Mở tất cả</button></div>
         <div class="card-bd tight">
           <div class="alert alert-o show" id="alertStats"></div>
@@ -682,9 +719,13 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
           </div>
 
           <div class="toolbar">
-            <label class="sw" title="Dùng tên file ảnh làm thuyết minh thay cho tên thư mục">
-              <input type="checkbox" id="swFileName" onchange="toggleUseFileName()"/>
-              <span class="sw-t"></span><span>Lấy tên file làm thuyết minh</span>
+            <label class="sw" title="Dùng tên file ảnh làm chú thích mặc định cho mọi ảnh">
+              <input type="checkbox" id="swFileName" onchange="setCapSrc('file', this.checked)"/>
+              <span class="sw-t"></span><span>Lấy tên file làm chú thích</span>
+            </label>
+            <label class="sw" title="Dùng tên thư mục (tên hạng mục) làm chú thích mặc định — bỏ qua bảng tên giấy tờ theo tiền tố">
+              <input type="checkbox" id="swFolderName" onchange="setCapSrc('folder', this.checked)"/>
+              <span class="sw-t"></span><span>Lấy tên thư mục làm chú thích</span>
             </label>
             <span class="sp"></span>
             <span class="chip chip-b" id="chipSel">0 ảnh đã chọn</span>
@@ -701,7 +742,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
           <div class="fg" style="margin-bottom:12px">
             <span class="hint">💡 Nhấp <b>vào ảnh</b> để chọn · <b>Ctrl/Cmd + nhấp</b> chọn thêm · <b>Shift + nhấp</b> chọn dải ·
               bật <b>Khoanh chọn</b> rồi kéo chuột trên vùng ảnh.<br/>
-              Gõ thẳng vào ô dưới mỗi ảnh để đặt thuyết minh riêng (<b>Tab</b> sang ô kế tiếp, bỏ trống = dùng mặc định).
+              Gõ thẳng vào ô dưới mỗi ảnh để đặt chú thích riêng (<b>Tab</b> sang ô kế tiếp, bỏ trống = dùng mặc định).
               Nút trên thẻ ảnh: 🖼️ thay ảnh · ↻ xoay 90° · ＋ chèn ảnh sau · 👁 xem lớn · 🗑 xóa.</span>
           </div>
 
@@ -732,7 +773,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
           <div class="pv-scroll" id="pvScroll">
             <div class="empty"><div class="ei">🖼️</div><p>Chưa có preview.</p></div>
           </div>
-          <div class="foot" style="padding-top:10px">Preview mô phỏng đúng tỷ lệ A4, header, thuyết minh và cắt ảnh như file PDF.</div>
+          <div class="foot" style="padding-top:10px">Preview mô phỏng đúng tỷ lệ A4, header, chú thích và cắt ảnh như file PDF.</div>
         </div>
       </div>
     </div>
@@ -766,8 +807,15 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
               <h3>Tạo PDF thành công!</h3>
               <p id="doneMsg"></p>
             </div>
-            <button class="btn btn-g btn-lg" style="width:100%" id="btnDownload">⬇️ Tải xuống PDF</button>
+            <button class="btn btn-g btn-lg" style="width:100%" id="btnDownload">⬇️ Tải file gốc (PDF)</button>
             <div class="res-btns">
+              <button class="btn btn-o btn-sm" id="btnDlSmall" onclick="downloadSmallPDF()"
+                      title="Tự động nén ảnh trong PDF cho tới khi file dưới 10MB, giữ chất lượng tốt nhất có thể">🗜️ Tải PDF nén &lt; 10MB</button>
+              <button class="btn btn-o btn-sm" id="btnDlJpg" onclick="downloadJPG()"
+                      title="Xuất mỗi trang bản ảnh thành một file ảnh .jpg (nhiều trang sẽ gói trong 1 file .zip)">🖼️ Tải file ảnh JPG</button>
+            </div>
+            <div class="foot" id="dlNote" style="padding-top:9px"></div>
+            <div class="res-btns" style="margin-top:11px">
               <button class="btn btn-o btn-sm" onclick="openSaveRecord()">💾 Lưu hồ sơ</button>
               <button class="btn btn-n btn-sm" onclick="resetApp()">🔄 Làm bản ảnh mới</button>
             </div>
@@ -903,7 +951,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
 <div class="ov hidden" id="grpModal">
   <div class="mdl">
     <h2>📝 Tên hạng mục</h2>
-    <p>Tên hạng mục được in làm thuyết minh cho mọi ảnh trong nhóm (trừ ảnh đã có thuyết minh riêng).</p>
+    <p>Tên hạng mục được in làm chú thích cho mọi ảnh trong nhóm (trừ ảnh đã có chú thích riêng).</p>
     <input type="text" id="grpInput" onkeydown="if(event.key==='Enter')applyGrpName()"/>
     <div style="height:14px"></div>
     <div class="mdl-f">
@@ -913,12 +961,29 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
   </div>
 </div>
 
+<!-- ════════ MODAL: HƯỚNG DẪN SỬ DỤNG ════════ -->
+<div class="ov hidden" id="guideModal">
+  <div class="mdl full">
+    <div class="gd-hd">
+      <h2>📖 Hướng dẫn sử dụng</h2>
+      <span class="sp" style="flex:1"></span>
+      <a class="btn btn-n btn-sm" id="gdNewTab" href="huong-dan.html" target="_blank"
+         rel="noopener" title="Mở bản hướng dẫn trong tab mới để vừa đọc vừa làm">↗️ Mở tab mới</a>
+      <button class="btn btn-p btn-sm" onclick="closeModal('guideModal')">Đóng</button>
+    </div>
+    <div class="gd-frame" id="gdFrameBox"></div>
+    <div class="foot" style="padding-top:9px">
+      Không mở được? Mở trực tiếp file <code>huong-dan.html</code> trong thư mục ứng dụng.
+    </div>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════════════════════════
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-13';
+const APP_BUILD   = '2026-11-14c';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô biển kiểm soát',
@@ -927,16 +992,52 @@ const LOAI_MAP = {
   xacminh:    'Ảnh xác minh hiện trường xe ô tô biển kiểm soát',
 };
 const LOAI_LBL = {
-  chitiet:'Bản ảnh chi tiết thiệt hại', hientruong:'Bản ảnh hiện trường',
-  giayto:'Giấy tờ có liên quan', xacminh:'Ảnh xác minh hiện trường',
+  chitiet:'Ảnh giám định chi tiết thiệt hại',
+  hientruong:'Ảnh giám định hiện trường/Xác minh hiện trường',
+  giayto:'Ảnh và file Giấy tờ xe (jpg, pdf...)',
+  xacminh:'Ảnh xác minh hiện trường',   // chỉ còn cho hồ sơ/bản nháp cũ
 };
+// Hồ sơ cũ có loai='xacminh' → gộp về 'hientruong' (droplist chỉ còn 3 kiểu)
+const normLoai = v => (LOAI_MAP[v] ? (v === 'xacminh' ? 'hientruong' : v) : 'chitiet');
 // Số ảnh/trang → [cols, rows]
 const GRID = {
   doc:   {1:[1,1],2:[1,2],3:[1,3],4:[2,2],6:[2,3],8:[2,4],9:[3,3],12:[3,4]},
   ngang: {1:[1,1],2:[2,1],4:[2,2],6:[3,2],8:[4,2],9:[3,3]},
 };
 const PERPAGE_DEFAULT = { doc:6, ngang:4 };
+
+// ── Kiểu "giayto": bố cục tự động theo tiền tố {chính}.{phụ} của tên ảnh ──
+// maj = tiền tố chính · lo..hi = khoảng tiền tố phụ · lay + per = khổ giấy & số ảnh/trang
+// Bảng này phải luôn khớp với GIAYTO_RULES trong ghep_anh.py
+const GIAYTO_RULES = [
+  { maj:1, lo:1, hi:99, lay:'ngang', per:4, note:'Đăng ký xe · bằng lái · căn cước (cỡ thẻ)' },
+  { maj:2, lo:1, hi:99, lay:'doc',   per:2, note:'Đăng kiểm · bảo hiểm khổ A5'               },
+  { maj:3, lo:1, hi:99, lay:'doc',   per:4, note:'Ảnh xác minh bằng lái'                     },
+];
+// Tiền tố từ 4 trở lên — giấy tờ khổ A4, mỗi ảnh một trang dọc
+const GIAYTO_BIG = { lay:'doc', per:1, note:'Giấy tờ khổ A4' };
+// Chú thích mặc định theo tiền tố — chỉ dùng cho ảnh chưa thuộc hạng mục nào
+const GIAYTO_NAMES = {
+  '1.1':'Đăng ký xe mặt trước', '1.2':'Đăng ký xe mặt sau',
+  '1.3':'Bằng lái mặt trước',   '1.4':'Bằng lái mặt sau',
+  '1.5':'Căn cước công dân lái xe', '1.6':'Căn cước công dân lái xe',
+  '2.1':'Giấy chứng nhận đăng kiểm A5 mặt trước',
+  '2.2':'Giấy chứng nhận đăng kiểm A5 mặt sau',
+  '2.3':'Giấy chứng nhận bảo hiểm A5 mặt trước',
+  '2.4':'Giấy chứng nhận bảo hiểm A5 mặt sau',
+  '3':'Xác minh bằng lái',
+  '4':'Giấy chứng nhận bảo hiểm A4',
+  '5':'Xác minh thanh toán phí bảo hiểm',
+  '6':'Giấy chứng nhận kiểm định XCG A4',
+  '7':'Biên bản bàn giao xe mới',
+  '8':'Giấy xác nhận quyền thụ hưởng Ngân hàng',
+};
 const IMAGE_EXTS = new Set(['.jpg','.jpeg','.png','.bmp','.webp']);
+// File PDF chỉ nhận với kiểu "giayto" — mỗi trang PDF được raster hóa thành một ảnh
+const PDFJS_VER     = '3.11.174';
+const PDF_RENDER_W  = 1700;   // bề rộng (px) khi raster hóa trang PDF — đủ nét để in A4
+const ACCEPT_IMG    = 'image/*';
+const ACCEPT_IMGPDF = 'image/*,application/pdf';
 const UNGROUPED = 'Ảnh chưa phân loại';
 
 const $ = id => document.getElementById(id);
@@ -956,6 +1057,31 @@ function cleanText(s) {
 }
 const baseName = n => n.replace(/\.[^.]+$/, '');
 function getPrefixNum(name) { const m = String(name).match(/^(\d+)/); return m ? parseInt(m[1]) : null; }
+/** Tiền tố số của tên ảnh / tên thư mục → [chính, phụ] (phụ = 0 nếu không có); null nếu không có tiền tố.
+ *  Chỉ nhận 1–2 chữ số để tên máy ảnh kiểu "20261114_123.jpg" không bị hiểu là tiền tố.
+ *  Chỉ cắt phần mở rộng ảnh — KHÔNG dùng baseName(), vì nó cắt luôn ".5 Căn cước…". */
+function getPrefixPair(name) {
+  const stem = String(name == null ? '' : name).replace(/\.(jpe?g|png|bmp|webp|pdf)$/i, '');
+  const m = stem.match(/^(\d{1,2})(?:\.(\d{1,2}))?(?!\d)/);
+  return m ? [parseInt(m[1]), parseInt(m[2] || 0)] : null;
+}
+/** Tiền tố hiệu lực của một ảnh: ưu tiên tên file, không có thì lấy tên hạng mục */
+const prefixOf = (it, g) => getPrefixPair(it.file.name) || getPrefixPair(g.src || g.name);
+/** Bố cục trang của một tiền tố (kiểu "giayto"); null = không có tiền tố → dùng bố cục chọn tay */
+function giaytoSpec(p) {
+  if (!p) return null;
+  const maj = p[0], mn = p[1] || 1;
+  const r = maj >= 4 ? GIAYTO_BIG
+          : (GIAYTO_RULES.find(x => x.maj === maj && mn >= x.lo && mn <= x.hi)
+          ||  GIAYTO_RULES.find(x => x.maj === maj) || GIAYTO_BIG);
+  const [c, rows] = GRID[r.lay][r.per];
+  return { key: r.lay + r.per, lay: r.lay, per: r.per, c, rows, note: r.note,
+           w: r.lay === 'doc' ? A4.w : A4.h, h: r.lay === 'doc' ? A4.h : A4.w };
+}
+/** Tên giấy tờ mặc định theo tiền tố (bảng GIAYTO_NAMES) */
+function giaytoName(p) {
+  return p ? (GIAYTO_NAMES[p[0] + '.' + p[1]] || GIAYTO_NAMES[String(p[0])] || '') : '';
+}
 function fmtBytes(b) {
   if (b < 1024) return b + ' B';
   if (b < 1048576) return (b/1024).toFixed(0) + ' KB';
@@ -993,11 +1119,12 @@ const state = {
   groups: [],          // [{id, name, open, items:[{id, file, cap}]}]
   sel: new Set(),      // id các ảnh đang chọn
   lastSelId: null,     // mốc cho Shift+click
-  useFileName: false,
+  capSrc:'auto',       // nguồn chú thích mặc định: 'auto' | 'file' | 'folder'
+  useFileName: false,  // = (capSrc === 'file') — giữ cho hồ sơ/bản nháp bản cũ
   lasso: false,
   maHs:'', bks:'', gaRa:'', gdv:'', ngay:'',
   layout:'doc', perPage:6, loai:'chitiet',
-  pdfBytes:null, pdfName:'',
+  pdfBytes:null, pdfName:'', smallBytes:null,
   pvZoom:1, recId:null,
 };
 
@@ -1007,13 +1134,39 @@ function findItem(id) {
   for (const g of state.groups) { const it = g.items.find(x => x.id === id); if (it) return { it, g }; }
   return null;
 }
-/** Thuyết minh hiệu lực của một ảnh: ưu tiên chú thích riêng → tên file → tên nhóm */
-function capOf(it, g) {
-  const own = (it.cap || '').trim();
-  if (own) return own;
-  if (state.useFileName) return baseName(it.file.name);
-  return g.name;
+/** Chú thích hiệu lực của một ảnh: chú thích riêng → chú thích mặc định */
+function capOf(it, g) { return (it.cap || '').trim() || defaultCapOf(it, g); }
+
+// ════════════════════════════════════════════════════════
+//  HƯỚNG DẪN SỬ DỤNG
+// ════════════════════════════════════════════════════════
+/** Mở hộp thoại hướng dẫn — nạp huong-dan.html vào iframe, đồng bộ sáng/tối.
+ *  iframe chỉ được tạo ở lần mở đầu tiên để không tải lại trang mỗi lần mở. */
+function openGuide() {
+  const theme = document.documentElement.getAttribute('data-theme') || 'light';
+  const url = 'huong-dan.html?theme=' + theme;
+  const box = $('gdFrameBox');
+  const frame = box.querySelector('iframe');
+  if (!frame) box.innerHTML = '<iframe src="' + url + '" title="Hướng dẫn sử dụng"></iframe>';
+  else if (frame.dataset.theme !== theme) { frame.src = url; }
+  if (box.querySelector('iframe')) box.querySelector('iframe').dataset.theme = theme;
+  $('gdNewTab').href = url;
+  $('btnGuide').classList.remove('new');
+  try { localStorage.setItem('pti_guide_seen', APP_BUILD); } catch (e) {}
+  openOverlay('guideModal');
 }
+// Lần đầu dùng (hoặc sau khi app cập nhật) thì chấm cam nhắc có bản hướng dẫn
+(function hintGuide() {
+  try {
+    if (localStorage.getItem('pti_guide_seen') !== APP_BUILD)
+      document.addEventListener('DOMContentLoaded', () => $('btnGuide').classList.add('new'));
+  } catch (e) {}
+})();
+document.addEventListener('keydown', e => {
+  if (e.key !== 'F1') return;
+  e.preventDefault();
+  $('guideModal').classList.contains('hidden') ? openGuide() : closeModal('guideModal');
+});
 
 // ════════════════════════════════════════════════════════
 //  THEME
@@ -1028,6 +1181,8 @@ function toggleTheme() {
   const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   localStorage.setItem('pti_theme', t);
   applyTheme(t);
+  // Hướng dẫn đang mở thì nạp lại theo đúng chế độ sáng/tối mới
+  if (!$('guideModal').classList.contains('hidden')) openGuide();
 }
 (function initTheme() {
   const saved = localStorage.getItem('pti_theme');
@@ -1140,7 +1295,7 @@ function openDB() {
         db.createObjectStore(DB_STORE, { keyPath: 'id' }).createIndex('ts', 'ts');
       }
       // v2 — bản nháp tự lưu: tách ảnh (blob) khỏi phần mô tả để lưu nhanh,
-      // nhờ vậy gõ thuyết minh chỉ ghi lại vài KB thay vì toàn bộ ảnh.
+      // nhờ vậy gõ chú thích chỉ ghi lại vài KB thay vì toàn bộ ảnh.
       if (!db.objectStoreNames.contains(DRAFT_META))  db.createObjectStore(DRAFT_META,  { keyPath: 'id' });
       if (!db.objectStoreNames.contains(DRAFT_BLOBS)) db.createObjectStore(DRAFT_BLOBS, { keyPath: 'id' });
     };
@@ -1168,7 +1323,8 @@ function currentInfo() {
   return {
     maHs:$('fMaHs').value.trim(), bks:$('fBks').value.trim(), gaRa:$('fGara').value.trim(),
     gdv:$('fGdv').value.trim(), ngay:$('fNgay').value.trim(), phong:$('fPhong').value.trim(),
-    loai:$('fLoai').value, layout:state.layout, perPage:state.perPage, useFileName:state.useFileName,
+    loai:$('fLoai').value, layout:state.layout, perPage:state.perPage,
+    capSrc:state.capSrc, useFileName:state.useFileName,
   };
 }
 
@@ -1283,12 +1439,13 @@ async function loadRecord(id) {
     $('fMaHs').value = i.maHs || ''; $('fBks').value = i.bks || '';
     $('fGara').value = i.gaRa || ''; $('fGdv').value = i.gdv || '';
     $('fPhong').value = i.phong || PHONG_DEFAULT;
-    $('fNgay').value = i.ngay || ''; $('fLoai').value = i.loai || 'chitiet';
+    $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
     syncNgayPicker();
     state.layout = i.layout || 'doc';
     state.perPage = i.perPage || PERPAGE_DEFAULT[state.layout];
-    state.useFileName = !!i.useFileName;
-    $('swFileName').checked = state.useFileName;
+    state.capSrc = i.capSrc || (i.useFileName ? 'file' : 'auto');
+    state.useFileName = state.capSrc === 'file';
+    syncCapSrcSwitches();
     state.recId = r.id;
 
     onLoaiChange(); selectLayout(state.layout, true); clearPvCache();
@@ -1303,7 +1460,7 @@ async function loadRecord(id) {
 
 // ════════════════════════════════════════════════════════
 //  BẢN NHÁP TỰ LƯU
-//  Ảnh (blob) ghi riêng mỗi tấm một lần theo `bid`; phần mô tả (thuyết minh,
+//  Ảnh (blob) ghi riêng mỗi tấm một lần theo `bid`; phần mô tả (chú thích,
 //  góc xoay, thứ tự…) chỉ vài KB nên gõ chữ cũng lưu lại tức thì.
 // ════════════════════════════════════════════════════════
 const DRAFT_KEY = 'current';
@@ -1428,12 +1585,13 @@ async function restoreDraft() {
     $('fMaHs').value = i.maHs || ''; $('fBks').value = i.bks || '';
     $('fGara').value = i.gaRa || ''; $('fGdv').value = i.gdv || '';
     $('fPhong').value = i.phong || PHONG_DEFAULT;
-    $('fNgay').value = i.ngay || ''; $('fLoai').value = i.loai || 'chitiet';
+    $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
     syncNgayPicker();
     state.layout  = i.layout || 'doc';
     state.perPage = i.perPage || PERPAGE_DEFAULT[state.layout];
-    state.useFileName = !!i.useFileName;
-    $('swFileName').checked = state.useFileName;
+    state.capSrc = i.capSrc || (i.useFileName ? 'file' : 'auto');
+    state.useFileName = state.capSrc === 'file';
+    syncCapSrcSwitches();
 
     clearPvCache(); onLoaiChange(); selectLayout(state.layout, true);
     state.groups.length ? renderGroups() : showEmpty();
@@ -1499,7 +1657,7 @@ function updateActionBar() {
 // ════════════════════════════════════════════════════════
 //  BƯỚC 1 — NGUỒN ẢNH
 //  state.groups là mô hình gốc, sửa trực tiếp (không dựng lại từ danh sách file)
-//  nhờ vậy giữ được thứ tự chèn, ảnh đã thay, góc xoay và thuyết minh riêng.
+//  nhờ vậy giữ được thứ tự chèn, ảnh đã thay, góc xoay và chú thích riêng.
 // ════════════════════════════════════════════════════════
 const pathOf = f => f.webkitRelativePath || f.name;
 let _pathSeq = 0;
@@ -1507,10 +1665,16 @@ let _pathSeq = 0;
 function mkItem(file, path) {
   return { id: uid(), bid: uid(), file, path: path || pathOf(file), cap: '', rot: 0 };
 }
-/** Gán lại file cho ảnh (thay ảnh) — giữ nguyên vị trí, thuyết minh và góc xoay */
+/** Gán lại file cho ảnh (thay ảnh) — giữ nguyên vị trí, chú thích và góc xoay */
 function setItemFile(it, file) { it.file = file; it.bid = uid(); }
 
-const isImage = f => IMAGE_EXTS.has(f.name.slice(f.name.lastIndexOf('.')).toLowerCase());
+const extOf = n => { const i = String(n).lastIndexOf('.'); return i < 0 ? '' : String(n).slice(i).toLowerCase(); };
+const isImage  = f => IMAGE_EXTS.has(extOf(f.name));
+const isPdf    = f => extOf(f.name) === '.pdf';
+/** PDF chỉ dùng được với kiểu "Ảnh và file Giấy tờ xe" */
+const pdfAllowed = () => $('fLoai').value === 'giayto';
+/** Tên file có được nạp vào không (dùng cho các hàm quét thư mục, chỉ có tên) */
+const extAccepted = n => IMAGE_EXTS.has(extOf(n)) || (extOf(n) === '.pdf' && pdfAllowed());
 const byFileName = (a, b) => a.name.localeCompare(b.name, 'vi', { numeric: true });
 
 function groupSrcOf(f) {
@@ -1534,8 +1698,10 @@ function sortGroupsOrder() {
   });
 }
 
-/** Thêm ảnh mới vào cuối hạng mục tương ứng, bỏ qua ảnh trùng đường dẫn */
-function mergeFiles(newFiles) {
+/** Thêm ảnh mới vào cuối hạng mục tương ứng, bỏ qua ảnh trùng đường dẫn.
+ *  File PDF (kiểu giấy tờ xe) được raster hóa thành ảnh từng trang trước khi thêm. */
+async function mergeFiles(rawFiles) {
+  const newFiles = await intakeFiles(rawFiles);
   const existing = new Set(allItems().map(({ it }) => it.path));
   const buckets = {};
   newFiles.filter(isImage).forEach(f => {
@@ -1566,7 +1732,7 @@ function clearFolders() {
   scheduleDraftSave(true);
 }
 
-// ──────── Thuyết minh ────────
+// ──────── Chú thích ────────
 const SENTENCE_START = /(^|[.!?…]["'”’»)\]]*\s+)([\p{Ll}])/gu;
 /** Chuẩn hóa chú thích: gộp khoảng trắng, viết hoa đầu câu (AutoCorrect) */
 function normalizeCaption(input) {
@@ -1576,8 +1742,21 @@ function normalizeCaption(input) {
   v = v.replace(/^(\s*[^\p{L}\p{N}]*)([\p{Ll}])/u, (_, pre, ch) => pre + ch.toLocaleUpperCase('vi-VN'));
   return v.replace(SENTENCE_START, (_, b, ch) => b + ch.toLocaleUpperCase('vi-VN'));
 }
-/** Thuyết minh mặc định khi ảnh chưa có thuyết minh riêng */
-function defaultCapOf(it, g) { return state.useFileName ? baseName(it.file.name) : g.name; }
+/** Chú thích mặc định của một ảnh (khi ảnh chưa có chú thích riêng).
+ *  capSrc 'file'   → tên file ảnh
+ *  capSrc 'folder' → tên thư mục / tên hạng mục
+ *  capSrc 'auto'   → kiểu giấy tờ xe: tên giấy tờ theo tiền tố; còn lại: tên hạng mục.
+ *  Tên hạng mục do người dùng tự đặt (đã bỏ tiền tố số) được ưu tiên hơn bảng tiền tố,
+ *  để nút đổi tên hạng mục vẫn có tác dụng. */
+function defaultCapOf(it, g) {
+  if (state.capSrc === 'file')   return baseName(it.file.name);
+  if (state.capSrc === 'folder') return g.name;
+  if ($('fLoai').value === 'giayto') {
+    const nm = giaytoName(prefixOf(it, g));
+    if (nm && (g.name === UNGROUPED || getPrefixPair(g.name))) return nm;
+  }
+  return g.name;
+}
 
 // ──────── Render gallery ────────
 function renderGroups() {
@@ -1589,7 +1768,7 @@ function renderGroups() {
     `✅ <strong>${state.groups.length}</strong> hạng mục — <strong>${totalImgs()}</strong> ảnh` +
     (coverN ? ` (<strong>${coverN}</strong> ảnh nhận dạng xe <code>0.</code> + <strong>${mainN}</strong> ảnh hạng mục)` : '');
 
-  let runningNo = 0;
+  const noMap = printNoMap();   // số thứ tự đúng như sẽ in ra bản ảnh
   $('groupList').innerHTML = state.groups.map(g => {
     const isCover = /^0/.test(g.src);
     const nCustom = g.items.filter(it => it.cap.trim()).length;
@@ -1599,7 +1778,7 @@ function renderGroups() {
         <img class="grp-th" data-thumb="${g.items[0] ? g.items[0].id : ''}" alt=""/>
         <div class="grp-i">
           <div class="grp-nm">${esc(g.name)}</div>
-          <div class="grp-ct">${g.items.length} ảnh${nCustom ? ` · ${nCustom} thuyết minh riêng` : ''}${isCover ? ' · trang nhận dạng xe' : ''}</div>
+          <div class="grp-ct">${g.items.length} ảnh${nCustom ? ` · ${nCustom} chú thích riêng` : ''}${isCover ? ' · trang nhận dạng xe' : ''}</div>
         </div>
         <span class="chip ${isCover ? 'chip-g' : 'chip-b'}">${isCover ? '0. Nhận dạng' : 'Hạng mục'}</span>
         <button class="btn btn-n btn-icon" onclick="event.stopPropagation();openGrpRename('${g.id}')" title="Đổi tên hạng mục">📝</button>
@@ -1612,29 +1791,29 @@ function renderGroups() {
           <button class="btn btn-n btn-sm" onclick="selectGroup('${g.id}',false)">Bỏ chọn nhóm</button>
           <span class="sp"></span>
           <button class="btn btn-o btn-sm" onclick="appendToGroup('${g.id}')">➕ Thêm ảnh vào nhóm</button>
-          <button class="btn btn-r btn-sm" onclick="clearGroupCaps('${g.id}')">↺ Xóa thuyết minh riêng</button>
+          <button class="btn btn-r btn-sm" onclick="clearGroupCaps('${g.id}')">↺ Xóa chú thích riêng</button>
         </div>
         <div class="thumbs ${state.lasso ? 'lasso' : ''}" data-g="${g.id}">
           ${g.items.map(it => {
-            runningNo++;
             const def = defaultCapOf(it, g);
+            const pno = noMap.get(it.id) || '';
             const rot = ((it.rot % 360) + 360) % 360;
             const quarter = rot === 90 || rot === 270;
             return `<div class="th ${state.sel.has(it.id) ? 'sel' : ''}" data-id="${it.id}">
               <div class="th-img ${quarter ? 'q' : ''}" title="${esc(it.file.name)}">
-                <span class="th-n">${runningNo}</span>
+                <span class="th-n" title="Số thứ tự ảnh in trên bản ảnh">${pno}</span>
                 <img data-thumb="${it.id}" alt="" style="transform:translate(-50%,-50%) rotate(${rot}deg)"/>
                 ${rot ? `<span class="th-rot">↻ ${rot}°</span>` : ''}
               </div>
               <div class="th-acts">
-                <button class="act-g" data-act="replace" title="Thay ảnh nhưng giữ nguyên vị trí và thuyết minh">🖼️</button>
+                <button class="act-g" data-act="replace" title="Thay ảnh nhưng giữ nguyên vị trí và chú thích">🖼️</button>
                 <button data-act="rotate" title="Xoay ảnh 90°">↻</button>
                 <button data-act="insert" title="Chèn ảnh mới ngay sau ảnh này">＋</button>
                 <button class="act-g" data-act="view" title="Xem ảnh kích thước lớn">👁</button>
                 <button class="act-r" data-act="del" title="Xóa ảnh">🗑</button>
               </div>
               <textarea class="th-ta ${it.cap.trim() ? 'has-val' : ''}" data-ta="${it.id}" rows="2"
-                placeholder="${esc(def)}" title="Để trống = dùng thuyết minh mặc định: ${esc(def)}&#10;Tab / Shift+Tab để sang ô kế tiếp">${esc(it.cap)}</textarea>
+                placeholder="${esc(def)}" title="Để trống = dùng chú thích mặc định: ${esc(def)}&#10;Tab / Shift+Tab để sang ô kế tiếp">${esc(it.cap)}</textarea>
             </div>`;
           }).join('')}
         </div>
@@ -1723,7 +1902,7 @@ function clearGroupCaps(gid) {
   const g = state.groups.find(x => x.id === gid); if (!g) return;
   g.items.forEach(it => it.cap = '');
   renderGroups(); scheduleDraftSave(false);
-  toast('Đã trả thuyết minh về mặc định');
+  toast('Đã trả chú thích về mặc định');
 }
 function appendToGroup(gid) { _addTargetGroup = gid; $('insertFile').click(); }
 
@@ -1781,7 +1960,7 @@ $('groupList').addEventListener('click', e => {
   paintSel();
 });
 
-// Ô thuyết minh riêng của từng ảnh
+// Ô chú thích riêng của từng ảnh
 $('groupList').addEventListener('input', e => {
   const ta = e.target.closest('[data-ta]'); if (!ta) return;
   const r = findItem(ta.dataset.ta); if (!r) return;
@@ -1873,21 +2052,29 @@ let _replaceTarget = null, _insertTarget = null, _addTargetGroup = null;
 function startReplace(id) { _replaceTarget = id; $('replaceFile').click(); }
 function startInsert(id)  { _insertTarget = id; _addTargetGroup = null; $('insertFile').click(); }
 
-$('replaceFile').addEventListener('change', e => {
+$('replaceFile').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = '';
   if (!f || !_replaceTarget) return;
-  if (!isImage(f)) { toast('File không phải ảnh', 'e'); return; }
+  let nf = f;
+  if (isPdf(f)) {
+    if (!pdfAllowed()) { toast(PDF_ONLY_MSG, 'e'); _replaceTarget = null; return; }
+    const ps = await pdfToImages(f).catch(err => { console.error(err); return []; });
+    if (!ps.length) { toast('Không đọc được file PDF này', 'e'); _replaceTarget = null; return; }
+    nf = ps[0];
+    if (ps.length > 1) toast('PDF nhiều trang — chỉ dùng trang 1 để thay ảnh');
+  } else if (!isImage(f)) { toast('File không phải ảnh', 'e'); _replaceTarget = null; return; }
   const r = findItem(_replaceTarget);
   if (r) {
-    setItemFile(r.it, f);
+    setItemFile(r.it, nf);
     clearPvCache(); renderGroups(); scheduleDraftSave(true);
-    toast('Đã thay ảnh — giữ nguyên vị trí và thuyết minh', 'o');
+    toast('Đã thay ảnh — giữ nguyên vị trí và chú thích', 'o');
   }
   _replaceTarget = null;
 });
 
-$('insertFile').addEventListener('change', e => {
-  const fs = [...e.target.files].filter(isImage); e.target.value = '';
+$('insertFile').addEventListener('change', async e => {
+  const raw = [...e.target.files]; e.target.value = '';
+  const fs = (await intakeFiles(raw)).filter(isImage);
   if (!fs.length) { _insertTarget = null; _addTargetGroup = null; return; }
   fs.sort(byFileName);
 
@@ -1971,15 +2158,29 @@ function viewerRotate() {
 }
 $('viewer').addEventListener('click', e => { if (e.target.id === 'viewer') closeViewer(); });
 
-// ──────── Thuyết minh gộp ────────
-function toggleUseFileName() {
-  state.useFileName = $('swFileName').checked;
-  renderGroups(); scheduleDraftSave(false);
-  toast(state.useFileName ? 'Thuyết minh mặc định = tên file ảnh' : 'Thuyết minh mặc định = tên hạng mục');
+// ──────── Nguồn chú thích mặc định ────────
+const CAPSRC_LBL = {
+  auto:   'Tự động theo kiểu bản ảnh',
+  file:   'Theo tên file ảnh',
+  folder: 'Theo tên thư mục (hạng mục)',
+};
+/** Chọn nguồn chú thích mặc định — hai công tắc loại trừ nhau, tắt cả hai = 'auto' */
+function setCapSrc(src, on) {
+  state.capSrc = on ? src : 'auto';
+  state.useFileName = state.capSrc === 'file';
+  syncCapSrcSwitches();
+  clearPvCache(); renderGroups(); updateSummaries(); scheduleDraftSave(false);
+  toast('Chú thích mặc định: ' + CAPSRC_LBL[state.capSrc].toLowerCase());
 }
+function syncCapSrcSwitches() {
+  $('swFileName').checked   = state.capSrc === 'file';
+  $('swFolderName').checked = state.capSrc === 'folder';
+}
+
+// ──────── Chú thích gộp ────────
 function openBulkCap() {
   if (!state.sel.size) return;
-  $('bulkCapInfo').textContent = `Áp dụng một thuyết minh chung cho ${state.sel.size} ảnh đang chọn.`;
+  $('bulkCapInfo').textContent = `Áp dụng một chú thích chung cho ${state.sel.size} ảnh đang chọn.`;
   $('bulkCapInput').value = '';
   $('bulkCapNorm').textContent = 'Nhập nội dung để xem trước.';
   openOverlay('bulkCapModal');
@@ -1991,11 +2192,110 @@ $('bulkCapInput').addEventListener('input', () => {
 });
 function applyBulkCap(reset) {
   const v = reset ? '' : normalizeCaption($('bulkCapInput').value);
-  if (!reset && !v) { toast('Nhập nội dung thuyết minh', 'e'); return; }
+  if (!reset && !v) { toast('Nhập nội dung chú thích', 'e'); return; }
   let n = 0;
   state.sel.forEach(id => { const r = findItem(id); if (r) { r.it.cap = v; n++; } });
   closeModal('bulkCapModal'); renderGroups(); scheduleDraftSave(false);
-  toast(reset ? `Đã trả ${n} ảnh về thuyết minh mặc định` : `Đã đặt thuyết minh cho ${n} ảnh`, 'o');
+  toast(reset ? `Đã trả ${n} ảnh về chú thích mặc định` : `Đã đặt chú thích cho ${n} ảnh`, 'o');
+}
+
+// ════════════════════════════════════════════════════════
+//  NẠP FILE PDF (chỉ kiểu "Ảnh và file Giấy tờ xe")
+//  Mỗi trang PDF được raster hóa thành MỘT ảnh, nhờ vậy toàn bộ phần sau
+//  (ảnh đại diện, chọn ảnh, xoay, chú thích, preview, dựng PDF) dùng chung
+//  một đường đi với ảnh thường — preview luôn khớp file PDF xuất ra.
+// ════════════════════════════════════════════════════════
+const PDF_ONLY_MSG = 'File PDF chỉ dùng được với kiểu "Ảnh và file Giấy tờ xe"';
+let _pdfjsP = null;
+
+/** Nạp pdf.js từ CDN ở lần đầu cần tới (ảnh thường không phải tải thư viện này) */
+function loadPdfjs() {
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if (_pdfjsP) return _pdfjsP;
+  _pdfjsP = new Promise((res, rej) => {
+    const sc = document.createElement('script');
+    sc.src = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VER}/pdf.min.js`;
+    sc.onload = () => {
+      if (!window.pdfjsLib) { _pdfjsP = null; rej(new Error('pdf.js nạp xong nhưng trống')); return; }
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${PDFJS_VER}/pdf.worker.min.js`;
+      res(window.pdfjsLib);
+    };
+    sc.onerror = () => { _pdfjsP = null; sc.remove(); rej(new Error('Không tải được pdf.js')); };
+    document.head.appendChild(sc);
+  });
+  return _pdfjsP;
+}
+
+/** Tên file ảnh cho trang thứ n của một PDF.
+ *  PDF nhiều trang mà tên có tiền tố đầy đủ {chính}.{phụ} thì trang thứ n nhận
+ *  tiền tố phụ kế tiếp — "1.1 Dang ky xe.pdf" 2 trang → "1.1 …(trang 1)" +
+ *  "1.2 …(trang 2)", nhờ vậy chú thích ra đúng "mặt trước" / "mặt sau".
+ *  Tiền tố phụ chỉ đổi phần SỐ nên bố cục trang không đổi (cùng một luật GIAYTO_RULES). */
+function pdfPageName(base, pp, n, total) {
+  if (total < 2) return base + '.jpg';
+  const mn = pp && pp[1] ? pp[1] + n - 1 : 0;
+  if (!mn || mn > 99) return `${base} (trang ${n}).jpg`;
+  const rest = base.replace(/^\d{1,2}(?:\.\d{1,2})?\s*[.\-_)]*\s*/, '').trim();
+  return `${pp[0]}.${mn}${rest ? ' ' + rest : ''} (trang ${n}).jpg`;
+}
+
+/** Raster hóa từng trang của một file PDF thành File ảnh JPEG.
+ *  Tên file ảnh giữ tên PDF kèm số trang để tiền tố số và chú thích theo tiền tố
+ *  vẫn nhận đúng; đường dẫn có thêm #p{n} cho khỏi trùng với ảnh cùng tên. */
+async function pdfToImages(file) {
+  const lib  = await loadPdfjs();
+  const buf  = await file.arrayBuffer();
+  const doc  = await lib.getDocument({ data: new Uint8Array(buf) }).promise;
+  const base = file.name.replace(/\.pdf$/i, '');
+  const pp   = getPrefixPair(file.name);
+  const dir  = pathOf(file).split('/').slice(0, -1).join('/');
+  const out  = [];
+  try {
+    for (let n = 1; n <= doc.numPages; n++) {
+      const page = await doc.getPage(n);
+      const v1   = page.getViewport({ scale: 1 });
+      const sc   = Math.min(3, Math.max(1, PDF_RENDER_W / Math.max(v1.width, v1.height)));
+      const vp   = page.getViewport({ scale: sc });
+      const cv   = document.createElement('canvas');
+      cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#FFFFFF';                 // trang PDF nền trong suốt → nền trắng
+      ctx.fillRect(0, 0, cv.width, cv.height);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .92));
+      cv.width = cv.height = 0;                  // giải phóng bộ nhớ canvas
+      if (!blob) continue;
+      const nm = pdfPageName(base, pp, n, doc.numPages);
+      const f2 = new File([blob], nm, { type: 'image/jpeg' });
+      out.push(withPath(f2, (dir ? dir + '/' : '') + `${base}#p${n}.jpg`));
+      page.cleanup();
+    }
+  } finally {
+    try { await doc.destroy(); } catch (_) {}
+  }
+  return out;
+}
+
+/** Lọc danh sách file nạp vào và raster hóa PDF. Trả về danh sách file ảnh. */
+async function intakeFiles(files) {
+  const imgs = files.filter(isImage);
+  const pdfs = files.filter(isPdf);
+  if (!pdfs.length) return imgs;
+  if (!pdfAllowed()) { toast(PDF_ONLY_MSG, 'e'); return imgs; }
+  toast(`Đang đọc ${pdfs.length} file PDF…`);
+  const out = [...imgs];
+  let nPage = 0, nFail = 0;
+  for (const f of pdfs) {
+    try {
+      const ps = await pdfToImages(f);
+      if (!ps.length) { nFail++; continue; }
+      out.push(...ps); nPage += ps.length;
+    } catch (err) { console.error('PDF:', f.name, err); nFail++; }
+  }
+  if (nFail)  toast(`Không đọc được ${nFail} file PDF — kiểm tra mạng (thư viện pdf.js) hoặc file bị khóa`, 'e');
+  if (nPage)  toast(`Đã chuyển ${pdfs.length - nFail} file PDF thành ${nPage} ảnh trang`, 'o');
+  return out;
 }
 
 // ════════════════════════════════════════════════════════
@@ -2009,7 +2309,8 @@ async function pickFolder() {
     try {
       const handle = await window.showDirectoryPicker({ mode: 'read' });
       const files = await readDirHandle(handle, handle.name);
-      if (files.length) mergeFiles(files); else toast('Thư mục không có ảnh nào', 'e');
+      if (files.length) mergeFiles(files);
+      else toast(pdfAllowed() ? 'Thư mục không có ảnh hoặc file PDF nào' : 'Thư mục không có ảnh nào', 'e');
       return;
     } catch (e) { if (e.name === 'AbortError') return; }
   }
@@ -2021,8 +2322,7 @@ async function readDirHandle(handle, relBase) {
   for await (const [name, entry] of handle.entries()) {
     const relPath = relBase + '/' + name;
     if (entry.kind === 'file') {
-      const ext = name.slice(name.lastIndexOf('.')).toLowerCase();
-      if (!IMAGE_EXTS.has(ext)) continue;
+      if (!extAccepted(name)) continue;
       files.push(withPath(await entry.getFile(), relPath));
     } else if (entry.kind === 'directory') {
       files.push(...await readDirHandle(entry, relPath));
@@ -2060,8 +2360,7 @@ dz.addEventListener('drop', async e => {
     const out = [];
     if (entry.isFile) {
       await new Promise(res => entry.file(f => {
-        const ext = f.name.slice(f.name.lastIndexOf('.')).toLowerCase();
-        if (IMAGE_EXTS.has(ext)) out.push(withPath(f, entry.fullPath.replace(/^\//, '')));
+        if (extAccepted(f.name)) out.push(withPath(f, entry.fullPath.replace(/^\//, '')));
         res();
       }, res));
     } else if (entry.isDirectory) out.push(...await readDirEntry(entry));
@@ -2125,7 +2424,14 @@ const headerFit = lines => headerMetrics(lines).fit;
 function onLoaiChange() {
   const loai = $('fLoai').value;
   const isGiayto = loai === 'giayto';
-  $('layoutSection').style.display = isGiayto ? 'none' : '';
+  // Kiểu giấy tờ xe nhận thêm file PDF (mỗi trang PDF → một ảnh)
+  const acc = isGiayto ? ACCEPT_IMGPDF : ACCEPT_IMG;
+  ['folderInput', 'imgInput', 'replaceFile', 'insertFile'].forEach(id => $(id).accept = acc);
+  $('dzFmt').textContent    = isGiayto ? 'JPG · PNG · BMP · WEBP · PDF' : 'JPG · PNG · BMP · WEBP';
+  $('btnPickImg').textContent = isGiayto ? '🖼️ Chọn ảnh / PDF' : '🖼️ Chọn ảnh';
+  // Kiểu giấy tờ xe vẫn cần bố cục chọn tay cho ảnh không có tiền tố số
+  $('layoutSection').style.display = '';
+  $('layoutHint').style.display    = isGiayto ? 'block' : 'none';
   $('giaytoNote').style.display    = isGiayto ? 'block' : 'none';
   updateLoaiPreview(); renderCntRow(); updateMiniLayouts(); updateSummaries();
 }
@@ -2235,8 +2541,28 @@ function validateInfo() {
 // ════════════════════════════════════════════════════════
 //  PHÂN TRANG — nguồn sự thật duy nhất cho tóm tắt, preview và PDF
 // ════════════════════════════════════════════════════════
-/** @returns {{w:number,h:number,cols:number,rows:number,cells:{it:object,g:object,cap:string}[]}[]} */
+/** Phân trang + đánh số thứ tự ảnh: trái→phải, trên→dưới, liên tục qua các trang.
+ *  Số này in ở đầu chú thích và cũng là số hiện trên thẻ ảnh ở bước 1.
+ *  @returns {{w,h,cols,rows,cells:{it,g,cap,no}[]}[]} */
 function buildPages() {
+  const pages = buildPagesRaw();
+  let n = 0;
+  pages.forEach(p => p.cells.forEach(c => { c.no = ++n; }));
+  return pages;
+}
+/** Dòng chú thích in ra: số thứ tự + nội dung chú thích */
+function capLine(c) {
+  const tx = cleanText(c.cap).replace(/\s+/g, ' ').trim();
+  return c.no ? c.no + '. ' + tx : tx;
+}
+/** Số thứ tự in ra của từng ảnh, tra theo id — dùng cho thẻ ảnh ở bước 1 */
+function printNoMap() {
+  const m = new Map();
+  buildPages().forEach(p => p.cells.forEach(c => m.set(c.it.id, c.no)));
+  return m;
+}
+
+function buildPagesRaw() {
   const loai   = $('fLoai').value;
   const layout = state.layout;
   const per    = GRID[layout][state.perPage] ? state.perPage : PERPAGE_DEFAULT[layout];
@@ -2251,16 +2577,23 @@ function buildPages() {
   };
 
   if (loai === 'giayto') {
-    // Bố cục tự động theo tiền tố số của hạng mục
-    const gs = state.groups.map(g => ({ ...g, pn: getPrefixNum(g.src) }))
-      .sort((a,b) => (a.pn ?? 99) - (b.pn ?? 99));
-    for (const g of gs) {
-      let w, h, c, r;
-      if (g.pn === 1)                    { w=A4.h; h=A4.w; c=2; r=2; }
-      else if (g.pn === 2 || g.pn === 3) { w=A4.w; h=A4.h; c=1; r=2; }
-      else                               { w=A4.w; h=A4.h; c=1; r=1; }
-      chunk(g.items.map(it => cell(it, g)), c*r, w, h, c, r);
-    }
+    // Bố cục tự động theo tiền tố số của TỪNG ẢNH (GIAYTO_RULES).
+    // Ảnh cùng bố cục được dồn chung trang, kể cả khi ở khác hạng mục — nhờ vậy
+    // 1.1 → 1.4 (mỗi loại 1 ảnh) nằm gọn trên MỘT trang 4 ảnh/trang A4 ngang.
+    const buckets = new Map();
+    state.groups.forEach((g, gi) => g.items.forEach((it, ii) => {
+      const p   = prefixOf(it, g);
+      const sp  = giaytoSpec(p) || { key:'manual', w:pw, h:ph, c:cols, rows };
+      const ord = p ? p[0] * 100 + (p[1] || 0) : 1e6;   // ảnh không tiền tố xuống cuối
+      let b = buckets.get(sp.key);
+      if (!b) buckets.set(sp.key, b = { sp, ord, list: [] });
+      if (ord < b.ord) b.ord = ord;
+      b.list.push({ ord, gi, ii, cell: cell(it, g) });
+    }));
+    [...buckets.values()].sort((x, y) => x.ord - y.ord).forEach(b => {
+      b.list.sort((x, y) => x.ord - y.ord || x.gi - y.gi || x.ii - y.ii);
+      chunk(b.list.map(x => x.cell), b.sp.c * b.sp.rows, b.sp.w, b.sp.h, b.sp.c, b.sp.rows);
+    });
     return pages;
   }
 
@@ -2321,19 +2654,20 @@ function updateSummaries() {
     extra = row('Ảnh nhận dạng xe (0.)', cover + ' ảnh') + row('Ảnh hạng mục', (nImg - cover) + ' ảnh');
   } else if (loai === 'giayto') {
     const by = {};
-    state.groups.forEach(g => {
-      const pn = getPrefixNum(g.src);
-      const k = pn === 1 ? '1. — 4 ảnh/trang ngang'
-              : (pn === 2 || pn === 3) ? '2.–3. — 2 ảnh/trang dọc' : '4.+ — 1 ảnh/trang dọc';
-      by[k] = (by[k] || 0) + g.items.length;
-    });
+    state.groups.forEach(g => g.items.forEach(it => {
+      const sp = giaytoSpec(prefixOf(it, g));
+      const k = sp ? `${sp.note} — ${sp.per} ảnh/trang ${sp.lay === 'doc' ? 'dọc' : 'ngang'}`
+                   : `Không có tiền tố — ${state.perPage} ảnh/trang ${state.layout === 'doc' ? 'dọc' : 'ngang'}`;
+      by[k] = (by[k] || 0) + 1;
+    }));
     extra = Object.entries(by).map(([k,v]) => row(k, v + ' ảnh')).join('');
   } else {
     extra = row('Tổng ảnh', nImg + ' ảnh');
   }
 
   const [c, r] = GRID[state.layout][state.perPage] || GRID[state.layout][PERPAGE_DEFAULT[state.layout]];
-  const layRow = loai === 'giayto' ? row('Bố cục', 'Tự động theo tiền tố số')
+  const layRow = loai === 'giayto'
+    ? row('Bố cục', `Tự động theo tiền tố · ảnh không tiền tố: A4 ${state.layout === 'doc' ? 'dọc' : 'ngang'} · ${state.perPage} ảnh/trang`)
     : row('Bố cục', `A4 ${state.layout === 'doc' ? 'dọc' : 'ngang'} · ${state.perPage} ảnh/trang · ${c} × ${r}`);
 
   const html =
@@ -2345,7 +2679,7 @@ function updateSummaries() {
     row('Phòng / Khu vực', $('fPhong').value.trim()) +
     row('Ngày giám định', $('fNgay').value.trim() || '(không in)') +
     layRow +
-    row('Thuyết minh', state.useFileName ? 'Theo tên file ảnh' : 'Theo tên hạng mục') +
+    row('Chú thích', CAPSRC_LBL[state.capSrc]) +
     extra +
     `<div class="sum-r big"><span class="l">Kết quả</span><span class="v">${nImg} ảnh · ${pages.length} trang</span></div>`;
 
@@ -2356,7 +2690,13 @@ function updateSummaries() {
 
 ['fMaHs','fBks','fGara','fGdv','fPhong'].forEach(id =>
   $(id).addEventListener('input', () => { updateLoaiPreview(); updateSummaries(); scheduleDraftSave(false); }));
-$('fLoai').addEventListener('change', () => { onLoaiChange(); scheduleDraftSave(false); });
+// Đổi kiểu bản ảnh → vẽ lại gallery: chú thích mặc định của ảnh chưa phân loại
+// lấy theo tiền tố giấy tờ nên placeholder phải cập nhật theo
+$('fLoai').addEventListener('change', () => {
+  onLoaiChange();
+  if (state.groups.length) renderGroups();
+  scheduleDraftSave(false);
+});
 
 // ════════════════════════════════════════════════════════
 //  PREVIEW A4
@@ -2400,7 +2740,7 @@ function renderPreview() {
         ? `<div class="pv-cell" style="height:${px(cellH)}">
              <div class="pv-img ph" data-pv="${c.it.id}" data-w="${(p.w - 2*C.MARGIN - (p.cols-1)*C.GAP)/p.cols}" data-h="${imgH}"></div>
              <div class="pv-cap" style="height:${px(C.CAPTION_H)}">
-               <span style="font-size:${px(14)}">${esc(c.cap)}</span></div>
+               <span style="font-size:${px(14)}">${esc(capLine(c))}</span></div>
            </div>`
         : `<div class="pv-cell" style="height:${px(cellH)};border-style:dashed;background:#FAFAFA"></div>`);
     }
@@ -2477,7 +2817,7 @@ function resetGenerate() {
   $('stateProgress').style.display = 'none';
   $('stateDone').style.display = 'none';
   $('alertErr3').className = 'alert alert-e';
-  state.pdfBytes = null;
+  state.pdfBytes = null; state.smallBytes = null;
 }
 
 async function startGenerate() {
@@ -2485,14 +2825,18 @@ async function startGenerate() {
   $('stateProgress').style.display = 'block';
   $('alertErr3').className = 'alert alert-e';
   try {
-    await generatePDF();
+    state.pdfBytes  = await generatePDF();
+    state.smallBytes = null;                      // bản nén cũ không còn đúng
     $('stateProgress').style.display = 'none';
     $('stateDone').style.display = 'block';
     const safe = s => String(s||'').replace(/[^\w\-]+/g, '_').replace(/^_+|_+$/g, '');
     const tag  = safe(state.maHs) || safe(state.bks) || 'ban_anh';
     state.pdfName = `BanAnh_${state.loai}_${tag}.pdf`;
-    $('doneMsg').textContent = state.pdfName;
+    $('doneMsg').textContent = `${state.pdfName} · ${fmtBytes(state.pdfBytes.length)}`;
     $('btnDownload').onclick = downloadPDF;
+    $('dlNote').textContent = state.pdfBytes.length > MAX_SMALL
+      ? `File gốc ${fmtBytes(state.pdfBytes.length)} — vượt 10MB, dùng nút nén nếu cần gửi qua email.`
+      : 'File gốc là bản nét nhất. Bản nén cho dung lượng nhỏ hơn để gửi email / tải lên hệ thống.';
     toast('✅ PDF đã sẵn sàng', 'o');
   } catch (err) {
     $('stateProgress').style.display = 'none';
@@ -2505,9 +2849,21 @@ async function startGenerate() {
   }
 }
 
-async function generatePDF() {
+/**
+ * Dựng file PDF.
+ * @param opts {scale, jpegQ, onProg}
+ *   scale  — độ phân giải ảnh so với point (2 = bản gốc nét nhất)
+ *   jpegQ  — 0: ảnh PNG không mất dữ liệu (bản gốc) · 0<q<1: nén JPEG chất lượng q
+ *   onProg — hàm báo tiến trình, mặc định là thanh tiến trình của bước 2
+ * @returns {Promise<Uint8Array>} nội dung file PDF
+ */
+async function generatePDF(opts) {
+  const O = opts || {};
+  const IMG_SCALE = O.scale || 2;
+  const JPEG_Q    = O.jpegQ || 0;
+  const rep       = O.onProg || setProgress;
   const { PDFDocument } = PDFLib;
-  setProgress(2, 'Đang nạp font và logo…');
+  rep(2, 'Đang nạp font và logo…');
 
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
@@ -2589,43 +2945,206 @@ async function generatePDF() {
       page.drawRectangle({ x:cx, y:cy, width:cellW, height:cellH, borderColor:LGRAY(), borderWidth:0.5 });
       try {
         // BytesIO/embedPng mỗi ảnh — không dùng file tạm để tránh ReportLab/pdf-lib cache theo đường dẫn
-        const bytes  = await processImage(it.file, cellW, imgH, 2, it.rot);
-        const pdfImg = await pdfDoc.embedPng(bytes);
+        const bytes  = await processImage(it.file, cellW, imgH, IMG_SCALE, it.rot, JPEG_Q);
+        const pdfImg = JPEG_Q ? await pdfDoc.embedJpg(bytes) : await pdfDoc.embedPng(bytes);
         page.drawImage(pdfImg, { x:cx, y:cy + C.CAPTION_H, width:cellW, height:imgH });
       } catch (e) { console.warn('Ảnh lỗi:', it.file.name, e); }
 
       page.drawRectangle({ x:cx, y:cy, width:cellW, height:C.CAPTION_H, color:BLUE() });
-      const capTx = cleanText(cap).replace(/\s+/g, ' ').trim();
+      const capTx = capLine(P.cells[idx]);
       let capSize = 14, capW = fontReg.widthOfTextAtSize(capTx, capSize);
       while (capW > cellW - 4 && capSize > 6) { capSize -= 0.5; capW = fontReg.widthOfTextAtSize(capTx, capSize); }
       page.drawText(capTx, { x: cx + (cellW - capW) / 2, y: cy + (C.CAPTION_H - capSize * 0.8) / 2,
         size: capSize, font: fontReg, color: WHITE() });
 
       processed++;
-      setProgress(Math.round(4 + processed / total * 92),
+      rep(Math.round(4 + processed / total * 92),
         `Trang ${pi+1}/${pages.length} — ảnh ${processed}/${total}: ${it.file.name.slice(0, 36)}`);
     }
   }
 
-  setProgress(98, 'Đang hoàn thiện PDF…');
-  state.pdfBytes = await pdfDoc.save();
-  setProgress(100, `Hoàn thành — ${pages.length} trang`);
+  rep(98, 'Đang hoàn thiện PDF…');
+  const bytes = await pdfDoc.save();
+  rep(100, `Hoàn thành — ${pages.length} trang`);
+  return bytes;
 }
+
+// ════════════════════════════════════════════════════════
+//  TẢI VỀ: file gốc · file PDF nén < 10MB · file ảnh JPG
+// ════════════════════════════════════════════════════════
+const MAX_SMALL = 10 * 1024 * 1024;        // ngưỡng dung lượng "file nén"
+const JPG_DPI   = 150;                     // độ phân giải khi xuất ảnh JPG
+// Các bước nén thử dần — dừng ngay ở bước đầu tiên cho file dưới 10MB
+const SMALL_STEPS = [
+  { scale: 1.6, jpegQ: .88 }, { scale: 1.3, jpegQ: .82 }, { scale: 1.1, jpegQ: .74 },
+  { scale: .9,  jpegQ: .66 }, { scale: .7,  jpegQ: .58 }, { scale: .55, jpegQ: .5 },
+];
+
+/** Lưu một Blob xuống máy */
+function saveBlob(blob, name) {
+  const _URL = window.URL || window.webkitURL;
+  const url = _URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => _URL.revokeObjectURL(url), 1500);
+}
+function busyBtn(id, txt) {
+  const b = $(id);
+  if (!b.dataset.lbl) b.dataset.lbl = b.textContent;
+  b.disabled = true; b.textContent = txt;
+}
+function freeBtn(id) {
+  const b = $(id);
+  b.disabled = false;
+  if (b.dataset.lbl) b.textContent = b.dataset.lbl;
+}
+const pdfBaseName = () => (state.pdfName || 'BanAnh.pdf').replace(/\.pdf$/i, '');
 
 function downloadPDF() {
   if (!state.pdfBytes) return;
-  const _URL = window.URL || window.webkitURL;
-  const url = _URL.createObjectURL(new Blob([state.pdfBytes], { type: 'application/pdf' }));
-  const a = document.createElement('a');
-  a.href = url; a.download = state.pdfName; a.click();
-  setTimeout(() => _URL.revokeObjectURL(url), 1500);
+  saveBlob(new Blob([state.pdfBytes], { type: 'application/pdf' }), state.pdfName);
+}
+
+/** Nén PDF về dưới 10MB: giảm dần độ phân giải ảnh + nén JPEG, giữ nguyên bố cục */
+async function downloadSmallPDF() {
+  if (!state.pdfBytes) return;
+  if (state.smallBytes) {                  // đã nén rồi thì tải lại ngay
+    saveBlob(new Blob([state.smallBytes], { type: 'application/pdf' }), pdfBaseName() + '_nen.pdf');
+    return;
+  }
+  busyBtn('btnDlSmall', '⏳ Đang nén…');
+  try {
+    let out = null, used = null;
+    for (let k = 0; k < SMALL_STEPS.length; k++) {
+      const st = SMALL_STEPS[k];
+      const onProg = (pct, msg) =>
+        busyBtn('btnDlSmall', `⏳ Nén mức ${k+1}/${SMALL_STEPS.length} — ${pct}%`);
+      out = await generatePDF({ scale: st.scale, jpegQ: st.jpegQ, onProg });
+      used = st;
+      if (out.length <= MAX_SMALL) break;
+    }
+    state.smallBytes = out;
+    const name = pdfBaseName() + '_nen.pdf';
+    saveBlob(new Blob([out], { type: 'application/pdf' }), name);
+    const tx = `${name} · ${fmtBytes(out.length)} (gốc ${fmtBytes(state.pdfBytes.length)})`;
+    $('dlNote').textContent = out.length <= MAX_SMALL
+      ? `✅ Đã nén: ${tx}`
+      : `⚠️ Đã nén hết mức: ${tx} — vẫn trên 10MB, hãy chia bản ảnh thành nhiều file.`;
+    toast(out.length <= MAX_SMALL ? 'Đã nén xong — ' + fmtBytes(out.length) : 'Đã nén hết mức', 'o');
+  } catch (err) {
+    console.error(err);
+    toast('Lỗi khi nén PDF: ' + err.message, 'e');
+  } finally {
+    freeBtn('btnDlSmall');
+  }
+}
+
+/** Xuất mỗi trang bản ảnh thành một file .jpg (dựng lại từ chính file PDF nên khớp 100%) */
+async function downloadJPG() {
+  if (!state.pdfBytes) return;
+  busyBtn('btnDlJpg', '⏳ Đang dựng ảnh…');
+  try {
+    const lib = await loadPdfjs();
+    // .slice() vì pdf.js có thể chuyển quyền sở hữu buffer sang worker
+    const doc = await lib.getDocument({ data: state.pdfBytes.slice() }).promise;
+    const sc  = JPG_DPI / 72;
+    const files = [];
+    for (let n = 1; n <= doc.numPages; n++) {
+      busyBtn('btnDlJpg', `⏳ Ảnh ${n}/${doc.numPages}…`);
+      const page = await doc.getPage(n);
+      const vp   = page.getViewport({ scale: sc });
+      const cv   = document.createElement('canvas');
+      cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, cv.width, cv.height);
+      await page.render({ canvasContext: ctx, viewport: vp }).promise;
+      const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .92));
+      cv.width = cv.height = 0;
+      page.cleanup();
+      if (blob) files.push({ name: `${pdfBaseName()}_trang${String(n).padStart(2, '0')}.jpg`,
+                             data: new Uint8Array(await blob.arrayBuffer()) });
+    }
+    try { await doc.destroy(); } catch (_) {}
+    if (!files.length) throw new Error('không dựng được trang nào');
+
+    if (files.length === 1) {
+      saveBlob(new Blob([files[0].data], { type: 'image/jpeg' }), files[0].name);
+      $('dlNote').textContent = `✅ Đã xuất ${files[0].name} · ${fmtBytes(files[0].data.length)}`;
+    } else {
+      const zip = zipStore(files);
+      const name = pdfBaseName() + '_anh_jpg.zip';
+      saveBlob(zip, name);
+      const sum = files.reduce((t, f) => t + f.data.length, 0);
+      $('dlNote').textContent = `✅ Đã xuất ${files.length} file .jpg trong ${name} · ${fmtBytes(sum)}`;
+    }
+    toast(`Đã xuất ${files.length} file ảnh JPG`, 'o');
+  } catch (err) {
+    console.error(err);
+    toast('Không xuất được ảnh JPG: ' + err.message + ' (lần đầu cần có mạng)', 'e');
+  } finally {
+    freeBtn('btnDlJpg');
+  }
+}
+
+// ──────── Gói file .zip (phương thức store — ảnh JPG đã nén sẵn) ────────
+const _CRC_TAB = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(u8) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < u8.length; i++) c = _CRC_TAB[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+/** @param files [{name, data:Uint8Array}] → Blob .zip */
+function zipStore(files) {
+  const enc = new TextEncoder(), now = new Date();
+  const tm = ((now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)) & 0xFFFF;
+  const dt = (((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()) & 0xFFFF;
+  const local = [], central = [];
+  let off = 0;
+  for (const f of files) {
+    const nm = enc.encode(f.name), crc = crc32(f.data), len = f.data.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true);
+    lh.setUint16(6, 0x0800, true);     lh.setUint16(8, 0, true);      // tên UTF-8, không nén
+    lh.setUint16(10, tm, true);        lh.setUint16(12, dt, true);
+    lh.setUint32(14, crc, true);       lh.setUint32(18, len, true);  lh.setUint32(22, len, true);
+    lh.setUint16(26, nm.length, true); lh.setUint16(28, 0, true);
+    local.push(new Uint8Array(lh.buffer), nm, f.data);
+
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true);   ch.setUint16(6, 20, true);
+    ch.setUint16(8, 0x0800, true);     ch.setUint16(10, 0, true);
+    ch.setUint16(12, tm, true);        ch.setUint16(14, dt, true);
+    ch.setUint32(16, crc, true);       ch.setUint32(20, len, true);  ch.setUint32(24, len, true);
+    ch.setUint16(28, nm.length, true); ch.setUint16(30, 0, true);    ch.setUint16(32, 0, true);
+    ch.setUint16(34, 0, true);         ch.setUint16(36, 0, true);    ch.setUint32(38, 0, true);
+    ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), nm);
+    off += 30 + nm.length + len;
+  }
+  const cdSize = central.reduce((t, a) => t + a.length, 0);
+  const eo = new DataView(new ArrayBuffer(22));
+  eo.setUint32(0, 0x06054b50, true);
+  eo.setUint16(4, 0, true);  eo.setUint16(6, 0, true);
+  eo.setUint16(8, files.length, true); eo.setUint16(10, files.length, true);
+  eo.setUint32(12, cdSize, true);      eo.setUint32(16, off, true);
+  eo.setUint16(20, 0, true);
+  return new Blob([...local, ...central, new Uint8Array(eo.buffer)], { type: 'application/zip' });
 }
 
 function resetApp() {
   if (!confirm('Làm bản ảnh mới? Ảnh và thông tin hiện tại sẽ bị xóa khỏi màn hình (hồ sơ đã lưu vẫn còn).')) return;
   clearPvCache();
   Object.assign(state, {
-    groups: [], useFileName: false, lasso: false, pdfBytes: null, pdfName: '',
+    groups: [], capSrc: 'auto', useFileName: false, lasso: false,
+    pdfBytes: null, pdfName: '', smallBytes: null,
     maHs:'', bks:'', gaRa:'', gdv:'', ngay:'', recId: null,
   });
   state.sel.clear(); state.lastSelId = null;
@@ -2634,7 +3153,7 @@ function resetApp() {
   ['fMaHs','fBks','fGara','fGdv','fNgay','fNgayPick'].forEach(id => { $(id).value = ''; $(id).classList.remove('ok'); });
   $('fPhong').value = getPhongList()[0] || PHONG_DEFAULT;
   $('fLoai').value = 'chitiet';
-  $('swFileName').checked = false;
+  syncCapSrcSwitches();
   $('btnLasso').classList.remove('on');
   $('cardGallery').style.display = 'none';
   $('emptyState').style.display = 'none';
@@ -2661,70 +3180,67 @@ function loadImage(file) {
 }
 
 /**
+ * Dựng ảnh cho MỘT ô ảnh: chỉ xoay theo đúng góc người dùng chọn, rồi THU VỪA
+ * khung (contain) — giữ nguyên toàn bộ chi tiết, không cắt mép, không tự xoay ngang.
+ * Canvas trả về đúng kích thước ô, phần trống để trong suốt nên nền trang (trắng)
+ * hiện qua; bo góc 4% vẽ quanh đúng vùng ảnh.
  * @param scale độ phân giải so với point (2 = nét cho PDF, 0.55 = nhanh cho preview)
- * @param rot   góc người dùng tự xoay (0/90/180/270), áp dụng TRƯỚC khi tự xoay ngang
+ * @param rot   góc người dùng tự xoay (0/90/180/270) — nguồn duy nhất quyết định chiều ảnh
+ * @param jpegQ 0 = PNG nền trong suốt (bản gốc) · 0<q<1 = JPEG chất lượng q, nền trắng
  */
-async function processImage(file, targetWpt, targetHpt, scale, rot) {
+async function processImage(file, targetWpt, targetHpt, scale, rot, jpegQ) {
   const SCALE = scale || 2;
   const cW = Math.max(8, Math.round(targetWpt * SCALE));
   const cH = Math.max(8, Math.round(targetHpt * SCALE));
   const img = await loadImage(file);
 
-  // 0) Góc xoay do người dùng chọn trên thẻ ảnh
+  // 0) Góc xoay do người dùng chọn trên thẻ ảnh — KHÔNG tự xoay thêm, nhờ vậy
+  //    bản in luôn cùng chiều với ảnh đang hiện trên màn hình.
   const deg = (((rot || 0) % 360) + 360) % 360;
-  let base = img, baseW = img.naturalWidth, baseH = img.naturalHeight;
+  let src = img, srcW = img.naturalWidth, srcH = img.naturalHeight;
   if (deg) {
     const swap = deg === 90 || deg === 270;
-    baseW = swap ? img.naturalHeight : img.naturalWidth;
-    baseH = swap ? img.naturalWidth  : img.naturalHeight;
+    srcW = swap ? img.naturalHeight : img.naturalWidth;
+    srcH = swap ? img.naturalWidth  : img.naturalHeight;
     const rc = document.createElement('canvas');
-    rc.width = baseW; rc.height = baseH;
+    rc.width = srcW; rc.height = srcH;
     const rctx = rc.getContext('2d');
-    rctx.translate(baseW/2, baseH/2);
+    rctx.imageSmoothingQuality = 'high';
+    rctx.translate(srcW/2, srcH/2);
     rctx.rotate(deg * Math.PI/180);
     rctx.drawImage(img, -img.naturalWidth/2, -img.naturalHeight/2);
-    base = rc;
+    src = rc;
   }
+  if (!srcW || !srcH) throw new Error('Ảnh rỗng: ' + file.name);
 
-  // 1) Vẫn còn dọc → tự xoay ngang cho khớp ô ảnh
-  const needRotate = baseW < baseH;
-  const srcW = needRotate ? baseH : baseW;
-  const srcH = needRotate ? baseW : baseH;
+  // 1) Thu vừa khung ô ảnh, giữ nguyên tỷ lệ (contain) rồi canh giữa
+  const k  = Math.min(cW / srcW, cH / srcH);
+  const dw = Math.max(1, Math.round(srcW * k));
+  const dh = Math.max(1, Math.round(srcH * k));
+  const dx = Math.round((cW - dw) / 2);
+  const dy = Math.round((cH - dh) / 2);
 
-  const mid = document.createElement('canvas');
-  mid.width = srcW; mid.height = srcH;
-  const mctx = mid.getContext('2d');
-  if (needRotate) {
-    mctx.translate(srcW/2, srcH/2);
-    mctx.rotate(-Math.PI/2);
-    mctx.drawImage(base, -baseW/2, -baseH/2);
-  } else {
-    mctx.drawImage(base, 0, 0);
-  }
-
-  // 2) Cắt giữa theo đúng tỷ lệ ô ảnh
-  const tR = targetWpt / targetHpt, iR = srcW / srcH;
-  let sx, sy, sw, sh;
-  if (iR > tR) { sh = srcH; sw = sh * tR; sx = (srcW - sw)/2; sy = 0; }
-  else         { sw = srcW; sh = sw / tR; sx = 0; sy = (srcH - sh)/2; }
-
-  // 3) Vẽ ra canvas cuối + bo góc 4%
+  // 2) Vẽ ra canvas cỡ ô ảnh (nền trong suốt) + bo góc quanh đúng vùng ảnh
   const out = document.createElement('canvas');
   out.width = cW; out.height = cH;
   const ctx = out.getContext('2d');
-  const r = Math.round(cW * 0.04);
+  ctx.imageSmoothingQuality = 'high';
+  // JPEG không có kênh trong suốt → tô trắng như nền trang, nếu không phần trống sẽ ra đen
+  if (jpegQ) { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, cW, cH); }
+  const r = Math.max(1, Math.round(Math.min(dw, dh) * 0.04));
   ctx.beginPath();
-  ctx.moveTo(r,0); ctx.lineTo(cW-r,0); ctx.quadraticCurveTo(cW,0,cW,r);
-  ctx.lineTo(cW,cH-r); ctx.quadraticCurveTo(cW,cH,cW-r,cH);
-  ctx.lineTo(r,cH); ctx.quadraticCurveTo(0,cH,0,cH-r);
-  ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0);
+  ctx.moveTo(dx + r, dy);
+  ctx.lineTo(dx + dw - r, dy);        ctx.quadraticCurveTo(dx + dw, dy, dx + dw, dy + r);
+  ctx.lineTo(dx + dw, dy + dh - r);   ctx.quadraticCurveTo(dx + dw, dy + dh, dx + dw - r, dy + dh);
+  ctx.lineTo(dx + r, dy + dh);        ctx.quadraticCurveTo(dx, dy + dh, dx, dy + dh - r);
+  ctx.lineTo(dx, dy + r);             ctx.quadraticCurveTo(dx, dy, dx + r, dy);
   ctx.closePath(); ctx.clip();
-  ctx.drawImage(mid, sx, sy, sw, sh, 0, 0, cW, cH);
+  ctx.drawImage(src, 0, 0, srcW, srcH, dx, dy, dw, dh);
 
   return new Promise((resolve, reject) => out.toBlob(b => {
     if (!b) { reject(new Error('Không tạo được ảnh')); return; }
     b.arrayBuffer().then(resolve, reject);
-  }, 'image/png'));
+  }, jpegQ ? 'image/jpeg' : 'image/png', jpegQ || undefined));
 }
 
 

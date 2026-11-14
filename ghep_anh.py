@@ -11,12 +11,17 @@ Cách dùng:
   python ghep_anh.py --gdv "Nguyễn Văn A" --layout doc
   python ghep_anh.py --gdv "Trần Thị B"   --layout ngang --so-anh 6
   python ghep_anh.py --gdv "Lê Văn C" --loai giayto      # bố cục tự động
-  python ghep_anh.py --gdv "Lê Văn C" --loai xacminh --thuyet-minh ten-file
+  python ghep_anh.py --gdv "Lê Văn C" --loai xacminh --chu-thich ten-file
 
   --layout doc   : Portrait A4  — 1, 2, 3, 4, 6, 8, 9, 12 ảnh/trang (mặc định 6)
   --layout ngang : Landscape A4 — 1, 2, 4, 6, 8, 9 ảnh/trang (mặc định 4)
-  --loai giayto  : bỏ qua --layout/--so-anh, bố cục tự động theo tiền tố số:
-                   1. → 4 ảnh/trang ngang · 2.–3. → 2 ảnh/trang dọc · 4.+ → 1 ảnh/trang dọc
+  --loai giayto  : bố cục tự động theo tiền tố {chính}.{phụ} của tên ảnh:
+                   1.1–1.6 (đăng ký xe, bằng lái, CCCD) → 4 ảnh/trang A4 ngang
+                   2.x     (đăng kiểm, bảo hiểm A5)     → 2 ảnh/trang A4 dọc
+                   3.x     (xác minh bằng lái)          → 4 ảnh/trang A4 dọc
+                   4+      (giấy tờ khổ A4)             → 1 ảnh/trang A4 dọc
+                   Ảnh cùng bố cục được dồn chung trang. Ảnh KHÔNG có tiền tố
+                   dùng --layout/--so-anh như các loại bản ảnh khác.
 
 Đọc thông tin BKS và ga-ra từ input/Bao_gia.xlsx (hoặc docs/thong_tin_giam_dinh_xe.xlsx),
 hoặc OCR ảnh báo giá bằng Gemini Vision.
@@ -67,7 +72,7 @@ FOOTER_H_MM   = 8
 CAPTION_H_MM  = 7
 GAP_MM        = 2           # khoảng cách giữa các ô ảnh
 MARGIN_MM     = 8           # lề xung quanh
-CORNER_RADIUS_PCT = 0.04    # bo góc = 4% chiều rộng ô ảnh
+CORNER_RADIUS_PCT = 0.04    # bo góc = 4% cạnh ngắn của vùng ảnh vẽ ra
 HEAD_PAD      = 2           # chừa trên/dưới khối chữ header (point)
 HEAD_LINE_SP  = 2           # giãn dòng header (point)
 ASC, DESC     = 0.78, 0.22  # tỉ lệ ascender / descender của Be Vietnam Pro
@@ -229,7 +234,7 @@ _SENTENCE_START = re.compile(r'(^|[.!?…]["\'”’»)\]]*\s+)([a-zà-ỹ])')
 
 def normalize_caption(text: str) -> str:
     """
-    AutoCorrect thuyết minh — khớp normalizeCaption() trong index.html:
+    AutoCorrect chú thích — khớp normalizeCaption() trong index.html:
     gộp khoảng trắng thừa, viết hoa chữ đầu và chữ đầu sau dấu . ! ? …
     """
     if text is None:
@@ -247,13 +252,14 @@ def load_images_with_captions(renamed_dir: str = RENAMED_DIR,
                               thuyet_minh: str = "hang-muc",
                               captions_file: str = ""):
     """
-    Trả về list of (prefix:int, filepath:str, caption:str), đã sắp xếp tăng dần.
+    Trả về list of (prefix:tuple|None, filepath:str, caption:str, rot:int), đã sắp xếp tăng dần.
+    prefix = (tiền tố chính, tiền tố phụ) đọc từ tên file; None nếu tên file không có tiền tố số.
 
     thuyet_minh   : "hang-muc" dùng tên thư mục gốc (mapping.json);
                     "ten-file" dùng tên file ảnh (bỏ phần mở rộng).
     captions_file : JSON ghi đè từng ảnh, mỗi mục nhận 1 trong 2 dạng:
-                      "tên file": "thuyết minh riêng"
-                      "tên file": {"cap": "thuyết minh", "rot": 90}
+                      "tên file": "chú thích riêng"
+                      "tên file": {"cap": "chú thích", "rot": 90}
                     rot = góc xoay 0/90/180/270, áp dụng trước khi tự xoay ngang.
     """
     if not os.path.exists(MAPPING_FILE):
@@ -268,7 +274,7 @@ def load_images_with_captions(renamed_dir: str = RENAMED_DIR,
             sys.exit(f"Không tìm thấy file chú thích: {captions_file}")
         with open(captions_file, encoding="utf-8") as f:
             overrides = json.load(f)
-        print(f"  Đã nạp {len(overrides)} thuyết minh riêng từ {captions_file}")
+        print(f"  Đã nạp {len(overrides)} chú thích riêng từ {captions_file}")
 
     IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 
@@ -280,9 +286,16 @@ def load_images_with_captions(renamed_dir: str = RENAMED_DIR,
         parts = re.split(r"(\d+)", stem)
         return tuple(int(p) if p.isdigit() else p.lower() for p in parts if p)
 
-    def file_prefix(name: str) -> int:
-        m = re.match(r"^(\d+)\.", os.path.splitext(name)[0])
-        return int(m.group(1)) if m else 999
+    def file_prefix(name: str):
+        """Tiền tố số của tên file → (chính, phụ); None nếu không có tiền tố.
+
+        Chỉ nhận 1–2 chữ số để tên máy ảnh kiểu "20261114_123.jpg" không bị hiểu là
+        tiền tố, và chỉ cắt phần mở rộng ảnh để giữ nguyên phần ".5" của "2.5 Căn cước…".
+        Giữ khớp với getPrefixPair() trong index.html.
+        """
+        stem = re.sub(r"\.(jpe?g|png|bmp|webp|pdf)$", "", name, flags=re.I)
+        m = re.match(r"^(\d{1,2})(?:\.(\d{1,2}))?(?!\d)", stem)
+        return (int(m.group(1)), int(m.group(2) or 0)) if m else None
 
     entries = []
     for fname, caption in mapping.items():
@@ -316,13 +329,6 @@ def round_corners(img: Image.Image, radius: int) -> Image.Image:
     return img
 
 
-def fit_image_landscape(img: Image.Image) -> Image.Image:
-    """Xoay ảnh nếu cần để luôn đặt ngang (width >= height)."""
-    if img.width < img.height:
-        img = img.rotate(90, expand=True)
-    return img
-
-
 # ── Vẽ trang PDF ─────────────────────────────────────────────────────────────
 
 def _pts(mm_val):
@@ -344,12 +350,61 @@ GRID = {
 }
 PERPAGE_DEFAULT = {"doc": 6, "ngang": 4}
 
+# Kiểu "giayto": tiền tố {chính}.{phụ} → (layout, số ảnh/trang, ghi chú).
+# (maj, lo, hi) = tiền tố chính, khoảng tiền tố phụ.
+# Bảng này phải luôn khớp với GIAYTO_RULES trong index.html.
+GIAYTO_RULES = [
+    (1, 1, 99, "ngang", 4, "Đăng ký xe · bằng lái · căn cước (cỡ thẻ)"),
+    (2, 1, 99, "doc",   2, "Đăng kiểm · bảo hiểm khổ A5"),
+    (3, 1, 99, "doc",   4, "Ảnh xác minh bằng lái"),
+]
+# Tiền tố từ 4 trở lên — giấy tờ khổ A4, mỗi ảnh một trang dọc
+GIAYTO_BIG = ("doc", 1, "Giấy tờ khổ A4")
+
+
+def giayto_spec(prefix):
+    """prefix = (chính, phụ) → (layout, số ảnh/trang, ghi chú).
+
+    Trả về None khi ảnh không có tiền tố số — khi đó dùng bố cục chọn tay
+    (--layout / --so-anh). Tiền tố phụ bỏ trống được coi như .1.
+    """
+    if not prefix:
+        return None
+    maj, mn = prefix[0], prefix[1] or 1
+    if maj >= 4:
+        return GIAYTO_BIG
+    for m, lo, hi, lay, per, note in GIAYTO_RULES:
+        if m == maj and lo <= mn <= hi:
+            return (lay, per, note)
+    for m, lo, hi, lay, per, note in GIAYTO_RULES:   # đúng tiền tố chính, lệch tiền tố phụ
+        if m == maj:
+            return (lay, per, note)
+    return GIAYTO_BIG
+
 
 def build_pages(entries: list, loai: str, layout: str, per_page: int) -> list:
     """
+    Phân trang + đánh số thứ tự ảnh (trái→phải, trên→dưới, liên tục qua các trang).
+
+    Trả về list of dict: {"size": (w,h), "cols": c, "rows": r,
+                          "cells": [(fpath, caption, rot, so_thu_tu)]}
+    Số thứ tự được in ở đầu chú thích — khớp với buildPages() trong index.html.
+    """
+    pages = _build_pages_raw(entries, loai, layout, per_page)
+    n = 0
+    for pg in pages:
+        numbered = []
+        for fpath, cap, rot in pg["cells"]:
+            n += 1
+            numbered.append((fpath, cap, rot, n))
+        pg["cells"] = numbered
+    return pages
+
+
+def _build_pages_raw(entries: list, loai: str, layout: str, per_page: int) -> list:
+    """
     Phân trang ảnh — nguồn sự thật duy nhất cho mọi loại bản ảnh.
-    entries: list of (prefix:int, filepath:str, caption:str, rot:int) đã sắp xếp.
-    Trả về list of dict: {"size": (w,h), "cols": c, "rows": r, "cells": [(fpath, caption, rot)]}
+    entries: list of (prefix:tuple|None, filepath:str, caption:str, rot:int) đã sắp xếp.
     """
     pages = []
 
@@ -359,19 +414,25 @@ def build_pages(entries: list, loai: str, layout: str, per_page: int) -> list:
                           "cells": cells[i:i + n]})
 
     if loai == "giayto":
-        # Bố cục tự động theo tiền tố số: 1. → 4 ảnh/trang ngang;
-        # 2.–3. → 2 ảnh/trang dọc; còn lại → 1 ảnh/trang dọc.
-        groups: dict = {}
+        # Bố cục tự động theo tiền tố số của TỪNG ảnh (GIAYTO_RULES). Ảnh cùng bố cục
+        # được dồn chung trang, kể cả khi ở khác hạng mục — nhờ vậy 1.1 → 1.4 (mỗi loại
+        # 1 ảnh) nằm gọn trên MỘT trang 4 ảnh/trang ngang. Ảnh không tiền tố xuống cuối.
+        buckets: dict = {}
         for prefix, fpath, cap, rot in entries:
-            groups.setdefault(prefix, []).append((fpath, cap, rot))
-        for prefix in sorted(groups):
-            if prefix == 1:
-                size, cols, rows = landscape(A4), 2, 2
-            elif prefix in (2, 3):
-                size, cols, rows = A4, 1, 2
+            spec = giayto_spec(prefix)
+            if spec is None:
+                key, lay, per, order = "manual", layout, per_page, 10 ** 6
             else:
-                size, cols, rows = A4, 1, 1
-            chunk(groups[prefix], cols * rows, size, cols, rows)
+                lay, per = spec[0], spec[1]
+                key, order = f"{lay}{per}", prefix[0] * 100 + (prefix[1] or 0)
+            cols, rows = GRID[lay].get(per) or GRID[lay][PERPAGE_DEFAULT[lay]]
+            b = buckets.setdefault(key, {"order": order, "lay": lay,
+                                         "cols": cols, "rows": rows, "cells": []})
+            b["order"] = min(b["order"], order)
+            b["cells"].append((fpath, cap, rot))
+        for b in sorted(buckets.values(), key=lambda x: x["order"]):
+            size = A4 if b["lay"] == "doc" else landscape(A4)
+            chunk(b["cells"], b["cols"] * b["rows"], size, b["cols"], b["rows"])
         return pages
 
     size = A4 if layout == "doc" else landscape(A4)
@@ -379,8 +440,8 @@ def build_pages(entries: list, loai: str, layout: str, per_page: int) -> list:
     n = cols * rows
 
     if loai == "chitiet":
-        cover = [(fp, cap, rot) for pre, fp, cap, rot in entries if pre == 0]
-        main  = [(fp, cap, rot) for pre, fp, cap, rot in entries if pre != 0]
+        cover = [(fp, cap, rot) for pre, fp, cap, rot in entries if pre and pre[0] == 0]
+        main  = [(fp, cap, rot) for pre, fp, cap, rot in entries if not (pre and pre[0] == 0)]
         if cover:
             chunk(cover, n, size, cols, rows)   # trang nhận dạng xe
         chunk(main, n, size, cols, rows)
@@ -519,7 +580,7 @@ def draw_image_grid(c: Canvas, page_w, page_h, images_captions: list,
                     cols: int, rows: int):
     """
     Vẽ lưới ảnh vào vùng còn lại (dưới header, trên footer).
-    images_captions: list of (filepath, caption) — đúng số lượng cho 1 trang.
+    images_captions: list of (filepath, caption, rot, so_thu_tu) — đúng số lượng cho 1 trang.
     """
     margin     = _pts(MARGIN_MM)
     header_h   = _pts(HEADER_H_MM)
@@ -538,7 +599,8 @@ def draw_image_grid(c: Canvas, page_w, page_h, images_captions: list,
     cell_h = (area_h - (rows - 1) * gap) / rows
     img_h  = cell_h - caption_h
 
-    for idx, (fpath, caption, rot) in enumerate(images_captions):
+    for idx, (fpath, caption, rot, cap_no) in enumerate(images_captions):
+        caption = f"{cap_no}. {caption}" if cap_no else caption
         col = idx % cols
         row = idx // cols
         cell_x = area_x + col * (cell_w + gap)
@@ -549,43 +611,36 @@ def draw_image_grid(c: Canvas, page_w, page_h, images_captions: list,
         c.setLineWidth(0.5)
         c.rect(cell_x, cell_y, cell_w, cell_h, fill=0, stroke=1)
 
-        # Ảnh với bo góc
+        # Ảnh với bo góc — thu vừa khung (contain), canh giữa, KHÔNG cắt mép
         try:
             img = Image.open(fpath)
-            # Thứ tự bắt buộc: EXIF → góc xoay người dùng → tự xoay ngang.
-            # Nếu fit_image_landscape chạy trước exif_transpose, ảnh chụp dọc
-            # có cờ EXIF sẽ bị xoay sai.
+            # Thứ tự bắt buộc: EXIF → góc xoay người dùng. Không tự xoay ngang nữa:
+            # chiều ảnh in ra phải đúng chiều người dùng thấy / đã chọn.
             img = ImageOps.exif_transpose(img)
             if rot:
                 img = img.rotate(-rot, expand=True)   # PIL xoay ngược chiều kim đồng hồ
-            img = fit_image_landscape(img)
-            # Scale vừa khít vùng ảnh (giữ tỉ lệ)
-            target_w = int(cell_w * 3)   # over-sample for quality
-            target_h = int(img_h * 3)
-            img.thumbnail((target_w, target_h), Image.LANCZOS)
-            # Crop để fill toàn bộ ô
-            img_ratio = img.width / img.height
-            cell_ratio = cell_w / img_h
-            if img_ratio > cell_ratio:
-                new_h = img.height
-                new_w = int(new_h * cell_ratio)
-                left = (img.width - new_w) // 2
-                img = img.crop((left, 0, left + new_w, new_h))
-            else:
-                new_w = img.width
-                new_h = int(new_w / cell_ratio)
-                top = (img.height - new_h) // 2
-                img = img.crop((0, top, new_w, top + new_h))
+            if not img.width or not img.height:
+                raise ValueError("ảnh rỗng")
 
-            corner_r = max(8, int(img.width * CORNER_RADIUS_PCT))
+            # Khung vẽ (point): thu vừa ô ảnh, giữ nguyên tỷ lệ
+            k = min(cell_w / img.width, img_h / img.height)
+            draw_w, draw_h = img.width * k, img.height * k
+
+            # Lấy mẫu 3× cho nét khi in, nhưng không phóng to quá ảnh gốc
+            px_w = max(1, int(min(img.width,  draw_w * 3)))
+            px_h = max(1, int(round(px_w * img.height / img.width)))
+            img = img.resize((px_w, px_h), Image.LANCZOS)
+
+            corner_r = max(4, int(min(px_w, px_h) * CORNER_RADIUS_PCT))
             img = round_corners(img, corner_r)
 
             # Đưa thẳng vào PDF qua bộ nhớ — tránh lỗi cache theo đường dẫn file
             buf = _bytesio.BytesIO()
             img.save(buf, format="PNG")
             buf.seek(0)
-            c.drawImage(ImageReader(buf), cell_x, cell_y + caption_h, cell_w, img_h,
-                        mask="auto")
+            draw_x = cell_x + (cell_w - draw_w) / 2
+            draw_y = cell_y + caption_h + (img_h - draw_h) / 2
+            c.drawImage(ImageReader(buf), draw_x, draw_y, draw_w, draw_h, mask="auto")
         except Exception as e:
             print(f"  Lỗi vẽ ảnh {fpath}: {e}", file=sys.stderr)
 
@@ -664,23 +719,28 @@ def main():
                         help="Số ảnh trên mỗi trang. "
                              "doc: 1,2,3,4,6,8,9,12 (mặc định 6); "
                              "ngang: 1,2,4,6,8,9 (mặc định 4). "
-                             "Bỏ qua với --loai giayto (bố cục tự động).")
+                             "Với --loai giayto chỉ áp dụng cho ảnh không có tiền tố số.")
     parser.add_argument("--ma-ho-so", default="", dest="ma_ho_so",
                         help="Số HSBT / mã hồ sơ — in trên tiêu đề bản ảnh và đặt tên file PDF")
-    parser.add_argument("--thuyet-minh", choices=["hang-muc", "ten-file"],
+    # --thuyet-minh giữ lại làm tên cũ cho các script/bat đã viết trước đây
+    parser.add_argument("--chu-thich", "--thuyet-minh", choices=["hang-muc", "ten-file"],
                         default="hang-muc", dest="thuyet_minh",
-                        help="Nguồn thuyết minh ảnh: tên hạng mục (mặc định) hoặc tên file ảnh")
+                        help="Nguồn chú thích ảnh: hang-muc = tên thư mục hạng mục (mặc định) "
+                             "hoặc ten-file = tên file ảnh")
     parser.add_argument("--phong", default=PHONG_DEFAULT,
                         help="Tên Phòng / khu vực giám định — in ở chân mỗi trang bản ảnh")
     parser.add_argument("--captions", default="",
-                        help="File JSON {\"tên file\": \"thuyết minh\"} ghi đè thuyết minh từng ảnh")
+                        help="File JSON {\"tên file\": \"chú thích\"} ghi đè chú thích từng ảnh")
     args = parser.parse_args()
 
     per_page = args.so_anh or PERPAGE_DEFAULT[args.layout]
-    if args.loai != "giayto" and per_page not in GRID[args.layout]:
-        hop_le = ", ".join(str(k) for k in sorted(GRID[args.layout]))
-        sys.exit(f"--so-anh {per_page} không hợp lệ cho layout {args.layout}. "
-                 f"Giá trị hợp lệ: {hop_le}")
+    if per_page not in GRID[args.layout]:
+        if args.loai == "giayto":   # chỉ dùng cho ảnh không tiền tố — lặng lẽ về mặc định
+            per_page = PERPAGE_DEFAULT[args.layout]
+        else:
+            hop_le = ", ".join(str(k) for k in sorted(GRID[args.layout]))
+            sys.exit(f"--so-anh {per_page} không hợp lệ cho layout {args.layout}. "
+                     f"Giá trị hợp lệ: {hop_le}")
 
     bks, ga_ra = get_bks_garage()
     if args.bks:
@@ -701,13 +761,14 @@ def main():
 
     print(f"  Kiểu bản ảnh: {LOAI_GD_MAP[args.loai]}")
     if args.loai == "giayto":
-        print("  Bố cục:       tự động theo tiền tố số")
+        print("  Bố cục:       tự động theo tiền tố số · ảnh không tiền tố: "
+              f"A4 {'dọc' if args.layout == 'doc' else 'ngang'} · {per_page} ảnh/trang")
     else:
         cols, rows = GRID[args.layout][per_page]
         print(f"  Bố cục:       A4 {'dọc' if args.layout == 'doc' else 'ngang'} · "
               f"{per_page} ảnh/trang · {cols} × {rows}")
     if args.loai == "chitiet":
-        n_cover = sum(1 for e in entries if e[0] == 0)
+        n_cover = sum(1 for e in entries if e[0] and e[0][0] == 0)
         print(f"  Ảnh nhận dạng xe (trang 1): {n_cover} ảnh")
         print(f"  Ảnh hạng mục (trang 2+):    {len(entries) - n_cover} ảnh")
     else:
