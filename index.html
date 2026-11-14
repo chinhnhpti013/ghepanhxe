@@ -1175,13 +1175,20 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-14n';
+const APP_BUILD   = '2026-11-14o';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
   hientruong: 'Giám định hiện trường xe ô tô BKS',
   giayto:     'Giám định giấy tờ xe ô tô BKS',
   xacminh:    'Ảnh xác minh hiện trường xe ô tô BKS',
+};
+// Tên file PDF xuất ra: "{tên theo kiểu} {BKS}.pdf" — không dấu cho dễ gửi email / nạp hệ thống
+const PDF_NAME = {
+  chitiet:    'Anh GD chi tiet xe',
+  hientruong: 'Anh GD hien truong xe',
+  giayto:     'Anh GD giay to xe',
+  xacminh:    'Anh xac minh hien truong xe',
 };
 const LOAI_LBL = {
   chitiet:'Ảnh giám định chi tiết thiệt hại',
@@ -3630,9 +3637,11 @@ async function startGenerate() {
     state.smallBytes = null;                      // bản nén cũ không còn đúng
     $('stateProgress').style.display = 'none';
     $('stateDone').style.display = 'block';
-    const safe = s => String(s||'').replace(/[^\w\-]+/g, '_').replace(/^_+|_+$/g, '');
-    const tag  = safe(state.maHs) || safe(state.bks) || 'ban_anh';
-    state.pdfName = `BanAnh_${state.loai}_${tag}.pdf`;
+    // Giữ nguyên biển số như người dùng gõ, chỉ bỏ ký tự Windows cấm trong tên file
+    const safe = s => String(s||'').replace(/[\\/:*?"<>|]+/g, ' ')
+                        .replace(/\s+/g, ' ').trim().replace(/\.+$/, '');
+    const tag  = safe(state.bks) || safe(state.maHs) || 'Ban anh';
+    state.pdfName = `${PDF_NAME[state.loai] || PDF_NAME.chitiet} ${tag}.pdf`;
     $('doneMsg').textContent = `${state.pdfName} · ${fmtBytes(state.pdfBytes.length)}`;
     $('btnDownload').onclick = downloadPDF;
     $('dlNote').textContent = state.pdfBytes.length > MAX_SMALL
@@ -3821,7 +3830,7 @@ function freeBtn(id) {
   b.disabled = false;
   if (b.dataset.lbl) b.textContent = b.dataset.lbl;
 }
-const pdfBaseName = () => (state.pdfName || 'BanAnh.pdf').replace(/\.pdf$/i, '');
+const pdfBaseName = () => (state.pdfName || 'Ban anh.pdf').replace(/\.pdf$/i, '');
 
 function downloadPDF() {
   if (!state.pdfBytes) return;

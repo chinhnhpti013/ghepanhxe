@@ -367,6 +367,14 @@ LOAI_GD_MAP = {
     "xacminh":    "Ảnh xác minh hiện trường xe ô tô BKS",
 }
 
+# Tên file PDF xuất ra: "{tên theo kiểu} {BKS}.pdf" — không dấu, khớp PDF_NAME của index.html
+PDF_NAME_MAP = {
+    "chitiet":    "Anh GD chi tiet xe",
+    "hientruong": "Anh GD hien truong xe",
+    "giayto":     "Anh GD giay to xe",
+    "xacminh":    "Anh xac minh hien truong xe",
+}
+
 # Số ảnh trên mỗi trang → (cols, rows). Giữ khớp với GRID trong index.html.
 GRID = {
     "doc":   {1: (1, 1), 2: (1, 2), 3: (1, 3), 4: (2, 2),
@@ -853,10 +861,11 @@ def main():
         print(f"  Tổng số ảnh:  {len(entries)} ảnh")
     print(f"  Số trang:     {len(pages)} trang")
 
-    tag = re.sub(r"[^\w\-]+", "_", args.ma_ho_so or bks).strip("_") or "ban_anh"
-    out_name = args.output or os.path.join(
-        OUTPUT_DIR, f"BanAnh_{args.loai}_{tag}.pdf"
-    )
+    # Giữ nguyên biển số, chỉ bỏ ký tự Windows cấm trong tên file
+    tag = re.sub(r'[\\/:*?"<>|]+', " ", bks or args.ma_ho_so or "")
+    tag = re.sub(r"\s+", " ", tag).strip().rstrip(".") or "Ban anh"
+    prefix = PDF_NAME_MAP.get(args.loai, PDF_NAME_MAP["chitiet"])
+    out_name = args.output or os.path.join(OUTPUT_DIR, f"{prefix} {tag}.pdf")
 
     create_pdf(pages, args.gdv, bks, ga_ra, out_name, args.ngay, args.loai,
                args.ma_ho_so, args.phong)

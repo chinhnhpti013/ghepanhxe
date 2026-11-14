@@ -354,7 +354,19 @@ python ghep_anh.py --gdv "Tên GĐV" --ma-ho-so "XCG.2026.001234" --ngay "06/06/
 | `--captions` | File JSON ghi đè từng ảnh (xem dưới) |
 | `--output` | Đường dẫn PDF đầu ra |
 
-Tên file mặc định: `output/BanAnh_{loai}_{mã hồ sơ hoặc BKS}.pdf`
+Tên file mặc định: `output/{tên theo kiểu} {BKS}.pdf` — bảng tên nằm ở `PDF_NAME_MAP`
+(Python) / `PDF_NAME` (web) và **phải khớp nhau**:
+
+| Kiểu | Tên file |
+|---|---|
+| `chitiet` | `Anh GD chi tiet xe {BKS}.pdf` |
+| `hientruong` | `Anh GD hien truong xe {BKS}.pdf` |
+| `giayto` | `Anh GD giay to xe {BKS}.pdf` |
+| `xacminh` | `Anh xac minh hien truong xe {BKS}.pdf` |
+
+Tên không dấu cho dễ gửi email / nạp hệ thống. Biển số giữ nguyên như người dùng gõ, chỉ thay
+ký tự Windows cấm (`\ / : * ? " < > |`) bằng khoảng trắng. Không có BKS thì lấy mã hồ sơ,
+không có cả hai thì `Ban anh`.
 
 **File `--captions`** — ghi đè chú thích và góc xoay từng ảnh, mỗi mục nhận 1 trong 2 dạng:
 

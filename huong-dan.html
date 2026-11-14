@@ -290,9 +290,9 @@ td{color:var(--text-2)}
     <tr><td>Số HSBT / Mã hồ sơ</td>
         <td>Ví dụ <code>XCG.2026.001234</code>. In ở <b>dòng 2</b> của tiêu đề, trước tên giám định viên.
             Nếu để trống thì đoạn "Số HSBT" <b>không được in</b>
-            và tên file PDF lấy theo biển kiểm soát.</td></tr>
+            Không ảnh hưởng tên file PDF — tên file luôn lấy theo biển kiểm soát.</td></tr>
     <tr><td><b>Biển kiểm soát *</b></td>
-        <td>Ví dụ <code>14C-402.84</code>. In ở dòng tiêu đề lớn nhất.</td></tr>
+        <td>Ví dụ <code>14C-402.84</code>. In ở dòng tiêu đề lớn nhất và <b>dùng để đặt tên file PDF</b>.</td></tr>
     <tr><td>Ngày giám định</td>
         <td>Bấm vào ô chọn ngày hoặc nút <span class="btn-ex">Hôm nay</span>; nút
             <span class="btn-ex">Xóa</span> để bỏ trống. In ở <b>cuối dòng tiêu đề thứ nhất</b>,
@@ -640,7 +640,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
         bố cục, số ảnh và số trang.</li>
     <li>Bấm <span class="btn-ex">⚡ Tạo file PDF</span> và chờ thanh tiến trình chạy xong.</li>
     <li>Bấm <span class="btn-ex">⬇️ Tải file gốc (PDF)</span>. Tên file dạng
-        <code>BanAnh_{kiểu}_{mã hồ sơ hoặc BKS}.pdf</code>. Dung lượng file hiện ngay dưới
+        <code>Anh GD chi tiet xe {BKS}.pdf</code> (kiểu hiện trường → <code>Anh GD hien truong xe …</code>,
+        giấy tờ xe → <code>Anh GD giay to xe …</code>). Dung lượng file hiện ngay dưới
         dòng thông báo. Xem thêm <a href="#xuat-jpg">PDF nén &amp; ảnh JPG</a>.</li>
     <li>Nếu cần: <span class="btn-ex">💾 Lưu hồ sơ</span> ở thẻ <b>Hồ sơ lưu trên máy</b> ngay bên
         dưới để mở lại sau, hoặc <span class="btn-ex">🔄 Làm bản ảnh mới</span> để bắt đầu hồ sơ khác.</li>
@@ -657,12 +658,12 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><th style="width:32%">Nút</th><th>Kết quả</th></tr>
     <tr><td><span class="btn-ex">⬇️ Tải file gốc (PDF)</span></td>
         <td>Bản <b>nét nhất</b> — ảnh không mất dữ liệu. Dùng để lưu hồ sơ, in ấn.
-            File tên <code>BanAnh_….pdf</code>.</td></tr>
+            File tên <code>Anh GD … {BKS}.pdf</code>.</td></tr>
     <tr><td><span class="btn-ex">🗜️ Tải PDF nén &lt; 10MB</span></td>
         <td>Ứng dụng <b>tự nén cho tới khi file dưới 10MB</b>: hạ dần độ phân giải ảnh và nén
             JPEG qua tối đa 6 mức, <b>dừng ngay ở mức đầu tiên</b> đạt dưới 10MB nên chất lượng
             giữ được cao nhất có thể. Bố cục, chú thích, số thứ tự giữ nguyên.
-            File tên <code>BanAnh_…_nen.pdf</code>.</td></tr>
+            File tên <code>Anh GD … {BKS}_nen.pdf</code>.</td></tr>
     <tr><td><span class="btn-ex">🖼️ Tải file ảnh JPG</span></td>
         <td>Mỗi trang bản ảnh thành <b>một file <code>.jpg</code></b> (150 DPI), dựng lại từ
             chính file PDF nên <b>giống hệt bản in</b>. Một trang → tải thẳng
