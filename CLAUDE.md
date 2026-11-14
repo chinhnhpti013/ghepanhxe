@@ -80,6 +80,12 @@ hai ô luôn đồng bộ qua `onDatePick()` và `syncNgayPicker()`.
 Nút **Tiếp tục** luôn bấm được; thiếu gì thì báo đúng chỗ đó và cuộn tới ô cần sửa
 (`validateInfo()` cho thông tin, `hasImages()` cho ảnh).
 
+`missingInfo()` là **nguồn sự thật duy nhất** về "ô bắt buộc nào còn trống" → `{id, msg}`;
+`validateInfo()` (bước 1→2), `startGenerate()` và `openSaveRecord()` đều gọi nó. Thiếu dữ liệu ở
+**bước 2** thì `showMissingOnStep2()` in lỗi lên `#alertErr3` kèm nút **← Quay lại màn hình 1 để nhập**
+(`backToInfo(id)`: về bước 1, cuộn tới ô và focus — phải chờ ~160ms vì `goStep(1)` có lệnh cuộn lên
+đầu trang sẽ đè lên). `resetGenerate()` xóa lỗi này mỗi lần vào lại bước 2.
+
 **Bước 2 — Xem & Xuất**
 - **Tóm tắt** (`#sumRows3`) — chỉ hiển thị ở bước này, không còn ở bước 1
 - **Preview A4 trực tiếp** đúng tỷ lệ, header, chú thích và cách cắt ảnh như PDF thật

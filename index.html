@@ -1028,7 +1028,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-14d';
+const APP_BUILD   = '2026-11-14e';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô biển kiểm soát',
@@ -1512,6 +1512,8 @@ function currentInfo() {
 function openSaveRecord() {
   const i = currentInfo();
   if (!totalImgs()) { toast('Chưa có ảnh nào để lưu', 'e'); return; }
+  const miss = missingInfo();
+  if (miss) { showMissingOnStep2(miss); return; }   // thiếu dữ liệu → mời quay lại màn hình 1
   $('recName').value = [i.maHs, i.bks].filter(Boolean).join(' — ') || 'Hồ sơ ' + new Date().toLocaleString('vi-VN');
   openOverlay('saveRecModal');
   setTimeout(() => $('recName').select(), 80);
@@ -2691,24 +2693,61 @@ function syncNgayPicker() {
 }
 
 /** Kiểm tra phần thông tin bắt buộc (ở đầu bước 1) */
-function validateInfo() {
-  const err = $('alertErr2');
-  const fail = (id, msg) => {
-    err.textContent = '❌ ' + msg;
-    err.className = 'alert alert-e show';
-    toast(msg, 'e');
-    if (state.step !== 1) goStep(1);
-    const el = $(id);
+/** Ô bắt buộc đầu tiên còn bỏ trống → {id, msg}; đủ hết thì trả null.
+ *  Dùng chung cho validateInfo() (bước 1 → 2) và cho nút "Tạo file PDF" / "Lưu hồ sơ" ở bước 2. */
+function missingInfo() {
+  const need = [
+    ['fBks',   'Vui lòng nhập Biển kiểm soát (BKS)'],
+    ['fGara',  'Vui lòng nhập tên Ga-ra / Địa điểm'],
+    ['fGdv',   'Vui lòng nhập tên Giám định viên'],
+    ['fPhong', 'Vui lòng nhập Phòng / Khu vực giám định'],
+  ];
+  for (const [id, msg] of need) if (!$(id).value.trim()) return { id, msg };
+  return null;
+}
+
+/** Quay về màn hình 1 (nhập liệu) và đưa con trỏ tới đúng ô còn thiếu.
+ *  Chờ một nhịp vì goStep(1) có lệnh cuộn lên đầu trang — cuộn ngay sẽ bị nó đè. */
+function backToInfo(id) {
+  const jumped = state.step !== 1;
+  if (jumped) goStep(1);
+  const el = $(id);
+  if (!el) return;
+  setTimeout(() => {
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setTimeout(() => el.focus(), 260);
+  }, jumped ? 160 : 0);
+}
+
+/** Báo thiếu dữ liệu ngay trên thẻ "Xuất PDF" của màn hình 2, kèm nút quay lại màn hình 1 */
+function showMissingOnStep2(miss) {
+  if (state.step !== 2) {        // đang ở màn hình 1: báo ngay tại thẻ "Thông tin giám định"
+    $('alertErr2').textContent = '❌ ' + miss.msg;
+    $('alertErr2').className = 'alert alert-e show';
+    toast(miss.msg, 'e');
+    backToInfo(miss.id);
+    return;
+  }
+  const a = $('alertErr3');
+  a.innerHTML = '❌ ' + esc(miss.msg) +
+    '<button class="btn btn-n btn-sm" style="display:block;margin-top:9px" ' +
+    `onclick="backToInfo('${miss.id}')">← Quay lại màn hình 1 để nhập</button>`;
+  a.className = 'alert alert-e show';
+  toast(miss.msg, 'e');
+}
+
+function validateInfo() {
+  const err = $('alertErr2');
+  const miss = missingInfo();
+  if (miss) {
+    err.textContent = '❌ ' + miss.msg;
+    err.className = 'alert alert-e show';
+    toast(miss.msg, 'e');
+    backToInfo(miss.id);
     return false;
-  };
+  }
   const bks = $('fBks').value.trim(), gara = $('fGara').value.trim();
   const gdv = $('fGdv').value.trim(), phong = $('fPhong').value.trim();
-  if (!bks)   return fail('fBks',   'Vui lòng nhập Biển kiểm soát (BKS)');
-  if (!gara)  return fail('fGara',  'Vui lòng nhập tên Ga-ra / Địa điểm');
-  if (!gdv)   return fail('fGdv',   'Vui lòng nhập tên Giám định viên');
-  if (!phong) return fail('fPhong', 'Vui lòng nhập Phòng / Khu vực giám định');
   err.className = 'alert alert-e';
   Object.assign(state, {
     maHs: $('fMaHs').value.trim(), bks, gaRa: gara, gdv,
@@ -3005,6 +3044,8 @@ function resetGenerate() {
 }
 
 async function startGenerate() {
+  const miss = missingInfo();
+  if (miss) { showMissingOnStep2(miss); return; }   // thiếu dữ liệu → mời quay lại màn hình 1
   $('stateReady').style.display = 'none';
   $('stateProgress').style.display = 'block';
   $('alertErr3').className = 'alert alert-e';
