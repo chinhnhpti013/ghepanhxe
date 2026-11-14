@@ -20,3 +20,8 @@ __pycache__/
 # Windows
 Thumbs.db
 desktop.ini
+
+# Tài liệu nội bộ của Phòng (.docx/.xlsx trong docs/) — repo này PUBLIC nên không đẩy lên.
+# Riêng docs/output.txt là ghi chú kỹ thuật, vẫn theo dõi bình thường.
+docs/*.docx
+docs/*.xlsx

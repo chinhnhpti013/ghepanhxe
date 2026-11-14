@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python dat_ten_file.py)",
+      "Bash(python ghep_anh.py *)",
+      "Bash(start *)",
+      "Bash(Remove-Item output\\*.pdf *)"
+    ]
+  }
+}
