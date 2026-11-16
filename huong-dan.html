@@ -224,6 +224,7 @@ td{color:var(--text-2)}
     <a class="lv2" href="#ho-so">10. Hồ sơ &amp; bản nháp</a>
     <a class="lv2" href="#danh-sach">11. Danh sách GĐV / Phòng</a>
     <a class="lv2" href="#phim-tat">12. Phím tắt</a>
+    <a class="lv2" href="#tao-ban-moi">13. Tạo bản mới &amp; nút Back của trình duyệt</a>
   </div>
   <div class="nav-g">
     <a href="#thiet-ke">B · Thông số bản ảnh</a>
@@ -276,8 +277,11 @@ td{color:var(--text-2)}
     <li><b>Lập bản ảnh</b> — nhập thông tin giám định và nạp, sắp xếp, đặt chú thích cho ảnh.</li>
     <li><b>Xem &amp; Xuất</b> — xem trước từng trang A4 rồi tạo và tải file PDF.</li>
   </ol>
-  <p>Các biểu tượng ở góc <b>trên cùng bên phải</b>: <span class="btn-ex">🗂️</span> hồ sơ đã lưu ·
-     <span class="btn-ex">🌙</span> chế độ sáng/tối · <span class="btn-ex">Help</span> mở lại bản hướng dẫn này.</p>
+  <p>Các biểu tượng ở góc <b>trên cùng bên phải</b>:
+     <span class="btn-ex">🔄 Tạo bản mới</span> làm lại từ đầu (mục <a href="#tao-ban-moi">13</a>) ·
+     <span class="btn-ex">🗂️</span> hồ sơ đã lưu ·
+     <span class="btn-ex">🌙</span> chế độ sáng/tối · <span class="btn-ex">Help</span> mở lại bản hướng dẫn này.
+     Thanh tiêu đề <b>luôn nằm trên màn hình</b> dù bạn cuộn tới đâu, nên 4 nút này bấm được bất cứ lúc nào.</p>
 
   <h4>Đọc giao diện theo màu</h4>
   <p>Giao diện dùng <b>2 màu nền</b> để bạn nhận ra ngay vai trò của từng khối:</p>
@@ -716,7 +720,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
         giấy tờ xe → <code>Anh GD giay to xe …</code>). Dung lượng file hiện ngay dưới
         dòng thông báo. Xem thêm <a href="#xuat-jpg">PDF nén &amp; ảnh JPG</a>.</li>
     <li>Nếu cần: <span class="btn-ex">💾 Lưu hồ sơ</span> ở thẻ <b>Hồ sơ lưu trên máy</b> ngay bên
-        dưới để mở lại sau, hoặc <span class="btn-ex">🔄 Làm bản ảnh mới</span> để bắt đầu hồ sơ khác.</li>
+        dưới để mở lại sau, hoặc <span class="btn-ex">🔄 Tạo bản mới</span> (xem mục
+        <a href="#tao-ban-moi">13</a>) để bắt đầu hồ sơ khác.</li>
   </ol>
   <div class="tip">
     💡 Sửa gì ở bước 1 (thêm ảnh, đổi chú thích, xoay ảnh) thì <b>tạo lại PDF</b> để file mới
@@ -865,7 +870,7 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
         nên lần sau chỉ cần chọn lại.</li>
     <li><b>Riêng ô Phòng / Khu vực được ghi nhớ sẵn:</b> tên bạn dùng lần gần nhất sẽ
         <b>tự điền lại ở những lần mở app sau</b> (kể cả sau khi bấm
-        <span class="btn-ex">↺ Làm bản ảnh mới</span>). Muốn đổi thì chọn tên khác —
+        <span class="btn-ex">🔄 Tạo bản mới</span>). Muốn đổi thì chọn tên khác —
         tên mới trở thành tên được nhớ. Nếu <b>xóa</b> tên đó khỏi danh sách thì app cũng
         thôi ghi nhớ và ô trở lại trống.</li>
     <li>Nút <span class="btn-ex">⚙️</span> bên cạnh mỗi ô (hoặc dòng cuối trong droplist)
@@ -887,6 +892,11 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
         <td>Trong ô <b>GĐV</b> / <b>Phòng</b>: mở danh sách, chạy giữa các dòng và chọn dòng đang sáng</td></tr>
     <tr><td><span class="kbd">Tab</span> / <span class="kbd">Shift</span>+<span class="kbd">Tab</span></td>
         <td>Nhảy sang ô chú thích kế tiếp / trước đó</td></tr>
+    <tr><td><span class="kbd">Backspace</span></td>
+        <td><b>Bị chặn</b> khi con trỏ không ở trong ô nhập — để không vô tình thoát ứng dụng.
+            Trong ô nhập thì vẫn xóa chữ bình thường.</td></tr>
+    <tr><td><span class="kbd">Alt</span>+<span class="kbd">←</span> · nút <b>◀</b> của trình duyệt</td>
+        <td>Không thoát app nữa — xem mục <a href="#tao-ban-moi">13</a></td></tr>
     <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang ở màn hình chụp ảnh</b></td></tr>
     <tr><td><span class="kbd">Space</span> · <span class="kbd">Enter</span></td><td>Chụp một ảnh</td></tr>
     <tr><td><span class="kbd">Esc</span></td><td>Đóng màn hình chụp</td></tr>
@@ -900,6 +910,38 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
   </div>
   <p>Phím tắt không hoạt động khi con trỏ đang ở trong một ô nhập chữ — bấm
      <span class="kbd">Esc</span> để rời ô trước.</p>
+
+  <h3 id="tao-ban-moi">13. Tạo bản mới &amp; nút Back của trình duyệt</h3>
+  <p>Nút <span class="btn-ex">🔄 Tạo bản mới</span> nằm trên <b>thanh tiêu đề xanh ở trên cùng</b>,
+     bên trái nhóm <span class="btn-ex">🗂️</span> <span class="btn-ex">🌙</span>
+     <span class="btn-ex">Help</span>. Thanh tiêu đề không cuộn đi, nên nút này bấm được
+     <b>ở cả màn hình 1 và màn hình 2, ở bất kỳ vị trí cuộn nào</b>.
+     Màn hình hẹp thì nút thu lại còn dấu <span class="btn-ex">🔄</span>.</p>
+  <ul>
+    <li>Bấm nút → app hỏi lại một lần → <b>xóa sạch ảnh và thông tin đang có trên màn hình</b>
+        rồi quay về màn hình 1 để làm hồ sơ khác.</li>
+    <li><b>Hồ sơ đã lưu trong máy vẫn còn nguyên</b> (nút <span class="btn-ex">🗂️</span>),
+        chỉ mất những gì chưa lưu. Muốn giữ lại thì lưu hồ sơ trước khi bấm.</li>
+    <li>Tên <b>Phòng / Khu vực</b> được giữ lại, vì thường làm nhiều hồ sơ cùng một phòng.</li>
+  </ul>
+  <div class="note">
+    <b>Nút ◀ của trình duyệt không còn làm thoát app.</b> Trước đây bấm <b>◀</b>,
+    <span class="kbd">Alt</span>+<span class="kbd">←</span>, <span class="kbd">Backspace</span>
+    hay vuốt-lùi trên điện thoại là rời khỏi trang, mất hết ảnh đang làm. Nay các thao tác đó
+    được dùng để <b>lùi trong app</b>:
+    <ol>
+      <li>Đang mở hộp thoại / màn hình chụp / màn hình ký / xem ảnh lớn → <b>đóng cái đó</b>.</li>
+      <li>Đang ở màn hình 2 → <b>về màn hình 1</b>, ảnh và thông tin vẫn còn.</li>
+      <li>Đã ở màn hình 1 → app chỉ hiện dòng nhắc, <b>không rời trang</b>.</li>
+    </ol>
+    Muốn làm hồ sơ khác thì bấm <span class="btn-ex">🔄 Tạo bản mới</span>;
+    muốn đóng hẳn thì đóng thẻ (tab) của trình duyệt.
+  </div>
+  <div class="tip">
+    Ảnh đang làm còn được <b>bản nháp tự lưu</b> đỡ thêm một lớp (mục
+    <a href="#ho-so">10</a>) — nên nếu máy có tắt bất ngờ, mở lại app vẫn có thanh mời
+    <b>Mở bản nháp</b>.
+  </div>
 </section>
 
 <!-- ════════════════════════════════════════════════════ -->

@@ -100,6 +100,14 @@ body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);backgro
   align-items:center;justify-content:center;transition:var(--t);font-family:inherit}
 .ab-btn:hover{background:rgba(255,255,255,.26)}
 .ab-btn:active{transform:scale(.94)}
+/* Nút "Tạo bản mới" phải ở THANH TIÊU ĐỀ, không phải thanh bước: .appbar và
+   .stepper-wrap đều sticky top:0, appbar z-index 60 > 50, nên vừa cuộn vài chục px
+   là thanh bước trượt xuống dưới appbar — nút ở đó bị che và bấm vào lại trúng 🌙.
+   Tông vàng #F2C86A lấy từ vạch nhấn ở đáy appbar cho nổi trên nền xanh. */
+.ab-btn-new{width:auto;padding:0 12px;gap:6px;font-size:.78rem;font-weight:700;
+  background:rgba(242,200,106,.22);border-color:rgba(242,200,106,.55);color:#FFF3D6}
+.ab-btn-new:hover{background:rgba(242,200,106,.36)}
+.ab-btn-new .sn-ico{font-size:.95rem;line-height:1}
 
 /* ════════ STEPPER ════════ */
 .stepper-wrap{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;
@@ -601,6 +609,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
   font-weight:600;box-shadow:var(--sh-3);animation:tin .22s;max-width:100%;text-align:center}
 .toast.e{background:var(--red);color:#fff}
 .toast.o{background:var(--green);color:#fff}
+.toast.w{background:var(--amber);color:#fff}   /* nhắc nhở — dùng cho thông báo chặn nút Back */
 @keyframes tin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
 /* ════════ ACTION BAR ════════ */
@@ -625,6 +634,7 @@ main > .foot{margin-top:auto}
   .ab-txt p{font-size:.68rem}
   .ab-btn{width:34px;height:34px;font-size:.95rem}
   .ab-btn-h{width:auto;min-width:34px;padding:0 10px;font-size:.78rem}
+  .ab-btn-new{padding:0 10px;font-size:.73rem;gap:5px}
   .stepper{padding:9px 12px;gap:2px}
   .stp{gap:7px;padding:3px}
   .stp-dot{width:26px;height:26px;font-size:.75rem}
@@ -696,6 +706,16 @@ main > .foot{margin-top:auto}
   .thumbs{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
   .lay-row{gap:7px}
   .lay{padding:9px 5px}
+}
+@media(max-width:560px){
+  /* Hết chỗ cho chữ trên thanh tiêu đề — giữ lại dấu 🔄, tooltip vẫn nói rõ nút làm gì */
+  .ab-btn-new .sn-tx{display:none}
+  .ab-btn-new{width:34px;padding:0}
+  /* 4 nút bên phải KHÔNG co được (.ab-acts flex-shrink:0), nên tiêu đề phải chịu co.
+     Không ghim một dòng thì chữ xuống 2–3 dòng và thanh tiêu đề cao gấp đôi,
+     đẩy cả trang xuống. Bỏ luôn huy hiệu phiên bản cho đỡ chiếm chỗ. */
+  .ab-txt h1{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ab-ver{display:none}
 }
 @media(max-width:400px){
   .ab-txt p{display:none}
@@ -815,6 +835,12 @@ main > .foot{margin-top:auto}
       <p>PTI SOS : Tận tâm từng phút - Kịp thời từng giây</p>
     </div>
     <div class="ab-acts">
+      <!-- Làm lại từ đầu. Ở thanh tiêu đề (luôn hiện) nên bấm được từ CẢ màn hình 1 và 2.
+           Đặt trước 🗂️ để 🌙 và Help giữ nguyên vị trí ngoài cùng bên phải. -->
+      <button class="ab-btn ab-btn-new" id="btnNewDoc" onclick="resetApp()"
+              title="Tạo bản ảnh mới — xóa ảnh và thông tin đang có trên màn hình để làm hồ sơ khác. Hồ sơ đã lưu trong máy vẫn còn.">
+        <span class="sn-ico">🔄</span><span class="sn-tx">Tạo bản mới</span>
+      </button>
       <button class="ab-btn" id="btnRecords" onclick="openRecords()" title="Hồ sơ đã lưu">🗂️</button>
       <button class="ab-btn" id="btnTheme" onclick="toggleTheme()" title="Chế độ sáng / tối">🌙</button>
       <button class="ab-btn ab-btn-h" id="btnGuide" onclick="openGuide()"
@@ -1231,7 +1257,7 @@ main > .foot{margin-top:auto}
             </div>
             <div class="foot" id="dlNote" style="padding-top:9px"></div>
             <div class="res-btns" style="margin-top:11px">
-              <button class="btn btn-n btn-sm" style="flex:1" onclick="resetApp()">🔄 Làm bản ảnh mới</button>
+              <button class="btn btn-n btn-sm" style="flex:1" onclick="resetApp()">🔄 Tạo bản ảnh mới</button>
             </div>
           </div>
         </div>
@@ -1462,7 +1488,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-16d';
+const APP_BUILD   = '2026-11-16e';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -4366,7 +4392,7 @@ function zipStore(files) {
 }
 
 function resetApp() {
-  if (!confirm('Làm bản ảnh mới? Ảnh và thông tin hiện tại sẽ bị xóa khỏi màn hình (hồ sơ đã lưu vẫn còn).')) return;
+  if (!confirm('Tạo bản ảnh mới? Ảnh và thông tin hiện tại sẽ bị xóa khỏi màn hình (hồ sơ đã lưu vẫn còn).')) return;
   clearPvCache();
   Object.assign(state, {
     groups: [], capSrc: 'auto', useFileName: false,
@@ -4507,6 +4533,58 @@ document.addEventListener('keydown', e => {
 });
 
 // ════════════════════════════════════════════════════════
+//  CHẶN RỜI TRANG BẰNG BACK / BACKSPACE
+//  Trên Chrome/Edge, nút ◀ của trình duyệt, Alt+←, vuốt-lùi trên cảm ứng và
+//  (ở vài webview cũ) phím Backspace đều thoát hẳn ứng dụng, mất ảnh đang làm.
+//  Cách chặn: ghim một mốc history rồi đẩy lại mốc ấy trong popstate, nên
+//  trang không bao giờ rời đi. Back khi đó được dùng làm "lùi TRONG app":
+//  đóng lớp phủ đang mở → từ bước 2 về bước 1 → báo cho người dùng.
+//  Muốn làm hồ sơ khác thì bấm 🔄 Tạo bản mới trên thanh tiêu đề.
+// ════════════════════════════════════════════════════════
+let _navPinned = false;
+
+/** Đóng lớp phủ TRÊN CÙNG đang mở. Trả về true nếu có cái gì vừa đóng. */
+function closeTopLayer() {
+  if (!$('sigModal').classList.contains('hidden')) { closeSign();   return true; }
+  if (!$('camModal').classList.contains('hidden')) { closeCamera(); return true; }
+  if (!$('viewer').classList.contains('hidden'))   { closeViewer(); return true; }
+  const ovs = document.querySelectorAll('.ov:not(.hidden)');
+  if (ovs.length) { ovs[ovs.length - 1].classList.add('hidden'); return true; }
+  return false;
+}
+
+/** Ghim mốc history. Gọi một lần lúc khởi tạo. */
+function pinNav() {
+  try {
+    history.replaceState({ pti: 'root' }, '');
+    history.pushState({ pti: 'app' }, '');
+    _navPinned = true;
+  } catch (e) { _navPinned = false; }   // trình duyệt chặn History API → bỏ qua
+}
+
+window.addEventListener('popstate', () => {
+  // Đẩy lại mốc NGAY, trước khi làm gì khác, kẻo lần Back sau là rớt khỏi trang
+  if (_navPinned) { try { history.pushState({ pti: 'app' }, ''); } catch (e) {} }
+  if (closeTopLayer()) return;
+  if (state.step > 1) {
+    goStep(1);
+    toast('Đã về màn hình 1 — ảnh và thông tin vẫn còn.');
+    return;
+  }
+  toast('Nút ◀ của trình duyệt đã bị chặn để không thoát ứng dụng. '
+      + 'Muốn làm hồ sơ khác thì bấm 🔄 Tạo bản mới.', 'w');
+});
+
+// Backspace ngoài ô nhập: vài webview vẫn hiểu là "lùi trang".
+// Dùng capture để chạy TRƯỚC mọi handler khác.
+window.addEventListener('keydown', e => {
+  if (e.key !== 'Backspace') return;
+  const t = e.target;
+  if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+  e.preventDefault();
+}, true);
+
+// ════════════════════════════════════════════════════════
 //  KHỞI TẠO
 // ════════════════════════════════════════════════════════
 (function init() {
@@ -4526,6 +4604,7 @@ document.addEventListener('keydown', e => {
   updateActionBar();
   $('pvZoomLbl').textContent = '100%';
   checkDraft();
+  pinNav();
   window.addEventListener('beforeunload', clearPvCache);
 })();
 </script>
