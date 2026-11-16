@@ -23,7 +23,8 @@ anh-giam-dinh-vcx-theo-ten-file/
 ├── renamed/                      ← ảnh đã đổi tên (do dat_ten_file.py tạo)
 │   └── mapping.json              ← tên file → tên thư mục gốc (chú thích)
 ├── output/                       ← PDF kết xuất
-├── assets/logo-ptisos.png
+├── assets/logo-ptisos.png        ← huy hiệu vuông, header BẢN ẢNH
+├── assets/logo-pti-bienban.png   ← logo ngang có dòng chữ, đầu trang BIÊN BẢN
 ├── fonts/BeVietnamPro-{Regular,Bold}.ttf
 ├── dat_ten_file.py               ← Giai đoạn 1 (Python)
 ├── ghep_anh.py                   ← Giai đoạn 2 (Python)
@@ -47,7 +48,7 @@ Không dùng thư viện nào khác.
 hộp thoại `#guideModal` qua iframe `huong-dan.html?theme={sáng|tối}`; `openGuide()` chỉ dựng
 iframe một lần và nạp lại khi đổi sáng/tối. Trang này cũng mở trực tiếp được bằng link hoặc
 in ra giấy (có `@media print`). Hướng dẫn **chỉ nói về web app** (A · Các bước sử dụng ·
-B · Thông số · C · Xử lý sự cố · D · FAQ; mục **9c** là Biên bản giám định & chữ ký tay) — phần luồng Python đã bỏ khỏi hướng dẫn, chỉ còn
+B · Thông số · C · Xử lý sự cố · D · FAQ; mục **9c** là Biên bản giám định & chữ ký tay, mục **7** có dải nút Thay thế/Sửa chữa/Không) — phần luồng Python đã bỏ khỏi hướng dẫn, chỉ còn
 tài liệu ở CLAUDE.md. **Sửa tính năng thì phải sửa `huong-dan.html` kèm theo** —
 bảng tiền tố giấy tờ, bảng lưới ảnh/trang và danh sách phím tắt được nhắc lại ở đó.
 Chấm cam trên nút `Help` hiện khi `localStorage.pti_guide_seen !== APP_BUILD`, nên **tăng `APP_BUILD`
@@ -63,7 +64,9 @@ mỗi lần cập nhật hướng dẫn** để người dùng thấy nhắc.
 **Bước 1 — Lập bản ảnh** (một cột, toàn chiều rộng; thông tin ở trên cùng rồi tới ảnh)
 
 *Thẻ "Thông tin giám định"* xếp gọn theo 5 hàng:
-1. Kiểu bản ảnh (3 lựa chọn: chi tiết thiệt hại · hiện trường/xác minh · giấy tờ xe) — toàn chiều rộng
+1. Kiểu bản ảnh (3 lựa chọn: chi tiết thiệt hại · hiện trường/xác minh · giấy tờ xe) — toàn chiều rộng,
+   kèm công tắc **`#fBbOn` — Lập Biên bản giám định** (`#bbSwitchRow`, nền vàng) chỉ hiện khi
+   `fLoai === 'chitiet'`
 2. Số HSBT / Mã hồ sơ · Biển kiểm soát · Ngày giám định *(3 cột)*
 3. Tên ga-ra / Địa điểm · Giám định viên · **Phòng / Khu vực giám định** *(3 cột)*
 4. **Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất** *(3 cột)* — **không bắt buộc**,
@@ -162,6 +165,9 @@ dùng chung một luật `GIAYTO_RULES`. Đường dẫn ảnh có hậu tố `#
   ＋ **chèn ảnh ngay sau** · 👁 **xem kích thước lớn** · 🗑 **xóa**
 - **Ô nhập chú thích ngay dưới mỗi ảnh** — gõ trực tiếp, `Tab`/`Shift+Tab` sang ô kế tiếp,
   bỏ trống = dùng chú thích mặc định (hiện ở placeholder)
+- **Dải nút phương án `.th-pa`** dưới mỗi ảnh — **Thay thế · Sửa chữa · Không** (`it.pa`,
+  mặc định `'khong'`; `paOf(it)` chuẩn hóa giá trị cũ/thiếu). Ẩn/hiện bằng **class `bb-on` trên
+  `<body>`** chứ không vẽ lại gallery. Đây là **nguồn duy nhất** của bảng hạng mục trong biên bản
 - **Chú thích gộp** cho nhiều ảnh cùng lúc, có xem trước **AutoCorrect**
 - Công tắc **"Lấy tên file làm chú thích"** đổi nguồn chú thích mặc định
 
@@ -202,7 +208,7 @@ người dùng tự gõ. Python: `letters_only()` / `cap_name()` gọi trong `lo
 **AutoCorrect chú thích** (`normalizeCaption`): gộp khoảng trắng thừa, viết hoa chữ đầu và
 chữ đầu sau dấu `. ! ? …`. Chạy khi rời ô nhập và khi áp dụng chú thích gộp.
 
-**Mô hình dữ liệu ảnh**: `state.groups[].items[] = {id, bid, file, path, cap, rot}` — sửa trực tiếp,
+**Mô hình dữ liệu ảnh**: `state.groups[].items[] = {id, bid, file, path, cap, rot, pa}` — sửa trực tiếp,
 **không dựng lại từ danh sách file**, nhờ vậy giữ được thứ tự chèn, ảnh đã thay, góc xoay và chú thích riêng.
 `bid` đổi mỗi lần thay file, dùng làm khóa lưu ảnh của bản nháp.
 
@@ -215,7 +221,7 @@ tập ảnh thay đổi. Mở lại app mà còn bản nháp thì có thanh mờ
 - DB `pti_ghepanh` (v2) với 3 store: `records` (hồ sơ lưu tay) · `draft_meta` + `draft_blobs` (bản nháp tự lưu)
 - Lưu thông tin + ảnh (Blob) ngay trong trình duyệt, **không tải lên internet**
 - Mở lại / tìm kiếm (theo mã hồ sơ, BKS, ga-ra, GĐV) / xóa qua nút 🗂️
-- Hồ sơ lưu kèm `cap` và `rot` của từng ảnh; khi mở lại dùng đường dẫn giả
+- Hồ sơ lưu kèm `cap`, `rot` và `pa` của từng ảnh; khi mở lại dùng đường dẫn giả
   `{chỉ số nhóm}/{tên hạng mục}/{tên file}` để vẫn thêm/bớt ảnh tiếp được
 
 ### Biên bản giám định thiệt hại (`#cardBienBan`, bước 2)
@@ -224,22 +230,38 @@ Lập **file PDF RIÊNG** theo mẫu `BM.PTI.CG.02.08a` (`BB_FORM`), tên
 `Bien ban giam dinh xe {BKS}.pdf` (`BB_PDF_NAME`) — **không nằm trong bản ảnh**.
 Toàn bộ mã nằm ở **khối `<script>` cuối cùng** của `index.html`.
 
+**Chỉ có khi `bbEnabled()`** = `fLoai === 'chitiet'` **và** `state.bbOn`. `applyBbVisible()` là nơi
+duy nhất bật/tắt: ẩn/hiện `#bbSwitchRow` (công tắc ở bước 1), `#cardBienBan` (bước 2) và class
+`bb-on` trên `<body>` (dải nút phương án dưới mỗi ảnh). Gọi từ `onLoaiChange()` và `setBbOn()`.
+
 **Xem trước = file thật.** `bbRenderPreview()` dựng PDF bằng `bbBuild()` rồi vẽ lại bằng **pdf.js**
 (`loadPdfjs()`, cùng thư viện với `downloadJPG()`), nên bản xem trước **chính là** file sẽ tải về.
 Lần đầu phải bấm nút (cần mạng để tải pdf.js); sau đó `_bbAuto = true` và mọi thay đổi **tự dựng
 lại sau 900ms** qua `bbTouch()`. `_bbSeq` chặn lượt dựng cũ ghi đè lượt mới.
 
-**Bảy mục của thẻ**: ① thông tin bổ sung (`BB_FIELDS`) · ② bảng hạng mục · ③ ý kiến các bên ·
-④ xem trước PDF · ⑤ xác thực + ô tích đồng ý · ⑥ hai ô chữ ký · ⑦ dấu vết kiểm chứng.
+**Năm mục của thẻ**: ① bảng hạng mục (dẫn xuất) · ② ý kiến các bên · ③ xem trước PDF ·
+④ xác thực + ô tích đồng ý · ⑤ hai ô chữ ký.
 
 **Dữ liệu** nằm trong object `bb` (không phải `state`), lưu kèm hồ sơ/bản nháp qua
 `currentInfo().bb = bbSnapshot()` và phục hồi bằng `bbRestore(i.bb)` trong `loadRecord()` /
 `restoreDraft()`; `resetApp()` gọi `bbReset()`. Hồ sơ cũ không có khóa `bb` → `bbRestore(undefined)`
-trả về trạng thái trống.
+trả về trạng thái trống; khóa thừa của bản cũ (`gdvTel`, `gps`, `contentHash`…) bị bỏ qua.
 
 **Ô bỏ trống thì in dòng chấm** để điền tay (`dotted()`), nên biên bản trắng vẫn in ra ký giấy được.
-Bảng hạng mục **luôn in tối thiểu `BB_MIN_ROWS` = 10 dòng**; nút *Lấy từ hạng mục ảnh*
-(`bbFromGroups()`) điền sẵn tên hạng mục ảnh qua `capName()`, bỏ nhóm tiền tố `0.`.
+Bảng hạng mục **luôn in tối thiểu `BB_MIN_ROWS` = 10 dòng**.
+
+#### Bảng hạng mục — DẪN XUẤT từ ảnh, không nhập tay
+`bbRowsFromImages()` duyệt `state.groups[].items[]` **theo đúng thứ tự ảnh**; ảnh có
+`paOf(it) ∈ {sua, thay}` thành một dòng, ảnh `khong` bị bỏ. Tên dòng = **tên hạng mục** qua
+`capName()` (nhóm `UNGROUPED` thì lấy `capOf(it, g)`), nên nhiều ảnh cùng hạng mục + cùng phương án
+gộp thành một dòng (khóa `tên|phương án`).
+
+`bbSyncRows()` dựng lại `bb.rows` nhưng **giữ cột `hv`** (Hiện vật thu hồi) theo cùng khóa — đó là
+thứ duy nhất người dùng còn chỉnh được trong bảng. Gọi từ: `setItemPa()`, `bbReloadRows()`,
+`setBbOn(true)`, `goStep(2)`, `bbRestore()` và **đầu `bbBuild()`** (bảng luôn khớp ảnh lúc xuất file).
+
+> `capName()` **bỏ hết chữ số**, nên hai hạng mục chỉ khác nhau ở con số
+> (`Hạng mục 1` / `Hạng mục 2`) sẽ gộp thành một dòng. Đúng như chú thích ảnh — không phải lỗi.
 
 #### Màn hình ký tay (`#sigModal`)
 HTML5 Canvas + **Pointer Events** (chạy chung cho chuột, cảm ứng và bút) — không dùng thư viện ngoài.
@@ -251,40 +273,39 @@ HTML5 Canvas + **Pointer Events** (chạy chung cho chuột, cảm ứng và bú
 - Nút *Xong* chỉ bật khi `_sigDirty`; `openSign('cus')` **chặn** khi chưa tích `#bbAgree`.
 - Nhánh phím tắt của `#sigModal` nằm **đầu** handler `keydown` (trước nhánh `#camModal`), nếu không
   `←` `→` sẽ nhảy bước trong lúc đang ký.
-- Ký xong gọi `bbGetGps(true)` (im lặng) để lấy toạ độ cho dấu vết.
 
-#### Dấu vết kiểm chứng & mã băm
-Khối `DẤU VẾT KIỂM CHỨNG ĐIỆN TỬ` **chỉ in khi `bb.agree || bb.sigCus || bb.sigGdv`** — nhờ vậy biên
-bản trắng 10 dòng vẫn **gọn trong một trang**. Gồm: mã hồ sơ · thời điểm tích đồng ý · thời điểm ký
-từng bên · toạ độ GPS · thiết bị (`bbDevice()`) · mã băm.
+#### Đã BỎ khỏi biên bản (đừng dựng lại)
+| Thứ đã bỏ | Ghi chú |
+|---|---|
+| Khối `DẤU VẾT KIỂM CHỨNG ĐIỆN TỬ` | kèm theo: GPS (`bbGetGps`), `bb.device`, `bb.contentHash`, `bbPayload()` |
+| Mục ① *Thông tin bổ sung* | `bbGdvTel` `bbLxTel` `bbGplx` `bbGaraAddr` `bbGaraTel` `bbPhuLuc` — giờ in dòng chấm |
+| `SĐT` ở dòng `1/ …` và `2/ …` | hai dòng này chỉ còn tên + phòng / BKS |
+| Nhập tay bảng hạng mục | `bbFromGroups` `bbAddRow` `bbDelRow` `bbClearRows` → thay bằng `bbSyncRows` |
 
-Hai mã băm khác nhau, đừng lẫn:
-| Mã | Tính từ | Hiện ở đâu |
-|---|---|---|
-| `bb.contentHash` | SHA-256 của `bbPayload()` — chuỗi JSON của mọi trường + 2 chữ ký | **In trên biên bản** |
-| `bb.fileHash` | SHA-256 của chính bytes file PDF | Khối dấu vết trên màn hình + dòng dưới nút tải |
-
-`bbPayload()` **đọc thẳng từ các ô nhập, không qua `currentInfo()`** — nếu không, mã băm sẽ tự chứa
-chính nó và đổi sau mỗi lần dựng. `pdfDoc.setCreationDate()/setModificationDate()` được ghim theo
-thời điểm ký (không có thì `2020-01-01`) để **cùng nội dung luôn cho cùng `fileHash`**.
-`crypto.subtle` cần ngữ cảnh bảo mật → mở bằng `http` LAN thì `sha256Hex()` trả rỗng và biên bản
-ghi "không khả dụng"; mọi thứ còn lại vẫn chạy.
+`bb.fileHash` (SHA-256 của chính bytes file) **vẫn giữ** — hiện ở dòng nhỏ dưới nút tải, **không in
+lên biên bản**. `pdfDoc.setCreationDate()/setModificationDate()` ghim theo thời điểm ký (không có thì
+`2020-01-01`) để **cùng nội dung luôn cho cùng `fileHash`**. `crypto.subtle` cần ngữ cảnh bảo mật →
+mở bằng `http` LAN thì `sha256Hex()` trả rỗng, mọi thứ còn lại vẫn chạy.
 
 #### Bố cục PDF biên bản (`BBC`)
 Lề `48/48/30/30`, cỡ chữ `FS 10.5`, giãn dòng `LH 14`, 6 cột bảng `[34,205,65,65,65,65] = 499pt`.
+Đầu trang dùng **logo ngang** `assets/logo-pti-bienban.png` (`A.logoBb`, 72 × 39pt, chữ bắt đầu ở
+`ML + 84`) — **khác** huy hiệu vuông `logo-ptisos.png` của bản ảnh; `bbBuild()` tự lùi về huy hiệu
+vuông nếu thiếu file.
 `bbBuild()` tự **chảy nội dung qua nhiều trang** bằng `need(h)` → `newPage()`; bảng tràn trang thì
 `drawHead()` vẽ lại đầu bảng. Chân trang (`Quy trình giám định … – BM.PTI.CG.02.08a` + `Trang n/m`)
 vẽ **sau cùng** cho mọi trang vì lúc đó mới biết tổng số trang.
 
 **Bẫy đã sửa, đừng lặp lại:**
-1. `cols2()` phải **tự co cỡ chữ** (tới 7.2pt) trước khi cắt bớt, kẻo SĐT và số GPLX ở cuối dòng
-   `1/ …` và `2/ …` bị mất đuôi.
+1. `cols2()` phải **tự co cỡ chữ** (tới 7.2pt) trước khi cắt bớt, kẻo đuôi dòng `1/ …` và `2/ …`
+   bị mất chữ.
 2. Tên ga-ra người dùng gõ thường đã có sẵn chữ "Gara" → mục 4 kiểm tra `/^gara\b/i` để không in
    thành `Gara Gara Toyota…`.
-3. Cột nhãn của khối dấu vết (`lw`) phải rộng hơn nhãn dài nhất, nếu không nhãn đè lên giá trị.
 
-`embedAssets(pdfDoc)` nạp font Be Vietnam Pro + logo, **dùng chung** cho `generatePDF()` (bản ảnh)
-và `bbBuild()` (biên bản).
+`embedAssets(pdfDoc, want)` nạp font Be Vietnam Pro + **đúng một** logo, dùng chung cho
+`generatePDF()` (`want` bỏ trống → huy hiệu vuông) và `bbBuild()` (`'bb'` → logo ngang).
+**Đừng nhúng cả hai** — logo vuông là PNG 614×614 nên mỗi biên bản sẽ cõng thêm ~130KB chết
+(biên bản 10 dòng: 110KB thay vì 233KB).
 
 ### Hệ màu giao diện — xanh nhạt + vàng nhạt
 

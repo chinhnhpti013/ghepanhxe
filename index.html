@@ -267,6 +267,19 @@ input[type=file]{display:none}
 .th-acts button.act-g:hover{background:var(--green-soft);color:var(--green);border-color:var(--green)}
 .th-acts button.act-r{color:var(--red);border-color:var(--red)}
 .th-acts button.act-r:hover{background:var(--red-soft);color:var(--red);border-color:var(--red)}
+/* Phương án giải quyết của từng ảnh — chuyển thẳng sang bảng hạng mục của Biên bản.
+   Chỉ hiện khi đang lập biên bản (body.bb-on) nên đổi công tắc không phải vẽ lại gallery. */
+.th-pa{display:none;gap:4px;padding:0 7px 7px;background:var(--sky-2)}
+body.bb-on .th-pa{display:flex}
+.th-pa button{flex:1;min-width:0;height:27px;border-radius:var(--r-xs);border:1px solid var(--border-s);
+  background:var(--surface);color:var(--text-3);font-size:.68rem;font-weight:700;cursor:pointer;
+  font-family:inherit;display:flex;align-items:center;justify-content:center;transition:var(--t);
+  line-height:1;padding:0 2px;white-space:nowrap}
+.th-pa button:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
+.th-pa button.on[data-pa="thay"]{background:var(--red);border-color:var(--red);color:#fff}
+.th-pa button.on[data-pa="sua"]{background:var(--green);border-color:var(--green);color:#fff}
+.th-pa button.on[data-pa="khong"]{background:var(--text-3);border-color:var(--text-3);color:#fff}
+:root[data-theme="dark"] .th-pa button.on{color:#07121F}
 .th-ta{width:100%;border:none;border-top:1px solid var(--border);background:var(--surface);
   color:var(--text);font-family:inherit;font-size:.78rem;line-height:1.4;padding:7px 9px;
   resize:vertical;min-height:52px;max-height:160px;transition:var(--t)}
@@ -664,16 +677,14 @@ main > .foot{margin-top:auto}
   border-radius:50%;background:var(--brand);color:#fff;font-size:.71rem;flex:0 0 auto}
 :root[data-theme="dark"] .bb-h .n{color:#07121F}
 .bb-h .sp{flex:1}
-.bb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
-@media(max-width:780px){.bb-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.bb-grid{grid-template-columns:1fr}}
 .bb-wrap{overflow-x:auto;border:1px solid var(--sky-b);border-radius:var(--r-sm);background:var(--surface)}
 .bb-tb{width:100%;min-width:560px;border-collapse:collapse;font-size:.8rem}
 .bb-tb th,.bb-tb td{border:1px solid var(--sky-b);padding:5px 6px;text-align:center;vertical-align:middle}
 .bb-tb th{background:var(--sky);color:var(--text-2);font-size:.71rem;font-weight:700;line-height:1.3}
-.bb-tb td.tx{text-align:left}
+.bb-tb td.tx{text-align:left;font-weight:600}
 .bb-tb td.no{width:36px;color:var(--text-3);font-size:.76rem}
-.bb-tb td.ac{width:38px}
+.bb-tb td.mk{width:62px;font-weight:800;color:var(--brand);font-size:.95rem}
+.bb-nores{padding:16px 12px !important;color:var(--text-3);font-size:.78rem;line-height:1.55}
 .bb-tb input,.bb-tb select{width:100%;border:1.5px solid var(--border-s);border-radius:var(--r-xs);
   padding:6px 7px;font-size:.82rem;font-family:inherit;background:var(--surface);color:var(--text)}
 .bb-tb input:focus,.bb-tb select:focus{outline:none;border-color:var(--brand);box-shadow:var(--ring)}
@@ -695,14 +706,6 @@ main > .foot{margin-top:auto}
   background:#fff;border:1px solid var(--border);border-radius:var(--r-xs)}
 .sig-box .sig-t{font-size:.71rem;color:var(--text-3);margin-top:7px;line-height:1.5;word-break:break-word}
 .sig-acts{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
-.bb-audit{background:var(--sand);border:1px solid var(--sand-b);border-radius:var(--r-sm);padding:12px 14px}
-.bb-audit .ar{display:flex;gap:10px;font-size:.76rem;padding:3.5px 0;color:var(--sand-tx)}
-.bb-audit .ar .l{flex:0 0 152px;color:var(--text-3)}
-.bb-audit .ar .v{font-weight:700;word-break:break-word;flex:1}
-.bb-audit .ar .v.hash{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.69rem;
-  font-weight:400;letter-spacing:.01em;word-break:break-all}
-@media(max-width:560px){.bb-audit .ar{flex-direction:column;gap:1px}.bb-audit .ar .l{flex:none}}
-
 /* ════════ MÀN HÌNH KÝ TAY ════════
    Dùng MÀU CỐ ĐỊNH TỐI (không theo token sáng/tối) như khối .cam — nền tối làm
    nổi khung ký trắng, nên đổi hệ màu giao diện KHÔNG phải sửa khối này. */
@@ -789,6 +792,19 @@ main > .foot{margin-top:auto}
               <option value="hientruong">Ảnh giám định hiện trường/Xác minh hiện trường</option>
               <option value="giayto">Ảnh và file Giấy tờ xe (jpg, pdf...)</option>
             </select>
+          </div>
+
+          <!-- Biên bản giám định CHỈ có ở kiểu "chi tiết thiệt hại", và chỉ khi người dùng tích -->
+          <div class="tipbox" id="bbSwitchRow" style="margin-bottom:13px;display:none">
+            <label class="sw" title="Lập thêm Biên bản giám định thiệt hại (file PDF riêng) ở màn hình 2">
+              <input type="checkbox" id="fBbOn" onchange="setBbOn(this.checked)"/>
+              <span class="sw-t"></span>
+              <span><strong>Lập Biên bản giám định</strong> theo mẫu BM.PTI.CG.02.08a</span>
+            </label>
+            <span class="hint" style="display:block;margin-top:6px">
+              Tích ô này thì màn hình 2 mới có thẻ Biên bản giám định, và mỗi ảnh ở phần
+              <b>Quản lý ảnh &amp; chú thích</b> mới có nút chọn <b>Thay thế / Sửa chữa / Không</b>.
+            </span>
           </div>
 
           <div class="fgrid3">
@@ -1029,51 +1045,20 @@ main > .foot{margin-top:auto}
       </div>
 
       <!-- ════════ BIÊN BẢN GIÁM ĐỊNH THIỆT HẠI (BM.PTI.CG.02.08a) ════════ -->
-      <div class="card" id="cardBienBan">
+      <div class="card" id="cardBienBan" style="display:none">
         <div class="card-hd"><span class="ico">📄</span>Biên bản giám định thiệt hại<span class="sp"></span>
           <span class="chip chip-n" id="bbChip">chưa dựng</span></div>
         <div class="card-bd tight">
           <div class="alert alert-i show">
             ℹ️ Biên bản theo mẫu <strong>BM.PTI.CG.02.08a</strong>, lập từ thông tin đã nhập ở màn hình 1.
             Đây là <strong>file PDF riêng</strong>, không nằm trong bản ảnh giám định.
-            Các ô bên dưới bỏ trống thì biên bản in <strong>dòng chấm để điền tay</strong>.
+            Các ô bỏ trống thì biên bản in <strong>dòng chấm để điền tay</strong>.
           </div>
 
-          <div class="bb-h"><span class="n">1</span>Thông tin bổ sung cho biên bản</div>
-          <div class="bb-grid">
-            <div class="fg">
-              <label>SĐT Giám định viên</label>
-              <input type="text" id="bbGdvTel" placeholder="09xx xxx xxx"/>
-            </div>
-            <div class="fg">
-              <label>SĐT Lái/chủ xe</label>
-              <input type="text" id="bbLxTel" placeholder="09xx xxx xxx"/>
-            </div>
-            <div class="fg">
-              <label>Số GPLX lái xe</label>
-              <input type="text" id="bbGplx" placeholder="140123456789"/>
-            </div>
-            <div class="fg">
-              <label>Địa chỉ đơn vị sửa chữa</label>
-              <input type="text" id="bbGaraAddr" placeholder="Số 1, đường X, TP Hạ Long"/>
-            </div>
-            <div class="fg">
-              <label>SĐT liên hệ ga-ra</label>
-              <input type="text" id="bbGaraTel" placeholder="02xx xxx xxx"/>
-            </div>
-            <div class="fg">
-              <label>Số phụ lục đính kèm</label>
-              <input type="text" id="bbPhuLuc" placeholder="02"/>
-              <span class="hint">Số bản ảnh / phụ lục kèm theo biên bản</span>
-            </div>
-          </div>
-
-          <div class="bb-h"><span class="n">2</span>Hạng mục giám định
+          <div class="bb-h"><span class="n">1</span>Hạng mục giám định
             <span class="sp"></span>
-            <button class="btn btn-o btn-sm" onclick="bbFromGroups()"
-                    title="Lấy tên các hạng mục ảnh đang có làm chi tiết thiệt hại">📋 Lấy từ hạng mục ảnh</button>
-            <button class="btn btn-n btn-sm" onclick="bbAddRow()">➕ Thêm dòng</button>
-            <button class="btn btn-r btn-sm" onclick="bbClearRows()">🗑️ Xóa hết</button>
+            <button class="btn btn-o btn-sm" onclick="bbReloadRows()"
+                    title="Lấy lại danh sách hạng mục từ các nút Thay thế / Sửa chữa ở màn hình 1">🔄 Lấy lại từ ảnh</button>
           </div>
           <div class="bb-wrap">
             <table class="bb-tb">
@@ -1083,24 +1068,26 @@ main > .foot{margin-top:auto}
                   <th rowspan="2">Chi tiết thiệt hại</th>
                   <th colspan="2">Phương án giải quyết</th>
                   <th colspan="2">Hiện vật thu hồi</th>
-                  <th rowspan="2"></th>
                 </tr>
-                <tr><th>Sửa chữa</th><th>Thay thế</th><th>Có</th><th>Không</th></tr>
+                <tr><th>Sửa chữa</th><th>Thay thế</th><th colspan="2">Có / Không</th></tr>
               </thead>
               <tbody id="bbRows"></tbody>
             </table>
           </div>
           <div class="fg tipbox" style="margin-top:10px">
-            <span class="hint">💡 Biên bản luôn in <b>tối thiểu 10 dòng</b> — các dòng trống để điền tay tại hiện trường.</span>
+            <span class="hint">💡 Bảng này <b>lấy tự động</b> từ phần <b>Quản lý ảnh &amp; chú thích</b> ở màn hình 1 —
+              mỗi ảnh tích <b>Thay thế</b> hoặc <b>Sửa chữa</b> thành một dòng, theo đúng thứ tự ảnh;
+              ảnh tích <b>Không</b> không vào biên bản. Hạng mục trùng tên và trùng phương án chỉ in một dòng.
+              Biên bản luôn in <b>tối thiểu 10 dòng</b> — các dòng trống để điền tay tại hiện trường.</span>
           </div>
 
-          <div class="bb-h"><span class="n">3</span>Ý kiến của các bên tham gia giám định</div>
+          <div class="bb-h"><span class="n">2</span>Ý kiến của các bên tham gia giám định</div>
           <div class="fg">
             <textarea id="bbYKien" rows="3"
                       placeholder="Bỏ trống để biên bản in dòng chấm điền tay."></textarea>
           </div>
 
-          <div class="bb-h"><span class="n">4</span>Xem trước biên bản (PDF)
+          <div class="bb-h"><span class="n">3</span>Xem trước biên bản (PDF)
             <span class="sp"></span>
             <button class="btn btn-o btn-sm" id="bbBuild" onclick="bbRenderPreview()">🔄 Dựng lại</button>
           </div>
@@ -1112,7 +1099,7 @@ main > .foot{margin-top:auto}
             </div>
           </div>
 
-          <div class="bb-h"><span class="n">5</span>Xác thực thông tin trước khi ký</div>
+          <div class="bb-h"><span class="n">4</span>Xác thực thông tin trước khi ký</div>
           <div class="sum"><div id="bbRecap"></div></div>
           <label class="sw" style="margin-top:12px">
             <input type="checkbox" id="bbAgree" onchange="bbSetAgree(this.checked)"/>
@@ -1120,10 +1107,10 @@ main > .foot{margin-top:auto}
             <span><strong>Tôi đã đọc và đồng ý nội dung biên bản</strong></span>
           </label>
           <div class="foot" style="padding-top:7px;text-align:left">
-            Khách hàng cần tích ô này trước khi ký. Thời điểm tích được ghi vào dấu vết kiểm chứng.
+            Khách hàng cần tích ô này thì nút <b>Ký</b> bên dưới mới bật.
           </div>
 
-          <div class="bb-h"><span class="n">6</span>Chữ ký</div>
+          <div class="bb-h"><span class="n">5</span>Chữ ký</div>
           <div class="bb-sigs">
             <div class="sig-box" id="bbSigCusBox">
               <h5>LÁI XE / CHỦ XE</h5>
@@ -1144,12 +1131,6 @@ main > .foot{margin-top:auto}
               <div class="sig-t" id="bbSigGdvTime"></div>
             </div>
           </div>
-
-          <div class="bb-h"><span class="n">7</span>Dấu vết kiểm chứng
-            <span class="sp"></span>
-            <button class="btn btn-n btn-sm" onclick="bbGetGps()" title="Lấy tọa độ GPS của thiết bị">📍 Lấy vị trí GPS</button>
-          </div>
-          <div class="bb-audit"><div id="bbAudit"></div></div>
 
           <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:15px">
             <button class="btn btn-g btn-lg" style="flex:1;min-width:200px" id="bbDl"
@@ -1429,7 +1410,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-16a';
+const APP_BUILD   = '2026-11-16b';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -1588,6 +1569,7 @@ const state = {
   useFileName: false,  // = (capSrc === 'file') — giữ cho hồ sơ/bản nháp bản cũ
   maHs:'', bks:'', gaRa:'', gdv:'', ngay:'',
   layout:'doc', perPage:6, loai:'chitiet',
+  bbOn:false,          // có lập Biên bản giám định không (chỉ kiểu 'chitiet')
   pdfBytes:null, pdfName:'', smallBytes:null,
   pvZoom:1, recId:null,
 };
@@ -1933,7 +1915,7 @@ function currentInfo() {
     capSrc:state.capSrc, useFileName:state.useFileName,
     // Thông tin vụ tổn thất (không bắt buộc) + toàn bộ dữ liệu Biên bản giám định
     laiXe:$('fLaiXe').value.trim(), ngayTt:$('fNgayTt').value.trim(), ddTt:$('fDdTt').value.trim(),
-    bb: bbSnapshot(),
+    bbOn: state.bbOn, bb: bbSnapshot(),
   };
 }
 
@@ -1960,7 +1942,7 @@ async function doSaveRecord() {
       groups: state.groups.map(g => ({
         name: g.name, src: g.src,
         items: g.items.map(it => ({
-          fname: it.file.name, cap: it.cap, rot: it.rot,
+          fname: it.file.name, cap: it.cap, rot: it.rot, pa: paOf(it),
           blob: withImgs ? it.file : null,
         })),
       })),
@@ -2040,6 +2022,7 @@ async function loadRecord(id) {
         const item = mkItem(withPath(f, `${gi}/${g.src || g.name}/${it.fname}`));
         item.cap = it.cap || '';
         item.rot = it.rot || 0;
+        item.pa  = it.pa  || 'khong';
         return item;
       }),
     })).filter(g => g.items.length);
@@ -2051,6 +2034,7 @@ async function loadRecord(id) {
     $('fGara').value = i.gaRa || ''; $('fGdv').value = i.gdv || '';
     $('fPhong').value = i.phong || getLastPhong();
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
+    state.bbOn = !!i.bbOn;
     $('fLaiXe').value = i.laiXe || ''; $('fDdTt').value = i.ddTt || '';
     $('fNgayTt').value = i.ngayTt || '';
     syncNgayPicker(); syncNgayTtPicker(); bbRestore(i.bb);
@@ -2133,7 +2117,7 @@ async function doDraftSave() {
       groups: state.groups.map(g => ({
         src: g.src, name: g.name, open: g.open,
         items: g.items.map(it => ({ bid: it.bid, fname: it.file.name, type: it.file.type,
-                                    path: it.path, cap: it.cap, rot: it.rot })),
+                                    path: it.path, cap: it.cap, rot: it.rot, pa: paOf(it) })),
       })),
     };
     await dbTx(DRAFT_META, 'readwrite', st => st.put(meta));
@@ -2188,6 +2172,7 @@ async function restoreDraft() {
         item.bid = it.bid;            // giữ nguyên bid để khỏi ghi lại blob
         item.cap = it.cap || '';
         item.rot = it.rot || 0;
+        item.pa  = it.pa  || 'khong';
         _savedBids.add(it.bid);
         return item;
       }),
@@ -2199,6 +2184,7 @@ async function restoreDraft() {
     $('fGara').value = i.gaRa || ''; $('fGdv').value = i.gdv || '';
     $('fPhong').value = i.phong || getLastPhong();
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
+    state.bbOn = !!i.bbOn;
     $('fLaiXe').value = i.laiXe || ''; $('fDdTt').value = i.ddTt || '';
     $('fNgayTt').value = i.ngayTt || '';
     syncNgayPicker(); syncNgayTtPicker(); bbRestore(i.bb);
@@ -2248,7 +2234,10 @@ function goStep(n) {
   });
   $('stpLine1').className = 'stp-line' + (n > 1 ? ' done' : '');
 
-  if (n === 2) { resetGenerate(); renderPreview(); bbRecap(); bbRenderSigs(); bbRenderAudit(); bbSyncChip(); }
+  if (n === 2) {
+    resetGenerate(); renderPreview();
+    bbSyncRows(); bbRenderRows(); bbRecap(); bbRenderSigs(); bbSyncChip();
+  }
   updateSummaries(); updateActionBar();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -2278,7 +2267,7 @@ const pathOf = f => f.webkitRelativePath || f.name;
 let _pathSeq = 0;
 
 function mkItem(file, path) {
-  return { id: uid(), bid: uid(), file, path: path || pathOf(file), cap: '', rot: 0 };
+  return { id: uid(), bid: uid(), file, path: path || pathOf(file), cap: '', rot: 0, pa: 'khong' };
 }
 /** Gán lại file cho ảnh (thay ảnh) — giữ nguyên vị trí, chú thích và góc xoay */
 function setItemFile(it, file) { it.file = file; it.bid = uid(); }
@@ -2429,6 +2418,11 @@ function renderGroups() {
                 <button data-act="insert" title="Chèn ảnh mới ngay sau ảnh này">＋</button>
                 <button class="act-g" data-act="view" title="Xem ảnh kích thước lớn">👁</button>
                 <button class="act-r" data-act="del" title="Xóa ảnh">🗑</button>
+              </div>
+              <div class="th-pa" title="Phương án giải quyết — đưa thẳng sang bảng hạng mục của Biên bản giám định">
+                <button data-pa="thay"  class="${paOf(it) === 'thay'  ? 'on' : ''}">Thay thế</button>
+                <button data-pa="sua"   class="${paOf(it) === 'sua'   ? 'on' : ''}">Sửa chữa</button>
+                <button data-pa="khong" class="${paOf(it) === 'khong' ? 'on' : ''}">Không</button>
               </div>
               <textarea class="th-ta ${it.cap.trim() ? 'has-val' : ''}" data-ta="${it.id}" rows="2"
                 placeholder="${esc(def)}" title="Để trống = dùng chú thích mặc định: ${esc(def)}&#10;Tab / Shift+Tab để sang ô kế tiếp">${esc(it.cap)}</textarea>
@@ -2581,8 +2575,47 @@ function selRangeTo(id) {
   if (a > -1 && b > -1) flat.slice(Math.min(a, b), Math.max(a, b) + 1).forEach(x => state.sel.add(x));
 }
 
+// ──────── Phương án giải quyết của từng ảnh (cho Biên bản giám định) ────────
+/** '' / undefined của hồ sơ cũ đều hiểu là "Không" */
+const paOf = it => (it.pa === 'thay' || it.pa === 'sua') ? it.pa : 'khong';
+const bbEnabled = () => $('fLoai').value === 'chitiet' && !!state.bbOn;
+
+function setItemPa(id, pa) {
+  const r = findItem(id);
+  if (!r) return;
+  r.it.pa = pa;
+  const cur = paOf(r.it);
+  document.querySelectorAll(`.th[data-id="${id}"] .th-pa button`)
+    .forEach(b => b.classList.toggle('on', b.dataset.pa === cur));
+  bbSyncRows(); bbRenderRows(); bbTouch();
+}
+
+/** Bật / tắt việc lập Biên bản giám định */
+function setBbOn(on) {
+  state.bbOn = !!on;
+  applyBbVisible();
+  if (state.bbOn) { bbSyncRows(); bbRenderRows(); }
+  updateSummaries(); scheduleDraftSave(false);
+}
+/** Ẩn/hiện công tắc, thẻ biên bản ở bước 2 và dải nút phương án dưới mỗi ảnh */
+function applyBbVisible() {
+  const isCt = $('fLoai').value === 'chitiet';
+  const on = bbEnabled();
+  if ($('fBbOn')) $('fBbOn').checked = !!state.bbOn;
+  $('bbSwitchRow').style.display = isCt ? '' : 'none';
+  $('cardBienBan').style.display = on ? '' : 'none';
+  document.body.classList.toggle('bb-on', on);
+}
+
 // ──────── Sự kiện trên thẻ ảnh ────────
 $('groupList').addEventListener('click', e => {
+  // Nút phương án Thay thế / Sửa chữa / Không của từng ảnh
+  const paBtn = e.target.closest('[data-pa]');
+  if (paBtn) {
+    e.stopPropagation();
+    setItemPa(paBtn.closest('.th').dataset.id, paBtn.dataset.pa);
+    return;
+  }
   const actBtn = e.target.closest('[data-act]');
   if (actBtn) {
     e.stopPropagation();
@@ -3399,6 +3432,7 @@ function onLoaiChange() {
   $('layoutSection').style.display = '';
   $('layoutHint').style.display    = isGiayto ? 'block' : 'none';
   $('giaytoNote').style.display    = isGiayto ? 'block' : 'none';
+  applyBbVisible();   // biên bản chỉ có ở kiểu "chi tiết thiệt hại"
   updateLoaiPreview(); renderCntRow(); updateMiniLayouts(); updateSummaries();
 }
 function updateLoaiPreview() {
@@ -3763,6 +3797,8 @@ function updateSummaries() {
       : '') +
     layRow +
     row('Chú thích', CAPSRC_LBL[state.capSrc]) +
+    (loai === 'chitiet'
+      ? row('Biên bản giám định', state.bbOn ? 'Có lập (file PDF riêng)' : 'Không lập') : '') +
     extra +
     `<div class="sum-r big"><span class="l">Kết quả</span><span class="v">${nImg} ảnh · ${pages.length} trang</span></div>`;
 
@@ -3895,8 +3931,11 @@ const LGRAY = () => PDFLib.rgb(189/255, 189/255, 189/255);
 
 /** Nạp font tiếng Việt + logo PTI SOS vào một tài liệu PDF.
  *  Dùng chung cho bản ảnh giám định và Biên bản giám định — font phải nạp qua fetch
- *  nên trang PHẢI mở bằng địa chỉ web, không mở bằng file://  */
-async function embedAssets(pdfDoc) {
+ *  nên trang PHẢI mở bằng địa chỉ web, không mở bằng file://
+ *  `want`: 'anh' (mặc định) = huy hiệu vuông cho header bản ảnh ·
+ *          'bb'             = logo ngang cho đầu trang biên bản.
+ *  Chỉ nhúng ĐÚNG MỘT logo — nhúng cả hai sẽ cõng thêm ~130KB chết vào mỗi file. */
+async function embedAssets(pdfDoc, want) {
   let reg, bold;
   try {
     const [rb, bbf] = await Promise.all([
@@ -3907,12 +3946,22 @@ async function embedAssets(pdfDoc) {
   } catch (e) {
     throw new Error('Không nạp được font tiếng Việt. Hãy mở app qua địa chỉ web (GitHub Pages / Render) thay vì mở file trực tiếp.');
   }
-  let logo = null;
-  try {
-    const lb = await fetch('assets/logo-ptisos.png').then(r => { if (!r.ok) throw new Error(''); return r.arrayBuffer(); });
-    logo = await pdfDoc.embedPng(lb);
-  } catch (e) { logo = null; }
-  return { reg, bold, logo };
+  // logo   = huy hiệu vuông, dùng cho header bản ảnh (ô 17mm × 17mm)
+  // logoBb  = logo ngang có dòng chữ, dùng cho đầu trang Biên bản giám định
+  const png = async p => {
+    try {
+      const b = await fetch(p).then(r => { if (!r.ok) throw new Error(''); return r.arrayBuffer(); });
+      return await pdfDoc.embedPng(b);
+    } catch (e) { return null; }
+  };
+  let logo = null, logoBb = null;
+  if (want === 'bb') {
+    logoBb = await png('assets/logo-pti-bienban.png');
+    if (!logoBb) logo = await png('assets/logo-ptisos.png');   // thiếu file → lùi về huy hiệu vuông
+  } else {
+    logo = await png('assets/logo-ptisos.png');
+  }
+  return { reg, bold, logo, logoBb };
 }
 
 function setProgress(pct, msg) {
@@ -4265,7 +4314,7 @@ function resetApp() {
   Object.assign(state, {
     groups: [], capSrc: 'auto', useFileName: false,
     pdfBytes: null, pdfName: '', smallBytes: null,
-    maHs:'', bks:'', gaRa:'', gdv:'', ngay:'', recId: null,
+    maHs:'', bks:'', gaRa:'', gdv:'', ngay:'', recId: null, bbOn: false,
   });
   state.sel.clear(); state.lastSelId = null;
   clearDraftStores().catch(() => {});
@@ -4446,18 +4495,16 @@ const BBC = {
 
 /** Toàn bộ dữ liệu riêng của biên bản. Lưu kèm hồ sơ và bản nháp qua currentInfo().bb */
 const bb = {
-  gdvTel:'', lxTel:'', gplx:'', garaAddr:'', garaTel:'', phuLuc:'', yKien:'',
-  rows: [],                    // [{tx, pa:''|'sua'|'thay', hv:''|'co'|'khong'}]
+  yKien:'',
+  rows: [],                    // [{tx, pa:'sua'|'thay', hv:''|'co'|'khong'}] — DẪN XUẤT từ ảnh
   agree:false, agreeAt:'',     // ô tích "Tôi đã đọc và đồng ý nội dung biên bản"
   sigCus:null, sigCusAt:'',    // chữ ký PNG nền trong suốt (dataURL) + thời điểm ký
   sigGdv:null, sigGdvAt:'',
-  gps:null,                    // {lat, lon, acc, at}
-  device:'',
-  contentHash:'', fileHash:'', // SHA-256 nội dung (in trên biên bản) và của chính file PDF
+  fileHash:'',                 // SHA-256 của chính file PDF (hiện dưới nút tải, KHÔNG in lên biên bản)
   bytes:null, name:'',
 };
-const BB_FIELDS = ['bbGdvTel','bbLxTel','bbGplx','bbGaraAddr','bbGaraTel','bbPhuLuc','bbYKien'];
-const bbKey = id => id.slice(2,3).toLowerCase() + id.slice(3);   // bbGdvTel → gdvTel
+const BB_FIELDS = ['bbYKien'];
+const bbKey = id => id.slice(2,3).toLowerCase() + id.slice(3);   // bbYKien → yKien
 
 let _bbAuto = false;    // đã dựng xem trước ít nhất 1 lần → tự dựng lại khi sửa
 let _bbT = null, _bbSeq = 0;
@@ -4465,12 +4512,6 @@ let _bbT = null, _bbSeq = 0;
 // ──────── Tiện ích ────────
 const bbVal = id => ($(id) ? $(id).value.trim() : '');
 const bbDT  = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('vi-VN'); };
-function bbDevice() {
-  const ua = (navigator.userAgent || '').replace(/\s+/g, ' ').trim();
-  const sc = (window.screen ? screen.width + '×' + screen.height : '?') +
-             ' @' + (window.devicePixelRatio || 1) + 'x';
-  return ua + ' · màn hình ' + sc;
-}
 /** SHA-256 → chuỗi hex. Cần ngữ cảnh bảo mật (https/localhost); không có thì trả rỗng. */
 async function sha256Hex(data) {
   try {
@@ -4485,18 +4526,6 @@ function dataUrlToBytes(u) {
   for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
   return a;
 }
-/** Chuỗi đại diện toàn bộ nội dung biên bản — nguồn để tính mã kiểm chứng SHA-256.
- *  Đọc thẳng từ các ô nhập (KHÔNG qua currentInfo) để mã băm không tự chứa chính nó. */
-function bbPayload() {
-  return JSON.stringify([
-    BB_FORM, bbVal('fMaHs'), bbVal('fBks'), bbVal('fGara'), bbVal('fGdv'), bbVal('fPhong'),
-    bbVal('fNgay'), bbVal('fLaiXe'), bbVal('fNgayTt'), bbVal('fDdTt'),
-    bb.gdvTel, bb.lxTel, bb.gplx, bb.garaAddr, bb.garaTel, bb.phuLuc, bb.yKien, bb.rows,
-    bb.agree, bb.agreeAt, bb.sigCus || '', bb.sigCusAt, bb.sigGdv || '', bb.sigGdvAt,
-    bb.gps, bb.device,
-  ]);
-}
-
 // ──────── Đọc / ghi form ────────
 function bbReadForm() {
   BB_FIELDS.forEach(id => { if ($(id)) bb[bbKey(id)] = $(id).value.trim(); });
@@ -4504,28 +4533,27 @@ function bbReadForm() {
 function bbSnapshot() {
   bbReadForm();
   const o = {};
-  ['gdvTel','lxTel','gplx','garaAddr','garaTel','phuLuc','yKien','agree','agreeAt',
-   'sigCus','sigCusAt','sigGdv','sigGdvAt','gps','device','contentHash','fileHash']
+  ['yKien','agree','agreeAt','sigCus','sigCusAt','sigGdv','sigGdvAt','fileHash']
     .forEach(k => { o[k] = bb[k]; });
+  // Bảng hạng mục dẫn xuất từ ảnh; chỉ lưu để giữ lại cột "Hiện vật thu hồi" người dùng đã chọn
   o.rows = bb.rows.map(r => ({ tx:r.tx, pa:r.pa, hv:r.hv }));
   return o;
 }
 function bbRestore(o) {
   o = o || {};
   Object.assign(bb, {
-    gdvTel:o.gdvTel||'', lxTel:o.lxTel||'', gplx:o.gplx||'', garaAddr:o.garaAddr||'',
-    garaTel:o.garaTel||'', phuLuc:o.phuLuc||'', yKien:o.yKien||'',
+    yKien:o.yKien||'',
     rows: Array.isArray(o.rows) ? o.rows.map(r => ({ tx:r.tx||'', pa:r.pa||'', hv:r.hv||'' })) : [],
     agree:!!o.agree, agreeAt:o.agreeAt||'',
     sigCus:o.sigCus||null, sigCusAt:o.sigCusAt||'',
     sigGdv:o.sigGdv||null, sigGdvAt:o.sigGdvAt||'',
-    gps:o.gps||null, device:o.device||'',
-    contentHash:o.contentHash||'', fileHash:o.fileHash||'',
+    fileHash:o.fileHash||'',
     bytes:null, name:'',
   });
   BB_FIELDS.forEach(id => { if ($(id)) $(id).value = bb[bbKey(id)] || ''; });
   if ($('bbAgree')) $('bbAgree').checked = bb.agree;
-  bbRenderRows(); bbRenderSigs(); bbRenderAudit(); bbRecap(); bbSyncChip();
+  bbSyncRows();            // dựng lại bảng từ ảnh, giữ cột thu hồi vừa phục hồi
+  bbRenderRows(); bbRenderSigs(); bbRecap(); bbSyncChip();
   _bbAuto = false;
   if ($('bbNote')) $('bbNote').textContent = '';
 }
@@ -4551,42 +4579,56 @@ function bbSyncChip() {
   c.className = 'chip ' + (n === 2 ? 'chip-o' : n === 1 ? 'chip-b' : 'chip-n');
 }
 
-// ──────── Bảng hạng mục giám định ────────
+// ──────── Bảng hạng mục giám định — DẪN XUẤT từ nút Thay thế / Sửa chữa của từng ảnh ────────
+/** Mỗi ảnh tích "Thay thế" / "Sửa chữa" thành một dòng, theo đúng thứ tự ảnh.
+ *  Ảnh tích "Không" bị bỏ qua; trùng cả tên lẫn phương án thì chỉ lấy một dòng. */
+function bbRowsFromImages() {
+  const out = [], seen = new Set();
+  state.groups.forEach(g => g.items.forEach(it => {
+    const pa = paOf(it);
+    if (pa !== 'sua' && pa !== 'thay') return;
+    // Ảnh nằm trong hạng mục có tên → lấy tên hạng mục; ảnh chưa phân loại → lấy chú thích của ảnh
+    const raw = g.src === UNGROUPED ? capOf(it, g) : g.name;
+    const tx = capName(raw) || String(raw || '').trim();
+    if (!tx) return;
+    const key = tx.toLowerCase() + '|' + pa;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ tx, pa, hv:'' });
+  }));
+  return out;
+}
+/** Dựng lại bb.rows từ ảnh, giữ nguyên cột "Hiện vật thu hồi" người dùng đã chọn */
+function bbSyncRows() {
+  const key = r => String(r.tx || '').toLowerCase() + '|' + r.pa;
+  const old = new Map(bb.rows.map(r => [key(r), r.hv]));
+  bb.rows = bbRowsFromImages().map(r => ({ ...r, hv: old.get(key(r)) || '' }));
+}
 function bbRenderRows() {
   const host = $('bbRows');
   if (!host) return;
-  if (!bb.rows.length) bb.rows.push({ tx:'', pa:'', hv:'' });
+  if (!bb.rows.length) {
+    host.innerHTML = '<tr><td colspan="6" class="bb-nores">Chưa có hạng mục nào.<br>' +
+      'Về <b>màn hình 1 › Quản lý ảnh &amp; chú thích</b> và tích <b>Thay thế</b> hoặc ' +
+      '<b>Sửa chữa</b> dưới những ảnh cần đưa vào biên bản.<br>' +
+      '<span class="hint">Biên bản vẫn in được với 10 dòng trống để ghi tay.</span></td></tr>';
+    return;
+  }
   const opt = (v, cur, lbl) => `<option value="${v}"${cur === v ? ' selected' : ''}>${lbl}</option>`;
   host.innerHTML = bb.rows.map((r, i) => `<tr>
     <td class="no">${i + 1}</td>
-    <td class="tx"><input type="text" value="${esc(r.tx)}" placeholder="vd. Cốp sau lõm bẹp, rách"
-        oninput="bbSetRow(${i},'tx',this.value)"/></td>
-    <td colspan="2"><select onchange="bbSetRow(${i},'pa',this.value)">
-      ${opt('', r.pa, '—')}${opt('sua', r.pa, 'Sửa chữa')}${opt('thay', r.pa, 'Thay thế')}</select></td>
+    <td class="tx">${esc(r.tx)}</td>
+    <td class="mk">${r.pa === 'sua'  ? 'x' : ''}</td>
+    <td class="mk">${r.pa === 'thay' ? 'x' : ''}</td>
     <td colspan="2"><select onchange="bbSetRow(${i},'hv',this.value)">
       ${opt('', r.hv, '—')}${opt('co', r.hv, 'Thu hồi: Có')}${opt('khong', r.hv, 'Thu hồi: Không')}</select></td>
-    <td class="ac"><button class="btn btn-r btn-sm" onclick="bbDelRow(${i})" title="Xóa dòng">✕</button></td>
   </tr>`).join('');
 }
 function bbSetRow(i, k, v) { if (bb.rows[i]) { bb.rows[i][k] = v; bbTouch(); } }
-function bbAddRow() { bb.rows.push({ tx:'', pa:'', hv:'' }); bbRenderRows(); bbTouch(); }
-function bbDelRow(i) { bb.rows.splice(i, 1); bbRenderRows(); bbTouch(); }
-function bbClearRows() {
-  if (!confirm('Xóa toàn bộ dòng hạng mục thiệt hại đã nhập?')) return;
-  bb.rows = [{ tx:'', pa:'', hv:'' }];
-  bbRenderRows(); bbTouch(); toast('Đã xóa bảng hạng mục');
-}
-/** Lấy tên hạng mục ảnh (bỏ nhóm tiền tố 0. — ảnh nhận dạng xe) làm chi tiết thiệt hại */
-function bbFromGroups() {
-  const names = state.groups
-    .filter(g => !/^0\b|^0\./.test(String(g.src || g.name)))
-    .map(g => capName(g.name))
-    .filter(Boolean);
-  if (!names.length) { toast('Chưa có hạng mục ảnh nào để lấy', 'e'); return; }
-  const seen = new Set();
-  bb.rows = names.filter(n => !seen.has(n) && seen.add(n)).map(tx => ({ tx, pa:'', hv:'' }));
-  bbRenderRows(); bbTouch();
-  toast(`Đã lấy ${bb.rows.length} hạng mục từ ảnh`, 'o');
+function bbReloadRows() {
+  bbSyncRows(); bbRenderRows(); bbTouch();
+  toast(bb.rows.length ? `Đã lấy ${bb.rows.length} hạng mục từ ảnh` : 'Chưa ảnh nào được tích Thay thế / Sửa chữa',
+        bb.rows.length ? 'o' : 'e');
 }
 
 // ──────── Xác thực thông tin ────────
@@ -4594,7 +4636,7 @@ function bbSetAgree(on) {
   bb.agree = !!on;
   bb.agreeAt = on ? new Date().toISOString() : '';
   if (!on && bb.sigCus) toast('Đã bỏ tích đồng ý — chữ ký khách hàng vẫn giữ, bấm "Xóa / Ký lại" nếu cần', 'e');
-  bbRenderAudit(); bbTouch();
+  bbTouch();
 }
 function bbRecap() {
   const host = $('bbRecap');
@@ -4605,50 +4647,12 @@ function bbRecap() {
     row('Số HSBT / Mã hồ sơ', bbVal('fMaHs')) +
     row('Biển kiểm soát', bbVal('fBks')) +
     row('Tên lái/chủ xe', bbVal('fLaiXe')) +
-    row('Số GPLX · SĐT', [bb.gplx, bb.lxTel].filter(Boolean).join(' · ')) +
     row('Ngày tổn thất', bbVal('fNgayTt')) +
     row('Địa điểm tổn thất', bbVal('fDdTt')) +
     row('Ngày giám định', bbVal('fNgay')) +
     row('Ga-ra / Địa điểm', bbVal('fGara')) +
     row('Giám định viên', [bbVal('fGdv'), bbVal('fPhong')].filter(Boolean).join(' — ')) +
     `<div class="sum-r big"><span class="l">Hạng mục thiệt hại</span><span class="v">${nHm} hạng mục đã ghi</span></div>`;
-}
-
-// ──────── Dấu vết kiểm chứng ────────
-function bbGetGps(silent) {
-  return new Promise(res => {
-    if (!navigator.geolocation) {
-      if (!silent) toast('Trình duyệt không hỗ trợ định vị', 'e');
-      res(null); return;
-    }
-    navigator.geolocation.getCurrentPosition(p => {
-      bb.gps = { lat:p.coords.latitude, lon:p.coords.longitude,
-                 acc:Math.round(p.coords.accuracy || 0), at:new Date().toISOString() };
-      bbRenderAudit(); bbTouch();
-      if (!silent) toast('✅ Đã lấy vị trí GPS', 'o');
-      res(bb.gps);
-    }, err => {
-      if (!silent) toast('Không lấy được vị trí: ' + (err.message || 'bị từ chối'), 'e');
-      res(null);
-    }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
-  });
-}
-const bbGpsText = () => bb.gps
-  ? `${bb.gps.lat.toFixed(6)}, ${bb.gps.lon.toFixed(6)} (±${bb.gps.acc}m) · lúc ${bbDT(bb.gps.at)}`
-  : '';
-function bbRenderAudit() {
-  const host = $('bbAudit');
-  if (!host) return;
-  const r = (l, v, cls) => `<div class="ar"><span class="l">${l}</span><span class="v${cls || ''}">${esc(v) || '—'}</span></div>`;
-  host.innerHTML =
-    r('Mã hồ sơ', bbVal('fMaHs')) +
-    r('Đồng ý nội dung', bb.agree ? 'Đã tích lúc ' + bbDT(bb.agreeAt) : 'chưa tích') +
-    r('Chữ ký lái/chủ xe', bb.sigCus ? 'Đã ký lúc ' + bbDT(bb.sigCusAt) : 'chưa ký') +
-    r('Chữ ký giám định viên', bb.sigGdv ? 'Đã ký lúc ' + bbDT(bb.sigGdvAt) : 'chưa ký') +
-    r('Vị trí GPS', bbGpsText() || 'chưa lấy') +
-    r('Thiết bị', bb.device || bbDevice()) +
-    r('Mã kiểm chứng nội dung', bb.contentHash || 'dựng biên bản để tính', ' hash') +
-    r('Mã băm file PDF', bb.fileHash || 'tạo file để tính', ' hash');
 }
 
 // ──────── Màn hình ký tay (HTML5 Canvas + Pointer Events) ────────
@@ -4733,15 +4737,14 @@ async function sigConfirm() {
   if (who === 'cus') { bb.sigCus = url; bb.sigCusAt = now; }
   else               { bb.sigGdv = url; bb.sigGdvAt = now; }
   closeSign();
-  bbRenderSigs(); bbRenderAudit(); bbTouch();
+  bbRenderSigs(); bbTouch();
   toast('✅ Đã lưu chữ ký', 'o');
-  bbGetGps(true);                    // thử lấy GPS ngầm cho dấu vết kiểm chứng
   if (_bbAuto) bbRenderPreview();
 }
 function bbClearSig(who) {
   if (who === 'cus') { bb.sigCus = null; bb.sigCusAt = ''; }
   else               { bb.sigGdv = null; bb.sigGdvAt = ''; }
-  bbRenderSigs(); bbRenderAudit(); bbTouch();
+  bbRenderSigs(); bbTouch();
   if (_bbAuto) bbRenderPreview();
 }
 function bbRenderSigs() {
@@ -4774,21 +4777,19 @@ const DGRAY = () => PDFLib.rgb(.35, .38, .42);
 
 async function bbBuild() {
   bbReadForm();
+  bbSyncRows();      // bảng hạng mục luôn khớp với các nút Thay thế / Sửa chữa ở màn hình 1
   const { PDFDocument, rgb } = PDFLib;
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
-  const A = await embedAssets(pdfDoc);
-  const reg = A.reg, bold = A.bold, logo = A.logo;
+  const A = await embedAssets(pdfDoc, 'bb');
+  const reg = A.reg, bold = A.bold, logo = A.logo, logoBb = A.logoBb;
 
   const sigCusImg = bb.sigCus ? await pdfDoc.embedPng(dataUrlToBytes(bb.sigCus)) : null;
   const sigGdvImg = bb.sigGdv ? await pdfDoc.embedPng(dataUrlToBytes(bb.sigGdv)) : null;
 
-  bb.device = bbDevice();
-  bb.contentHash = await sha256Hex(new TextEncoder().encode(bbPayload()));
-
   // ── Dữ liệu điền vào mẫu ──
   const V = {
-    maHs: bbVal('fMaHs'), bks: bbVal('fBks'), gara: bbVal('fGara'),
+    bks: bbVal('fBks'), gara: bbVal('fGara'),
     gdv: bbVal('fGdv'), phong: bbVal('fPhong'), ngay: bbVal('fNgay'),
     laiXe: bbVal('fLaiXe'), ngayTt: bbVal('fNgayTt'), ddTt: bbVal('fDdTt'),
   };
@@ -4869,8 +4870,11 @@ async function bbBuild() {
   const gap = h => { y -= h; };
 
   // ════ Khối đầu trang 1: logo + tên tổng công ty ════
-  if (logo) page.drawImage(logo, { x: BBC.ML, y: y - 42, width: 42, height: 42 });
-  const hx = BBC.ML + 53;
+  // Biên bản dùng logo NGANG (có dòng chữ "Cứu hộ & Bảo hiểm"), khác huy hiệu vuông của bản ảnh
+  const LG_W = 72, LG_H = 39;
+  if (logoBb)   page.drawImage(logoBb, { x: BBC.ML, y: y - LG_H - 2, width: LG_W, height: LG_H });
+  else if (logo) page.drawImage(logo,  { x: BBC.ML, y: y - 42, width: 42, height: 42 });
+  const hx = BBC.ML + (logoBb ? LG_W + 12 : 53);
   page.drawText(BB_ORG, { x: hx, y: y - 10, size: 10.5, font: bold, color: PDFLib.rgb(.05, .18, .35) });
   page.drawText(BB_ADDR, { x: hx, y: y - 22, size: 8.5, font: reg, color: DGRAY() });
   page.drawText(BB_TEL,  { x: hx, y: y - 33, size: 8.5, font: reg, color: DGRAY() });
@@ -4883,12 +4887,9 @@ async function bbBuild() {
   // ════ Phần mở đầu ════
   dotted(`Hôm nay, ngày ${V.ngay || '…………'} tại : `, V.gara);
   para('Chúng tôi gồm có:', { bold:true });
-  cols2(`1/ ${V.gdv || '…………'}`,
-        `GĐV ${V.phong || '…………'}${bb.gdvTel ? ',  SĐT: ' + bb.gdvTel : ',  SĐT: ………………'}`, 172);
+  cols2(`1/ ${V.gdv || '…………'}`, `GĐV ${V.phong || '…………'}`, 172);
   cols2(`2/ ${V.laiXe || '…………………'}`,
-        `là Đại diện: Chủ xe/lái xe BKS : ${V.bks || '…………'}` +
-        (bb.lxTel ? ',  SĐT ' + bb.lxTel : ',  SĐT ……………') +
-        (bb.gplx ? ',  GPLX: ' + bb.gplx : ''), 172);
+        `là Đại diện: Chủ xe/lái xe BKS : ${V.bks || '…………'}`, 172);
   para(`Giám định thiệt hại xe ô tô BKS ${V.bks || '…………'} bị tổn thất ngày : ${V.ngayTt || '…………………'}`);
   dotted('Tại : ', V.ddTt);
   para('1. Thông tin tai nạn : Theo Thông báo tai nạn và yêu cầu bồi thường', { bold:true });
@@ -4970,17 +4971,17 @@ async function bbBuild() {
       }
     };
     page.drawText(l1, { x: BBC.ML, y: y - size * .82, size, font: reg, color: BLACK() });
-    put(bb.garaAddr, BBC.ML + w1, halfA);
+    put('', BBC.ML + w1, halfA);           // không còn ô nhập → in dòng chấm điền tay
     const xm = BBC.ML + CW * .58;
     page.drawText(mid, { x: xm, y: y - size * .82, size, font: reg, color: BLACK() });
-    put(bb.garaTel, xm + wm, halfB);
+    put('', xm + wm, halfB);
     y -= BBC.LH;
   }
   gap(8);
 
   // ════ Phần kết ════
   para('Biên bản này được lập với sự xác nhận của các bên liên quan cùng tham gia giám định bao gồm ' +
-       `${bb.phuLuc ? bb.phuLuc : '……………'} phụ lục đính kèm làm cơ sở xây dựng Báo giá sửa chữa`);
+       '…………… phụ lục đính kèm làm cơ sở xây dựng Báo giá sửa chữa');
   para('Đại diện chủ xe/ lái xe giữ bản sao/chụp ảnh làm cơ sở theo dõi nội dung sửa chữa');
   gap(10);
 
@@ -5028,42 +5029,6 @@ async function bbBuild() {
     y -= 14;
   }
 
-  // ════ Dấu vết kiểm chứng ════
-  // Chỉ in khi đã có xác nhận hoặc chữ ký — biên bản trắng in để ký tay thì
-  // không có gì để kiểm chứng, và nhờ vậy mẫu 10 dòng vẫn gọn trong MỘT trang.
-  if (bb.agree || bb.sigCus || bb.sigGdv) {
-    const L = [
-      ['Mã hồ sơ', V.maHs || '—'],
-      ['Xác nhận của chủ xe/lái xe', bb.agree
-        ? 'Đã tích "Tôi đã đọc và đồng ý nội dung biên bản" lúc ' + bbDT(bb.agreeAt)
-        : 'chưa tích'],
-      ['Thời điểm ký', [bb.sigCusAt ? 'Lái/chủ xe: ' + bbDT(bb.sigCusAt) : '',
-                        bb.sigGdvAt ? 'GĐV: ' + bbDT(bb.sigGdvAt) : ''].filter(Boolean).join('  ·  ') || 'chưa ký'],
-      ['Toạ độ GPS lúc ký', bbGpsText() || 'không lấy được / chưa lấy'],
-      ['Thiết bị ký', bb.device],
-      ['Mã kiểm chứng (SHA-256)', bb.contentHash || 'không khả dụng (cần mở trang bằng https)'],
-    ];
-    // lw = bề rộng cột nhãn; phải rộng hơn nhãn dài nhất kẻo nhãn đè lên giá trị
-    const fs = 7.4, lh = 9.8, lw = 128;
-    const lines = L.map(([k, v]) => ({ k, vs: wrap(v, reg, fs, CW - lw - 16) }));
-    const h = 15 + lines.reduce((s, l) => s + l.vs.length * lh, 0) + 7;
-    need(h + 6);
-    page.drawRectangle({ x: BBC.ML, y: y - h, width: CW, height: h,
-      color: PDFLib.rgb(.965, .975, .99), borderColor: PDFLib.rgb(.76, .82, .89), borderWidth: .7 });
-    let ty = y - 11;
-    page.drawText('DẤU VẾT KIỂM CHỨNG ĐIỆN TỬ', { x: BBC.ML + 8, y: ty, size: 7.8, font: bold,
-      color: PDFLib.rgb(.1, .3, .55) });
-    ty -= 11;
-    lines.forEach(l => {
-      page.drawText(l.k + ':', { x: BBC.ML + 8, y: ty, size: fs, font: reg, color: DGRAY() });
-      l.vs.forEach(v => {
-        page.drawText(v, { x: BBC.ML + 8 + lw, y: ty, size: fs, font: reg, color: BLACK() });
-        ty -= lh;      // mỗi dòng tiếp theo của cùng một mục tụt xuống, nhãn chỉ in một lần
-      });
-    });
-    y -= h + 6;
-  }
-
   // ════ Chân trang mọi trang ════
   pages.forEach((p, i) => {
     const ft = `Quy trình giám định bảo hiểm xe cơ giới – ${BB_FORM}`;
@@ -5079,12 +5044,11 @@ async function bbBuild() {
   pdfDoc.setCreationDate(fixed);
   pdfDoc.setModificationDate(fixed);
   pdfDoc.setTitle('Biên bản giám định thiệt hại ' + (V.bks || ''));
-  pdfDoc.setSubject('Mã kiểm chứng nội dung SHA-256: ' + (bb.contentHash || 'n/a'));
+  pdfDoc.setSubject(BB_FORM + ' — Biên bản giám định thiệt hại xe ' + (V.bks || ''));
   pdfDoc.setProducer('PTI SOS — Tiện ích ghép ảnh giám định ' + APP_VERSION);
 
   const bytes = await pdfDoc.save();
   bb.fileHash = await sha256Hex(bytes.slice().buffer);
-  bbRenderAudit();
   return bytes;
 }
 
@@ -5160,7 +5124,7 @@ async function bbDownload() {
 BB_FIELDS.forEach(id => { const el = $(id); if (el) el.addEventListener('input', bbTouch); });
 ['fLaiXe','fDdTt'].forEach(id => $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); bbTouch(); }));
 ['fMaHs','fBks','fGara','fGdv','fPhong'].forEach(id =>
-  $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); bbRenderAudit(); }));
+  $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); }));
 
 (function sigBind() {
   const cv = $('sigCanvas');
@@ -5195,7 +5159,7 @@ BB_FIELDS.forEach(id => { const el = $(id); if (el) el.addEventListener('input',
   });
 })();
 
-bbRenderRows(); bbRenderSigs(); bbRenderAudit(); bbRecap(); bbSyncChip();
+bbRenderRows(); bbRenderSigs(); bbRecap(); bbSyncChip();
 </script>
 
 </body>

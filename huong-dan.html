@@ -288,6 +288,13 @@ td{color:var(--text-2)}
     <tr><td><b>Kiểu bản ảnh giám định *</b></td>
         <td>Chọn 1 trong 3 kiểu — quyết định tiêu đề in ra và cách chia trang. Xem mục
             <a href="#kieu-ban-anh">Kiểu bản ảnh</a>.</td></tr>
+    <tr><td>Lập Biên bản giám định</td>
+        <td><b>Chỉ hiện khi chọn kiểu "Ảnh giám định chi tiết thiệt hại"</b> — ba kiểu còn lại
+            không có biên bản. Tích ô này thì:
+            <br>• bước 2 mới có thẻ <a href="#bien-ban">Biên bản giám định</a>;
+            <br>• mỗi ảnh ở mục <a href="#quan-ly-anh">Chọn và chỉnh từng ảnh</a> mới hiện
+              dải nút <b>Thay thế / Sửa chữa / Không</b>.
+            <br>Không tích thì ứng dụng chạy y như cũ, chỉ xuất bản ảnh.</td></tr>
     <tr><td>Số HSBT / Mã hồ sơ</td>
         <td>Ví dụ <code>XCG.2026.001234</code>. In ở <b>dòng 2</b> của tiêu đề, trước tên giám định viên.
             Nếu để trống thì đoạn "Số HSBT" <b>không được in</b>
@@ -588,6 +595,29 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
   <p>Xóa nhiều ảnh cùng lúc: chọn các ảnh rồi bấm
      <span class="btn-ex">🗑️ Xóa ảnh đã chọn</span> hoặc phím <span class="kbd">Delete</span>.</p>
 
+  <h4 id="phuong-an">Dải nút Thay thế / Sửa chữa / Không</h4>
+  <p>Dải ba nút này nằm <b>ngay dưới mỗi ảnh</b> và <b>chỉ hiện khi</b> bạn đã chọn kiểu
+     <i>"Ảnh giám định chi tiết thiệt hại"</i> và tích <b>Lập Biên bản giám định</b> ở
+     <a href="#thong-tin">thẻ Thông tin giám định</a>. Nó quyết định
+     <a href="#bien-ban">bảng hạng mục của Biên bản giám định</a>.</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:18%">Nút</th><th>Tác dụng</th></tr>
+    <tr><td><b>Thay thế</b></td>
+        <td>Hạng mục của ảnh này vào biên bản, cột <i>Phương án giải quyết → Thay thế</i>.</td></tr>
+    <tr><td><b>Sửa chữa</b></td>
+        <td>Vào biên bản, cột <i>Phương án giải quyết → Sửa chữa</i>.</td></tr>
+    <tr><td><b>Không</b> <i>(mặc định)</i></td>
+        <td>Ảnh <b>không vào biên bản</b>. Dùng cho ảnh nhận dạng xe, ảnh chụp cận cảnh phụ,
+            ảnh hiện trường… — chúng vẫn nằm trong bản ảnh như thường.</td></tr>
+  </table>
+  </div>
+  <div class="tip">
+    💡 <b>Mỗi hạng mục chỉ cần tích một ảnh.</b> Tên đưa sang biên bản là <b>tên hạng mục</b>
+    (tên thư mục) chứ không phải tên file, nên tích nhiều ảnh trong cùng một hạng mục với cùng
+    phương án cũng chỉ ra <b>một dòng</b>. Thứ tự dòng trong biên bản theo đúng thứ tự ảnh.
+  </div>
+
   <h3 id="thuyet-minh">8. Chú thích ảnh</h3>
   <p>Chú thích là dòng chữ trắng trên nền xanh ở dưới mỗi ảnh trong file PDF.
      Thứ tự ưu tiên khi lấy nội dung:</p>
@@ -695,46 +725,48 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
   </div>
 
   <h3 id="bien-ban">9c. Biên bản giám định &amp; chữ ký tay</h3>
-  <p>Ở <b>bước 2</b>, dưới phần xem trước bản ảnh có thẻ <b>📄 Biên bản giám định thiệt hại</b> —
-     lập biên bản theo mẫu <code>BM.PTI.CG.02.08a</code> từ chính thông tin đã nhập ở bước 1,
-     ký tay ngay trên điện thoại rồi tải về dưới dạng <b>file PDF riêng</b>.</p>
+  <p>Thẻ <b>📄 Biên bản giám định thiệt hại</b> ở <b>bước 2</b> lập biên bản theo mẫu
+     <code>BM.PTI.CG.02.08a</code> từ chính thông tin đã nhập ở bước 1, ký tay ngay trên điện
+     thoại rồi tải về dưới dạng <b>file PDF riêng</b>.</p>
+  <div class="warn">
+    ⚠️ Thẻ này <b>chỉ xuất hiện</b> khi ở bước 1 bạn chọn kiểu
+    <i>"Ảnh giám định chi tiết thiệt hại"</i> <b>và</b> tích <b>Lập Biên bản giám định</b>.
+    Hai kiểu còn lại (hiện trường · giấy tờ xe) không có biên bản.
+  </div>
   <div class="note">
     ℹ️ Biên bản là <b>file PDF tách rời</b>, không nằm trong bản ảnh giám định. Tên file
     <code>Bien ban giam dinh xe {BKS}.pdf</code>.
   </div>
 
-  <h4>Bảy mục của thẻ biên bản</h4>
+  <h4>Năm mục của thẻ biên bản</h4>
   <div class="tbl-wrap">
   <table>
     <tr><th style="width:26%">Mục</th><th>Việc cần làm</th></tr>
-    <tr><td><b>1 · Thông tin bổ sung</b></td>
-        <td>SĐT giám định viên · SĐT lái/chủ xe · số GPLX · địa chỉ và SĐT đơn vị sửa chữa ·
-            số phụ lục đính kèm. <b>Bỏ trống ô nào thì biên bản in dòng chấm</b> ở đúng chỗ đó
-            để điền tay tại hiện trường.</td></tr>
-    <tr><td><b>2 · Hạng mục giám định</b></td>
-        <td>Mỗi dòng gồm <i>chi tiết thiệt hại</i> + <i>phương án</i> (Sửa chữa / Thay thế) +
-            <i>hiện vật thu hồi</i> (Có / Không). Nút
-            <span class="btn-ex">📋 Lấy từ hạng mục ảnh</span> điền sẵn tên các hạng mục ảnh
-            đang có (bỏ qua nhóm tiền tố <code>0.</code> — ảnh nhận dạng xe).
-            Biên bản <b>luôn in tối thiểu 10 dòng</b>, dòng thừa để trống.</td></tr>
-    <tr><td><b>3 · Ý kiến các bên</b></td>
+    <tr><td><b>1 · Hạng mục giám định</b></td>
+        <td>Bảng này <b>lấy tự động</b> từ dải nút
+            <a href="#phuong-an">Thay thế / Sửa chữa / Không</a> dưới mỗi ảnh ở bước 1 —
+            không gõ tay. Ảnh tích <b>Không</b> không có trong biên bản.
+            Việc duy nhất làm ở đây là chọn <i>Hiện vật thu hồi</i> <b>Có / Không</b> cho từng dòng.
+            Nút <span class="btn-ex">🔄 Lấy lại từ ảnh</span> dựng lại bảng nếu bạn vừa sửa ảnh.
+            Biên bản <b>luôn in tối thiểu 10 dòng</b>, dòng thừa để trống ghi tay.</td></tr>
+    <tr><td><b>2 · Ý kiến các bên</b></td>
         <td>Bỏ trống thì in 2 dòng chấm để ghi tay.</td></tr>
-    <tr><td><b>4 · Xem trước (PDF)</b></td>
+    <tr><td><b>3 · Xem trước (PDF)</b></td>
         <td>Bấm <span class="btn-ex">👁️ Dựng bản xem trước</span> — ứng dụng dựng
             <b>đúng file PDF sẽ tải về</b> rồi hiển thị lại, nên những gì bạn thấy là bản in thật.
             Sau lần dựng đầu tiên, mọi thay đổi sẽ <b>tự dựng lại</b> sau khoảng 1 giây.</td></tr>
-    <tr><td><b>5 · Xác thực thông tin</b></td>
-        <td>Bảng tóm tắt biển số, họ tên, số GPLX, ngày và địa điểm tổn thất… để khách hàng
-            đọc lại. Phải tích <b>"Tôi đã đọc và đồng ý nội dung biên bản"</b> thì nút
+    <tr><td><b>4 · Xác thực thông tin</b></td>
+        <td>Bảng tóm tắt biển số, họ tên, ngày và địa điểm tổn thất… để khách hàng đọc lại.
+            Phải tích <b>"Tôi đã đọc và đồng ý nội dung biên bản"</b> thì nút
             <b>Ký</b> của khách hàng mới bật.</td></tr>
-    <tr><td><b>6 · Chữ ký</b></td>
+    <tr><td><b>5 · Chữ ký</b></td>
         <td>Hai ô ký riêng — <b>Lái xe/chủ xe</b> và <b>Giám định viên PTI</b>. Mỗi ô có nút
             <span class="btn-ex">✍️ Ký</span> và <span class="btn-ex">🗑️ Xóa / Ký lại</span>.</td></tr>
-    <tr><td><b>7 · Dấu vết kiểm chứng</b></td>
-        <td>Thời điểm tích đồng ý, thời điểm ký của từng bên, toạ độ GPS, thiết bị ký, mã hồ sơ
-            và mã băm chống sửa đổi. Nút <span class="btn-ex">📍 Lấy vị trí GPS</span> để lấy
-            toạ độ thủ công.</td></tr>
   </table>
+  </div>
+  <div class="tip">
+    💡 Những ô biên bản không có chỗ nhập trong ứng dụng — địa chỉ và SĐT đơn vị sửa chữa,
+    số phụ lục đính kèm — được in thành <b>dòng chấm</b> để điền tay tại hiện trường.
   </div>
 
   <h4>Màn hình ký tay</h4>
@@ -745,8 +777,7 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <li>Nút <span class="btn-ex">✓ Xong — lưu chữ ký</span> chỉ bật khi đã có nét ký.</li>
     <li>Chữ ký được <b>cắt sát nét mực</b> và lưu thành ảnh <b>PNG nền trong suốt</b>, nên
         đặt lên biên bản không bị khối nền trắng che chữ.</li>
-    <li>Ký xong, ứng dụng <b>tự thử lấy toạ độ GPS</b> cho dấu vết kiểm chứng (trình duyệt sẽ
-        hỏi quyền; từ chối cũng không sao, biên bản vẫn lập được).</li>
+    <li>Dưới mỗi chữ ký, biên bản in thêm dòng nhỏ <i>"Ký lúc …"</i> theo giờ của máy.</li>
     <li><span class="kbd">Esc</span> đóng màn hình ký.</li>
   </ul>
   <div class="tip">
@@ -754,35 +785,15 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <b>LÁI XE/CHỦ XE</b> và <b>GIÁM ĐỊNH VIÊN PTI</b>). Chưa ký thì in chữ mờ
     <i>(chưa ký)</i> — vẫn in và ký tay trên giấy được như thường.
   </div>
-
-  <h4>Dấu vết kiểm chứng &amp; mã băm</h4>
-  <p>Khối <b>"DẤU VẾT KIỂM CHỨNG ĐIỆN TỬ"</b> chỉ được in vào biên bản khi <b>đã tích đồng ý
-     hoặc đã có chữ ký</b> — biên bản trắng in ra để ký tay thì không có khối này.</p>
-  <div class="tbl-wrap">
-  <table>
-    <tr><th style="width:32%">Mục</th><th>Ý nghĩa</th></tr>
-    <tr><td>Thời điểm ký</td><td>Giờ máy của thiết bị, ghi riêng cho từng bên.</td></tr>
-    <tr><td>Toạ độ GPS</td><td>Vĩ độ, kinh độ và sai số (mét) lúc lấy vị trí.</td></tr>
-    <tr><td>Thiết bị ký</td><td>Chuỗi nhận dạng trình duyệt + kích thước màn hình.</td></tr>
-    <tr><td>Mã kiểm chứng nội dung</td>
-        <td>Mã băm <b>SHA-256</b> của toàn bộ nội dung biên bản (thông tin, bảng hạng mục,
-            hai chữ ký, dấu vết). Được <b>in ngay trên biên bản</b> — đổi bất kỳ chi tiết nào
-            thì mã này đổi theo, dùng để đối chiếu bản giấy với bản gốc.</td></tr>
-    <tr><td>Mã băm file PDF</td>
-        <td>SHA-256 của chính file vừa tải về, hiện ở dòng chữ nhỏ dưới nút tải.
-            Cùng một nội dung luôn cho ra <b>cùng một mã</b>, nên sửa file sẽ lộ ngay.</td></tr>
-  </table>
-  </div>
-  <div class="warn">
-    ⚠️ Mã băm và chữ ký <b>chỉ tính được khi trang mở bằng <code>https</code></b> (hoặc
-    <code>localhost</code>). Mở bằng <code>http</code> trong mạng LAN thì phần mã băm ghi
-    "không khả dụng" — biên bản vẫn lập và ký được bình thường.
-    Lần đầu dựng xem trước cần <b>có mạng</b> để tải thư viện đọc PDF.
-  </div>
   <div class="note">
-    ℹ️ Toàn bộ chữ ký và dấu vết <b>nằm trong máy bạn</b>, được lưu kèm hồ sơ và bản nháp,
-    <b>không tải lên internet</b>.
+    ℹ️ Chữ ký và toàn bộ dữ liệu biên bản <b>nằm trong máy bạn</b>, được lưu kèm hồ sơ và
+    bản nháp, <b>không tải lên internet</b>. Lần đầu dựng xem trước cần <b>có mạng</b> để tải
+    thư viện đọc PDF.
   </div>
+  <p>Sau khi bấm <span class="btn-ex">⬇️ Tải biên bản PDF</span>, dòng chữ nhỏ dưới nút hiện
+     <b>mã băm SHA-256</b> của chính file vừa tải — cùng một nội dung luôn cho ra cùng một mã,
+     nên nếu file bị sửa sẽ lộ ngay. Mã này <b>không in lên biên bản</b>; nó chỉ hiện khi trang
+     mở bằng <code>https</code> (hoặc <code>localhost</code>).</p>
 
   <h3 id="ho-so">10. Hồ sơ lưu trên máy &amp; bản nháp tự lưu</h3>
   <h4>Bản nháp tự lưu</h4>
