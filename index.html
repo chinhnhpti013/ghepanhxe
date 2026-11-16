@@ -664,10 +664,45 @@ main > .foot{margin-top:auto}
   .actbar{padding:9px 12px calc(9px + env(safe-area-inset-bottom))}
   .actbar .meta{display:none}
   .actbar-in .btn{flex:1}
+  /* ── Thao tác bằng ngón tay: nút rộng hết hàng, vùng bấm cao hơn ── */
+  .card-bd.tight{padding:12px}
+  /* Bỏ khoảng đệm giãn giữa các nút, cho nút xếp 2 cái một hàng và rộng hết bề ngang */
+  .toolbar{padding:10px 11px;gap:7px}
+  .toolbar .sp{display:none}
+  .toolbar .btn{flex:1 1 calc(50% - 4px)}
+  .draft-bar{padding:9px 11px}
+  .draft-bar .sp{display:none}
+  .draft-bar .btn{flex:1 1 calc(50% - 5px)}
+  .grp-hd{padding:10px 11px;gap:9px}
+  .cnt{padding:10px 0;min-width:42px}
+  .th-pa button{height:34px;font-size:.72rem}  /* nút Thay thế / Sửa chữa / Không */
+  .title-prev .tp-l1{font-size:.86rem}
+  .title-prev .tp-b{padding:9px 11px}
+  /* Danh sách hồ sơ đã lưu — nút xuống hàng riêng cho dễ bấm */
+  .rec{flex-wrap:wrap;gap:9px;padding:11px}
+  .rec-i{flex:1 1 100%}
+  .rec-a{width:100%}
+  .rec-a .btn{flex:1}
+}
+@media(max-width:480px){
+  main{padding:0 10px 130px}
+  .card-bd{padding:12px}
+  .card-hd{padding:10px 12px}
+  #btnCam{flex:1 1 100%}            /* việc hay làm nhất ngoài hiện trường → một hàng riêng */
+  .thumbs{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+  .lay-row{gap:7px}
+  .lay{padding:9px 5px}
 }
 @media(max-width:400px){
   .ab-txt p{display:none}
   .stp-lbl{display:none}
+}
+/* Điện thoại nằm ngang (bàn phím ảo / màn hình thấp): đừng để khung xem trước
+   chiếm hết chiều cao, nếu không nút bấm bị đẩy ra ngoài tầm với.
+   (Khối .bb-pv nằm ở cuối phần CSS Biên bản vì khai báo gốc của nó ở dưới đây.) */
+@media(max-height:560px) and (orientation:landscape){
+  .pv-scroll{max-height:none}
+  .mdl{max-height:94vh}
 }
 /* ════════ BIÊN BẢN GIÁM ĐỊNH (bước 2) ════════ */
 .bb-h{display:flex;align-items:center;gap:8px;margin:18px 0 10px;font-size:.84rem;
@@ -684,6 +719,7 @@ main > .foot{margin-top:auto}
 .bb-tb td.tx{text-align:left;font-weight:600}
 .bb-tb td.no{width:36px;color:var(--text-3);font-size:.76rem}
 .bb-tb td.mk{width:62px;font-weight:800;color:var(--brand);font-size:.95rem}
+.bb-tb td.hv{width:96px}
 .bb-nores{padding:16px 12px !important;color:var(--text-3);font-size:.78rem;line-height:1.55}
 .bb-tb input,.bb-tb select{width:100%;border:1.5px solid var(--border-s);border-radius:var(--r-xs);
   padding:6px 7px;font-size:.82rem;font-family:inherit;background:var(--surface);color:var(--text)}
@@ -729,11 +765,36 @@ main > .foot{margin-top:auto}
   padding:12px 14px calc(12px + env(safe-area-inset-bottom))}
 .sig-bar .sp{flex:1}
 .sig-bar .note{color:#9FC2E4;font-size:.74rem}
+/* ════════ RESPONSIVE cho khối BIÊN BẢN + MÀN HÌNH KÝ ════════
+   Phải đặt SAU các khai báo gốc ở trên: cùng độ ưu tiên thì rule viết sau thắng,
+   nên đừng chuyển mấy khối này lên phần RESPONSIVE chung ở trên. */
+@media(max-width:700px){
+  .bb-h{font-size:.81rem;margin:15px 0 9px}
+  .bb-h .btn{flex:1 1 100%}
+  .sig-box{padding:10px}
+  .sig-box .sig-ph,.sig-box img{height:76px}
+  .sig-acts .btn{flex:1 1 calc(50% - 4px)}
+}
 @media(max-width:620px){
   .bb-tb{min-width:520px}
   .bb-pv{max-height:60vh;padding:10px 6px}
   .sig-bar .note{display:none}
   .sig-bar .btn{flex:1}
+}
+@media(max-width:480px){
+  /* Bảng hạng mục vừa đúng bề ngang điện thoại — không phải vuốt ngang */
+  .bb-tb{min-width:0;font-size:.74rem}
+  .bb-tb th,.bb-tb td{padding:4px 3px}
+  .bb-tb th{font-size:.64rem;line-height:1.25}
+  .bb-tb td.tx{font-size:.72rem;word-break:break-word}
+  .bb-tb td.no{width:26px;font-size:.68rem}
+  .bb-tb td.mk{width:38px}
+  .bb-tb td.hv{width:64px}
+  .bb-tb select{padding:5px 2px;font-size:.74rem}
+  .bb-pv{padding:8px 5px;max-height:56vh}
+}
+@media(max-height:560px) and (orientation:landscape){
+  .bb-pv{max-height:none}
 }
 @media print{.appbar,.stepper-wrap,.actbar,.toasts,.pv-bar{display:none!important}}
 </style>
@@ -859,8 +920,9 @@ main > .foot{margin-top:auto}
             </div>
           </div>
 
-          <!-- Thông tin vụ tổn thất — KHÔNG bắt buộc, chỉ dùng cho Biên bản giám định ở bước 2 -->
-          <div class="fgrid3" style="margin-top:13px">
+          <!-- Thông tin vụ tổn thất — KHÔNG bắt buộc, CHỈ hiện khi đang lập Biên bản giám định.
+               applyBbVisible() là nơi duy nhất ẩn/hiện khối này. -->
+          <div class="fgrid3" id="ttRow" style="margin-top:13px;display:none">
             <div class="fg">
               <label>Tên Lái/chủ xe</label>
               <input type="text" id="fLaiXe" placeholder="Nguyễn Văn A"/>
@@ -1053,12 +1115,15 @@ main > .foot{margin-top:auto}
             ℹ️ Biên bản theo mẫu <strong>BM.PTI.CG.02.08a</strong>, lập từ thông tin đã nhập ở màn hình 1.
             Đây là <strong>file PDF riêng</strong>, không nằm trong bản ảnh giám định.
             Các ô bỏ trống thì biên bản in <strong>dòng chấm để điền tay</strong>.
+            Mục <em>Ý kiến của các bên</em> luôn in sẵn câu
+            “<em>Chúng tôi đồng ý với nội dung phương án sửa chữa như trên</em>”,
+            nên hai bên chỉ cần ký là xong.
           </div>
 
           <div class="bb-h"><span class="n">1</span>Hạng mục giám định
             <span class="sp"></span>
             <button class="btn btn-o btn-sm" onclick="bbReloadRows()"
-                    title="Lấy lại danh sách hạng mục từ các nút Thay thế / Sửa chữa ở màn hình 1">🔄 Lấy lại từ ảnh</button>
+                    title="Lấy lại danh sách hạng mục từ các nút Thay thế / Sửa chữa ở màn hình 1, đồng thời đặt lại cột Hiện vật thu hồi về mặc định">🔄 Lấy lại từ ảnh</button>
           </div>
           <div class="bb-wrap">
             <table class="bb-tb">
@@ -1081,13 +1146,7 @@ main > .foot{margin-top:auto}
               Biên bản luôn in <b>tối thiểu 10 dòng</b> — các dòng trống để điền tay tại hiện trường.</span>
           </div>
 
-          <div class="bb-h"><span class="n">2</span>Ý kiến của các bên tham gia giám định</div>
-          <div class="fg">
-            <textarea id="bbYKien" rows="3"
-                      placeholder="Bỏ trống để biên bản in dòng chấm điền tay."></textarea>
-          </div>
-
-          <div class="bb-h"><span class="n">3</span>Xem trước biên bản (PDF)
+          <div class="bb-h"><span class="n">2</span>Xem trước biên bản (PDF)
             <span class="sp"></span>
             <button class="btn btn-o btn-sm" id="bbBuild" onclick="bbRenderPreview()">🔄 Dựng lại</button>
           </div>
@@ -1099,18 +1158,7 @@ main > .foot{margin-top:auto}
             </div>
           </div>
 
-          <div class="bb-h"><span class="n">4</span>Xác thực thông tin trước khi ký</div>
-          <div class="sum"><div id="bbRecap"></div></div>
-          <label class="sw" style="margin-top:12px">
-            <input type="checkbox" id="bbAgree" onchange="bbSetAgree(this.checked)"/>
-            <span class="sw-t"></span>
-            <span><strong>Tôi đã đọc và đồng ý nội dung biên bản</strong></span>
-          </label>
-          <div class="foot" style="padding-top:7px;text-align:left">
-            Khách hàng cần tích ô này thì nút <b>Ký</b> bên dưới mới bật.
-          </div>
-
-          <div class="bb-h"><span class="n">5</span>Chữ ký</div>
+          <div class="bb-h"><span class="n">3</span>Chữ ký</div>
           <div class="bb-sigs">
             <div class="sig-box" id="bbSigCusBox">
               <h5>LÁI XE / CHỦ XE</h5>
@@ -1410,7 +1458,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-16b';
+const APP_BUILD   = '2026-11-16c';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -2597,12 +2645,15 @@ function setBbOn(on) {
   if (state.bbOn) { bbSyncRows(); bbRenderRows(); }
   updateSummaries(); scheduleDraftSave(false);
 }
-/** Ẩn/hiện công tắc, thẻ biên bản ở bước 2 và dải nút phương án dưới mỗi ảnh */
+/** Ẩn/hiện công tắc, 3 ô thông tin tổn thất, thẻ biên bản ở bước 2
+ *  và dải nút phương án dưới mỗi ảnh */
 function applyBbVisible() {
   const isCt = $('fLoai').value === 'chitiet';
   const on = bbEnabled();
   if ($('fBbOn')) $('fBbOn').checked = !!state.bbOn;
   $('bbSwitchRow').style.display = isCt ? '' : 'none';
+  // Tên lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất chỉ phục vụ Biên bản giám định
+  if ($('ttRow')) $('ttRow').style.display = on ? '' : 'none';
   $('cardBienBan').style.display = on ? '' : 'none';
   document.body.classList.toggle('bb-on', on);
 }
@@ -3790,7 +3841,9 @@ function updateSummaries() {
     row('Giám định viên', $('fGdv').value.trim()) +
     row('Phòng / Khu vực', $('fPhong').value.trim()) +
     row('Ngày giám định', $('fNgay').value.trim() || '(không in)') +
-    (($('fLaiXe').value.trim() || $('fNgayTt').value.trim() || $('fDdTt').value.trim())
+    // 3 ô tổn thất chỉ hiện khi đang lập biên bản → tóm tắt cũng theo đúng điều kiện đó,
+    // kẻo bỏ tích rồi mà tóm tắt vẫn in tên lái xe đã gõ trước đó
+    ((bbEnabled() && ($('fLaiXe').value.trim() || $('fNgayTt').value.trim() || $('fDdTt').value.trim()))
       ? row('Lái/chủ xe', $('fLaiXe').value.trim()) +
         row('Ngày tổn thất', $('fNgayTt').value.trim()) +
         row('Địa điểm tổn thất', $('fDdTt').value.trim())
@@ -4486,6 +4539,9 @@ const BB_ORG  = 'TỔNG CÔNG TY CỔ PHẦN BẢO HIỂM BƯU ĐIỆN';
 const BB_ADDR = 'Số 95, Trần Thái Tông, Cầu Giấy, Hà nội';
 const BB_TEL  = 'Tel: 1900545475   Website : pti.com.vn';
 
+/** Khoảng cách từ MÉP PHẢI logo PTI SOS tới khối chữ đầu trang biên bản — 60mm */
+const BB_HEAD_GAP = 60 * MM;
+
 // Bố cục biên bản (point). Tổng bề rộng 6 cột = 499 = 595 - 48 - 48
 const BBC = {
   ML:48, MR:48, MT:30, MB:30,
@@ -4493,17 +4549,20 @@ const BBC = {
   COLS:[34, 205, 65, 65, 65, 65],   // STT · Chi tiết thiệt hại · Sửa chữa · Thay thế · Có · Không
 };
 
+/** Ý kiến của các bên — câu cố định, không còn ô nhập ở màn hình 2 */
+const BB_YKIEN = 'Chúng tôi đồng ý với nội dung phương án sửa chữa như trên';
+
 /** Toàn bộ dữ liệu riêng của biên bản. Lưu kèm hồ sơ và bản nháp qua currentInfo().bb */
 const bb = {
-  yKien:'',
+  yKien:'',                    // hồ sơ cũ có thể còn ý kiến gõ tay; rỗng → in BB_YKIEN
   rows: [],                    // [{tx, pa:'sua'|'thay', hv:''|'co'|'khong'}] — DẪN XUẤT từ ảnh
-  agree:false, agreeAt:'',     // ô tích "Tôi đã đọc và đồng ý nội dung biên bản"
+  agree:true, agreeAt:'',      // luôn đồng ý — ô tích "Tôi đã đọc và đồng ý" đã bỏ khỏi giao diện
   sigCus:null, sigCusAt:'',    // chữ ký PNG nền trong suốt (dataURL) + thời điểm ký
   sigGdv:null, sigGdvAt:'',
   fileHash:'',                 // SHA-256 của chính file PDF (hiện dưới nút tải, KHÔNG in lên biên bản)
   bytes:null, name:'',
 };
-const BB_FIELDS = ['bbYKien'];
+const BB_FIELDS = [];          // không còn ô nhập riêng của biên bản ở màn hình 2
 const bbKey = id => id.slice(2,3).toLowerCase() + id.slice(3);   // bbYKien → yKien
 
 let _bbAuto = false;    // đã dựng xem trước ít nhất 1 lần → tự dựng lại khi sửa
@@ -4544,14 +4603,13 @@ function bbRestore(o) {
   Object.assign(bb, {
     yKien:o.yKien||'',
     rows: Array.isArray(o.rows) ? o.rows.map(r => ({ tx:r.tx||'', pa:r.pa||'', hv:r.hv||'' })) : [],
-    agree:!!o.agree, agreeAt:o.agreeAt||'',
+    agree:true, agreeAt:o.agreeAt||'',
     sigCus:o.sigCus||null, sigCusAt:o.sigCusAt||'',
     sigGdv:o.sigGdv||null, sigGdvAt:o.sigGdvAt||'',
     fileHash:o.fileHash||'',
     bytes:null, name:'',
   });
   BB_FIELDS.forEach(id => { if ($(id)) $(id).value = bb[bbKey(id)] || ''; });
-  if ($('bbAgree')) $('bbAgree').checked = bb.agree;
   bbSyncRows();            // dựng lại bảng từ ảnh, giữ cột thu hồi vừa phục hồi
   bbRenderRows(); bbRenderSigs(); bbRecap(); bbSyncChip();
   _bbAuto = false;
@@ -4582,6 +4640,10 @@ function bbSyncChip() {
 // ──────── Bảng hạng mục giám định — DẪN XUẤT từ nút Thay thế / Sửa chữa của từng ảnh ────────
 /** Mỗi ảnh tích "Thay thế" / "Sửa chữa" thành một dòng, theo đúng thứ tự ảnh.
  *  Ảnh tích "Không" bị bỏ qua; trùng cả tên lẫn phương án thì chỉ lấy một dòng. */
+/** Mặc định cột "Hiện vật thu hồi": Thay thế → Có (có phụ tùng cũ để thu hồi),
+ *  Sửa chữa → Không. Người dùng vẫn đổi được trong bảng. */
+const bbHvDefault = pa => (pa === 'thay' ? 'co' : 'khong');
+
 function bbRowsFromImages() {
   const out = [], seen = new Set();
   state.groups.forEach(g => g.items.forEach(it => {
@@ -4594,15 +4656,21 @@ function bbRowsFromImages() {
     const key = tx.toLowerCase() + '|' + pa;
     if (seen.has(key)) return;
     seen.add(key);
-    out.push({ tx, pa, hv:'' });
+    out.push({ tx, pa, hv: bbHvDefault(pa) });
   }));
   return out;
 }
-/** Dựng lại bb.rows từ ảnh, giữ nguyên cột "Hiện vật thu hồi" người dùng đã chọn */
-function bbSyncRows() {
+/** Dựng lại bb.rows từ ảnh, giữ nguyên cột "Hiện vật thu hồi" người dùng đã chọn.
+ *  Dùng old.has() chứ không phải `|| mặc định` — người dùng chọn "—" (rỗng) là một
+ *  lựa chọn thật, không được hiểu là "chưa đặt" rồi điền lại giá trị mặc định. */
+function bbSyncRows(resetHv) {
+  if (resetHv) { bb.rows = bbRowsFromImages(); return; }
   const key = r => String(r.tx || '').toLowerCase() + '|' + r.pa;
   const old = new Map(bb.rows.map(r => [key(r), r.hv]));
-  bb.rows = bbRowsFromImages().map(r => ({ ...r, hv: old.get(key(r)) || '' }));
+  bb.rows = bbRowsFromImages().map(r => {
+    const k = key(r);
+    return { ...r, hv: old.has(k) ? old.get(k) : bbHvDefault(r.pa) };
+  });
 }
 function bbRenderRows() {
   const host = $('bbRows');
@@ -4620,24 +4688,23 @@ function bbRenderRows() {
     <td class="tx">${esc(r.tx)}</td>
     <td class="mk">${r.pa === 'sua'  ? 'x' : ''}</td>
     <td class="mk">${r.pa === 'thay' ? 'x' : ''}</td>
-    <td colspan="2"><select onchange="bbSetRow(${i},'hv',this.value)">
-      ${opt('', r.hv, '—')}${opt('co', r.hv, 'Thu hồi: Có')}${opt('khong', r.hv, 'Thu hồi: Không')}</select></td>
+    <td colspan="2" class="hv"><select onchange="bbSetRow(${i},'hv',this.value)">
+      ${opt('', r.hv, '—')}${opt('co', r.hv, 'Có')}${opt('khong', r.hv, 'Không')}</select></td>
   </tr>`).join('');
 }
 function bbSetRow(i, k, v) { if (bb.rows[i]) { bb.rows[i][k] = v; bbTouch(); } }
+/** Nút "Lấy lại từ ảnh" — dựng lại bảng VÀ trả cột Hiện vật thu hồi về mặc định
+ *  (Thay thế → Có · Sửa chữa → Không). Đây là đường duy nhất để lấy lại mặc định
+ *  sau khi đã tự đổi, và cũng để hồ sơ lưu từ bản cũ (cột thu hồi còn trống) điền lại được. */
 function bbReloadRows() {
-  bbSyncRows(); bbRenderRows(); bbTouch();
+  bbSyncRows(true); bbRenderRows(); bbTouch();
   toast(bb.rows.length ? `Đã lấy ${bb.rows.length} hạng mục từ ảnh` : 'Chưa ảnh nào được tích Thay thế / Sửa chữa',
         bb.rows.length ? 'o' : 'e');
 }
 
-// ──────── Xác thực thông tin ────────
-function bbSetAgree(on) {
-  bb.agree = !!on;
-  bb.agreeAt = on ? new Date().toISOString() : '';
-  if (!on && bb.sigCus) toast('Đã bỏ tích đồng ý — chữ ký khách hàng vẫn giữ, bấm "Xóa / Ký lại" nếu cần', 'e');
-  bbTouch();
-}
+// ──────── Tóm tắt thông tin biên bản ────────
+// Khối này KHÔNG còn hiện trên màn hình 2 (#bbRecap đã bỏ) — hàm giữ lại vì
+// bbTouch()/bbRestore() vẫn gọi, và tự thoát khi không tìm thấy ô chứa.
 function bbRecap() {
   const host = $('bbRecap');
   if (!host) return;
@@ -4659,13 +4726,8 @@ function bbRecap() {
 let _sigWho = null, _sigCv = null, _sigCtx = null;
 let _sigDrawing = false, _sigLast = null, _sigDirty = false;
 
+// Không còn ô tích "Tôi đã đọc và đồng ý" — ký là đã đồng ý, nút Ký luôn bấm được
 function openSign(who) {
-  if (who === 'cus' && !bb.agree) {
-    toast('Khách hàng cần tích "Tôi đã đọc và đồng ý nội dung biên bản" trước khi ký', 'e');
-    const el = $('bbAgree');
-    if (el) el.closest('.sw').scrollIntoView({ behavior:'smooth', block:'center' });
-    return;
-  }
   _sigWho = who;
   $('sigTitle').textContent = who === 'cus' ? '✍️ Chữ ký Lái xe / Chủ xe' : '✍️ Chữ ký Giám định viên PTI';
   $('sigName').textContent = who === 'cus'
@@ -4734,7 +4796,8 @@ async function sigConfirm() {
   if (!url) { toast('Chưa có nét ký nào', 'e'); return; }
   const who = _sigWho;
   const now = new Date().toISOString();
-  if (who === 'cus') { bb.sigCus = url; bb.sigCusAt = now; }
+  // Chữ ký của lái/chủ xe CHÍNH LÀ sự đồng ý — không còn ô tích riêng
+  if (who === 'cus') { bb.sigCus = url; bb.sigCusAt = now; bb.agree = true; bb.agreeAt = now; }
   else               { bb.sigGdv = url; bb.sigGdvAt = now; }
   closeSign();
   bbRenderSigs(); bbTouch();
@@ -4757,9 +4820,7 @@ function bbRenderSigs() {
     box.classList.toggle('done', !!url);
     view.innerHTML = url
       ? `<img src="${url}" alt="chữ ký"/>`
-      : `<div class="sig-ph">${who === 'cus'
-          ? 'Chưa ký — tích ô đồng ý ở mục 5 rồi bấm <b>Ký</b>'
-          : 'Chưa ký — bấm <b>Ký</b> để ký tay'}</div>`;
+      : '<div class="sig-ph">Chưa ký — bấm <b>Ký</b> để ký tay</div>';
     btn.textContent = url ? '✍️ Ký lại' : '✍️ Ký';
     tm.innerHTML = url
       ? `${esc(nameVal || '')}<br>Ký lúc ${esc(bbDT(at))}`
@@ -4870,14 +4931,25 @@ async function bbBuild() {
   const gap = h => { y -= h; };
 
   // ════ Khối đầu trang 1: logo + tên tổng công ty ════
-  // Biên bản dùng logo NGANG (có dòng chữ "Cứu hộ & Bảo hiểm"), khác huy hiệu vuông của bản ảnh
+  // Biên bản dùng logo NGANG (có dòng chữ "Cứu hộ & Bảo hiểm"), khác huy hiệu vuông của bản ảnh.
+  // Khối chữ bắt đầu cách MÉP PHẢI logo đúng BB_HEAD_GAP (60mm) — xem hằng ở đầu khối biên bản.
   const LG_W = 72, LG_H = 39;
   if (logoBb)   page.drawImage(logoBb, { x: BBC.ML, y: y - LG_H - 2, width: LG_W, height: LG_H });
   else if (logo) page.drawImage(logo,  { x: BBC.ML, y: y - 42, width: 42, height: 42 });
-  const hx = BBC.ML + (logoBb ? LG_W + 12 : 53);
-  page.drawText(BB_ORG, { x: hx, y: y - 10, size: 10.5, font: bold, color: PDFLib.rgb(.05, .18, .35) });
-  page.drawText(BB_ADDR, { x: hx, y: y - 22, size: 8.5, font: reg, color: DGRAY() });
-  page.drawText(BB_TEL,  { x: hx, y: y - 33, size: 8.5, font: reg, color: DGRAY() });
+  {
+    const logoW = logoBb ? LG_W : (logo ? 42 : 0);
+    const hx = BBC.ML + logoW + BB_HEAD_GAP;
+    const hw = A4.w - BBC.MR - hx;              // bề ngang còn lại cho khối chữ
+    // Đẩy sang phải 60mm thì chỗ cho chữ hẹp đi → tự co cỡ chữ cho vừa, đừng để cụt đuôi
+    const put = (t, dy, size, font, color) => {
+      let fs = size;
+      while (fs > 5.5 && font.widthOfTextAtSize(t, fs) > hw) fs -= .2;
+      page.drawText(t, { x: hx, y: y - dy, size: fs, font, color });
+    };
+    put(BB_ORG,  10, 10.5, bold, PDFLib.rgb(.05, .18, .35));
+    put(BB_ADDR, 22,  8.5, reg,  DGRAY());
+    put(BB_TEL,  33,  8.5, reg,  DGRAY());
+  }
   y -= 54;
 
   // ════ Tiêu đề ════
@@ -4946,9 +5018,9 @@ async function bbBuild() {
   gap(12);
 
   // ════ Mục 3 — Ý kiến các bên ════
+  // Câu đồng ý là MẶC ĐỊNH, không còn ô nhập ở màn hình 2; hồ sơ cũ có ý kiến gõ tay thì dùng lại.
   para('3. Ý kiến của các bên tham gia giám định:', { bold:true });
-  if (T(bb.yKien)) para(bb.yKien);
-  else { dotted('', ''); dotted('', ''); }
+  para(T(bb.yKien) || BB_YKIEN);
   gap(2);
 
   // ════ Mục 4 — Đơn vị sửa chữa ════

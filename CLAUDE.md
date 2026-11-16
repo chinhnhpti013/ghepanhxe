@@ -69,8 +69,10 @@ mỗi lần cập nhật hướng dẫn** để người dùng thấy nhắc.
    `fLoai === 'chitiet'`
 2. Số HSBT / Mã hồ sơ · Biển kiểm soát · Ngày giám định *(3 cột)*
 3. Tên ga-ra / Địa điểm · Giám định viên · **Phòng / Khu vực giám định** *(3 cột)*
-4. **Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất** *(3 cột)* — **không bắt buộc**,
-   không in lên bản ảnh, chỉ dùng cho Biên bản giám định ở bước 2
+4. **Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất** (`#ttRow`, 3 cột) — **không bắt buộc**,
+   không in lên bản ảnh, chỉ dùng cho Biên bản giám định ở bước 2. **Chỉ hiện khi `bbEnabled()`**;
+   `applyBbVisible()` ẩn/hiện, và `updateSummaries()` cũng gọi `bbEnabled()` trước khi in 3 dòng này
+   vào tóm tắt (bỏ tích rồi thì tóm tắt không được in lại tên lái xe đã gõ trước đó)
 5. Bố cục A4 dọc/ngang · Số ảnh trên mỗi trang *(2 cột cạnh nhau)*
 
 Dưới cùng thẻ là khối **xem trước tiêu đề bản in** (`#loaiPreview`) — hiện đúng các dòng
@@ -231,16 +233,20 @@ Lập **file PDF RIÊNG** theo mẫu `BM.PTI.CG.02.08a` (`BB_FORM`), tên
 Toàn bộ mã nằm ở **khối `<script>` cuối cùng** của `index.html`.
 
 **Chỉ có khi `bbEnabled()`** = `fLoai === 'chitiet'` **và** `state.bbOn`. `applyBbVisible()` là nơi
-duy nhất bật/tắt: ẩn/hiện `#bbSwitchRow` (công tắc ở bước 1), `#cardBienBan` (bước 2) và class
-`bb-on` trên `<body>` (dải nút phương án dưới mỗi ảnh). Gọi từ `onLoaiChange()` và `setBbOn()`.
+duy nhất bật/tắt: ẩn/hiện `#bbSwitchRow` (công tắc ở bước 1), **`#ttRow`** (3 ô thông tin tổn thất ở
+bước 1), `#cardBienBan` (bước 2) và class `bb-on` trên `<body>` (dải nút phương án dưới mỗi ảnh).
+Gọi từ `onLoaiChange()` và `setBbOn()`.
 
 **Xem trước = file thật.** `bbRenderPreview()` dựng PDF bằng `bbBuild()` rồi vẽ lại bằng **pdf.js**
 (`loadPdfjs()`, cùng thư viện với `downloadJPG()`), nên bản xem trước **chính là** file sẽ tải về.
 Lần đầu phải bấm nút (cần mạng để tải pdf.js); sau đó `_bbAuto = true` và mọi thay đổi **tự dựng
 lại sau 900ms** qua `bbTouch()`. `_bbSeq` chặn lượt dựng cũ ghi đè lượt mới.
 
-**Năm mục của thẻ**: ① bảng hạng mục (dẫn xuất) · ② ý kiến các bên · ③ xem trước PDF ·
-④ xác thực + ô tích đồng ý · ⑤ hai ô chữ ký.
+**Ba mục của thẻ**: ① bảng hạng mục (dẫn xuất) · ② xem trước PDF · ③ hai ô chữ ký.
+Ý kiến các bên là **câu cố định** `BB_YKIEN` = *"Chúng tôi đồng ý với nội dung phương án sửa chữa
+như trên"* (không có ô nhập; hồ sơ cũ còn `bb.yKien` gõ tay thì vẫn dùng lại giá trị đó).
+Không còn mục xác thực và **không còn ô tích "Tôi đã đọc và đồng ý"** — `bb.agree` luôn `true`,
+nút **Ký** của cả hai bên luôn bấm được, `sigConfirm('cus')` ghi `bb.agreeAt` làm dấu thời điểm.
 
 **Dữ liệu** nằm trong object `bb` (không phải `state`), lưu kèm hồ sơ/bản nháp qua
 `currentInfo().bb = bbSnapshot()` và phục hồi bằng `bbRestore(i.bb)` trong `loadRecord()` /
@@ -256,9 +262,16 @@ Bảng hạng mục **luôn in tối thiểu `BB_MIN_ROWS` = 10 dòng**.
 `capName()` (nhóm `UNGROUPED` thì lấy `capOf(it, g)`), nên nhiều ảnh cùng hạng mục + cùng phương án
 gộp thành một dòng (khóa `tên|phương án`).
 
-`bbSyncRows()` dựng lại `bb.rows` nhưng **giữ cột `hv`** (Hiện vật thu hồi) theo cùng khóa — đó là
-thứ duy nhất người dùng còn chỉnh được trong bảng. Gọi từ: `setItemPa()`, `bbReloadRows()`,
-`setBbOn(true)`, `goStep(2)`, `bbRestore()` và **đầu `bbBuild()`** (bảng luôn khớp ảnh lúc xuất file).
+Cột **Hiện vật thu hồi** có **mặc định theo phương án** — `bbHvDefault(pa)`:
+`thay` → `'co'` · `sua` → `'khong'`. Đây là thứ duy nhất người dùng còn chỉnh được trong bảng.
+
+`bbSyncRows()` dựng lại `bb.rows` nhưng **giữ cột `hv`** theo cùng khóa. Phải dùng
+`old.has(key)` chứ **không** phải `old.get(key) || mặc định`: chọn `—` (rỗng) là một lựa chọn thật
+của người dùng, `||` sẽ hiểu nhầm thành "chưa đặt" rồi điền lại giá trị mặc định.
+Gọi từ: `setItemPa()`, `setBbOn(true)`, `goStep(2)`, `bbRestore()` và **đầu `bbBuild()`**
+(bảng luôn khớp ảnh lúc xuất file). Riêng `bbReloadRows()` (nút *🔄 Lấy lại từ ảnh*) gọi
+`bbSyncRows(true)` — **đặt lại** cột `hv` về mặc định; đó là đường duy nhất lấy lại mặc định
+sau khi đã tự đổi, và để hồ sơ lưu từ bản cũ (cột thu hồi còn trống) điền lại được.
 
 > `capName()` **bỏ hết chữ số**, nên hai hạng mục chỉ khác nhau ở con số
 > (`Hạng mục 1` / `Hạng mục 2`) sẽ gộp thành một dòng. Đúng như chú thích ảnh — không phải lỗi.
@@ -270,7 +283,7 @@ HTML5 Canvas + **Pointer Events** (chạy chung cho chuột, cảm ứng và bú
   theo toạ độ CSS px. **Không bao giờ tô nền** — nhờ vậy ảnh xuất ra là **PNG nền trong suốt**.
 - `sigExport()` quét kênh alpha tìm khung bao nét mực rồi **cắt sát** trước khi `toDataURL('image/png')`,
   nên chữ ký lấp đầy ô trên biên bản thay vì thành một chấm nhỏ giữa khoảng trắng.
-- Nút *Xong* chỉ bật khi `_sigDirty`; `openSign('cus')` **chặn** khi chưa tích `#bbAgree`.
+- Nút *Xong* chỉ bật khi `_sigDirty`. `openSign()` **không còn chặn** — ô tích `#bbAgree` đã bỏ.
 - Nhánh phím tắt của `#sigModal` nằm **đầu** handler `keydown` (trước nhánh `#camModal`), nếu không
   `←` `→` sẽ nhảy bước trong lúc đang ký.
 
@@ -281,6 +294,9 @@ HTML5 Canvas + **Pointer Events** (chạy chung cho chuột, cảm ứng và bú
 | Mục ① *Thông tin bổ sung* | `bbGdvTel` `bbLxTel` `bbGplx` `bbGaraAddr` `bbGaraTel` `bbPhuLuc` — giờ in dòng chấm |
 | `SĐT` ở dòng `1/ …` và `2/ …` | hai dòng này chỉ còn tên + phòng / BKS |
 | Nhập tay bảng hạng mục | `bbFromGroups` `bbAddRow` `bbDelRow` `bbClearRows` → thay bằng `bbSyncRows` |
+| Ô nhập **Ý kiến các bên** `#bbYKien` | `BB_FIELDS` giờ rỗng; biên bản luôn in `BB_YKIEN` |
+| Mục ④ *Xác thực thông tin trước khi ký* | `#bbRecap` bỏ khỏi HTML — hàm `bbRecap()` **giữ lại** vì `bbTouch()`/`bbRestore()` vẫn gọi, tự thoát khi không có ô chứa |
+| Ô tích **Tôi đã đọc và đồng ý** `#bbAgree` | kèm `bbSetAgree()`; `bb.agree` luôn `true` |
 
 `bb.fileHash` (SHA-256 của chính bytes file) **vẫn giữ** — hiện ở dòng nhỏ dưới nút tải, **không in
 lên biên bản**. `pdfDoc.setCreationDate()/setModificationDate()` ghim theo thời điểm ký (không có thì
@@ -289,9 +305,11 @@ mở bằng `http` LAN thì `sha256Hex()` trả rỗng, mọi thứ còn lại v
 
 #### Bố cục PDF biên bản (`BBC`)
 Lề `48/48/30/30`, cỡ chữ `FS 10.5`, giãn dòng `LH 14`, 6 cột bảng `[34,205,65,65,65,65] = 499pt`.
-Đầu trang dùng **logo ngang** `assets/logo-pti-bienban.png` (`A.logoBb`, 72 × 39pt, chữ bắt đầu ở
-`ML + 84`) — **khác** huy hiệu vuông `logo-ptisos.png` của bản ảnh; `bbBuild()` tự lùi về huy hiệu
-vuông nếu thiếu file.
+Đầu trang dùng **logo ngang** `assets/logo-pti-bienban.png` (`A.logoBb`, 72 × 39pt) — **khác**
+huy hiệu vuông `logo-ptisos.png` của bản ảnh; `bbBuild()` tự lùi về huy hiệu vuông nếu thiếu file.
+Khối chữ (tên tổng công ty + địa chỉ + tel) bắt đầu cách **mép phải logo** đúng
+`BB_HEAD_GAP = 60 * MM` ≈ 170pt, tức `x = 48 + 72 + 170 = 290pt`, chỉ còn ~257pt bề ngang —
+nên mỗi dòng **tự co cỡ chữ** (tới 5,5pt) cho vừa thay vì bị cụt đuôi.
 `bbBuild()` tự **chảy nội dung qua nhiều trang** bằng `need(h)` → `newPage()`; bảng tràn trang thì
 `drawHead()` vẽ lại đầu bảng. Chân trang (`Quy trình giám định … – BM.PTI.CG.02.08a` + `Trang n/m`)
 vẽ **sau cùng** cho mọi trang vì lúc đó mới biết tổng số trang.
@@ -336,6 +354,24 @@ chỉ đạt 2.6:1 nên **không dùng cho chữ**. `--amber` đã đổi từ c
 **Vạch vàng `#F2C86A`** dày 3px ở đáy `.appbar` (và `.hd` của trang hướng dẫn) là điểm nhấn
 duy nhất dùng màu vàng đậm — chấm "hướng dẫn mới" trên nút `Help` dùng `#FFC94D` cho nổi trên
 nền xanh của appbar (trước đây dùng `var(--amber)`, sau khi đổi sang vàng-nâu thì bị tối).
+
+### Bố cục trên điện thoại
+
+Các điểm ngắt: **≤980px** (bỏ cột phải) · **≤760px** (`fgrid3` 2 cột, `lay-wrap` 1 cột) ·
+**≤700px** (khối RESPONSIVE chính: nút cao ≥42px, ô nhập 16px để iOS không tự phóng to,
+`.toolbar`/`.draft-bar` ẩn `.sp` cho nút xếp 2 cái/hàng, `#btnCam` lên đầu `.dz-btns`) ·
+**≤620px** (bảng hạng mục + thanh ký) · **≤480px** (`fgrid3` 1 cột, thumbnail 132px,
+`#btnCam` chiếm trọn một hàng, **bảng hạng mục bỏ `min-width` để vừa màn hình, không phải vuốt
+ngang**) · **≤400px** (ẩn nhãn phụ của appbar/stepper) ·
+**`max-height:560px` + landscape** (bỏ `max-height` của `.pv-scroll` / `.bb-pv`).
+
+> **Bẫy thứ tự CSS:** khối RESPONSIVE chung nằm **trước** phần CSS của Biên bản (`.bb-*`,
+> `.sig-box`) trong `<style>`. Cùng độ ưu tiên thì **rule viết sau thắng**, nên media query
+> cho `.bb-*` phải đặt **sau** khai báo gốc của chúng — có một khối
+> *"RESPONSIVE cho khối BIÊN BẢN + MÀN HÌNH KÝ"* riêng ở cuối phần đó. Đừng gộp lên trên.
+
+`huong-dan.html` có điểm ngắt riêng **≤900px** (bỏ mục lục dính) và **≤560px** (thu gọn header,
+section, bảng còn `min-width:430px`).
 
 ### Khác
 - **Dark mode** (nút 🌙, lưu localStorage, mặc định theo hệ điều hành)
