@@ -47,7 +47,7 @@ Không dùng thư viện nào khác.
 hộp thoại `#guideModal` qua iframe `huong-dan.html?theme={sáng|tối}`; `openGuide()` chỉ dựng
 iframe một lần và nạp lại khi đổi sáng/tối. Trang này cũng mở trực tiếp được bằng link hoặc
 in ra giấy (có `@media print`). Hướng dẫn **chỉ nói về web app** (A · Các bước sử dụng ·
-B · Thông số · C · Xử lý sự cố · D · FAQ) — phần luồng Python đã bỏ khỏi hướng dẫn, chỉ còn
+B · Thông số · C · Xử lý sự cố · D · FAQ; mục **9c** là Biên bản giám định & chữ ký tay) — phần luồng Python đã bỏ khỏi hướng dẫn, chỉ còn
 tài liệu ở CLAUDE.md. **Sửa tính năng thì phải sửa `huong-dan.html` kèm theo** —
 bảng tiền tố giấy tờ, bảng lưới ảnh/trang và danh sách phím tắt được nhắc lại ở đó.
 Chấm cam trên nút `Help` hiện khi `localStorage.pti_guide_seen !== APP_BUILD`, nên **tăng `APP_BUILD`
@@ -62,11 +62,13 @@ mỗi lần cập nhật hướng dẫn** để người dùng thấy nhắc.
 
 **Bước 1 — Lập bản ảnh** (một cột, toàn chiều rộng; thông tin ở trên cùng rồi tới ảnh)
 
-*Thẻ "Thông tin giám định"* xếp gọn theo 4 hàng:
+*Thẻ "Thông tin giám định"* xếp gọn theo 5 hàng:
 1. Kiểu bản ảnh (3 lựa chọn: chi tiết thiệt hại · hiện trường/xác minh · giấy tờ xe) — toàn chiều rộng
 2. Số HSBT / Mã hồ sơ · Biển kiểm soát · Ngày giám định *(3 cột)*
 3. Tên ga-ra / Địa điểm · Giám định viên · **Phòng / Khu vực giám định** *(3 cột)*
-4. Bố cục A4 dọc/ngang · Số ảnh trên mỗi trang *(2 cột cạnh nhau)*
+4. **Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất** *(3 cột)* — **không bắt buộc**,
+   không in lên bản ảnh, chỉ dùng cho Biên bản giám định ở bước 2
+5. Bố cục A4 dọc/ngang · Số ảnh trên mỗi trang *(2 cột cạnh nhau)*
 
 Dưới cùng thẻ là khối **xem trước tiêu đề bản in** (`#loaiPreview`) — hiện đúng các dòng
 sẽ in lên đầu mỗi trang PDF, cập nhật ngay khi gõ.
@@ -74,6 +76,8 @@ sẽ in lên đầu mỗi trang PDF, cập nhật ngay khi gõ.
 Ngày giám định dùng **một ô chọn ngày** (`#fNgayPick`) + nút *Hôm nay* / *Xóa*.
 `#fNgay` là input **ẩn** giữ giá trị chuẩn `DD/MM/YYYY` dùng cho header, tóm tắt, hồ sơ và bản nháp —
 hai ô luôn đồng bộ qua `onDatePick()` và `syncNgayPicker()`.
+**Ngày tổn thất** dùng đúng nếp đó: `#fNgayTtPick` + `#fNgayTt` (ẩn) + `onDateTtPick()` /
+`clearDateTt()` / `syncNgayTtPicker()`.
 
 *Phần ảnh* — xem chi tiết bên dưới.
 
@@ -91,6 +95,7 @@ Nút **Tiếp tục** luôn bấm được; thiếu gì thì báo đúng chỗ �
 - **Preview A4 trực tiếp** đúng tỷ lệ, header, chú thích và cách cắt ảnh như PDF thật
   (ảnh preview đi qua chính hàm `processImage()` của PDF nên khớp 100%)
 - Tạo PDF → tải xuống → tùy chọn **lưu hồ sơ trên máy**
+- **Biên bản giám định** (`#cardBienBan`) — xem mục riêng bên dưới
 
 ---
 
@@ -213,6 +218,74 @@ tập ảnh thay đổi. Mở lại app mà còn bản nháp thì có thanh mờ
 - Hồ sơ lưu kèm `cap` và `rot` của từng ảnh; khi mở lại dùng đường dẫn giả
   `{chỉ số nhóm}/{tên hạng mục}/{tên file}` để vẫn thêm/bớt ảnh tiếp được
 
+### Biên bản giám định thiệt hại (`#cardBienBan`, bước 2)
+
+Lập **file PDF RIÊNG** theo mẫu `BM.PTI.CG.02.08a` (`BB_FORM`), tên
+`Bien ban giam dinh xe {BKS}.pdf` (`BB_PDF_NAME`) — **không nằm trong bản ảnh**.
+Toàn bộ mã nằm ở **khối `<script>` cuối cùng** của `index.html`.
+
+**Xem trước = file thật.** `bbRenderPreview()` dựng PDF bằng `bbBuild()` rồi vẽ lại bằng **pdf.js**
+(`loadPdfjs()`, cùng thư viện với `downloadJPG()`), nên bản xem trước **chính là** file sẽ tải về.
+Lần đầu phải bấm nút (cần mạng để tải pdf.js); sau đó `_bbAuto = true` và mọi thay đổi **tự dựng
+lại sau 900ms** qua `bbTouch()`. `_bbSeq` chặn lượt dựng cũ ghi đè lượt mới.
+
+**Bảy mục của thẻ**: ① thông tin bổ sung (`BB_FIELDS`) · ② bảng hạng mục · ③ ý kiến các bên ·
+④ xem trước PDF · ⑤ xác thực + ô tích đồng ý · ⑥ hai ô chữ ký · ⑦ dấu vết kiểm chứng.
+
+**Dữ liệu** nằm trong object `bb` (không phải `state`), lưu kèm hồ sơ/bản nháp qua
+`currentInfo().bb = bbSnapshot()` và phục hồi bằng `bbRestore(i.bb)` trong `loadRecord()` /
+`restoreDraft()`; `resetApp()` gọi `bbReset()`. Hồ sơ cũ không có khóa `bb` → `bbRestore(undefined)`
+trả về trạng thái trống.
+
+**Ô bỏ trống thì in dòng chấm** để điền tay (`dotted()`), nên biên bản trắng vẫn in ra ký giấy được.
+Bảng hạng mục **luôn in tối thiểu `BB_MIN_ROWS` = 10 dòng**; nút *Lấy từ hạng mục ảnh*
+(`bbFromGroups()`) điền sẵn tên hạng mục ảnh qua `capName()`, bỏ nhóm tiền tố `0.`.
+
+#### Màn hình ký tay (`#sigModal`)
+HTML5 Canvas + **Pointer Events** (chạy chung cho chuột, cảm ứng và bút) — không dùng thư viện ngoài.
+- Lớp phủ `.sig-ov` dùng **màu cố định tối** như khối `.cam`, **đổi hệ màu không phải sửa khối này**.
+- `sigInit()` đặt canvas theo kích thước thật × `devicePixelRatio` rồi `setTransform(dpr,…)` để vẽ
+  theo toạ độ CSS px. **Không bao giờ tô nền** — nhờ vậy ảnh xuất ra là **PNG nền trong suốt**.
+- `sigExport()` quét kênh alpha tìm khung bao nét mực rồi **cắt sát** trước khi `toDataURL('image/png')`,
+  nên chữ ký lấp đầy ô trên biên bản thay vì thành một chấm nhỏ giữa khoảng trắng.
+- Nút *Xong* chỉ bật khi `_sigDirty`; `openSign('cus')` **chặn** khi chưa tích `#bbAgree`.
+- Nhánh phím tắt của `#sigModal` nằm **đầu** handler `keydown` (trước nhánh `#camModal`), nếu không
+  `←` `→` sẽ nhảy bước trong lúc đang ký.
+- Ký xong gọi `bbGetGps(true)` (im lặng) để lấy toạ độ cho dấu vết.
+
+#### Dấu vết kiểm chứng & mã băm
+Khối `DẤU VẾT KIỂM CHỨNG ĐIỆN TỬ` **chỉ in khi `bb.agree || bb.sigCus || bb.sigGdv`** — nhờ vậy biên
+bản trắng 10 dòng vẫn **gọn trong một trang**. Gồm: mã hồ sơ · thời điểm tích đồng ý · thời điểm ký
+từng bên · toạ độ GPS · thiết bị (`bbDevice()`) · mã băm.
+
+Hai mã băm khác nhau, đừng lẫn:
+| Mã | Tính từ | Hiện ở đâu |
+|---|---|---|
+| `bb.contentHash` | SHA-256 của `bbPayload()` — chuỗi JSON của mọi trường + 2 chữ ký | **In trên biên bản** |
+| `bb.fileHash` | SHA-256 của chính bytes file PDF | Khối dấu vết trên màn hình + dòng dưới nút tải |
+
+`bbPayload()` **đọc thẳng từ các ô nhập, không qua `currentInfo()`** — nếu không, mã băm sẽ tự chứa
+chính nó và đổi sau mỗi lần dựng. `pdfDoc.setCreationDate()/setModificationDate()` được ghim theo
+thời điểm ký (không có thì `2020-01-01`) để **cùng nội dung luôn cho cùng `fileHash`**.
+`crypto.subtle` cần ngữ cảnh bảo mật → mở bằng `http` LAN thì `sha256Hex()` trả rỗng và biên bản
+ghi "không khả dụng"; mọi thứ còn lại vẫn chạy.
+
+#### Bố cục PDF biên bản (`BBC`)
+Lề `48/48/30/30`, cỡ chữ `FS 10.5`, giãn dòng `LH 14`, 6 cột bảng `[34,205,65,65,65,65] = 499pt`.
+`bbBuild()` tự **chảy nội dung qua nhiều trang** bằng `need(h)` → `newPage()`; bảng tràn trang thì
+`drawHead()` vẽ lại đầu bảng. Chân trang (`Quy trình giám định … – BM.PTI.CG.02.08a` + `Trang n/m`)
+vẽ **sau cùng** cho mọi trang vì lúc đó mới biết tổng số trang.
+
+**Bẫy đã sửa, đừng lặp lại:**
+1. `cols2()` phải **tự co cỡ chữ** (tới 7.2pt) trước khi cắt bớt, kẻo SĐT và số GPLX ở cuối dòng
+   `1/ …` và `2/ …` bị mất đuôi.
+2. Tên ga-ra người dùng gõ thường đã có sẵn chữ "Gara" → mục 4 kiểm tra `/^gara\b/i` để không in
+   thành `Gara Gara Toyota…`.
+3. Cột nhãn của khối dấu vết (`lw`) phải rộng hơn nhãn dài nhất, nếu không nhãn đè lên giá trị.
+
+`embedAssets(pdfDoc)` nạp font Be Vietnam Pro + logo, **dùng chung** cho `generatePDF()` (bản ảnh)
+và `bbBuild()` (biên bản).
+
 ### Hệ màu giao diện — xanh nhạt + vàng nhạt
 
 Toàn bộ giao diện chạy bằng **design token** ở đầu `<style>`; muốn đổi màu thì sửa token,
@@ -269,6 +342,7 @@ nền xanh của appbar (trước đây dùng `var(--amber)`, sau khi đổi san
     chứng là "chỉ chọn được 1 lần"
 - Phím tắt: `Ctrl/Cmd+A` chọn tất cả · `Delete` xóa ảnh đã chọn · `Esc` bỏ chọn · `←` `→` chuyển giữa 2 bước
 - Khi đang xem ảnh lớn: `←` `→` chuyển ảnh · `R` xoay · `Esc` đóng
+- Khi đang ở màn hình ký tay: `Esc` đóng (nhánh này nằm **trước** nhánh màn hình chụp)
 - Khi đang ở màn hình chụp: `Space` / `Enter` chụp · `Esc` đóng. Nhánh này nằm **đầu** handler
   phím tắt và bỏ qua cả `BUTTON` (không chỉ ô nhập), kẻo `Enter` trên nút *Xong* vừa chụp vừa đóng
 

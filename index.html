@@ -656,6 +656,82 @@ main > .foot{margin-top:auto}
   .ab-txt p{display:none}
   .stp-lbl{display:none}
 }
+/* ════════ BIÊN BẢN GIÁM ĐỊNH (bước 2) ════════ */
+.bb-h{display:flex;align-items:center;gap:8px;margin:18px 0 10px;font-size:.84rem;
+  font-weight:700;color:var(--brand-d)}
+.bb-h:first-child{margin-top:2px}
+.bb-h .n{display:inline-flex;align-items:center;justify-content:center;width:21px;height:21px;
+  border-radius:50%;background:var(--brand);color:#fff;font-size:.71rem;flex:0 0 auto}
+:root[data-theme="dark"] .bb-h .n{color:#07121F}
+.bb-h .sp{flex:1}
+.bb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+@media(max-width:780px){.bb-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.bb-grid{grid-template-columns:1fr}}
+.bb-wrap{overflow-x:auto;border:1px solid var(--sky-b);border-radius:var(--r-sm);background:var(--surface)}
+.bb-tb{width:100%;min-width:560px;border-collapse:collapse;font-size:.8rem}
+.bb-tb th,.bb-tb td{border:1px solid var(--sky-b);padding:5px 6px;text-align:center;vertical-align:middle}
+.bb-tb th{background:var(--sky);color:var(--text-2);font-size:.71rem;font-weight:700;line-height:1.3}
+.bb-tb td.tx{text-align:left}
+.bb-tb td.no{width:36px;color:var(--text-3);font-size:.76rem}
+.bb-tb td.ac{width:38px}
+.bb-tb input,.bb-tb select{width:100%;border:1.5px solid var(--border-s);border-radius:var(--r-xs);
+  padding:6px 7px;font-size:.82rem;font-family:inherit;background:var(--surface);color:var(--text)}
+.bb-tb input:focus,.bb-tb select:focus{outline:none;border-color:var(--brand);box-shadow:var(--ring)}
+.bb-pv{background:var(--sky-2);border:1px solid var(--sky-b);border-radius:var(--r-sm);
+  padding:14px 10px;max-height:72vh;overflow:auto}
+.bb-pv canvas{max-width:100%;height:auto;background:#fff;border:1px solid var(--border);
+  border-radius:4px;box-shadow:var(--sh-2);display:block;margin:0 auto 14px}
+.bb-pv .empty{margin:0}
+.bb-sigs{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:560px){.bb-sigs{grid-template-columns:1fr}}
+.sig-box{border:1.5px dashed var(--sky-b);border-radius:var(--r-sm);background:var(--surface);
+  padding:12px;text-align:center}
+.sig-box.done{border-style:solid;border-color:var(--green);background:var(--green-soft)}
+.sig-box h5{font-size:.79rem;font-weight:700;color:var(--text-2);margin-bottom:9px}
+.sig-box .sig-ph{height:96px;display:flex;align-items:center;justify-content:center;color:var(--text-3);
+  font-size:.76rem;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-xs);margin-bottom:10px;padding:0 10px;line-height:1.45}
+.sig-box img{height:96px;max-width:100%;object-fit:contain;display:block;margin:0 auto 10px;
+  background:#fff;border:1px solid var(--border);border-radius:var(--r-xs)}
+.sig-box .sig-t{font-size:.71rem;color:var(--text-3);margin-top:7px;line-height:1.5;word-break:break-word}
+.sig-acts{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.bb-audit{background:var(--sand);border:1px solid var(--sand-b);border-radius:var(--r-sm);padding:12px 14px}
+.bb-audit .ar{display:flex;gap:10px;font-size:.76rem;padding:3.5px 0;color:var(--sand-tx)}
+.bb-audit .ar .l{flex:0 0 152px;color:var(--text-3)}
+.bb-audit .ar .v{font-weight:700;word-break:break-word;flex:1}
+.bb-audit .ar .v.hash{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.69rem;
+  font-weight:400;letter-spacing:.01em;word-break:break-all}
+@media(max-width:560px){.bb-audit .ar{flex-direction:column;gap:1px}.bb-audit .ar .l{flex:none}}
+
+/* ════════ MÀN HÌNH KÝ TAY ════════
+   Dùng MÀU CỐ ĐỊNH TỐI (không theo token sáng/tối) như khối .cam — nền tối làm
+   nổi khung ký trắng, nên đổi hệ màu giao diện KHÔNG phải sửa khối này. */
+.sig-ov{position:fixed;inset:0;z-index:950;background:#0B1621;display:flex;flex-direction:column}
+.sig-ov.hidden{display:none}
+.sig-top{display:flex;align-items:center;gap:10px;padding:11px 14px;color:#fff;background:#13263A;
+  border-bottom:3px solid #F2C86A;flex-wrap:wrap}
+.sig-top b{font-size:.95rem}
+.sig-top .who{font-size:.78rem;color:#9FC2E4}
+.sig-top .sp{flex:1}
+.sig-ic{width:34px;height:34px;border:none;border-radius:9px;background:rgba(255,255,255,.12);
+  color:#fff;font-size:.95rem;cursor:pointer}
+.sig-stage{flex:1;min-height:0;padding:12px;display:flex}
+.sig-pad{flex:1;position:relative;background:#fff;border-radius:12px;overflow:hidden;touch-action:none}
+.sig-pad canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.sig-pad .sig-base{position:absolute;left:7%;right:7%;bottom:24%;border-bottom:2px dashed #C7DEF5;
+  pointer-events:none}
+.sig-pad .sig-tip{position:absolute;left:0;right:0;bottom:11%;text-align:center;color:#8FA8BF;
+  font-size:.84rem;pointer-events:none;padding:0 14px}
+.sig-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#13263A;
+  padding:12px 14px calc(12px + env(safe-area-inset-bottom))}
+.sig-bar .sp{flex:1}
+.sig-bar .note{color:#9FC2E4;font-size:.74rem}
+@media(max-width:620px){
+  .bb-tb{min-width:520px}
+  .bb-pv{max-height:60vh;padding:10px 6px}
+  .sig-bar .note{display:none}
+  .sig-bar .btn{flex:1}
+}
 @media print{.appbar,.stepper-wrap,.actbar,.toasts,.pv-bar{display:none!important}}
 </style>
 </head>
@@ -764,6 +840,29 @@ main > .foot{margin-top:auto}
                 <button class="btn btn-n btn-icon" onclick="openPhongMgr()" title="Quản lý danh sách Phòng/khu vực">⚙️</button>
               </div>
               <span class="hint">In ở chân mỗi trang bản ảnh</span>
+            </div>
+          </div>
+
+          <!-- Thông tin vụ tổn thất — KHÔNG bắt buộc, chỉ dùng cho Biên bản giám định ở bước 2 -->
+          <div class="fgrid3" style="margin-top:13px">
+            <div class="fg">
+              <label>Tên Lái/chủ xe</label>
+              <input type="text" id="fLaiXe" placeholder="Nguyễn Văn A"/>
+              <span class="hint">Không bắt buộc — dùng cho Biên bản giám định</span>
+            </div>
+            <div class="fg">
+              <label>Ngày tổn thất</label>
+              <div class="row">
+                <input type="date" id="fNgayTtPick" onchange="onDateTtPick()"/>
+                <button class="btn btn-n btn-sm" onclick="clearDateTt()" title="Xóa ngày tổn thất">✖</button>
+              </div>
+              <input type="hidden" id="fNgayTt"/>
+              <span class="hint">Không bắt buộc</span>
+            </div>
+            <div class="fg">
+              <label>Địa điểm tổn thất</label>
+              <input type="text" id="fDdTt" placeholder="QL18, TP Hạ Long, Quảng Ninh"/>
+              <span class="hint">Không bắt buộc</span>
             </div>
           </div>
 
@@ -926,6 +1025,137 @@ main > .foot{margin-top:auto}
             <div class="empty"><div class="ei">🖼️</div><p>Chưa có preview.</p></div>
           </div>
           <div class="foot" style="padding-top:10px">Preview mô phỏng đúng tỷ lệ A4, header, chú thích và cắt ảnh như file PDF.</div>
+        </div>
+      </div>
+
+      <!-- ════════ BIÊN BẢN GIÁM ĐỊNH THIỆT HẠI (BM.PTI.CG.02.08a) ════════ -->
+      <div class="card" id="cardBienBan">
+        <div class="card-hd"><span class="ico">📄</span>Biên bản giám định thiệt hại<span class="sp"></span>
+          <span class="chip chip-n" id="bbChip">chưa dựng</span></div>
+        <div class="card-bd tight">
+          <div class="alert alert-i show">
+            ℹ️ Biên bản theo mẫu <strong>BM.PTI.CG.02.08a</strong>, lập từ thông tin đã nhập ở màn hình 1.
+            Đây là <strong>file PDF riêng</strong>, không nằm trong bản ảnh giám định.
+            Các ô bên dưới bỏ trống thì biên bản in <strong>dòng chấm để điền tay</strong>.
+          </div>
+
+          <div class="bb-h"><span class="n">1</span>Thông tin bổ sung cho biên bản</div>
+          <div class="bb-grid">
+            <div class="fg">
+              <label>SĐT Giám định viên</label>
+              <input type="text" id="bbGdvTel" placeholder="09xx xxx xxx"/>
+            </div>
+            <div class="fg">
+              <label>SĐT Lái/chủ xe</label>
+              <input type="text" id="bbLxTel" placeholder="09xx xxx xxx"/>
+            </div>
+            <div class="fg">
+              <label>Số GPLX lái xe</label>
+              <input type="text" id="bbGplx" placeholder="140123456789"/>
+            </div>
+            <div class="fg">
+              <label>Địa chỉ đơn vị sửa chữa</label>
+              <input type="text" id="bbGaraAddr" placeholder="Số 1, đường X, TP Hạ Long"/>
+            </div>
+            <div class="fg">
+              <label>SĐT liên hệ ga-ra</label>
+              <input type="text" id="bbGaraTel" placeholder="02xx xxx xxx"/>
+            </div>
+            <div class="fg">
+              <label>Số phụ lục đính kèm</label>
+              <input type="text" id="bbPhuLuc" placeholder="02"/>
+              <span class="hint">Số bản ảnh / phụ lục kèm theo biên bản</span>
+            </div>
+          </div>
+
+          <div class="bb-h"><span class="n">2</span>Hạng mục giám định
+            <span class="sp"></span>
+            <button class="btn btn-o btn-sm" onclick="bbFromGroups()"
+                    title="Lấy tên các hạng mục ảnh đang có làm chi tiết thiệt hại">📋 Lấy từ hạng mục ảnh</button>
+            <button class="btn btn-n btn-sm" onclick="bbAddRow()">➕ Thêm dòng</button>
+            <button class="btn btn-r btn-sm" onclick="bbClearRows()">🗑️ Xóa hết</button>
+          </div>
+          <div class="bb-wrap">
+            <table class="bb-tb">
+              <thead>
+                <tr>
+                  <th rowspan="2">STT</th>
+                  <th rowspan="2">Chi tiết thiệt hại</th>
+                  <th colspan="2">Phương án giải quyết</th>
+                  <th colspan="2">Hiện vật thu hồi</th>
+                  <th rowspan="2"></th>
+                </tr>
+                <tr><th>Sửa chữa</th><th>Thay thế</th><th>Có</th><th>Không</th></tr>
+              </thead>
+              <tbody id="bbRows"></tbody>
+            </table>
+          </div>
+          <div class="fg tipbox" style="margin-top:10px">
+            <span class="hint">💡 Biên bản luôn in <b>tối thiểu 10 dòng</b> — các dòng trống để điền tay tại hiện trường.</span>
+          </div>
+
+          <div class="bb-h"><span class="n">3</span>Ý kiến của các bên tham gia giám định</div>
+          <div class="fg">
+            <textarea id="bbYKien" rows="3"
+                      placeholder="Bỏ trống để biên bản in dòng chấm điền tay."></textarea>
+          </div>
+
+          <div class="bb-h"><span class="n">4</span>Xem trước biên bản (PDF)
+            <span class="sp"></span>
+            <button class="btn btn-o btn-sm" id="bbBuild" onclick="bbRenderPreview()">🔄 Dựng lại</button>
+          </div>
+          <div class="bb-pv" id="bbPvScroll">
+            <div class="empty">
+              <div class="ei">📄</div>
+              <p>Bấm <strong>Dựng bản xem trước</strong> để xem đúng file PDF sẽ in ra.</p>
+              <button class="btn btn-p btn-sm" style="margin-top:10px" onclick="bbRenderPreview()">👁️ Dựng bản xem trước</button>
+            </div>
+          </div>
+
+          <div class="bb-h"><span class="n">5</span>Xác thực thông tin trước khi ký</div>
+          <div class="sum"><div id="bbRecap"></div></div>
+          <label class="sw" style="margin-top:12px">
+            <input type="checkbox" id="bbAgree" onchange="bbSetAgree(this.checked)"/>
+            <span class="sw-t"></span>
+            <span><strong>Tôi đã đọc và đồng ý nội dung biên bản</strong></span>
+          </label>
+          <div class="foot" style="padding-top:7px;text-align:left">
+            Khách hàng cần tích ô này trước khi ký. Thời điểm tích được ghi vào dấu vết kiểm chứng.
+          </div>
+
+          <div class="bb-h"><span class="n">6</span>Chữ ký</div>
+          <div class="bb-sigs">
+            <div class="sig-box" id="bbSigCusBox">
+              <h5>LÁI XE / CHỦ XE</h5>
+              <div id="bbSigCusView"></div>
+              <div class="sig-acts">
+                <button class="btn btn-p btn-sm" onclick="openSign('cus')" id="bbSigCusBtn">✍️ Ký</button>
+                <button class="btn btn-n btn-sm" onclick="bbClearSig('cus')">🗑️ Xóa / Ký lại</button>
+              </div>
+              <div class="sig-t" id="bbSigCusTime"></div>
+            </div>
+            <div class="sig-box" id="bbSigGdvBox">
+              <h5>GIÁM ĐỊNH VIÊN PTI</h5>
+              <div id="bbSigGdvView"></div>
+              <div class="sig-acts">
+                <button class="btn btn-p btn-sm" onclick="openSign('gdv')" id="bbSigGdvBtn">✍️ Ký</button>
+                <button class="btn btn-n btn-sm" onclick="bbClearSig('gdv')">🗑️ Xóa / Ký lại</button>
+              </div>
+              <div class="sig-t" id="bbSigGdvTime"></div>
+            </div>
+          </div>
+
+          <div class="bb-h"><span class="n">7</span>Dấu vết kiểm chứng
+            <span class="sp"></span>
+            <button class="btn btn-n btn-sm" onclick="bbGetGps()" title="Lấy tọa độ GPS của thiết bị">📍 Lấy vị trí GPS</button>
+          </div>
+          <div class="bb-audit"><div id="bbAudit"></div></div>
+
+          <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:15px">
+            <button class="btn btn-g btn-lg" style="flex:1;min-width:200px" id="bbDl"
+                    onclick="bbDownload()">⬇️ Tải biên bản PDF</button>
+          </div>
+          <div class="foot" id="bbNote" style="padding-top:9px;text-align:left"></div>
         </div>
       </div>
     </div>
@@ -1139,6 +1369,30 @@ main > .foot{margin-top:auto}
   </div>
 </div>
 
+<!-- ════════ MÀN HÌNH KÝ TAY (signature pad) ════════ -->
+<div class="sig-ov hidden" id="sigModal">
+  <div class="sig-top">
+    <b id="sigTitle">✍️ Chữ ký</b>
+    <span class="who" id="sigName"></span>
+    <span class="sp"></span>
+    <button class="sig-ic" onclick="closeSign()" title="Đóng (Esc)">✕</button>
+  </div>
+  <div class="sig-stage">
+    <div class="sig-pad" id="sigPad">
+      <canvas id="sigCanvas"></canvas>
+      <div class="sig-base"></div>
+      <div class="sig-tip" id="sigTip">Ký bằng ngón tay, bút cảm ứng hoặc chuột vào khung này</div>
+    </div>
+  </div>
+  <div class="sig-bar">
+    <button class="btn btn-n" onclick="sigClear()">🗑️ Xóa / Ký lại</button>
+    <span class="note" id="sigNote">Chữ ký được lưu dạng PNG nền trong suốt, chỉ nằm trên máy này.</span>
+    <span class="sp"></span>
+    <button class="btn btn-n" onclick="closeSign()">Hủy</button>
+    <button class="btn btn-g" id="sigDone" onclick="sigConfirm()" disabled>✓ Xong — lưu chữ ký</button>
+  </div>
+</div>
+
 <!-- ════════ MODAL: ĐỔI TÊN NHÓM ════════ -->
 <div class="ov hidden" id="grpModal">
   <div class="mdl">
@@ -1175,7 +1429,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-14o';
+const APP_BUILD   = '2026-11-16a';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -1677,6 +1931,9 @@ function currentInfo() {
     gdv:$('fGdv').value.trim(), ngay:$('fNgay').value.trim(), phong:$('fPhong').value.trim(),
     loai:$('fLoai').value, layout:state.layout, perPage:state.perPage,
     capSrc:state.capSrc, useFileName:state.useFileName,
+    // Thông tin vụ tổn thất (không bắt buộc) + toàn bộ dữ liệu Biên bản giám định
+    laiXe:$('fLaiXe').value.trim(), ngayTt:$('fNgayTt').value.trim(), ddTt:$('fDdTt').value.trim(),
+    bb: bbSnapshot(),
   };
 }
 
@@ -1794,7 +2051,9 @@ async function loadRecord(id) {
     $('fGara').value = i.gaRa || ''; $('fGdv').value = i.gdv || '';
     $('fPhong').value = i.phong || getLastPhong();
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
-    syncNgayPicker();
+    $('fLaiXe').value = i.laiXe || ''; $('fDdTt').value = i.ddTt || '';
+    $('fNgayTt').value = i.ngayTt || '';
+    syncNgayPicker(); syncNgayTtPicker(); bbRestore(i.bb);
     state.layout = i.layout || 'doc';
     state.perPage = i.perPage || PERPAGE_DEFAULT[state.layout];
     state.capSrc = i.capSrc || (i.useFileName ? 'file' : 'auto');
@@ -1940,7 +2199,9 @@ async function restoreDraft() {
     $('fGara').value = i.gaRa || ''; $('fGdv').value = i.gdv || '';
     $('fPhong').value = i.phong || getLastPhong();
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
-    syncNgayPicker();
+    $('fLaiXe').value = i.laiXe || ''; $('fDdTt').value = i.ddTt || '';
+    $('fNgayTt').value = i.ngayTt || '';
+    syncNgayPicker(); syncNgayTtPicker(); bbRestore(i.bb);
     state.layout  = i.layout || 'doc';
     state.perPage = i.perPage || PERPAGE_DEFAULT[state.layout];
     state.capSrc = i.capSrc || (i.useFileName ? 'file' : 'auto');
@@ -1987,7 +2248,7 @@ function goStep(n) {
   });
   $('stpLine1').className = 'stp-line' + (n > 1 ? ' done' : '');
 
-  if (n === 2) { resetGenerate(); renderPreview(); }
+  if (n === 2) { resetGenerate(); renderPreview(); bbRecap(); bbRenderSigs(); bbRenderAudit(); bbSyncChip(); }
   updateSummaries(); updateActionBar();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -3211,6 +3472,20 @@ function syncNgayPicker() {
   $('fNgayPick').value = m ? `${m[3]}-${_pad(m[2])}-${_pad(m[1])}` : '';
 }
 
+// ──────── Ngày tổn thất (không bắt buộc — chỉ dùng cho Biên bản giám định) ────────
+// Cùng nếp với Ngày giám định: #fNgayTt là ô ẩn giữ DD/MM/YYYY, #fNgayTtPick là ô chọn ngày.
+function onDateTtPick() {
+  const v = $('fNgayTtPick').value;            // YYYY-MM-DD
+  const [y, m, d] = (v || '').split('-');
+  $('fNgayTt').value = v ? `${d}/${m}/${y}` : '';
+  updateSummaries(); bbRecap(); bbTouch();
+}
+function clearDateTt() { $('fNgayTtPick').value = ''; onDateTtPick(); }
+function syncNgayTtPicker() {
+  const m = ($('fNgayTt').value || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  $('fNgayTtPick').value = m ? `${m[3]}-${_pad(m[2])}-${_pad(m[1])}` : '';
+}
+
 /** Kiểm tra phần thông tin bắt buộc (ở đầu bước 1) */
 /** Ô bắt buộc đầu tiên còn bỏ trống → {id, msg}; đủ hết thì trả null.
  *  Dùng chung cho validateInfo() (bước 1 → 2) và cho nút "Tạo file PDF" / "Lưu hồ sơ" ở bước 2. */
@@ -3481,6 +3756,11 @@ function updateSummaries() {
     row('Giám định viên', $('fGdv').value.trim()) +
     row('Phòng / Khu vực', $('fPhong').value.trim()) +
     row('Ngày giám định', $('fNgay').value.trim() || '(không in)') +
+    (($('fLaiXe').value.trim() || $('fNgayTt').value.trim() || $('fDdTt').value.trim())
+      ? row('Lái/chủ xe', $('fLaiXe').value.trim()) +
+        row('Ngày tổn thất', $('fNgayTt').value.trim()) +
+        row('Địa điểm tổn thất', $('fDdTt').value.trim())
+      : '') +
     layRow +
     row('Chú thích', CAPSRC_LBL[state.capSrc]) +
     extra +
@@ -3613,6 +3893,28 @@ const GRAY  = () => PDFLib.rgb(117/255, 117/255, 117/255);
 const WHITE = () => PDFLib.rgb(1, 1, 1);
 const LGRAY = () => PDFLib.rgb(189/255, 189/255, 189/255);
 
+/** Nạp font tiếng Việt + logo PTI SOS vào một tài liệu PDF.
+ *  Dùng chung cho bản ảnh giám định và Biên bản giám định — font phải nạp qua fetch
+ *  nên trang PHẢI mở bằng địa chỉ web, không mở bằng file://  */
+async function embedAssets(pdfDoc) {
+  let reg, bold;
+  try {
+    const [rb, bbf] = await Promise.all([
+      fetch('fonts/BeVietnamPro-Regular.ttf').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); }),
+      fetch('fonts/BeVietnamPro-Bold.ttf').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); }),
+    ]);
+    [reg, bold] = await Promise.all([pdfDoc.embedFont(rb), pdfDoc.embedFont(bbf)]);
+  } catch (e) {
+    throw new Error('Không nạp được font tiếng Việt. Hãy mở app qua địa chỉ web (GitHub Pages / Render) thay vì mở file trực tiếp.');
+  }
+  let logo = null;
+  try {
+    const lb = await fetch('assets/logo-ptisos.png').then(r => { if (!r.ok) throw new Error(''); return r.arrayBuffer(); });
+    logo = await pdfDoc.embedPng(lb);
+  } catch (e) { logo = null; }
+  return { reg, bold, logo };
+}
+
 function setProgress(pct, msg) {
   $('progFill').style.width = pct + '%';
   $('progText').textContent = msg;
@@ -3678,22 +3980,8 @@ async function generatePDF(opts) {
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
-  let fontReg, fontBold;
-  try {
-    const [rb, bb] = await Promise.all([
-      fetch('fonts/BeVietnamPro-Regular.ttf').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); }),
-      fetch('fonts/BeVietnamPro-Bold.ttf').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); }),
-    ]);
-    [fontReg, fontBold] = await Promise.all([pdfDoc.embedFont(rb), pdfDoc.embedFont(bb)]);
-  } catch (e) {
-    throw new Error('Không nạp được font tiếng Việt. Hãy mở app qua địa chỉ web (GitHub Pages / Render) thay vì mở file trực tiếp.');
-  }
-
-  let logo = null;
-  try {
-    const lb = await fetch('assets/logo-ptisos.png').then(r => { if (!r.ok) throw new Error(''); return r.arrayBuffer(); });
-    logo = await pdfDoc.embedPng(lb);
-  } catch { logo = null; }
+  const _A = await embedAssets(pdfDoc);
+  const fontReg = _A.reg, fontBold = _A.bold, logo = _A.logo;
 
   const pages = buildPages();
   const hLines = headerLines();
@@ -3982,7 +4270,9 @@ function resetApp() {
   state.sel.clear(); state.lastSelId = null;
   clearDraftStores().catch(() => {});
   setDraftBar('off', 'Bản nháp tự lưu sẽ bật khi có ảnh.', false);
-  ['fMaHs','fBks','fGara','fGdv','fNgay','fNgayPick'].forEach(id => { $(id).value = ''; $(id).classList.remove('ok'); });
+  ['fMaHs','fBks','fGara','fGdv','fNgay','fNgayPick',
+   'fLaiXe','fNgayTt','fNgayTtPick','fDdTt'].forEach(id => { $(id).value = ''; $(id).classList.remove('ok'); });
+  bbReset();
   $('fPhong').value = getLastPhong();
   $('fLoai').value = 'chitiet';
   syncCapSrcSwitches();
@@ -4080,6 +4370,11 @@ async function processImage(file, targetWpt, targetHpt, scale, rot, jpegQ) {
 //  PHÍM TẮT
 // ════════════════════════════════════════════════════════
 document.addEventListener('keydown', e => {
+  // Đang ký tay: chỉ nhận Esc để đóng — ← → không được nhảy bước
+  if (!$('sigModal').classList.contains('hidden')) {
+    if (e.key === 'Escape') { e.preventDefault(); closeSign(); }
+    return;
+  }
   // Đang chụp ảnh: Space/Enter = chụp, Esc = đóng (bỏ qua khi con trỏ ở trong ô nhập)
   if (!$('camModal').classList.contains('hidden')) {
     // ô nhập và nút đang được chọn thì để trình duyệt tự xử lý (Enter trên nút = bấm nút)
@@ -4128,5 +4423,780 @@ document.addEventListener('keydown', e => {
   window.addEventListener('beforeunload', clearPvCache);
 })();
 </script>
+<script>
+// ════════════════════════════════════════════════════════
+//  BIÊN BẢN GIÁM ĐỊNH THIỆT HẠI — mẫu BM.PTI.CG.02.08a
+//  File PDF RIÊNG, không nằm trong bản ảnh. Dựng bằng pdf-lib rồi xem trước
+//  bằng pdf.js — nên bản xem trước CHÍNH LÀ file sẽ tải về, khớp 100%.
+// ════════════════════════════════════════════════════════
+const BB_FORM     = 'BM.PTI.CG.02.08a';
+const BB_MIN_ROWS = 10;                 // biên bản luôn in tối thiểu 10 dòng hạng mục
+const BB_PDF_NAME = 'Bien ban giam dinh xe';
+const BB_PV_SCALE = 1.6;                // độ phân giải canvas xem trước (595pt → ~950px)
+const BB_ORG  = 'TỔNG CÔNG TY CỔ PHẦN BẢO HIỂM BƯU ĐIỆN';
+const BB_ADDR = 'Số 95, Trần Thái Tông, Cầu Giấy, Hà nội';
+const BB_TEL  = 'Tel: 1900545475   Website : pti.com.vn';
+
+// Bố cục biên bản (point). Tổng bề rộng 6 cột = 499 = 595 - 48 - 48
+const BBC = {
+  ML:48, MR:48, MT:30, MB:30,
+  FS:10.5, LH:14, SM:8,
+  COLS:[34, 205, 65, 65, 65, 65],   // STT · Chi tiết thiệt hại · Sửa chữa · Thay thế · Có · Không
+};
+
+/** Toàn bộ dữ liệu riêng của biên bản. Lưu kèm hồ sơ và bản nháp qua currentInfo().bb */
+const bb = {
+  gdvTel:'', lxTel:'', gplx:'', garaAddr:'', garaTel:'', phuLuc:'', yKien:'',
+  rows: [],                    // [{tx, pa:''|'sua'|'thay', hv:''|'co'|'khong'}]
+  agree:false, agreeAt:'',     // ô tích "Tôi đã đọc và đồng ý nội dung biên bản"
+  sigCus:null, sigCusAt:'',    // chữ ký PNG nền trong suốt (dataURL) + thời điểm ký
+  sigGdv:null, sigGdvAt:'',
+  gps:null,                    // {lat, lon, acc, at}
+  device:'',
+  contentHash:'', fileHash:'', // SHA-256 nội dung (in trên biên bản) và của chính file PDF
+  bytes:null, name:'',
+};
+const BB_FIELDS = ['bbGdvTel','bbLxTel','bbGplx','bbGaraAddr','bbGaraTel','bbPhuLuc','bbYKien'];
+const bbKey = id => id.slice(2,3).toLowerCase() + id.slice(3);   // bbGdvTel → gdvTel
+
+let _bbAuto = false;    // đã dựng xem trước ít nhất 1 lần → tự dựng lại khi sửa
+let _bbT = null, _bbSeq = 0;
+
+// ──────── Tiện ích ────────
+const bbVal = id => ($(id) ? $(id).value.trim() : '');
+const bbDT  = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('vi-VN'); };
+function bbDevice() {
+  const ua = (navigator.userAgent || '').replace(/\s+/g, ' ').trim();
+  const sc = (window.screen ? screen.width + '×' + screen.height : '?') +
+             ' @' + (window.devicePixelRatio || 1) + 'x';
+  return ua + ' · màn hình ' + sc;
+}
+/** SHA-256 → chuỗi hex. Cần ngữ cảnh bảo mật (https/localhost); không có thì trả rỗng. */
+async function sha256Hex(data) {
+  try {
+    if (!window.crypto || !crypto.subtle) return '';
+    const d = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e) { return ''; }
+}
+function dataUrlToBytes(u) {
+  const bin = atob(String(u).split(',')[1] || '');
+  const a = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+  return a;
+}
+/** Chuỗi đại diện toàn bộ nội dung biên bản — nguồn để tính mã kiểm chứng SHA-256.
+ *  Đọc thẳng từ các ô nhập (KHÔNG qua currentInfo) để mã băm không tự chứa chính nó. */
+function bbPayload() {
+  return JSON.stringify([
+    BB_FORM, bbVal('fMaHs'), bbVal('fBks'), bbVal('fGara'), bbVal('fGdv'), bbVal('fPhong'),
+    bbVal('fNgay'), bbVal('fLaiXe'), bbVal('fNgayTt'), bbVal('fDdTt'),
+    bb.gdvTel, bb.lxTel, bb.gplx, bb.garaAddr, bb.garaTel, bb.phuLuc, bb.yKien, bb.rows,
+    bb.agree, bb.agreeAt, bb.sigCus || '', bb.sigCusAt, bb.sigGdv || '', bb.sigGdvAt,
+    bb.gps, bb.device,
+  ]);
+}
+
+// ──────── Đọc / ghi form ────────
+function bbReadForm() {
+  BB_FIELDS.forEach(id => { if ($(id)) bb[bbKey(id)] = $(id).value.trim(); });
+}
+function bbSnapshot() {
+  bbReadForm();
+  const o = {};
+  ['gdvTel','lxTel','gplx','garaAddr','garaTel','phuLuc','yKien','agree','agreeAt',
+   'sigCus','sigCusAt','sigGdv','sigGdvAt','gps','device','contentHash','fileHash']
+    .forEach(k => { o[k] = bb[k]; });
+  o.rows = bb.rows.map(r => ({ tx:r.tx, pa:r.pa, hv:r.hv }));
+  return o;
+}
+function bbRestore(o) {
+  o = o || {};
+  Object.assign(bb, {
+    gdvTel:o.gdvTel||'', lxTel:o.lxTel||'', gplx:o.gplx||'', garaAddr:o.garaAddr||'',
+    garaTel:o.garaTel||'', phuLuc:o.phuLuc||'', yKien:o.yKien||'',
+    rows: Array.isArray(o.rows) ? o.rows.map(r => ({ tx:r.tx||'', pa:r.pa||'', hv:r.hv||'' })) : [],
+    agree:!!o.agree, agreeAt:o.agreeAt||'',
+    sigCus:o.sigCus||null, sigCusAt:o.sigCusAt||'',
+    sigGdv:o.sigGdv||null, sigGdvAt:o.sigGdvAt||'',
+    gps:o.gps||null, device:o.device||'',
+    contentHash:o.contentHash||'', fileHash:o.fileHash||'',
+    bytes:null, name:'',
+  });
+  BB_FIELDS.forEach(id => { if ($(id)) $(id).value = bb[bbKey(id)] || ''; });
+  if ($('bbAgree')) $('bbAgree').checked = bb.agree;
+  bbRenderRows(); bbRenderSigs(); bbRenderAudit(); bbRecap(); bbSyncChip();
+  _bbAuto = false;
+  if ($('bbNote')) $('bbNote').textContent = '';
+}
+function bbReset() {
+  bbRestore({});
+  if ($('bbPvScroll')) $('bbPvScroll').innerHTML =
+    '<div class="empty"><div class="ei">📄</div><p>Bấm <strong>Dựng bản xem trước</strong> để xem đúng file PDF sẽ in ra.</p>' +
+    '<button class="btn btn-p btn-sm" style="margin-top:10px" onclick="bbRenderPreview()">👁️ Dựng bản xem trước</button></div>';
+}
+
+/** Mọi thay đổi của biên bản đi qua đây: cập nhật tóm tắt, lưu nháp, dựng lại xem trước */
+function bbTouch() {
+  bbReadForm(); bbRecap(); bbSyncChip(); scheduleDraftSave(false);
+  clearTimeout(_bbT);
+  if (!_bbAuto) return;
+  _bbT = setTimeout(() => { if (state.step === 2) bbRenderPreview(); }, 900);
+}
+function bbSyncChip() {
+  const n = (bb.sigCus ? 1 : 0) + (bb.sigGdv ? 1 : 0);
+  const c = $('bbChip');
+  if (!c) return;
+  c.textContent = n === 2 ? 'đã ký đủ 2 bên' : n === 1 ? 'đã ký 1/2' : 'chưa ký';
+  c.className = 'chip ' + (n === 2 ? 'chip-o' : n === 1 ? 'chip-b' : 'chip-n');
+}
+
+// ──────── Bảng hạng mục giám định ────────
+function bbRenderRows() {
+  const host = $('bbRows');
+  if (!host) return;
+  if (!bb.rows.length) bb.rows.push({ tx:'', pa:'', hv:'' });
+  const opt = (v, cur, lbl) => `<option value="${v}"${cur === v ? ' selected' : ''}>${lbl}</option>`;
+  host.innerHTML = bb.rows.map((r, i) => `<tr>
+    <td class="no">${i + 1}</td>
+    <td class="tx"><input type="text" value="${esc(r.tx)}" placeholder="vd. Cốp sau lõm bẹp, rách"
+        oninput="bbSetRow(${i},'tx',this.value)"/></td>
+    <td colspan="2"><select onchange="bbSetRow(${i},'pa',this.value)">
+      ${opt('', r.pa, '—')}${opt('sua', r.pa, 'Sửa chữa')}${opt('thay', r.pa, 'Thay thế')}</select></td>
+    <td colspan="2"><select onchange="bbSetRow(${i},'hv',this.value)">
+      ${opt('', r.hv, '—')}${opt('co', r.hv, 'Thu hồi: Có')}${opt('khong', r.hv, 'Thu hồi: Không')}</select></td>
+    <td class="ac"><button class="btn btn-r btn-sm" onclick="bbDelRow(${i})" title="Xóa dòng">✕</button></td>
+  </tr>`).join('');
+}
+function bbSetRow(i, k, v) { if (bb.rows[i]) { bb.rows[i][k] = v; bbTouch(); } }
+function bbAddRow() { bb.rows.push({ tx:'', pa:'', hv:'' }); bbRenderRows(); bbTouch(); }
+function bbDelRow(i) { bb.rows.splice(i, 1); bbRenderRows(); bbTouch(); }
+function bbClearRows() {
+  if (!confirm('Xóa toàn bộ dòng hạng mục thiệt hại đã nhập?')) return;
+  bb.rows = [{ tx:'', pa:'', hv:'' }];
+  bbRenderRows(); bbTouch(); toast('Đã xóa bảng hạng mục');
+}
+/** Lấy tên hạng mục ảnh (bỏ nhóm tiền tố 0. — ảnh nhận dạng xe) làm chi tiết thiệt hại */
+function bbFromGroups() {
+  const names = state.groups
+    .filter(g => !/^0\b|^0\./.test(String(g.src || g.name)))
+    .map(g => capName(g.name))
+    .filter(Boolean);
+  if (!names.length) { toast('Chưa có hạng mục ảnh nào để lấy', 'e'); return; }
+  const seen = new Set();
+  bb.rows = names.filter(n => !seen.has(n) && seen.add(n)).map(tx => ({ tx, pa:'', hv:'' }));
+  bbRenderRows(); bbTouch();
+  toast(`Đã lấy ${bb.rows.length} hạng mục từ ảnh`, 'o');
+}
+
+// ──────── Xác thực thông tin ────────
+function bbSetAgree(on) {
+  bb.agree = !!on;
+  bb.agreeAt = on ? new Date().toISOString() : '';
+  if (!on && bb.sigCus) toast('Đã bỏ tích đồng ý — chữ ký khách hàng vẫn giữ, bấm "Xóa / Ký lại" nếu cần', 'e');
+  bbRenderAudit(); bbTouch();
+}
+function bbRecap() {
+  const host = $('bbRecap');
+  if (!host) return;
+  const row = (l, v) => `<div class="sum-r"><span class="l">${l}</span><span class="v">${esc(v) || '—'}</span></div>`;
+  const nHm = bb.rows.filter(r => (r.tx || '').trim()).length;
+  host.innerHTML =
+    row('Số HSBT / Mã hồ sơ', bbVal('fMaHs')) +
+    row('Biển kiểm soát', bbVal('fBks')) +
+    row('Tên lái/chủ xe', bbVal('fLaiXe')) +
+    row('Số GPLX · SĐT', [bb.gplx, bb.lxTel].filter(Boolean).join(' · ')) +
+    row('Ngày tổn thất', bbVal('fNgayTt')) +
+    row('Địa điểm tổn thất', bbVal('fDdTt')) +
+    row('Ngày giám định', bbVal('fNgay')) +
+    row('Ga-ra / Địa điểm', bbVal('fGara')) +
+    row('Giám định viên', [bbVal('fGdv'), bbVal('fPhong')].filter(Boolean).join(' — ')) +
+    `<div class="sum-r big"><span class="l">Hạng mục thiệt hại</span><span class="v">${nHm} hạng mục đã ghi</span></div>`;
+}
+
+// ──────── Dấu vết kiểm chứng ────────
+function bbGetGps(silent) {
+  return new Promise(res => {
+    if (!navigator.geolocation) {
+      if (!silent) toast('Trình duyệt không hỗ trợ định vị', 'e');
+      res(null); return;
+    }
+    navigator.geolocation.getCurrentPosition(p => {
+      bb.gps = { lat:p.coords.latitude, lon:p.coords.longitude,
+                 acc:Math.round(p.coords.accuracy || 0), at:new Date().toISOString() };
+      bbRenderAudit(); bbTouch();
+      if (!silent) toast('✅ Đã lấy vị trí GPS', 'o');
+      res(bb.gps);
+    }, err => {
+      if (!silent) toast('Không lấy được vị trí: ' + (err.message || 'bị từ chối'), 'e');
+      res(null);
+    }, { enableHighAccuracy:true, timeout:10000, maximumAge:60000 });
+  });
+}
+const bbGpsText = () => bb.gps
+  ? `${bb.gps.lat.toFixed(6)}, ${bb.gps.lon.toFixed(6)} (±${bb.gps.acc}m) · lúc ${bbDT(bb.gps.at)}`
+  : '';
+function bbRenderAudit() {
+  const host = $('bbAudit');
+  if (!host) return;
+  const r = (l, v, cls) => `<div class="ar"><span class="l">${l}</span><span class="v${cls || ''}">${esc(v) || '—'}</span></div>`;
+  host.innerHTML =
+    r('Mã hồ sơ', bbVal('fMaHs')) +
+    r('Đồng ý nội dung', bb.agree ? 'Đã tích lúc ' + bbDT(bb.agreeAt) : 'chưa tích') +
+    r('Chữ ký lái/chủ xe', bb.sigCus ? 'Đã ký lúc ' + bbDT(bb.sigCusAt) : 'chưa ký') +
+    r('Chữ ký giám định viên', bb.sigGdv ? 'Đã ký lúc ' + bbDT(bb.sigGdvAt) : 'chưa ký') +
+    r('Vị trí GPS', bbGpsText() || 'chưa lấy') +
+    r('Thiết bị', bb.device || bbDevice()) +
+    r('Mã kiểm chứng nội dung', bb.contentHash || 'dựng biên bản để tính', ' hash') +
+    r('Mã băm file PDF', bb.fileHash || 'tạo file để tính', ' hash');
+}
+
+// ──────── Màn hình ký tay (HTML5 Canvas + Pointer Events) ────────
+let _sigWho = null, _sigCv = null, _sigCtx = null;
+let _sigDrawing = false, _sigLast = null, _sigDirty = false;
+
+function openSign(who) {
+  if (who === 'cus' && !bb.agree) {
+    toast('Khách hàng cần tích "Tôi đã đọc và đồng ý nội dung biên bản" trước khi ký', 'e');
+    const el = $('bbAgree');
+    if (el) el.closest('.sw').scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+  _sigWho = who;
+  $('sigTitle').textContent = who === 'cus' ? '✍️ Chữ ký Lái xe / Chủ xe' : '✍️ Chữ ký Giám định viên PTI';
+  $('sigName').textContent = who === 'cus'
+    ? (bbVal('fLaiXe') || '(chưa nhập tên lái/chủ xe)')
+    : (bbVal('fGdv') || '');
+  $('sigModal').classList.remove('hidden');
+  requestAnimationFrame(() => setTimeout(sigInit, 30));
+}
+function closeSign() {
+  $('sigModal').classList.add('hidden');
+  _sigWho = null; _sigDrawing = false; _sigLast = null;
+}
+/** Dựng canvas đúng kích thước thật của khung (nhân devicePixelRatio cho nét trên điện thoại).
+ *  KHÔNG tô nền — nhờ vậy ảnh xuất ra là PNG nền trong suốt. */
+function sigInit() {
+  _sigCv = $('sigCanvas');
+  const box = $('sigPad').getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  _sigCv.width  = Math.max(320, Math.round(box.width  * dpr));
+  _sigCv.height = Math.max(160, Math.round(box.height * dpr));
+  _sigCtx = _sigCv.getContext('2d');
+  _sigCtx.setTransform(dpr, 0, 0, dpr, 0, 0);     // vẽ theo toạ độ CSS px
+  _sigCtx.lineWidth = 2.6;
+  _sigCtx.lineCap = 'round';
+  _sigCtx.lineJoin = 'round';
+  _sigCtx.strokeStyle = '#0D2B4E';
+  _sigDirty = false; _sigLast = null;
+  $('sigTip').style.display = '';
+  $('sigDone').disabled = true;
+}
+function sigPos(e) {
+  const r = _sigCv.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+function sigMark() {
+  if (_sigDirty) return;
+  _sigDirty = true;
+  $('sigTip').style.display = 'none';
+  $('sigDone').disabled = false;
+}
+function sigClear() { if (_sigCv) sigInit(); }
+/** Cắt sát nét mực rồi xuất PNG nền trong suốt — chữ ký lấp đầy ô trên biên bản */
+function sigExport() {
+  const w = _sigCv.width, h = _sigCv.height;
+  const d = _sigCtx.getImageData(0, 0, w, h).data;
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (d[(y * w + x) * 4 + 3] > 8) {
+      if (x < x0) x0 = x; if (x > x1) x1 = x;
+      if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+  }
+  if (x1 < 0) return null;
+  const pad = Math.round(Math.min(w, h) * 0.04);
+  x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad);
+  x1 = Math.min(w - 1, x1 + pad); y1 = Math.min(h - 1, y1 + pad);
+  const cw = x1 - x0 + 1, ch = y1 - y0 + 1;
+  const out = document.createElement('canvas');
+  out.width = cw; out.height = ch;
+  out.getContext('2d').drawImage(_sigCv, x0, y0, cw, ch, 0, 0, cw, ch);
+  return out.toDataURL('image/png');
+}
+async function sigConfirm() {
+  if (!_sigDirty) { toast('Chưa có nét ký nào', 'e'); return; }
+  const url = sigExport();
+  if (!url) { toast('Chưa có nét ký nào', 'e'); return; }
+  const who = _sigWho;
+  const now = new Date().toISOString();
+  if (who === 'cus') { bb.sigCus = url; bb.sigCusAt = now; }
+  else               { bb.sigGdv = url; bb.sigGdvAt = now; }
+  closeSign();
+  bbRenderSigs(); bbRenderAudit(); bbTouch();
+  toast('✅ Đã lưu chữ ký', 'o');
+  bbGetGps(true);                    // thử lấy GPS ngầm cho dấu vết kiểm chứng
+  if (_bbAuto) bbRenderPreview();
+}
+function bbClearSig(who) {
+  if (who === 'cus') { bb.sigCus = null; bb.sigCusAt = ''; }
+  else               { bb.sigGdv = null; bb.sigGdvAt = ''; }
+  bbRenderSigs(); bbRenderAudit(); bbTouch();
+  if (_bbAuto) bbRenderPreview();
+}
+function bbRenderSigs() {
+  const one = (who, url, at, nameVal) => {
+    const box = $(who === 'cus' ? 'bbSigCusBox' : 'bbSigGdvBox');
+    const view = $(who === 'cus' ? 'bbSigCusView' : 'bbSigGdvView');
+    const tm = $(who === 'cus' ? 'bbSigCusTime' : 'bbSigGdvTime');
+    const btn = $(who === 'cus' ? 'bbSigCusBtn' : 'bbSigGdvBtn');
+    if (!box) return;
+    box.classList.toggle('done', !!url);
+    view.innerHTML = url
+      ? `<img src="${url}" alt="chữ ký"/>`
+      : `<div class="sig-ph">${who === 'cus'
+          ? 'Chưa ký — tích ô đồng ý ở mục 5 rồi bấm <b>Ký</b>'
+          : 'Chưa ký — bấm <b>Ký</b> để ký tay'}</div>`;
+    btn.textContent = url ? '✍️ Ký lại' : '✍️ Ký';
+    tm.innerHTML = url
+      ? `${esc(nameVal || '')}<br>Ký lúc ${esc(bbDT(at))}`
+      : esc(nameVal || '');
+  };
+  one('cus', bb.sigCus, bb.sigCusAt, bbVal('fLaiXe'));
+  one('gdv', bb.sigGdv, bb.sigGdvAt, bbVal('fGdv'));
+}
+
+// ════════════════════════════════════════════════════════
+//  DỰNG FILE PDF BIÊN BẢN
+// ════════════════════════════════════════════════════════
+const BLACK = () => PDFLib.rgb(0, 0, 0);
+const DGRAY = () => PDFLib.rgb(.35, .38, .42);
+
+async function bbBuild() {
+  bbReadForm();
+  const { PDFDocument, rgb } = PDFLib;
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const A = await embedAssets(pdfDoc);
+  const reg = A.reg, bold = A.bold, logo = A.logo;
+
+  const sigCusImg = bb.sigCus ? await pdfDoc.embedPng(dataUrlToBytes(bb.sigCus)) : null;
+  const sigGdvImg = bb.sigGdv ? await pdfDoc.embedPng(dataUrlToBytes(bb.sigGdv)) : null;
+
+  bb.device = bbDevice();
+  bb.contentHash = await sha256Hex(new TextEncoder().encode(bbPayload()));
+
+  // ── Dữ liệu điền vào mẫu ──
+  const V = {
+    maHs: bbVal('fMaHs'), bks: bbVal('fBks'), gara: bbVal('fGara'),
+    gdv: bbVal('fGdv'), phong: bbVal('fPhong'), ngay: bbVal('fNgay'),
+    laiXe: bbVal('fLaiXe'), ngayTt: bbVal('fNgayTt'), ddTt: bbVal('fDdTt'),
+  };
+  const CW = A4.w - BBC.ML - BBC.MR;
+  const T = s => cleanText(s).replace(/\s+/g, ' ').trim();
+
+  // ── Máy "chảy" nội dung qua nhiều trang ──
+  const pages = [];
+  let page = null, y = 0;
+  const newPage = () => { page = pdfDoc.addPage([A4.w, A4.h]); pages.push(page); y = A4.h - BBC.MT; };
+  const need = h => { if (!page || y - h < BBC.MB + 16) newPage(); };
+  newPage();
+
+  const wrap = (txt, font, size, maxW) => {
+    const words = T(txt).split(' ').filter(Boolean);
+    if (!words.length) return [''];
+    const out = []; let cur = '';
+    for (const w of words) {
+      const t = cur ? cur + ' ' + w : w;
+      if (font.widthOfTextAtSize(t, size) <= maxW || !cur) cur = t;
+      else { out.push(cur); cur = w; }
+    }
+    if (cur) out.push(cur);
+    return out;
+  };
+  /** Một đoạn chữ căn trái (tự xuống dòng) hoặc căn giữa */
+  const para = (txt, o) => {
+    o = o || {};
+    const font = o.bold ? bold : reg, size = o.size || BBC.FS, lh = o.lh || BBC.LH;
+    const x0 = BBC.ML + (o.x || 0), maxW = o.w || (CW - (o.x || 0));
+    for (const ln of wrap(txt, font, size, maxW)) {
+      need(lh);
+      const x = o.center ? x0 + (maxW - font.widthOfTextAtSize(ln, size)) / 2 : x0;
+      page.drawText(ln, { x, y: y - size * .82, size, font, color: o.color || BLACK() });
+      y -= lh;
+    }
+  };
+  /** Dòng 2 cột của mẫu: "1/ {GĐV}   |   GĐV {phòng}, SĐT: …" */
+  const cols2 = (left, right, xr) => {
+    need(BBC.LH);
+    const size = BBC.FS, off = xr || 200, bx = BBC.ML + off;
+    // Đoạn bên phải hay dài (phòng + SĐT + GPLX) — TỰ CO CỠ CHỮ trước, cắt bớt là bước cuối,
+    // kẻo số điện thoại / số GPLX bị mất đuôi.
+    const fit = (t, maxW) => {
+      let s = T(t), fs = size;
+      while (fs > 7.2 && reg.widthOfTextAtSize(s, fs) > maxW) fs -= .3;
+      while (s.length > 1 && reg.widthOfTextAtSize(s, fs) > maxW) s = s.slice(0, -1);
+      return { s, fs };
+    };
+    const L = fit(left, off - 8), R = fit(right, A4.w - BBC.MR - bx);
+    page.drawText(L.s, { x: BBC.ML, y: y - size * .82, size: L.fs, font: reg, color: BLACK() });
+    page.drawText(R.s, { x: bx,     y: y - size * .82, size: R.fs, font: reg, color: BLACK() });
+    y -= BBC.LH;
+  };
+  /** Dòng chấm để điền tay, bắt đầu sau một nhãn */
+  const dotted = (label, text, size) => {
+    size = size || BBC.FS;
+    need(BBC.LH);
+    const lb = T(label);
+    const lw = reg.widthOfTextAtSize(lb, size);
+    if (lb) page.drawText(lb, { x: BBC.ML, y: y - size * .82, size, font: reg, color: BLACK() });
+    const rest = CW - lw;
+    if (T(text)) {
+      page.drawText(clipTo(T(text), rest), { x: BBC.ML + lw, y: y - size * .82, size, font: reg, color: BLACK() });
+    } else {
+      const dw = reg.widthOfTextAtSize('.', size);
+      const n = Math.max(0, Math.floor(rest / dw) - 1);
+      page.drawText('.'.repeat(n), { x: BBC.ML + lw, y: y - size * .82, size, font: reg, color: DGRAY() });
+    }
+    y -= BBC.LH;
+  };
+  const clipTo = (t, maxW, size, font) => {
+    size = size || BBC.FS; font = font || reg;
+    let s = T(t);
+    while (s.length > 1 && font.widthOfTextAtSize(s, size) > maxW) s = s.slice(0, -1);
+    return s;
+  };
+  const gap = h => { y -= h; };
+
+  // ════ Khối đầu trang 1: logo + tên tổng công ty ════
+  if (logo) page.drawImage(logo, { x: BBC.ML, y: y - 42, width: 42, height: 42 });
+  const hx = BBC.ML + 53;
+  page.drawText(BB_ORG, { x: hx, y: y - 10, size: 10.5, font: bold, color: PDFLib.rgb(.05, .18, .35) });
+  page.drawText(BB_ADDR, { x: hx, y: y - 22, size: 8.5, font: reg, color: DGRAY() });
+  page.drawText(BB_TEL,  { x: hx, y: y - 33, size: 8.5, font: reg, color: DGRAY() });
+  y -= 54;
+
+  // ════ Tiêu đề ════
+  para('BIÊN BẢN GIÁM ĐỊNH THIỆT HẠI', { bold:true, size:15.5, lh:26, center:true });
+  gap(4);
+
+  // ════ Phần mở đầu ════
+  dotted(`Hôm nay, ngày ${V.ngay || '…………'} tại : `, V.gara);
+  para('Chúng tôi gồm có:', { bold:true });
+  cols2(`1/ ${V.gdv || '…………'}`,
+        `GĐV ${V.phong || '…………'}${bb.gdvTel ? ',  SĐT: ' + bb.gdvTel : ',  SĐT: ………………'}`, 172);
+  cols2(`2/ ${V.laiXe || '…………………'}`,
+        `là Đại diện: Chủ xe/lái xe BKS : ${V.bks || '…………'}` +
+        (bb.lxTel ? ',  SĐT ' + bb.lxTel : ',  SĐT ……………') +
+        (bb.gplx ? ',  GPLX: ' + bb.gplx : ''), 172);
+  para(`Giám định thiệt hại xe ô tô BKS ${V.bks || '…………'} bị tổn thất ngày : ${V.ngayTt || '…………………'}`);
+  dotted('Tại : ', V.ddTt);
+  para('1. Thông tin tai nạn : Theo Thông báo tai nạn và yêu cầu bồi thường', { bold:true });
+  gap(2);
+  para('2. Hạng mục giám định : ( Theo các phụ lục đính kèm )', { bold:true });
+  gap(4);
+
+  // ════ Bảng hạng mục ════
+  const W = BBC.COLS, xs = [];
+  { let x = BBC.ML; for (const w of W) { xs.push(x); x += w; } }
+  const H1 = 16, H2 = 14, HR = 16;
+  const bx = (x, top, w, h) => page.drawRectangle({ x, y: top - h, width: w, height: h,
+    borderColor: BLACK(), borderWidth: .8 });
+  const cTx = (s, x, top, w, h, o) => {
+    o = o || {};
+    const font = o.bold ? bold : reg;
+    let fs = o.size || 9, t = T(s);
+    if (!t) return;
+    while (fs > 5 && font.widthOfTextAtSize(t, fs) > w - 6) fs -= .4;
+    const tw = font.widthOfTextAtSize(t, fs);
+    const x0 = o.left ? x + 4 : x + (w - tw) / 2;
+    page.drawText(o.left ? clipTo(t, w - 8, fs, font) : t,
+      { x: x0, y: top - h / 2 - fs * .33, size: fs, font, color: BLACK() });
+  };
+  const drawHead = () => {
+    const top = y;
+    bx(xs[0], top, W[0], H1 + H2);  cTx('STT', xs[0], top, W[0], H1 + H2, { bold:true, size:8.6 });
+    bx(xs[1], top, W[1], H1 + H2);  cTx('Chi tiết thiệt hại', xs[1], top, W[1], H1 + H2, { bold:true, size:9.4 });
+    bx(xs[2], top, W[2] + W[3], H1); cTx('Phương án giải quyết', xs[2], top, W[2] + W[3], H1, { bold:true, size:8.8 });
+    bx(xs[4], top, W[4] + W[5], H1); cTx('Hiện vật thu hồi', xs[4], top, W[4] + W[5], H1, { bold:true, size:8.8 });
+    const t2 = top - H1;
+    ['Sửa chữa','Thay thế','Có','Không'].forEach((lbl, k) => {
+      bx(xs[k + 2], t2, W[k + 2], H2);
+      cTx(lbl, xs[k + 2], t2, W[k + 2], H2, { bold:true, size:8.6 });
+    });
+    y = top - H1 - H2;
+  };
+  need(H1 + H2 + HR * 2);
+  drawHead();
+  const rows = bb.rows.slice();
+  while (rows.length < BB_MIN_ROWS) rows.push({ tx:'', pa:'', hv:'' });
+  rows.forEach((r, i) => {
+    if (y - HR < BBC.MB + 16) { newPage(); drawHead(); }
+    const top = y;
+    W.forEach((w, k) => bx(xs[k], top, w, HR));
+    cTx(String(i + 1), xs[0], top, W[0], HR, { size:8.8 });
+    cTx(r.tx, xs[1], top, W[1], HR, { size:9, left:true });
+    if (r.pa === 'sua')   cTx('x', xs[2], top, W[2], HR, { bold:true, size:10 });
+    if (r.pa === 'thay')  cTx('x', xs[3], top, W[3], HR, { bold:true, size:10 });
+    if (r.hv === 'co')    cTx('x', xs[4], top, W[4], HR, { bold:true, size:10 });
+    if (r.hv === 'khong') cTx('x', xs[5], top, W[5], HR, { bold:true, size:10 });
+    y = top - HR;
+  });
+  gap(12);
+
+  // ════ Mục 3 — Ý kiến các bên ════
+  para('3. Ý kiến của các bên tham gia giám định:', { bold:true });
+  if (T(bb.yKien)) para(bb.yKien);
+  else { dotted('', ''); dotted('', ''); }
+  gap(2);
+
+  // ════ Mục 4 — Đơn vị sửa chữa ════
+  // Tên ga-ra người dùng gõ thường đã có sẵn chữ "Gara" — đừng in thành "Gara Gara …"
+  const garaTx = !V.gara ? 'Gara …………………'
+               : (/^gara\b/i.test(V.gara) ? V.gara : 'Gara ' + V.gara);
+  para(`4. Đơn vị sửa chữa: ${garaTx}`, { bold:true });
+  {
+    need(BBC.LH);
+    const size = BBC.FS;
+    const l1 = 'Đ/c : ', mid = 'SĐT liên hệ ';
+    const w1 = reg.widthOfTextAtSize(l1, size), wm = reg.widthOfTextAtSize(mid, size);
+    const halfA = CW * .58 - w1, halfB = CW * .42 - wm;
+    const put = (t, x, w) => {
+      if (T(t)) page.drawText(clipTo(t, w), { x, y: y - size * .82, size, font: reg, color: BLACK() });
+      else {
+        const dw = reg.widthOfTextAtSize('.', size);
+        page.drawText('.'.repeat(Math.max(0, Math.floor(w / dw) - 1)),
+          { x, y: y - size * .82, size, font: reg, color: DGRAY() });
+      }
+    };
+    page.drawText(l1, { x: BBC.ML, y: y - size * .82, size, font: reg, color: BLACK() });
+    put(bb.garaAddr, BBC.ML + w1, halfA);
+    const xm = BBC.ML + CW * .58;
+    page.drawText(mid, { x: xm, y: y - size * .82, size, font: reg, color: BLACK() });
+    put(bb.garaTel, xm + wm, halfB);
+    y -= BBC.LH;
+  }
+  gap(8);
+
+  // ════ Phần kết ════
+  para('Biên bản này được lập với sự xác nhận của các bên liên quan cùng tham gia giám định bao gồm ' +
+       `${bb.phuLuc ? bb.phuLuc : '……………'} phụ lục đính kèm làm cơ sở xây dựng Báo giá sửa chữa`);
+  para('Đại diện chủ xe/ lái xe giữ bản sao/chụp ảnh làm cơ sở theo dõi nội dung sửa chữa');
+  gap(10);
+
+  // ════ Khối chữ ký ════
+  {
+    const SIG_H = 128;
+    need(SIG_H);
+    const half = CW / 2;
+    const cL = BBC.ML + half / 2, cR = BBC.ML + half + half / 2;
+    const ctr = (t, cx, size, font, color) => {
+      const s = T(t); if (!s) return;
+      page.drawText(s, { x: cx - font.widthOfTextAtSize(s, size) / 2, y: y - size * .82,
+                         size, font, color: color || BLACK() });
+    };
+    ctr('LÁI XE/CHỦ XE', cL, 11, bold);
+    ctr('GIÁM ĐỊNH VIÊN PTI', cR, 11, bold);
+    y -= 18;
+
+    // Ô đặt chữ ký (placeholder sẵn trong mẫu) — ảnh PNG nền trong suốt vẽ đè lên
+    const boxH = 54, boxW = half - 54;
+    const slot = (img, cx) => {
+      if (img) {
+        const k = Math.min(boxW / img.width, boxH / img.height);
+        const w = img.width * k, h = img.height * k;
+        page.drawImage(img, { x: cx - w / 2, y: y - boxH + (boxH - h) / 2, width: w, height: h });
+      } else {
+        // căn giữa theo chiều dọc của ô ký, không dính lên mép trên
+        const ph = '(chưa ký)';
+        page.drawText(ph, { x: cx - reg.widthOfTextAtSize(ph, 9) / 2,
+          y: y - boxH / 2 - 3, size: 9, font: reg, color: PDFLib.rgb(.62, .66, .7) });
+      }
+      const dw = reg.widthOfTextAtSize('.', 10);
+      const n = Math.max(0, Math.floor(boxW / dw));
+      page.drawText('.'.repeat(n), { x: cx - boxW / 2, y: y - boxH - 2, size: 10, font: reg, color: DGRAY() });
+    };
+    slot(sigCusImg, cL);
+    slot(sigGdvImg, cR);
+    y -= boxH + 12;
+
+    ctr(V.laiXe, cL, 10.5, bold);
+    ctr(V.gdv,   cR, 10.5, bold);
+    y -= 13;
+    ctr(bb.sigCusAt ? 'Ký lúc ' + bbDT(bb.sigCusAt) : '', cL, 7.5, reg, DGRAY());
+    ctr(bb.sigGdvAt ? 'Ký lúc ' + bbDT(bb.sigGdvAt) : '', cR, 7.5, reg, DGRAY());
+    y -= 14;
+  }
+
+  // ════ Dấu vết kiểm chứng ════
+  // Chỉ in khi đã có xác nhận hoặc chữ ký — biên bản trắng in để ký tay thì
+  // không có gì để kiểm chứng, và nhờ vậy mẫu 10 dòng vẫn gọn trong MỘT trang.
+  if (bb.agree || bb.sigCus || bb.sigGdv) {
+    const L = [
+      ['Mã hồ sơ', V.maHs || '—'],
+      ['Xác nhận của chủ xe/lái xe', bb.agree
+        ? 'Đã tích "Tôi đã đọc và đồng ý nội dung biên bản" lúc ' + bbDT(bb.agreeAt)
+        : 'chưa tích'],
+      ['Thời điểm ký', [bb.sigCusAt ? 'Lái/chủ xe: ' + bbDT(bb.sigCusAt) : '',
+                        bb.sigGdvAt ? 'GĐV: ' + bbDT(bb.sigGdvAt) : ''].filter(Boolean).join('  ·  ') || 'chưa ký'],
+      ['Toạ độ GPS lúc ký', bbGpsText() || 'không lấy được / chưa lấy'],
+      ['Thiết bị ký', bb.device],
+      ['Mã kiểm chứng (SHA-256)', bb.contentHash || 'không khả dụng (cần mở trang bằng https)'],
+    ];
+    // lw = bề rộng cột nhãn; phải rộng hơn nhãn dài nhất kẻo nhãn đè lên giá trị
+    const fs = 7.4, lh = 9.8, lw = 128;
+    const lines = L.map(([k, v]) => ({ k, vs: wrap(v, reg, fs, CW - lw - 16) }));
+    const h = 15 + lines.reduce((s, l) => s + l.vs.length * lh, 0) + 7;
+    need(h + 6);
+    page.drawRectangle({ x: BBC.ML, y: y - h, width: CW, height: h,
+      color: PDFLib.rgb(.965, .975, .99), borderColor: PDFLib.rgb(.76, .82, .89), borderWidth: .7 });
+    let ty = y - 11;
+    page.drawText('DẤU VẾT KIỂM CHỨNG ĐIỆN TỬ', { x: BBC.ML + 8, y: ty, size: 7.8, font: bold,
+      color: PDFLib.rgb(.1, .3, .55) });
+    ty -= 11;
+    lines.forEach(l => {
+      page.drawText(l.k + ':', { x: BBC.ML + 8, y: ty, size: fs, font: reg, color: DGRAY() });
+      l.vs.forEach(v => {
+        page.drawText(v, { x: BBC.ML + 8 + lw, y: ty, size: fs, font: reg, color: BLACK() });
+        ty -= lh;      // mỗi dòng tiếp theo của cùng một mục tụt xuống, nhãn chỉ in một lần
+      });
+    });
+    y -= h + 6;
+  }
+
+  // ════ Chân trang mọi trang ════
+  pages.forEach((p, i) => {
+    const ft = `Quy trình giám định bảo hiểm xe cơ giới – ${BB_FORM}`;
+    p.drawText(ft, { x: BBC.ML, y: 18, size: 7.6, font: reg, color: DGRAY() });
+    const pn = `Trang ${i + 1}/${pages.length}`;
+    p.drawText(pn, { x: A4.w - BBC.MR - reg.widthOfTextAtSize(pn, 7.6), y: 18, size: 7.6,
+      font: reg, color: DGRAY() });
+  });
+
+  // Ngày tạo cố định theo thời điểm ký → cùng nội dung thì cùng mã băm file
+  const stamp = new Date(bb.sigGdvAt || bb.sigCusAt || '2020-01-01T00:00:00Z');
+  const fixed = isNaN(stamp) ? new Date('2020-01-01T00:00:00Z') : stamp;
+  pdfDoc.setCreationDate(fixed);
+  pdfDoc.setModificationDate(fixed);
+  pdfDoc.setTitle('Biên bản giám định thiệt hại ' + (V.bks || ''));
+  pdfDoc.setSubject('Mã kiểm chứng nội dung SHA-256: ' + (bb.contentHash || 'n/a'));
+  pdfDoc.setProducer('PTI SOS — Tiện ích ghép ảnh giám định ' + APP_VERSION);
+
+  const bytes = await pdfDoc.save();
+  bb.fileHash = await sha256Hex(bytes.slice().buffer);
+  bbRenderAudit();
+  return bytes;
+}
+
+// ──────── Xem trước (dựng PDF thật rồi vẽ bằng pdf.js) ────────
+async function bbRenderPreview() {
+  const host = $('bbPvScroll');
+  if (!host) return;
+  const seq = ++_bbSeq;
+  busyBtn('bbBuild', '⏳ Đang dựng…');
+  host.innerHTML = '<div class="empty"><p>⏳ Đang dựng biên bản…</p></div>';
+  try {
+    const bytes = await bbBuild();
+    bb.bytes = bytes;
+    const lib = await loadPdfjs();
+    if (seq !== _bbSeq) return;                       // đã có lượt dựng mới hơn
+    // .slice() vì pdf.js có thể lấy quyền sở hữu buffer
+    const doc = await lib.getDocument({ data: bytes.slice() }).promise;
+    const n = doc.numPages;
+    const frag = document.createDocumentFragment();
+    for (let i = 1; i <= n; i++) {
+      const pg = await doc.getPage(i);
+      const vp = pg.getViewport({ scale: BB_PV_SCALE });
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, cv.width, cv.height);
+      await pg.render({ canvasContext: ctx, viewport: vp }).promise;
+      pg.cleanup();
+      frag.appendChild(cv);
+    }
+    try { await doc.destroy(); } catch (_) {}
+    if (seq !== _bbSeq) return;
+    host.innerHTML = '';
+    host.appendChild(frag);
+    _bbAuto = true;
+    $('bbChip').textContent = (bb.sigCus && bb.sigGdv ? 'đã ký đủ 2 bên · ' :
+                               bb.sigCus || bb.sigGdv ? 'đã ký 1/2 · ' : '') + n + ' trang';
+  } catch (e) {
+    console.error(e);
+    host.innerHTML = `<div class="empty"><div class="ei">⚠️</div><p>Không dựng được biên bản: ${esc(e.message)}` +
+      `<br><span class="hint">Lần đầu cần có mạng để tải thư viện pdf.js.</span></p>` +
+      `<button class="btn btn-p btn-sm" style="margin-top:10px" onclick="bbRenderPreview()">🔄 Thử lại</button></div>`;
+  } finally {
+    freeBtn('bbBuild');
+  }
+}
+
+async function bbDownload() {
+  const miss = missingInfo();
+  if (miss) { showMissingOnStep2(miss); return; }
+  busyBtn('bbDl', '⏳ Đang tạo biên bản…');
+  try {
+    const bytes = await bbBuild();
+    bb.bytes = bytes;
+    const safe = s => String(s || '').replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim().replace(/\.+$/, '');
+    const tag = safe(bbVal('fBks')) || safe(bbVal('fMaHs')) || 'Bien ban';
+    bb.name = `${BB_PDF_NAME} ${tag}.pdf`;
+    saveBlob(new Blob([bytes], { type: 'application/pdf' }), bb.name);
+    $('bbNote').innerHTML = `✅ Đã tải <strong>${esc(bb.name)}</strong> · ${fmtBytes(bytes.length)}` +
+      `<br>Mã băm file (SHA-256): <code style="word-break:break-all">${esc(bb.fileHash || 'không khả dụng — cần mở trang bằng https')}</code>`;
+    scheduleDraftSave(false);
+    toast('✅ Đã tải biên bản PDF', 'o');
+  } catch (e) {
+    console.error(e);
+    $('bbNote').textContent = '❌ ' + e.message;
+    toast('❌ Không tạo được biên bản: ' + e.message, 'e');
+  } finally {
+    freeBtn('bbDl');
+  }
+}
+
+// ──────── Gắn sự kiện ────────
+BB_FIELDS.forEach(id => { const el = $(id); if (el) el.addEventListener('input', bbTouch); });
+['fLaiXe','fDdTt'].forEach(id => $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); bbTouch(); }));
+['fMaHs','fBks','fGara','fGdv','fPhong'].forEach(id =>
+  $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); bbRenderAudit(); }));
+
+(function sigBind() {
+  const cv = $('sigCanvas');
+  if (!cv) return;
+  cv.addEventListener('pointerdown', e => {
+    if (!_sigCtx) return;
+    e.preventDefault();
+    try { cv.setPointerCapture(e.pointerId); } catch (_) {}
+    _sigDrawing = true; _sigLast = sigPos(e);
+    _sigCtx.beginPath();
+    _sigCtx.arc(_sigLast.x, _sigLast.y, _sigCtx.lineWidth / 2, 0, Math.PI * 2);
+    _sigCtx.fillStyle = _sigCtx.strokeStyle; _sigCtx.fill();
+    sigMark();
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!_sigDrawing || !_sigCtx) return;
+    e.preventDefault();
+    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    for (const ev of evs) {
+      const p = sigPos(ev);
+      _sigCtx.beginPath();
+      _sigCtx.moveTo(_sigLast.x, _sigLast.y);
+      _sigCtx.lineTo(p.x, p.y);
+      _sigCtx.stroke();
+      _sigLast = p;
+    }
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev =>
+    cv.addEventListener(ev, () => { _sigDrawing = false; _sigLast = null; }));
+  window.addEventListener('resize', () => {
+    if (!$('sigModal').classList.contains('hidden') && !_sigDirty) sigInit();
+  });
+})();
+
+bbRenderRows(); bbRenderSigs(); bbRenderAudit(); bbRecap(); bbSyncChip();
+</script>
+
 </body>
 </html>

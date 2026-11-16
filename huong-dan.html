@@ -196,6 +196,7 @@ td{color:var(--text-2)}
     <a class="lv2" href="#thuyet-minh">8. Chú thích</a>
     <a class="lv2" href="#xuat-pdf">9. Xem trước &amp; xuất PDF</a>
     <a class="lv2" href="#xuat-jpg">9b. Tải PDF nén &amp; ảnh JPG</a>
+    <a class="lv2" href="#bien-ban">9c. Biên bản giám định &amp; chữ ký tay</a>
     <a class="lv2" href="#ho-so">10. Hồ sơ &amp; bản nháp</a>
     <a class="lv2" href="#danh-sach">11. Danh sách GĐV / Phòng</a>
     <a class="lv2" href="#phim-tat">12. Phím tắt</a>
@@ -307,6 +308,18 @@ td{color:var(--text-2)}
         <td>In ở <b>chân mỗi trang</b> (góc trái). <b>Lần đầu dùng app ô này để trống</b> —
             bạn chọn hoặc gõ tên phòng <b>một lần</b>, những lần mở app sau ô tự điền lại
             đúng tên đó nên không phải nhập lại.</td></tr>
+    <tr><td colspan="2" style="background:var(--surface-2)">
+        <b>Thông tin vụ tổn thất</b> — <b>không bắt buộc</b>, không in lên bản ảnh.
+        Chỉ dùng cho <a href="#bien-ban">Biên bản giám định</a> ở bước 2.</td></tr>
+    <tr><td>Tên Lái/chủ xe</td>
+        <td>Người đại diện chủ xe/lái xe ký vào biên bản. In ở dòng <code>2/ …</code>
+            và dưới ô chữ ký bên trái của biên bản.</td></tr>
+    <tr><td>Ngày tổn thất</td>
+        <td>Ô chọn ngày, nút <span class="btn-ex">✖</span> để bỏ trống. In vào câu
+            <i>"… bị tổn thất ngày : …"</i> của biên bản.</td></tr>
+    <tr><td>Địa điểm tổn thất</td>
+        <td>Nơi xảy ra tổn thất, in vào dòng <code>Tại : …</code> của biên bản.
+            Bỏ trống thì biên bản in dòng chấm để điền tay.</td></tr>
     <tr><td>Bố cục trang + Số ảnh/trang</td>
         <td>A4 dọc hay ngang và số ảnh mỗi trang. Xem mục <a href="#bo-cuc">Bố cục trang</a>.</td></tr>
   </table>
@@ -681,6 +694,96 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     đang ở mức nén thứ mấy.
   </div>
 
+  <h3 id="bien-ban">9c. Biên bản giám định &amp; chữ ký tay</h3>
+  <p>Ở <b>bước 2</b>, dưới phần xem trước bản ảnh có thẻ <b>📄 Biên bản giám định thiệt hại</b> —
+     lập biên bản theo mẫu <code>BM.PTI.CG.02.08a</code> từ chính thông tin đã nhập ở bước 1,
+     ký tay ngay trên điện thoại rồi tải về dưới dạng <b>file PDF riêng</b>.</p>
+  <div class="note">
+    ℹ️ Biên bản là <b>file PDF tách rời</b>, không nằm trong bản ảnh giám định. Tên file
+    <code>Bien ban giam dinh xe {BKS}.pdf</code>.
+  </div>
+
+  <h4>Bảy mục của thẻ biên bản</h4>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:26%">Mục</th><th>Việc cần làm</th></tr>
+    <tr><td><b>1 · Thông tin bổ sung</b></td>
+        <td>SĐT giám định viên · SĐT lái/chủ xe · số GPLX · địa chỉ và SĐT đơn vị sửa chữa ·
+            số phụ lục đính kèm. <b>Bỏ trống ô nào thì biên bản in dòng chấm</b> ở đúng chỗ đó
+            để điền tay tại hiện trường.</td></tr>
+    <tr><td><b>2 · Hạng mục giám định</b></td>
+        <td>Mỗi dòng gồm <i>chi tiết thiệt hại</i> + <i>phương án</i> (Sửa chữa / Thay thế) +
+            <i>hiện vật thu hồi</i> (Có / Không). Nút
+            <span class="btn-ex">📋 Lấy từ hạng mục ảnh</span> điền sẵn tên các hạng mục ảnh
+            đang có (bỏ qua nhóm tiền tố <code>0.</code> — ảnh nhận dạng xe).
+            Biên bản <b>luôn in tối thiểu 10 dòng</b>, dòng thừa để trống.</td></tr>
+    <tr><td><b>3 · Ý kiến các bên</b></td>
+        <td>Bỏ trống thì in 2 dòng chấm để ghi tay.</td></tr>
+    <tr><td><b>4 · Xem trước (PDF)</b></td>
+        <td>Bấm <span class="btn-ex">👁️ Dựng bản xem trước</span> — ứng dụng dựng
+            <b>đúng file PDF sẽ tải về</b> rồi hiển thị lại, nên những gì bạn thấy là bản in thật.
+            Sau lần dựng đầu tiên, mọi thay đổi sẽ <b>tự dựng lại</b> sau khoảng 1 giây.</td></tr>
+    <tr><td><b>5 · Xác thực thông tin</b></td>
+        <td>Bảng tóm tắt biển số, họ tên, số GPLX, ngày và địa điểm tổn thất… để khách hàng
+            đọc lại. Phải tích <b>"Tôi đã đọc và đồng ý nội dung biên bản"</b> thì nút
+            <b>Ký</b> của khách hàng mới bật.</td></tr>
+    <tr><td><b>6 · Chữ ký</b></td>
+        <td>Hai ô ký riêng — <b>Lái xe/chủ xe</b> và <b>Giám định viên PTI</b>. Mỗi ô có nút
+            <span class="btn-ex">✍️ Ký</span> và <span class="btn-ex">🗑️ Xóa / Ký lại</span>.</td></tr>
+    <tr><td><b>7 · Dấu vết kiểm chứng</b></td>
+        <td>Thời điểm tích đồng ý, thời điểm ký của từng bên, toạ độ GPS, thiết bị ký, mã hồ sơ
+            và mã băm chống sửa đổi. Nút <span class="btn-ex">📍 Lấy vị trí GPS</span> để lấy
+            toạ độ thủ công.</td></tr>
+  </table>
+  </div>
+
+  <h4>Màn hình ký tay</h4>
+  <p>Bấm <span class="btn-ex">✍️ Ký</span> mở <b>màn hình ký toàn màn hình</b> nền tối, khung ký
+     trắng chiếm gần hết màn hình — ký được bằng <b>ngón tay, bút cảm ứng hoặc chuột</b>.</p>
+  <ul>
+    <li>Nút <span class="btn-ex">🗑️ Xóa / Ký lại</span> xóa sạch khung để ký lại.</li>
+    <li>Nút <span class="btn-ex">✓ Xong — lưu chữ ký</span> chỉ bật khi đã có nét ký.</li>
+    <li>Chữ ký được <b>cắt sát nét mực</b> và lưu thành ảnh <b>PNG nền trong suốt</b>, nên
+        đặt lên biên bản không bị khối nền trắng che chữ.</li>
+    <li>Ký xong, ứng dụng <b>tự thử lấy toạ độ GPS</b> cho dấu vết kiểm chứng (trình duyệt sẽ
+        hỏi quyền; từ chối cũng không sao, biên bản vẫn lập được).</li>
+    <li><span class="kbd">Esc</span> đóng màn hình ký.</li>
+  </ul>
+  <div class="tip">
+    💡 Chỗ đặt chữ ký đã có sẵn trong mẫu biên bản (dòng kẻ dưới chữ
+    <b>LÁI XE/CHỦ XE</b> và <b>GIÁM ĐỊNH VIÊN PTI</b>). Chưa ký thì in chữ mờ
+    <i>(chưa ký)</i> — vẫn in và ký tay trên giấy được như thường.
+  </div>
+
+  <h4>Dấu vết kiểm chứng &amp; mã băm</h4>
+  <p>Khối <b>"DẤU VẾT KIỂM CHỨNG ĐIỆN TỬ"</b> chỉ được in vào biên bản khi <b>đã tích đồng ý
+     hoặc đã có chữ ký</b> — biên bản trắng in ra để ký tay thì không có khối này.</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:32%">Mục</th><th>Ý nghĩa</th></tr>
+    <tr><td>Thời điểm ký</td><td>Giờ máy của thiết bị, ghi riêng cho từng bên.</td></tr>
+    <tr><td>Toạ độ GPS</td><td>Vĩ độ, kinh độ và sai số (mét) lúc lấy vị trí.</td></tr>
+    <tr><td>Thiết bị ký</td><td>Chuỗi nhận dạng trình duyệt + kích thước màn hình.</td></tr>
+    <tr><td>Mã kiểm chứng nội dung</td>
+        <td>Mã băm <b>SHA-256</b> của toàn bộ nội dung biên bản (thông tin, bảng hạng mục,
+            hai chữ ký, dấu vết). Được <b>in ngay trên biên bản</b> — đổi bất kỳ chi tiết nào
+            thì mã này đổi theo, dùng để đối chiếu bản giấy với bản gốc.</td></tr>
+    <tr><td>Mã băm file PDF</td>
+        <td>SHA-256 của chính file vừa tải về, hiện ở dòng chữ nhỏ dưới nút tải.
+            Cùng một nội dung luôn cho ra <b>cùng một mã</b>, nên sửa file sẽ lộ ngay.</td></tr>
+  </table>
+  </div>
+  <div class="warn">
+    ⚠️ Mã băm và chữ ký <b>chỉ tính được khi trang mở bằng <code>https</code></b> (hoặc
+    <code>localhost</code>). Mở bằng <code>http</code> trong mạng LAN thì phần mã băm ghi
+    "không khả dụng" — biên bản vẫn lập và ký được bình thường.
+    Lần đầu dựng xem trước cần <b>có mạng</b> để tải thư viện đọc PDF.
+  </div>
+  <div class="note">
+    ℹ️ Toàn bộ chữ ký và dấu vết <b>nằm trong máy bạn</b>, được lưu kèm hồ sơ và bản nháp,
+    <b>không tải lên internet</b>.
+  </div>
+
   <h3 id="ho-so">10. Hồ sơ lưu trên máy &amp; bản nháp tự lưu</h3>
   <h4>Bản nháp tự lưu</h4>
   <p>Mọi thay đổi được <b>tự lưu sau khoảng 1,5 giây</b> vào bộ nhớ trình duyệt. Nếu máy tắt đột
@@ -744,6 +847,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang ở màn hình chụp ảnh</b></td></tr>
     <tr><td><span class="kbd">Space</span> · <span class="kbd">Enter</span></td><td>Chụp một ảnh</td></tr>
     <tr><td><span class="kbd">Esc</span></td><td>Đóng màn hình chụp</td></tr>
+    <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang ở màn hình ký tay</b></td></tr>
+    <tr><td><span class="kbd">Esc</span></td><td>Đóng màn hình ký (chữ ký chưa lưu sẽ mất)</td></tr>
     <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang xem ảnh kích thước lớn</b></td></tr>
     <tr><td><span class="kbd">←</span> <span class="kbd">→</span></td><td>Ảnh trước / ảnh sau</td></tr>
     <tr><td><span class="kbd">R</span></td><td>Xoay ảnh 90°</td></tr>
