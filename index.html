@@ -1143,7 +1143,7 @@ main > .foot{margin-top:auto}
             <span class="hint">💡 Bảng này <b>lấy tự động</b> từ phần <b>Quản lý ảnh &amp; chú thích</b> ở màn hình 1 —
               mỗi ảnh tích <b>Thay thế</b> hoặc <b>Sửa chữa</b> thành một dòng, theo đúng thứ tự ảnh;
               ảnh tích <b>Không</b> không vào biên bản. Hạng mục trùng tên và trùng phương án chỉ in một dòng.
-              Biên bản luôn in <b>tối thiểu 10 dòng</b> — các dòng trống để điền tay tại hiện trường.</span>
+              Biên bản luôn in <b>tối thiểu 10 dòng</b> — các dòng trống để điền tay tại hiện trường, <b>không đánh sẵn STT</b>: số thứ tự trong biên bản chạy đúng theo bảng này.</span>
           </div>
 
           <div class="bb-h"><span class="n">2</span>Xem trước biên bản (PDF)
@@ -1458,7 +1458,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-16c';
+const APP_BUILD   = '2026-11-16d';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -5003,11 +5003,14 @@ async function bbBuild() {
   drawHead();
   const rows = bb.rows.slice();
   while (rows.length < BB_MIN_ROWS) rows.push({ tx:'', pa:'', hv:'' });
-  rows.forEach((r, i) => {
+  // STT chỉ đánh cho dòng CÓ hạng mục, chạy đúng như bảng "Hạng mục giám định" ở màn hình 2.
+  // Dòng trống thêm vào cho đủ BB_MIN_ROWS để ghi tay thì BỎ TRỐNG ô STT — đừng in sẵn 1…10.
+  let stt = 0;
+  rows.forEach((r) => {
     if (y - HR < BBC.MB + 16) { newPage(); drawHead(); }
     const top = y;
     W.forEach((w, k) => bx(xs[k], top, w, HR));
-    cTx(String(i + 1), xs[0], top, W[0], HR, { size:8.8 });
+    if (T(r.tx)) cTx(String(++stt), xs[0], top, W[0], HR, { size:8.8 });
     cTx(r.tx, xs[1], top, W[1], HR, { size:9, left:true });
     if (r.pa === 'sua')   cTx('x', xs[2], top, W[2], HR, { bold:true, size:10 });
     if (r.pa === 'thay')  cTx('x', xs[3], top, W[3], HR, { bold:true, size:10 });
