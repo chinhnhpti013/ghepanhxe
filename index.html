@@ -18,8 +18,11 @@
 
 /* ════════ DESIGN TOKENS ════════ */
 :root{
-  /* Màu IN ẤN (nền header + caption của PDF) — KHÔNG đổi, để bản in giữ nguyên nhận diện */
+  /* Màu nhấn của GIAO DIỆN (nút, viền, đầu thẻ) */
   --brand:#1565C0; --brand-d:#0D47A1; --brand-m:#1976D2; --brand-soft:#E3F2FD;
+  /* Màu IN RA PDF: nền dải tiêu đề + nền chú thích ảnh, chữ trắng ở trên.
+     Đổi ở đây thì phải đổi cả BLUE() dưới script và BLUE_HEADER/BLUE_CAPTION trong ghep_anh.py */
+  --print:#1976D2;
   --green:#2E7D32; --green-soft:#E8F5E9;
   --red:#C62828;   --red-soft:#FFEBEE;
   --amber:#9A6700; --amber-soft:#FFF6DA;
@@ -48,6 +51,7 @@
 }
 :root[data-theme="dark"]{
   --brand:#5B9DF0; --brand-d:#8FC0FA; --brand-m:#4A8FE8; --brand-soft:#16293F;
+  --print:#5B9DF0;             /* nền tối thì phải sáng lên mới đọc được */
   --green:#6BBF73; --green-soft:#14271A;
   --red:#F2847E;   --red-soft:#2C1618;
   --amber:#E8BE6A; --amber-soft:#2E2614;
@@ -465,18 +469,18 @@ details.fold .fold-bd{padding:11px 13px;font-size:.77rem;line-height:1.6;color:v
   border-radius:4px;color:var(--brand);font-size:.95em}
 
 /* ════════ XEM TRƯỚC TIÊU ĐỀ BẢN IN ════════ */
-.title-prev{margin-top:15px;border:1px solid var(--brand);border-radius:var(--r-sm);
+.title-prev{margin-top:15px;border:1px solid var(--print);border-radius:var(--r-sm);
   overflow:hidden;background:var(--brand-soft)}
-.title-prev .tp-h{background:var(--brand);color:#fff;font-size:.72rem;font-weight:700;
+.title-prev .tp-h{background:var(--print);color:#fff;font-size:.72rem;font-weight:700;
   padding:5px 12px;letter-spacing:.01em}
 :root[data-theme="dark"] .title-prev .tp-h{color:#07121F}
 .title-prev .tp-b{padding:10px 13px;text-align:center}
-.title-prev .tp-b div{color:var(--brand);line-height:1.42;word-break:break-word}
+.title-prev .tp-b div{color:var(--print);line-height:1.42;word-break:break-word}
 .title-prev .tp-l1{font-size:.92rem;font-weight:700}
 .title-prev .tp-l2{font-size:.84rem}
 .title-prev .tp-l3{font-size:.8rem}
 .title-prev .tp-mute{opacity:.5;font-style:italic}
-.title-prev .tp-n{padding:6px 13px;border-top:1px dashed var(--brand);
+.title-prev .tp-n{padding:6px 13px;border-top:1px dashed var(--print);
   font-size:.72rem;color:var(--text-2);text-align:left}
 .fg{display:flex;flex-direction:column;gap:7px}
 .fg.span2{grid-column:1/-1}
@@ -572,7 +576,7 @@ details.fold .fold-bd{padding:11px 13px;font-size:.77rem;line-height:1.6;color:v
 .pv-no{background:var(--brand);color:#fff;font-size:.68rem;font-weight:700;padding:2px 13px;
   border-radius:30px;white-space:nowrap}
 :root[data-theme="dark"] .pv-no{color:#07121F}
-.pvh{background:#1565C0;color:#fff;display:flex;align-items:center;flex-shrink:0;position:relative}
+.pvh{background:#1976D2;color:#fff;display:flex;align-items:center;flex-shrink:0;position:relative}
 .pvh-logo{object-fit:contain;flex-shrink:0}
 .pvh-t{flex:1;min-width:0;text-align:left;padding:0;overflow:hidden}
 .pvh-t div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.26}
@@ -582,11 +586,11 @@ details.fold .fold-bd{padding:11px 13px;font-size:.77rem;line-height:1.6;color:v
 .pv-img img{width:100%;height:100%;object-fit:fill;display:block}
 .pv-img.ph::after{content:'…';position:absolute;inset:0;display:flex;align-items:center;
   justify-content:center;color:#CBD5E1;font-size:1.3rem}
-.pv-cap{background:#1565C0;color:#fff;text-align:center;flex-shrink:0;display:flex;
+.pv-cap{background:#1976D2;color:#fff;text-align:center;flex-shrink:0;display:flex;
   align-items:center;justify-content:center;overflow:hidden;padding:0 2px}
 .pv-cap span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
 .pvf{display:flex;justify-content:space-between;align-items:center;flex-shrink:0;color:#757575}
-.pvf .pn{color:#1565C0;font-weight:600}
+.pvf .pn{color:#1976D2;font-weight:600}
 
 /* ════════ PROGRESS ════════ */
 .prog{margin:14px 0}
@@ -1119,13 +1123,9 @@ main > .foot{margin-top:auto}
                 </div>
                 <input type="hidden" id="fNgayTt"/>
               </div>
-              <div class="fg">
-                <label>Địa điểm tổn thất</label>
-                <input type="text" id="fDdTt" placeholder="QL18, TP Hạ Long, Quảng Ninh"/>
-              </div>
             </div>
             <span class="hint" id="ttHint" style="display:none;margin-top:8px">
-              Bốn ô trên <b>không bắt buộc</b>, không in lên bản ảnh — chỉ dùng cho
+              Ba ô trên <b>không bắt buộc</b>, không in lên bản ảnh — chỉ dùng cho
               <b>mục I · Thông tin cơ bản</b> của biên bản; bỏ trống thì biên bản in
               dòng chấm để điền tay.</span>
           </div>
@@ -1590,7 +1590,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-17b';
+const APP_BUILD   = '2026-11-17d';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -2123,7 +2123,7 @@ function currentInfo() {
     loai:$('fLoai').value, layout:state.layout, perPage:state.perPage,
     capSrc:state.capSrc, useFileName:state.useFileName,
     // Thông tin vụ tổn thất (không bắt buộc) + toàn bộ dữ liệu Biên bản giám định
-    laiXe:$('fLaiXe').value.trim(), ngayTt:$('fNgayTt').value.trim(), ddTt:$('fDdTt').value.trim(),
+    laiXe:$('fLaiXe').value.trim(), ngayTt:$('fNgayTt').value.trim(),
     loaiXe:$('fLoaiXe').value.trim(), sdtGdv:$('fSdtGdv').value.trim(),
     bbOn: state.bbOn, bb: bbSnapshot(),
   };
@@ -2245,7 +2245,7 @@ async function loadRecord(id) {
     $('fPhong').value = i.phong || getLastPhong();
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
     state.bbOn = !!i.bbOn;
-    $('fLaiXe').value = i.laiXe || ''; $('fDdTt').value = i.ddTt || '';
+    $('fLaiXe').value = i.laiXe || '';
     $('fNgayTt').value = i.ngayTt || ''; $('fLoaiXe').value = i.loaiXe || '';
     // Hồ sơ cũ không có sdtGdv → lấy số đã nhớ của chính GĐV đó
     $('fSdtGdv').value = i.sdtGdv || (getGdvTelMap()[gdvTelKey(i.gdv)] || '');
@@ -2396,7 +2396,7 @@ async function restoreDraft() {
     $('fPhong').value = i.phong || getLastPhong();
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
     state.bbOn = !!i.bbOn;
-    $('fLaiXe').value = i.laiXe || ''; $('fDdTt').value = i.ddTt || '';
+    $('fLaiXe').value = i.laiXe || '';
     $('fNgayTt').value = i.ngayTt || ''; $('fLoaiXe').value = i.loaiXe || '';
     // Hồ sơ cũ không có sdtGdv → lấy số đã nhớ của chính GĐV đó
     $('fSdtGdv').value = i.sdtGdv || (getGdvTelMap()[gdvTelKey(i.gdv)] || '');
@@ -2814,7 +2814,7 @@ function applyBbVisible() {
   const on = bbEnabled();
   if ($('fBbOn')) $('fBbOn').checked = !!state.bbOn;
   $('bbSwitchRow').style.display = isCt ? '' : 'none';
-  // Tên lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất chỉ phục vụ Biên bản giám định
+  // Tên lái/chủ xe · Loại xe · Ngày tổn thất chỉ phục vụ Biên bản giám định
   if ($('ttRow'))  $('ttRow').style.display  = on ? '' : 'none';
   if ($('ttHint')) $('ttHint').style.display = on ? 'block' : 'none';
   $('cardBienBan').style.display = on ? '' : 'none';
@@ -4023,8 +4023,7 @@ function updateSummaries() {
       ? rowIf('Điện thoại GĐV', $('fSdtGdv').value.trim()) +
         rowIf('Lái/chủ xe', $('fLaiXe').value.trim()) +
         rowIf('Loại xe', $('fLoaiXe').value.trim()) +
-        rowIf('Ngày tổn thất', $('fNgayTt').value.trim()) +
-        rowIf('Địa điểm tổn thất', $('fDdTt').value.trim())
+        rowIf('Ngày tổn thất', $('fNgayTt').value.trim())
       : '') +
     layRow +
     // 'auto' là mặc định — chỉ nhắc khi người dùng đã đổi nguồn chú thích
@@ -4157,7 +4156,7 @@ function clearPvCache() {
 // ════════════════════════════════════════════════════════
 //  TẠO PDF
 // ════════════════════════════════════════════════════════
-const BLUE  = () => PDFLib.rgb(21/255, 101/255, 192/255);
+const BLUE  = () => PDFLib.rgb(25/255, 118/255, 210/255);   // #1976D2 — xem token --print
 const GRAY  = () => PDFLib.rgb(117/255, 117/255, 117/255);
 const WHITE = () => PDFLib.rgb(1, 1, 1);
 const LGRAY = () => PDFLib.rgb(189/255, 189/255, 189/255);
@@ -4165,17 +4164,29 @@ const LGRAY = () => PDFLib.rgb(189/255, 189/255, 189/255);
 /** Nạp font tiếng Việt + logo PTI SOS vào một tài liệu PDF.
  *  Dùng chung cho bản ảnh giám định và Biên bản giám định — font phải nạp qua fetch
  *  nên trang PHẢI mở bằng địa chỉ web, không mở bằng file://
- *  `want`: 'anh' (mặc định) = huy hiệu vuông cho header bản ảnh ·
- *          'bb'             = logo ngang cho đầu trang biên bản.
+ *  `want`: 'anh' (mặc định) = Be Vietnam Pro + huy hiệu vuông cho header bản ảnh ·
+ *          'bb'             = Tinos (Times New Roman) + logo cho đầu trang biên bản.
  *  Chỉ nhúng ĐÚNG MỘT logo — nhúng cả hai sẽ cõng thêm ~130KB chết vào mỗi file. */
 async function embedAssets(pdfDoc, want) {
+  // Biên bản giám định in bằng Tinos — bộ chữ chân có bề ngang TRÙNG KHÍT từng ký tự
+  // với Times New Roman (đo trên toàn bộ chữ Latin + dấu tiếng Việt), nhưng giấy phép
+  // mở (SIL OFL, fonts/Tinos-OFL.txt) nên gửi kèm repo được. Times New Roman của
+  // Windows là font bản quyền Monotype — ĐỪNG chép vào đây.
+  const BVP = ['fonts/BeVietnamPro-Regular.ttf', 'fonts/BeVietnamPro-Bold.ttf'];
+  const ttf = p => fetch(p).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
+  const pair = async ([a, b]) => {
+    const [x, z] = await Promise.all([ttf(a), ttf(b)]);
+    return Promise.all([pdfDoc.embedFont(x), pdfDoc.embedFont(z)]);
+  };
   let reg, bold;
   try {
-    const [rb, bbf] = await Promise.all([
-      fetch('fonts/BeVietnamPro-Regular.ttf').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); }),
-      fetch('fonts/BeVietnamPro-Bold.ttf').then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); }),
-    ]);
-    [reg, bold] = await Promise.all([pdfDoc.embedFont(rb), pdfDoc.embedFont(bbf)]);
+    if (want === 'bb') {
+      // Thiếu font chân thì vẫn ra được biên bản bằng Be Vietnam Pro, chỉ khác mặt chữ
+      try { [reg, bold] = await pair(['fonts/Tinos-Regular.ttf', 'fonts/Tinos-Bold.ttf']); }
+      catch (e) { [reg, bold] = await pair(BVP); }
+    } else {
+      [reg, bold] = await pair(BVP);
+    }
   } catch (e) {
     throw new Error('Không nạp được font tiếng Việt. Hãy mở app qua địa chỉ web (GitHub Pages / Render) thay vì mở file trực tiếp.');
   }
@@ -4556,7 +4567,7 @@ function resetApp() {
   clearDraftStores().catch(() => {});
   setDraftBar('off', 'Bản nháp tự lưu sẽ bật khi có ảnh.', false);
   ['fMaHs','fBks','fGara','fGdv','fNgay','fNgayPick','fSdtGdv','fLoaiXe',
-   'fLaiXe','fNgayTt','fNgayTtPick','fDdTt'].forEach(id => { $(id).value = ''; $(id).classList.remove('ok'); });
+   'fLaiXe','fNgayTt','fNgayTtPick'].forEach(id => { $(id).value = ''; $(id).classList.remove('ok'); });
   bbReset();
   $('fPhong').value = getLastPhong();
   $('fLoai').value = 'chitiet';
@@ -4792,12 +4803,13 @@ const BBC = {
   ML:48.6, MR:32.5,            // lề chữ trái / phải
   MT:30,   MB:42,              // MB chừa chỗ cho dải cam (23,2pt) + dòng số trang
   COL2:316,                    // mốc cột phải của mục I (Loại xe / Ngày GĐ / SĐT GĐV)
-  FS:11.5, LH:16.3,            // cỡ chữ & giãn dòng phần chữ thường
-  H1:16,   H2:12.5,            // cỡ chữ "BIÊN BẢN GIÁM ĐỊNH" / "I." "II."
+  FS:13,   LH:16.3,            // cỡ chữ & giãn dòng phần chữ thường
+  H1:16,   H2:13,              // cỡ chữ "BIÊN BẢN GIÁM ĐỊNH" / "I." "II."
   HIND:36,                     // thụt đầu dòng của tiêu đề mục (I.  ⟶  THÔNG TIN…)
   TL:30.9, TCOL:[34.8, 297, 100.4, 99.7],   // STT · Chi tiết thiệt hại · Phương án · Thu hồi
-  THH:24,  TRH:18.9,           // cao hàng tiêu đề bảng / hàng dữ liệu
-  LOGO_W:62, LOGO_R:1.0879,    // logo "pti Insurance": bề ngang + tỷ lệ w/h của file PNG
+  TFS:14,  THFS:13,            // cỡ chữ hàng dữ liệu / hàng tiêu đề bảng
+  THH:29.9, TRH:18.9,          // cao hàng tiêu đề bảng / hàng dữ liệu
+  LOGO_W:62, LOGO_R:1.0923,    // logo "pti Insurance": bề ngang + tỷ lệ w/h của file PNG
   FOOT_H:23.2,                 // dải cam chân trang
 };
 /** Màu theo đúng mẫu: tiêu đề #ed7d31 · "I."/"II." #c65911 · nền tiêu đề bảng #5b9bd5 */
@@ -4967,7 +4979,6 @@ function bbRecap() {
     row('Tên lái/chủ xe', bbVal('fLaiXe')) +
     row('Loại xe', bbVal('fLoaiXe')) +
     row('Ngày tổn thất', bbVal('fNgayTt')) +
-    row('Địa điểm tổn thất', bbVal('fDdTt')) +
     row('Ngày giám định', bbVal('fNgay')) +
     row('Ga-ra / Địa điểm', bbVal('fGara')) +
     row('Giám định viên', [bbVal('fGdv'), bbVal('fPhong')].filter(Boolean).join(' — ')) +
@@ -5105,7 +5116,7 @@ async function bbBuild() {
   const V = {
     bks: bbVal('fBks'), gdv: bbVal('fGdv'), sdtGdv: bbVal('fSdtGdv'), ngay: bbVal('fNgay'),
     laiXe: bbVal('fLaiXe'), loaiXe: bbVal('fLoaiXe'),
-    ngayTt: bbVal('fNgayTt'), ddTt: bbVal('fDdTt'),
+    ngayTt: bbVal('fNgayTt'),
   };
   const CW = A4.w - BBC.ML - BBC.MR;
   const TW = BBC.TCOL.reduce((a, b) => a + b, 0);     // bề ngang bảng hạng mục
@@ -5173,25 +5184,22 @@ async function bbBuild() {
     const tt = 'BIÊN BẢN GIÁM ĐỊNH';
     let fs = BBC.H1;
     while (fs > 10 && bold.widthOfTextAtSize(tt, fs) > x1 - x0) fs -= .4;
-    put(tt, (x0 + x1 - bold.widthOfTextAtSize(tt, fs)) / 2, fs, bold, BB_ORANGE(), y - 30);
-    y -= 90;
+    put(tt, (x0 + x1 - bold.widthOfTextAtSize(tt, fs)) / 2, fs, bold, BB_ORANGE(), y - 34.1);
+    y -= 92.8;
   }
 
   // ════ I. THÔNG TIN CƠ BẢN ════
   heading('I.', 'THÔNG TIN CƠ BẢN');
-  gap(6);
+  gap(7.2);
   row1('Tên chủ xe/Lái xe: ', V.laiXe);
   row2('Biển số: ',      V.bks,    'Loại xe: ',        V.loaiXe);
   row2('Ngày tai nạn: ', V.ngayTt, 'Ngày giám định: ', V.ngay);
   row2('Tên GĐV: ',      V.gdv,    'Điện thoại GĐV: ', V.sdtGdv);
-  // Mẫu không có dòng này — chỉ in thêm khi người dùng đã nhập, để biên bản bỏ trống
-  // vẫn giống hệt mẫu BM.PTI.CG.02.08a.
-  if (T(V.ddTt)) row1('Địa điểm tai nạn: ', V.ddTt);
-  gap(14);
+  gap(11.8);
 
   // ════ II. THÔNG TIN THIỆT HẠI ════
   heading('II.', 'THÔNG TIN THIỆT HẠI');
-  gap(8);
+  gap(6.2);
 
   const xs = []; { let x = BBC.TL; for (const w of BBC.TCOL) { xs.push(x); x += w; } }
   const bx = (x, top, w, h) => page.drawRectangle({ x, y: top - h, width: w, height: h,
@@ -5200,7 +5208,7 @@ async function bbBuild() {
   const cTx = (s, x, top, w, h, o) => {
     o = o || {};
     const font = o.bold ? bold : reg;
-    let fs = o.size || 11, t = T(s);
+    let fs = o.size || BBC.TFS, t = T(s);
     if (!t) return;
     while (fs > 5 && font.widthOfTextAtSize(t, fs) > w - 8) fs -= .4;
     const x0 = o.left ? x + 5 : x + (w - font.widthOfTextAtSize(t, fs)) / 2;
@@ -5213,7 +5221,7 @@ async function bbBuild() {
     page.drawRectangle({ x: BBC.TL, y: top - BBC.THH, width: TW, height: BBC.THH, color: BB_BLUE() });
     BBC.TCOL.forEach((w, k) => {
       bx(xs[k], top, w, BBC.THH);
-      cTx(TH[k], xs[k], top, w, BBC.THH, { bold: true, size: 10, color: WHITE() });
+      cTx(TH[k], xs[k], top, w, BBC.THH, { bold: true, size: BBC.THFS, color: WHITE() });
     });
     y = top - BBC.THH;
   };
@@ -5229,28 +5237,28 @@ async function bbBuild() {
     if (y - BBC.TRH < BBC.MB) { newPage(); drawHead(); }
     const top = y;
     BBC.TCOL.forEach((w, k) => bx(xs[k], top, w, BBC.TRH));
-    if (T(r.tx)) cTx(String(++stt), xs[0], top, BBC.TCOL[0], BBC.TRH, { size: 10.5 });
-    cTx(r.tx,                  xs[1], top, BBC.TCOL[1], BBC.TRH, { size: 11, left: true });
-    cTx(BB_PA_LBL[r.pa] || '', xs[2], top, BBC.TCOL[2], BBC.TRH, { size: 11, left: true });
-    cTx(BB_HV_LBL[r.hv] || '', xs[3], top, BBC.TCOL[3], BBC.TRH, { size: 11, left: true });
+    if (T(r.tx)) cTx(String(++stt), xs[0], top, BBC.TCOL[0], BBC.TRH, { size: BBC.TFS });
+    cTx(r.tx,                  xs[1], top, BBC.TCOL[1], BBC.TRH, { size: BBC.TFS, left: true });
+    cTx(BB_PA_LBL[r.pa] || '', xs[2], top, BBC.TCOL[2], BBC.TRH, { size: BBC.TFS, left: true });
+    cTx(BB_HV_LBL[r.hv] || '', xs[3], top, BBC.TCOL[3], BBC.TRH, { size: BBC.TFS, left: true });
     y = top - BBC.TRH;
   });
 
   // ════ Khối chữ ký ════
   {
     const SIG_H = 112;
-    need(26 + SIG_H);
-    gap(26);
+    need(17.2 + SIG_H);
+    gap(17.2);
     const cL = BBC.TL + TW / 4, cR = BBC.TL + TW * 3 / 4;
     const ctr = (t, cx, size, font, color) => {
       const s = T(t); if (!s) return;
       put(s, cx - font.widthOfTextAtSize(s, size) / 2, size, font, color);
     };
-    ctr('Xác nhận của chủ xe/lái xe', cL, 11.5, bold);
-    ctr('Xác nhận của đại diện PTI',  cR, 11.5, bold);
-    y -= 14.5;
-    ctr('(Chữ ký và ghi rõ họ tên)', cL, 10.5, reg, DGRAY());
-    ctr('(Ký và ghi rõ họ tên)',     cR, 10.5, reg, DGRAY());
+    ctr('Xác nhận của chủ xe/lái xe', cL, 12, bold);
+    ctr('Xác nhận của đại diện PTI',  cR, 12, bold);
+    y -= 13.8;
+    ctr('(Chữ ký và ghi rõ họ tên)', cL, 12, reg, DGRAY());
+    ctr('(Ký và ghi rõ họ tên)',     cR, 12, reg, DGRAY());
     y -= 15;
 
     // Ô đặt chữ ký — ảnh PNG nền trong suốt, thu vừa khung và canh giữa
@@ -5266,16 +5274,16 @@ async function bbBuild() {
     y -= boxH + 4;
     // Mẫu ghi "(Ký và ghi rõ họ tên)" — ký giấy thì tên do người ký tự viết.
     // Chỉ in sẵn tên khi bên đó đã ký điện tử, để chữ ký ảnh có tên đi kèm.
-    if (sigCusImg) ctr(V.laiXe, cL, 11, reg);
-    if (sigGdvImg) ctr(V.gdv,   cR, 11, reg);
+    if (sigCusImg) ctr(V.laiXe, cL, 12, reg);
+    if (sigGdvImg) ctr(V.gdv,   cR, 12, reg);
     y -= 15;
   }
 
   // ════ Chân trang mọi trang: số trang + dải cam ════
   pages.forEach((p, i) => {
     const pn = (i + 1) + '/' + pages.length;
-    p.drawText(pn, { x: A4.w - BBC.MR - 11 - reg.widthOfTextAtSize(pn, 9),
-      y: BBC.FOOT_H + 6, size: 9, font: reg, color: BLACK() });
+    p.drawText(pn, { x: A4.w - 20.9 - reg.widthOfTextAtSize(pn, 9),
+      y: BBC.FOOT_H + 2, size: 9, font: reg, color: BLACK() });
     if (footImg) {
       p.drawImage(footImg, { x: 0, y: 0, width: A4.w, height: BBC.FOOT_H });
     } else {
@@ -5372,7 +5380,7 @@ async function bbDownload() {
 
 // ──────── Gắn sự kiện ────────
 BB_FIELDS.forEach(id => { const el = $(id); if (el) el.addEventListener('input', bbTouch); });
-['fLaiXe','fDdTt','fLoaiXe','fSdtGdv'].forEach(id =>
+['fLaiXe','fLoaiXe','fSdtGdv'].forEach(id =>
   $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); bbTouch(); }));
 ['fMaHs','fBks','fGara','fGdv','fPhong'].forEach(id =>
   $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); }));

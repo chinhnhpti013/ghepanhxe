@@ -306,7 +306,7 @@ td{color:var(--text-2)}
   </div>
   <div class="tip">
     💡 Màu nền chỉ là giao diện làm việc, <b>không ảnh hưởng tới file PDF</b>. Bản in luôn giữ
-    header và chú thích màu xanh <code>#1565C0</code> theo mẫu của Phòng.
+    header và chú thích màu xanh dương nhạt <code>#1976D2</code> theo mẫu của Phòng.
   </div>
 
   <h3 id="thong-tin">2. Thẻ "Thông tin giám định"</h3>
@@ -337,7 +337,7 @@ td{color:var(--text-2)}
             <br>• bước 2 mới có thẻ <a href="#bien-ban">Biên bản giám định</a>;
             <br>• mỗi ảnh ở mục <a href="#quan-ly-anh">Chọn và chỉnh từng ảnh</a> mới hiện
               dải nút <b>Thay thế / Sửa chữa / Không</b>;
-            <br>• bốn ô <b>Tên Lái/chủ xe · Loại xe · Ngày tổn thất · Địa điểm tổn thất</b>
+            <br>• ba ô <b>Tên Lái/chủ xe · Loại xe · Ngày tổn thất</b>
               mới hiện ra ngay trong khung ❺ này.
             <br>Không tích thì ứng dụng chạy y như cũ, chỉ xuất bản ảnh.</td></tr>
     <tr><td>Số HSBT / Mã hồ sơ</td>
@@ -381,10 +381,6 @@ td{color:var(--text-2)}
     <tr><td>Ngày tổn thất</td>
         <td>Ô chọn ngày, nút <span class="btn-ex">✖</span> để bỏ trống. In vào dòng
             <code>Ngày tai nạn: …</code>.</td></tr>
-    <tr><td>Địa điểm tổn thất</td>
-        <td>Nơi xảy ra tổn thất. Mẫu biên bản <b>không có dòng này</b>, nên ứng dụng chỉ in thêm
-            dòng <code>Địa điểm tai nạn: …</code> khi bạn có nhập — bỏ trống thì biên bản giống
-            hệt mẫu giấy.</td></tr>
     <tr><td>Bố cục trang + Số ảnh/trang</td>
         <td>A4 dọc hay ngang và số ảnh mỗi trang. Xem mục <a href="#bo-cuc">Bố cục trang</a>.</td></tr>
   </table>
@@ -801,7 +797,9 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
      tiêu đề <b>BIÊN BẢN GIÁM ĐỊNH</b>, mục <b>I · Thông tin cơ bản</b> (chủ xe · biển số ·
      loại xe · ngày tai nạn · ngày giám định · GĐV · điện thoại GĐV), mục
      <b>II · Thông tin thiệt hại</b> là bảng 4 cột
-     <i>STT · Chi tiết thiệt hại · Phương án · Thu hồi</i>, hai ô ký ở dưới và dải cam chân trang.</p>
+     <i>STT · Chi tiết thiệt hại · Phương án · Thu hồi</i>, hai ô ký ở dưới và dải cam chân trang.
+     Chữ in trên biên bản là <b>Times New Roman</b>, đúng cỡ chữ của mẫu giấy — khác với bản ảnh
+     giám định (dùng phông chữ không chân).</p>
   <div class="warn">
     ⚠️ Thẻ này <b>chỉ xuất hiện</b> khi ở bước 1 bạn chọn kiểu
     <i>"Ảnh giám định chi tiết thiệt hại"</i> <b>và</b> tích <b>Lập Biên bản giám định</b>.
@@ -990,7 +988,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><th style="width:30%">Thành phần</th><th>Thông số</th></tr>
     <tr><td>Khổ giấy</td><td>A4 dọc hoặc A4 ngang (kiểu <i>Giấy tờ xe</i> trộn được cả hai trong một file)</td></tr>
     <tr><td>Phông chữ</td><td>Be Vietnam Pro (Regular + Bold) — hỗ trợ đầy đủ dấu tiếng Việt</td></tr>
-    <tr><td>Dải tiêu đề</td><td>Cao 20 mm, nền xanh <code>#1565C0</code>, chữ trắng, dán sát mép trên trang</td></tr>
+    <tr><td>Dải tiêu đề</td><td>Cao 20 mm, nền xanh dương nhạt <code>#1976D2</code>, chữ trắng,
+        dán sát mép trên trang</td></tr>
     <tr><td>Logo PTI SOS</td><td>17 × 17 mm, góc trái dải tiêu đề</td></tr>
     <tr><td>Dòng tiêu đề</td>
         <td>Căn trái, cách logo <b>12 mm</b>, gồm <b>3 dòng</b>:<br>
@@ -1002,7 +1001,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
             thu nhỏ bằng nhau cho vừa dải tiêu đề. Đoạn Số HSBT chỉ in khi có mã hồ sơ
             (khi đó dòng 2 chỉ còn tên giám định viên).</td></tr>
     <tr><td>Khung ảnh</td><td>Bo góc mềm, khoảng cách giữa các ô 2 mm, lề trang 8 mm</td></tr>
-    <tr><td>Chú thích</td><td>14pt, chữ trắng trên nền xanh dưới mỗi ảnh, tự thu nhỏ nếu dài.
+    <tr><td>Chú thích</td><td>14pt, chữ trắng trên nền xanh dương nhạt <code>#1976D2</code>
+        dưới mỗi ảnh, tự thu nhỏ nếu dài.
         Bắt đầu bằng <b>số thứ tự ảnh</b> chạy liên tục qua các trang</td></tr>
     <tr><td>Chân trang</td><td>Tên Phòng / Khu vực (xám, bên trái) + <b>số trang / tổng số trang</b>
         (xanh, bên phải), cỡ chữ <b>8,7pt</b> (2/3 cỡ cũ)</td></tr>

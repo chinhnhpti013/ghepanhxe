@@ -28,7 +28,9 @@ anh-giam-dinh-vcx-theo-ten-file/
 ├── assets/bb-footer.png          ← dải cam chân trang BIÊN BẢN
 ├── assets/logo-pti-bienban.png   ← logo PTI SOS ngang (dự phòng cho biên bản)
 ├── docs/bien_ban_giam_dinh.pdf   ← MẪU GIẤY của biên bản (gitignore: có dữ liệu khách thật)
-├── fonts/BeVietnamPro-{Regular,Bold}.ttf
+├── fonts/BeVietnamPro-{Regular,Bold}.ttf   ← chữ của BẢN ẢNH
+├── fonts/Tinos-{Regular,Bold}.ttf          ← chữ của BIÊN BẢN (= Times New Roman)
+├── fonts/Tinos-OFL.txt                     ← giấy phép SIL OFL của Tinos
 ├── dat_ten_file.py               ← Giai đoạn 1 (Python)
 ├── ghep_anh.py                   ← Giai đoạn 2 (Python)
 ├── chay_doc.bat / chay_ngang.bat ← chạy nhanh bằng double-click
@@ -77,10 +79,10 @@ thông tin (xem *Khung thông tin `.fsec`* ở phần hệ màu):
 4. **Bố cục trang in** (`#layoutSection`) — A4 dọc/ngang · Số ảnh trên mỗi trang *(2 cột)*;
    `#layoutHint` giờ là `<span class="tag">` nằm trong `.fsec-h`
 5. **Biên bản giám định** (`#bbSwitchRow`, `.fsec.warm` nền vàng) — công tắc **`#fBbOn`** +
-   **Tên Lái/chủ xe · Loại xe · Ngày tổn thất · Địa điểm tổn thất** (`#ttRow`) + dòng ghi chú
+   **Tên Lái/chủ xe · Loại xe · Ngày tổn thất** (`#ttRow`) + dòng ghi chú
    `#ttHint`.
    Cả khung chỉ hiện khi `fLoai === 'chitiet'`; `#ttRow`/`#ttHint` chỉ hiện khi `bbEnabled()`.
-   `updateSummaries()` cũng gọi `bbEnabled()` trước khi in 4 dòng tổn thất vào tóm tắt
+   `updateSummaries()` cũng gọi `bbEnabled()` trước khi in các dòng tổn thất vào tóm tắt
    (bỏ tích rồi thì tóm tắt không được in lại tên lái xe đã gõ trước đó)
 
 > Khung ⑤ đặt **cuối cùng** (sau Bố cục) chứ không phải ngay dưới Kiểu bản ảnh, để khi nó bị ẩn
@@ -297,7 +299,7 @@ trả về trạng thái trống; khóa thừa của bản cũ (`yKien`, `gdvTel
 Bảng hạng mục in **đúng số hạng mục đã tích**; **chưa tích ảnh nào** thì mới in `BB_MIN_ROWS` = 10
 dòng trống (mẫu giấy không có dòng thừa — đừng thêm lại).
 
-#### Nguồn dữ liệu mục I — 2 ô nhập MỚI ở bước 1
+#### Nguồn dữ liệu mục I
 | Dòng in ra | Ô nhập | Nằm ở |
 |---|---|---|
 | `Tên chủ xe/Lái xe:` | `#fLaiXe` | khung ⑤ |
@@ -307,7 +309,6 @@ dòng trống (mẫu giấy không có dòng thừa — đừng thêm lại).
 | `Ngày giám định:` | `#fNgay` | khung ② |
 | `Tên GĐV:` | `#fGdv` | khung ③ |
 | `Điện thoại GĐV:` | **`#fSdtGdv`** | khung ③ |
-| `Địa điểm tai nạn:` *(chỉ khi có nhập)* | `#fDdTt` | khung ⑤ |
 
 `#fSdtGdv` đặt ở khung ③ **cạnh tên GĐV** vì nó là thuộc tính của con người, không phải của hồ sơ:
 `pti_gdv_tel` (`getGdvTelMap()`) nhớ **số theo từng tên GĐV**, `rememberGdvTel()` ghi khi rời ô,
@@ -315,8 +316,9 @@ dòng trống (mẫu giấy không có dòng thừa — đừng thêm lại).
 (bấm droplist **không** sinh `change`) và từ `useGdv()`. `fillGdvTel()` **chỉ ghi đè** khi ô số
 đang trống hoặc đang giữ số của một GĐV khác trong bộ nhớ, kẻo đang sửa tay thì bị nhảy số.
 
-`#fDdTt` **không có trong mẫu giấy** — chỉ in thêm một dòng khi người dùng có nhập, để biên bản
-bỏ trống vẫn giống hệt mẫu. Ga-ra, Số HSBT, Phòng/Khu vực **không in lên biên bản**.
+Ga-ra, Số HSBT, Phòng/Khu vực **không in lên biên bản** — mẫu giấy không có chỗ cho chúng.
+**Địa điểm tổn thất** (`#fDdTt`) đã **bỏ hẳn** khỏi cả ô nhập lẫn biên bản: mẫu không có dòng
+đó. Hồ sơ/bản nháp cũ còn khóa `ddTt` thì khóa đó bị bỏ qua — đừng dựng lại ô này.
 
 #### Bảng hạng mục — DẪN XUẤT từ ảnh, không nhập tay
 `bbRowsFromImages()` duyệt `state.groups[].items[]` **theo đúng thứ tự ảnh**; ảnh có
@@ -378,11 +380,12 @@ mở bằng `http` LAN thì `sha256Hex()` trả rỗng, mọi thứ còn lại v
 |---|---|---|
 | `ML` `MR` `MT` `MB` | `48.6` `32.5` `30` `42` | lề; `MB` chừa chỗ cho dải cam (23,2pt) + dòng số trang |
 | `COL2` | `316` | mốc cột phải của mục I (Loại xe · Ngày GĐ · SĐT GĐV) |
-| `FS` `LH` | `11.5` `16.3` | cỡ chữ & giãn dòng phần chữ thường |
-| `H1` `H2` `HIND` | `16` `12.5` `36` | tiêu đề lớn · `I.`/`II.` · thụt đầu dòng tên mục |
+| `FS` `LH` | `13` `16.3` | cỡ chữ & giãn dòng phần chữ thường |
+| `H1` `H2` `HIND` | `16` `13` `36` | tiêu đề lớn · `I.`/`II.` · thụt đầu dòng tên mục |
 | `TL` `TCOL` | `30.9` `[34.8, 297, 100.4, 99.7]` | bảng **tràn ra ngoài lề chữ** cả hai bên, đúng như mẫu |
-| `THH` `TRH` | `24` `18.9` | cao hàng tiêu đề / hàng dữ liệu bảng |
-| `LOGO_W` `LOGO_R` | `62` `1.0879` | logo `pti Insurance`: bề ngang + tỷ lệ `w/h` của file PNG |
+| `TFS` `THFS` | `14` `13` | cỡ chữ hàng dữ liệu / hàng tiêu đề bảng |
+| `THH` `TRH` | `29.9` `18.9` | cao hàng tiêu đề / hàng dữ liệu bảng |
+| `LOGO_W` `LOGO_R` | `62` `1.0923` | logo `pti Insurance`: bề ngang + tỷ lệ `w/h` của file PNG |
 | `FOOT_H` | `23.2` | dải cam chân trang |
 
 Màu: `BB_ORANGE()` `#ED7D31` (tiêu đề) · `BB_ORANGE2()` `#C65911` (`I.` `II.`) ·
@@ -397,17 +400,37 @@ tổng số trang.
 **Bẫy đã sửa, đừng lặp lại:**
 1. `fld()` phải cộng lại `' '` sau nhãn — `T()` gộp khoảng trắng nên `T('Biển số: ')` mất dấu cách
    cuối và in ra `Biển số:15K-547.64` dính liền.
-2. Giá trị dài (loại xe, địa điểm) phải **tự co cỡ chữ** (tới 7,5pt) **trước khi** cắt bớt.
+2. Giá trị dài (loại xe, tên hạng mục) phải **tự co cỡ chữ** (tới 7,5pt) **trước khi** cắt bớt.
+3. **Mọi cỡ chữ và mốc dọc của biên bản đong từ file mẫu**, không ước lượng. Cách đo:
+   `fitz.open(...)[0].get_text('dict')` cho cỡ chữ + baseline từng dòng, `get_drawings()`
+   cho khung bảng. Sửa xong thì dựng lại file rồi so y-baseline với mẫu — hiện lệch ≤ 0,8pt.
 
 **Hai ảnh riêng của biên bản** (`embedAssets(pdfDoc, 'bb')`):
-- `assets/logo-pti-insurance.png` — logo `pti Insurance` 297×273, **cắt từ chính file mẫu**.
+- `assets/logo-pti-insurance.png` — logo `pti Insurance` 426×390 (PNG bảng màu 96 màu, ~25KB).
+  Cắt sát nét từ ảnh logo gốc; `LOGO_R` = 1,0923 là tỷ lệ `w/h` của **chính file này** —
+  thay logo thì phải đo lại số đó.
   Thiếu file thì lùi về `logo-pti-bienban.png` (logo PTI SOS bản cũ), thiếu nốt thì huy hiệu vuông.
 - `assets/bb-footer.png` — dải cam 1260×49, **lấy nguyên từ file mẫu** nên khớp 100%.
   Thiếu file thì `bbBuild()` tự vẽ lại dải cam bằng `BB_ORG` / `BB_ADDR` / `BB_TEL`.
 
-`embedAssets(pdfDoc, want)` nạp font Be Vietnam Pro + **đúng một** logo, dùng chung cho
-`generatePDF()` (`want` bỏ trống → huy hiệu vuông) và `bbBuild()` (`'bb'` → logo + dải cam).
+`embedAssets(pdfDoc, want)` nạp **một cặp font** + **đúng một** logo, dùng chung cho
+`generatePDF()` (`want` bỏ trống → Be Vietnam Pro + huy hiệu vuông) và `bbBuild()`
+(`'bb'` → Tinos + logo + dải cam).
 **Đừng nhúng cả hai logo** — logo vuông là PNG 614×614 nên mỗi biên bản sẽ cõng thêm ~130KB chết.
+
+#### Chữ của biên bản = Times New Roman
+Mẫu giấy in bằng **Times New Roman**, nên biên bản dùng **Tinos** (`fonts/Tinos-{Regular,Bold}.ttf`):
+bộ chữ chân có **bề ngang trùng khít từng ký tự** với Times New Roman — đã đo trên toàn bộ chữ
+Latin + dấu tiếng Việt, lệch 0/267 ký tự — nhưng giấy phép **SIL OFL** (`fonts/Tinos-OFL.txt`)
+nên gửi kèm repo public được. **`C:\Windows\Fonts\times.ttf` là font bản quyền Monotype —
+đừng bao giờ chép vào dự án.** Hai file đã được cắt gọn (subset) còn Latin + tiếng Việt:
+59KB + 77KB, nhẹ hơn cặp Be Vietnam Pro.
+
+Nhờ in đúng mặt chữ của mẫu nên **cỡ chữ cũng lấy thẳng số của mẫu**: chữ thường 13 · `I.`/`II.`
+13 đậm · tiêu đề 16 đậm · hàng tiêu đề bảng 13 đậm · hàng dữ liệu 14 · khối ký 12 · số trang 9.
+Thiếu file Tinos thì `embedAssets()` tự lùi về Be Vietnam Pro — biên bản vẫn ra, chỉ khác mặt chữ.
+Mẫu in dòng *(Ký và ghi rõ họ tên)* và số trang bằng **chữ nghiêng**; bản dựng để chữ đứng vì
+nhúng thêm `Tinos-Italic` sẽ cõng thêm ~60KB cho đúng một dòng.
 
 ### Hệ màu giao diện — xanh nhạt + vàng nhạt
 
@@ -419,7 +442,8 @@ và `:root[data-theme="dark"]`.
 
 | Nhóm token | Giá trị sáng | Dùng ở đâu |
 |---|---|---|
-| `--brand` `--brand-d` `--brand-m` `--brand-soft` | `#1565C0` `#0D47A1` `#1976D2` `#E3F2FD` | **Màu in của PDF** — giữ nguyên, đừng đổi theo giao diện |
+| `--brand` `--brand-d` `--brand-m` `--brand-soft` | `#1565C0` `#0D47A1` `#1976D2` `#E3F2FD` | Màu nhấn của **giao diện**: nút, viền, đầu thẻ |
+| `--print` | `#1976D2` (tối: `#5B9DF0`) | **Màu in ra PDF** — nền dải tiêu đề + nền chú thích ảnh, chữ trắng. Dùng ở `.title-prev`; xem *Màu in của bản ảnh* bên dưới |
 | `--sky` `--sky-2` `--sky-b` | `#DCEBFA` `#EFF6FE` `#C7DEF5` | Nền trang · `.card-hd` · `.grp-hd` · `.th-acts` · `.rec` · `.pv-scroll` · viền thẻ |
 | `--sand` `--sand-2` `--sand-b` `--sand-tx` | `#FFFCF2` `#FFF6DC` `#EBD9A8` `#7A5B0B` | `.toolbar` · `.dz` · `.sum` · `.pv-bar` · `.tipbox` · `#emptyState` · `.grp.is-cover .grp-hd` |
 | `--bg-grad` | chuyển sắc xanh dọc trang | `body{background-image}` + `background-attachment:fixed` |
@@ -444,7 +468,18 @@ thẻ mang hành động chính của màn hình (hiện chỉ `⚡ Xuất PDF` 
 **Quy ước đọc màu** (giải thích cho người dùng ở `huong-dan.html` mục 1):
 xanh nhạt = khung chứa dữ liệu · ô nhập liệu luôn **nền trắng** trong khung xanh ·
 vàng nhạt = khối cần thao tác hoặc cần để ý · `.grp.is-cover` (hạng mục tiền tố `0.`) nền vàng ·
-xanh đậm = màu sẽ in ra PDF (khối `#loaiPreview` và preview trang A4).
+xanh dương nhạt `--print` = màu sẽ in ra PDF (khối `#loaiPreview` và preview trang A4).
+
+**Màu in của bản ảnh** — nền dải tiêu đề và nền chú thích ảnh là `#1976D2`, chữ trắng
+(tương phản 4,60:1, vừa đạt WCAG AA — **nhạt hơn nữa là chữ trắng mờ**, lúc đó phải đổi chữ
+sang xanh đậm). Màu này nằm ở **4 nơi và phải luôn khớp nhau**:
+
+| Nơi | Thứ cần sửa |
+|---|---|
+| `index.html` — token | `--print` ở `:root` (và bản sáng hơn ở `:root[data-theme="dark"]`) |
+| `index.html` — preview A4 | hằng số `#1976D2` trong `.pvh` · `.pv-cap` · `.pvf .pn` — **cố ý ghi thẳng mã màu**, không theo token, vì trang A4 xem trước là bản sao của tờ giấy nên không được đổi theo sáng/tối |
+| `index.html` — PDF | `BLUE()` (dùng cho dải tiêu đề, nền chú thích và số trang ở chân trang) |
+| `ghep_anh.py` — PDF | `BLUE_HEADER` / `BLUE_CAPTION` |
 
 **Độ tương phản**: mọi cặp chữ/nền đã kiểm ≥ 4.5:1 (WCAG AA). Đáng chú ý —
 `--text-3` phải là `#5A7691` (4.74:1 trên trắng); giá trị xám-xanh nhạt hơn như `#89A2BB`
@@ -627,7 +662,7 @@ mỗi trang tự mang khổ giấy riêng nên `giayto` trộn được trang ng
 | Tham số | Giá trị |
 |---|---|
 | Font | Be Vietnam Pro (Regular + Bold) |
-| Màu header / caption | `#1565C0`, chữ trắng |
+| Màu header / caption | `#1976D2` (xanh dương nhạt), chữ trắng |
 | Header | `20mm`, **dán sát mép trên trang** (không chừa lề) · khoảng trắng header→ảnh `3mm` |
 | Logo PTI SOS | `17mm × 17mm`, góc trái header (vừa trong 20mm) |
 | Ảnh trong ô | **Thu vừa khung (contain), canh giữa, không cắt mép, không tự xoay** |

@@ -60,8 +60,10 @@ PHONG_DEFAULT  = "Phòng Cứu hộ & Giám định tại khu vực Quảng Ninh
 THONG_TIN_PATH = "docs/thong_tin_giam_dinh_xe.xlsx"
 
 # ── Màu sắc ───────────────────────────────────────────────────────────────────
-BLUE_HEADER   = colors.HexColor("#1565C0")
-BLUE_CAPTION  = colors.HexColor("#1565C0")
+# Nền dải tiêu đề + nền chú thích ảnh, chữ trắng ở trên.
+# PHẢI khớp token --print và hàm BLUE() trong index.html.
+BLUE_HEADER   = colors.HexColor("#1976D2")
+BLUE_CAPTION  = colors.HexColor("#1976D2")
 GRAY_FOOTER   = colors.HexColor("#757575")
 WHITE         = colors.white
 
