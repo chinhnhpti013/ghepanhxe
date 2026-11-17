@@ -24,7 +24,10 @@ anh-giam-dinh-vcx-theo-ten-file/
 │   └── mapping.json              ← tên file → tên thư mục gốc (chú thích)
 ├── output/                       ← PDF kết xuất
 ├── assets/logo-ptisos.png        ← huy hiệu vuông, header BẢN ẢNH
-├── assets/logo-pti-bienban.png   ← logo ngang có dòng chữ, đầu trang BIÊN BẢN
+├── assets/logo-pti-insurance.png ← logo "pti Insurance", góc trái BIÊN BẢN
+├── assets/bb-footer.png          ← dải cam chân trang BIÊN BẢN
+├── assets/logo-pti-bienban.png   ← logo PTI SOS ngang (dự phòng cho biên bản)
+├── docs/bien_ban_giam_dinh.pdf   ← MẪU GIẤY của biên bản (gitignore: có dữ liệu khách thật)
 ├── fonts/BeVietnamPro-{Regular,Bold}.ttf
 ├── dat_ten_file.py               ← Giai đoạn 1 (Python)
 ├── ghep_anh.py                   ← Giai đoạn 2 (Python)
@@ -69,13 +72,15 @@ thông tin (xem *Khung thông tin `.fsec`* ở phần hệ màu):
    — `<select>` nằm **thẳng trong `.fsec`**, không bọc `.fg`, nên bộ style ô nhập phải kể thêm
    `.fsec > select`. Khung này chứa luôn `#giaytoNote`
 2. **Hồ sơ & xe** — Số HSBT / Mã hồ sơ · Biển kiểm soát · Ngày giám định *(3 cột)*
-3. **Nơi giám định & người thực hiện** — Tên ga-ra · Giám định viên · Phòng / Khu vực *(3 cột)*
+3. **Nơi giám định & người thực hiện** — Tên ga-ra · Giám định viên · Phòng / Khu vực ·
+   **Điện thoại GĐV** (`#fSdtGdv`, chỉ in lên biên bản) *(lưới 3 cột, ô thứ 4 xuống hàng)*
 4. **Bố cục trang in** (`#layoutSection`) — A4 dọc/ngang · Số ảnh trên mỗi trang *(2 cột)*;
    `#layoutHint` giờ là `<span class="tag">` nằm trong `.fsec-h`
 5. **Biên bản giám định** (`#bbSwitchRow`, `.fsec.warm` nền vàng) — công tắc **`#fBbOn`** +
-   **Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất** (`#ttRow`) + dòng ghi chú `#ttHint`.
+   **Tên Lái/chủ xe · Loại xe · Ngày tổn thất · Địa điểm tổn thất** (`#ttRow`) + dòng ghi chú
+   `#ttHint`.
    Cả khung chỉ hiện khi `fLoai === 'chitiet'`; `#ttRow`/`#ttHint` chỉ hiện khi `bbEnabled()`.
-   `updateSummaries()` cũng gọi `bbEnabled()` trước khi in 3 dòng tổn thất vào tóm tắt
+   `updateSummaries()` cũng gọi `bbEnabled()` trước khi in 4 dòng tổn thất vào tóm tắt
    (bỏ tích rồi thì tóm tắt không được in lại tên lái xe đã gõ trước đó)
 
 > Khung ⑤ đặt **cuối cùng** (sau Bố cục) chứ không phải ngay dưới Kiểu bản ảnh, để khi nó bị ẩn
@@ -249,19 +254,29 @@ tập ảnh thay đổi. Mở lại app mà còn bản nháp thì có thanh mờ
 - DB `pti_ghepanh` (v2) với 3 store: `records` (hồ sơ lưu tay) · `draft_meta` + `draft_blobs` (bản nháp tự lưu)
 - Lưu thông tin + ảnh (Blob) ngay trong trình duyệt, **không tải lên internet**
 - Mở lại / tìm kiếm (theo mã hồ sơ, BKS, ga-ra, GĐV) / xóa qua nút 🗂️
-- Hồ sơ lưu kèm `cap`, `rot` và `pa` của từng ảnh; khi mở lại dùng đường dẫn giả
+- Hồ sơ lưu kèm `loaiXe` + `sdtGdv` (hồ sơ cũ thiếu `sdtGdv` thì lấy lại từ `pti_gdv_tel`
+  theo tên GĐV), và kèm `cap`, `rot`, `pa` của từng ảnh; khi mở lại dùng đường dẫn giả
   `{chỉ số nhóm}/{tên hạng mục}/{tên file}` để vẫn thêm/bớt ảnh tiếp được
 
-### Biên bản giám định thiệt hại (`#cardBienBan`, bước 2)
+### Biên bản giám định (`#cardBienBan`, bước 2)
 
 Lập **file PDF RIÊNG** theo mẫu `BM.PTI.CG.02.08a` (`BB_FORM`), tên
 `Bien ban giam dinh xe {BKS}.pdf` (`BB_PDF_NAME`) — **không nằm trong bản ảnh**.
 Toàn bộ mã nằm ở **khối `<script>` cuối cùng** của `index.html`.
 
+> **Mẫu gốc** là `docs/bien_ban_giam_dinh.pdf` (xuất từ `docs/BM.PTI.CG.02.08a Bien ban giam dinh.docx`).
+> Mọi số đo trong `BBC` đong từ chính file đó, nên bản dựng ra đặt chồng lên mẫu là khớp.
+> Sửa bố cục thì mở lại file mẫu mà đối chiếu, đừng ước lượng.
+
+**Một trang A4 gồm:** logo `pti Insurance` góc trái + tiêu đề `BIÊN BẢN GIÁM ĐỊNH` (cam `#ED7D31`,
+căn giữa **khoảng trống bên phải logo**, không phải giữa trang) · mục **I · THÔNG TIN CƠ BẢN**
+(cam đậm `#C65911`) · mục **II · THÔNG TIN THIỆT HẠI** + bảng 4 cột · hai ô chữ ký · số trang
+`n/m` · **dải cam chân trang** (ảnh `assets/bb-footer.png`).
+
 **Chỉ có khi `bbEnabled()`** = `fLoai === 'chitiet'` **và** `state.bbOn`. `applyBbVisible()` là nơi
 duy nhất bật/tắt: ẩn/hiện `#bbSwitchRow` (cả khung ⑤ ở bước 1), **`#ttRow` + `#ttHint`**
-(3 ô thông tin tổn thất và dòng ghi chú của chúng ở
-bước 1), `#cardBienBan` (bước 2) và class `bb-on` trên `<body>` (dải nút phương án dưới mỗi ảnh).
+(4 ô thông tin tổn thất và dòng ghi chú của chúng ở bước 1), `#cardBienBan` (bước 2)
+và class `bb-on` trên `<body>` (dải nút phương án dưới mỗi ảnh).
 Gọi từ `onLoaiChange()` và `setBbOn()`.
 
 **Xem trước = file thật.** `bbRenderPreview()` dựng PDF bằng `bbBuild()` rồi vẽ lại bằng **pdf.js**
@@ -270,18 +285,38 @@ Lần đầu phải bấm nút (cần mạng để tải pdf.js); sau đó `_bbA
 lại sau 900ms** qua `bbTouch()`. `_bbSeq` chặn lượt dựng cũ ghi đè lượt mới.
 
 **Ba mục của thẻ**: ① bảng hạng mục (dẫn xuất) · ② xem trước PDF · ③ hai ô chữ ký.
-Ý kiến các bên là **câu cố định** `BB_YKIEN` = *"Chúng tôi đồng ý với nội dung phương án sửa chữa
-như trên"* (không có ô nhập; hồ sơ cũ còn `bb.yKien` gõ tay thì vẫn dùng lại giá trị đó).
 Không còn mục xác thực và **không còn ô tích "Tôi đã đọc và đồng ý"** — `bb.agree` luôn `true`,
 nút **Ký** của cả hai bên luôn bấm được, `sigConfirm('cus')` ghi `bb.agreeAt` làm dấu thời điểm.
 
 **Dữ liệu** nằm trong object `bb` (không phải `state`), lưu kèm hồ sơ/bản nháp qua
 `currentInfo().bb = bbSnapshot()` và phục hồi bằng `bbRestore(i.bb)` trong `loadRecord()` /
 `restoreDraft()`; `resetApp()` gọi `bbReset()`. Hồ sơ cũ không có khóa `bb` → `bbRestore(undefined)`
-trả về trạng thái trống; khóa thừa của bản cũ (`gdvTel`, `gps`, `contentHash`…) bị bỏ qua.
+trả về trạng thái trống; khóa thừa của bản cũ (`yKien`, `gdvTel`, `gps`, `contentHash`…) bị bỏ qua.
 
-**Ô bỏ trống thì in dòng chấm** để điền tay (`dotted()`), nên biên bản trắng vẫn in ra ký giấy được.
-Bảng hạng mục **luôn in tối thiểu `BB_MIN_ROWS` = 10 dòng**.
+**Ô bỏ trống thì in dòng chấm** để điền tay (`fld()`), nên biên bản trắng vẫn in ra ký giấy được.
+Bảng hạng mục in **đúng số hạng mục đã tích**; **chưa tích ảnh nào** thì mới in `BB_MIN_ROWS` = 10
+dòng trống (mẫu giấy không có dòng thừa — đừng thêm lại).
+
+#### Nguồn dữ liệu mục I — 2 ô nhập MỚI ở bước 1
+| Dòng in ra | Ô nhập | Nằm ở |
+|---|---|---|
+| `Tên chủ xe/Lái xe:` | `#fLaiXe` | khung ⑤ |
+| `Biển số:` | `#fBks` | khung ② |
+| `Loại xe:` | **`#fLoaiXe`** | khung ⑤ |
+| `Ngày tai nạn:` | `#fNgayTt` | khung ⑤ |
+| `Ngày giám định:` | `#fNgay` | khung ② |
+| `Tên GĐV:` | `#fGdv` | khung ③ |
+| `Điện thoại GĐV:` | **`#fSdtGdv`** | khung ③ |
+| `Địa điểm tai nạn:` *(chỉ khi có nhập)* | `#fDdTt` | khung ⑤ |
+
+`#fSdtGdv` đặt ở khung ③ **cạnh tên GĐV** vì nó là thuộc tính của con người, không phải của hồ sơ:
+`pti_gdv_tel` (`getGdvTelMap()`) nhớ **số theo từng tên GĐV**, `rememberGdvTel()` ghi khi rời ô,
+`fillGdvTel()` điền lại khi đổi tên — gọi từ `change` của `#fGdv`, từ `pickCombo('fGdv')`
+(bấm droplist **không** sinh `change`) và từ `useGdv()`. `fillGdvTel()` **chỉ ghi đè** khi ô số
+đang trống hoặc đang giữ số của một GĐV khác trong bộ nhớ, kẻo đang sửa tay thì bị nhảy số.
+
+`#fDdTt` **không có trong mẫu giấy** — chỉ in thêm một dòng khi người dùng có nhập, để biên bản
+bỏ trống vẫn giống hệt mẫu. Ga-ra, Số HSBT, Phòng/Khu vực **không in lên biên bản**.
 
 #### Bảng hạng mục — DẪN XUẤT từ ảnh, không nhập tay
 `bbRowsFromImages()` duyệt `state.groups[].items[]` **theo đúng thứ tự ảnh**; ảnh có
@@ -289,7 +324,11 @@ Bảng hạng mục **luôn in tối thiểu `BB_MIN_ROWS` = 10 dòng**.
 `capName()` (nhóm `UNGROUPED` thì lấy `capOf(it, g)`), nên nhiều ảnh cùng hạng mục + cùng phương án
 gộp thành một dòng (khóa `tên|phương án`).
 
-Cột **Hiện vật thu hồi** có **mặc định theo phương án** — `bbHvDefault(pa)`:
+Bảng có **4 cột** — `STT · CHI TIẾT THIỆT HẠI · PHƯƠNG ÁN · THU HỒI` (`BBC.TCOL`), cột Phương án và
+Thu hồi in **chữ** (`BB_PA_LBL` / `BB_HV_LBL`), **không** phải 6 cột đánh dấu `x` như bản cũ.
+Bảng trên màn hình 2 (`.bb-tb` + `bbRenderRows()`) dùng đúng 4 cột đó cho khớp bản in.
+
+Cột **Thu hồi** có **mặc định theo phương án** — `bbHvDefault(pa)`:
 `thay` → `'co'` · `sua` → `'khong'`. Đây là thứ duy nhất người dùng còn chỉnh được trong bảng.
 
 `bbSyncRows()` dựng lại `bb.rows` nhưng **giữ cột `hv`** theo cùng khóa. Phải dùng
@@ -313,15 +352,19 @@ HTML5 Canvas + **Pointer Events** (chạy chung cho chuột, cảm ứng và bú
 - Nút *Xong* chỉ bật khi `_sigDirty`. `openSign()` **không còn chặn** — ô tích `#bbAgree` đã bỏ.
 - Nhánh phím tắt của `#sigModal` nằm **đầu** handler `keydown` (trước nhánh `#camModal`), nếu không
   `←` `→` sẽ nhảy bước trong lúc đang ký.
+- Dưới mỗi ô ký, **tên chỉ in sẵn khi bên đó đã ký điện tử**. Mẫu ghi *"(Ký và ghi rõ họ tên)"* —
+  ký giấy thì người ký tự viết tên, in sẵn là sai mẫu.
 
 #### Đã BỎ khỏi biên bản (đừng dựng lại)
 | Thứ đã bỏ | Ghi chú |
 |---|---|
 | Khối `DẤU VẾT KIỂM CHỨNG ĐIỆN TỬ` | kèm theo: GPS (`bbGetGps`), `bb.device`, `bb.contentHash`, `bbPayload()` |
-| Mục ① *Thông tin bổ sung* | `bbGdvTel` `bbLxTel` `bbGplx` `bbGaraAddr` `bbGaraTel` `bbPhuLuc` — giờ in dòng chấm |
-| `SĐT` ở dòng `1/ …` và `2/ …` | hai dòng này chỉ còn tên + phòng / BKS |
+| Mục ① *Thông tin bổ sung* | `bbGdvTel` `bbLxTel` `bbGplx` `bbGaraAddr` `bbGaraTel` `bbPhuLuc` |
+| Toàn bộ phần chữ của mẫu cũ | `Hôm nay, ngày … tại :` · `Chúng tôi gồm có:` · `1/ …` `2/ …` · `1. Thông tin tai nạn` · `2. Hạng mục giám định` · `3. Ý kiến các bên` (`BB_YKIEN`, `bb.yKien`) · `4. Đơn vị sửa chữa` · phần kết — mẫu mới chỉ còn mục **I** và **II** |
+| Hàm dựng chữ của mẫu cũ | `para()` `wrap()` `cols2()` `dotted()` → thay bằng `put()` `fld()` `row1()` `row2()` `heading()` |
+| Khối chữ đầu trang (tên TCT + địa chỉ + tel) | `BB_HEAD_GAP` đã bỏ; thông tin đó nằm trong **ảnh dải cam chân trang**. `BB_ORG`/`BB_ADDR`/`BB_TEL` **chỉ còn là phương án dự phòng** khi thiếu `assets/bb-footer.png` |
+| Chân trang `Quy trình giám định … – BM.PTI.CG.02.08a` | thay bằng dải cam + số trang `n/m` |
 | Nhập tay bảng hạng mục | `bbFromGroups` `bbAddRow` `bbDelRow` `bbClearRows` → thay bằng `bbSyncRows` |
-| Ô nhập **Ý kiến các bên** `#bbYKien` | `BB_FIELDS` giờ rỗng; biên bản luôn in `BB_YKIEN` |
 | Mục ④ *Xác thực thông tin trước khi ký* | `#bbRecap` bỏ khỏi HTML — hàm `bbRecap()` **giữ lại** vì `bbTouch()`/`bbRestore()` vẫn gọi, tự thoát khi không có ô chứa |
 | Ô tích **Tôi đã đọc và đồng ý** `#bbAgree` | kèm `bbSetAgree()`; `bb.agree` luôn `true` |
 
@@ -331,26 +374,40 @@ lên biên bản**. `pdfDoc.setCreationDate()/setModificationDate()` ghim theo t
 mở bằng `http` LAN thì `sha256Hex()` trả rỗng, mọi thứ còn lại vẫn chạy.
 
 #### Bố cục PDF biên bản (`BBC`)
-Lề `48/48/30/30`, cỡ chữ `FS 10.5`, giãn dòng `LH 14`, 6 cột bảng `[34,205,65,65,65,65] = 499pt`.
-Đầu trang dùng **logo ngang** `assets/logo-pti-bienban.png` (`A.logoBb`, 72 × 39pt) — **khác**
-huy hiệu vuông `logo-ptisos.png` của bản ảnh; `bbBuild()` tự lùi về huy hiệu vuông nếu thiếu file.
-Khối chữ (tên tổng công ty + địa chỉ + tel) bắt đầu cách **mép phải logo** đúng
-`BB_HEAD_GAP = 60 * MM` ≈ 170pt, tức `x = 48 + 72 + 170 = 290pt`, chỉ còn ~257pt bề ngang —
-nên mỗi dòng **tự co cỡ chữ** (tới 5,5pt) cho vừa thay vì bị cụt đuôi.
+| Hằng | Giá trị | Ý nghĩa |
+|---|---|---|
+| `ML` `MR` `MT` `MB` | `48.6` `32.5` `30` `42` | lề; `MB` chừa chỗ cho dải cam (23,2pt) + dòng số trang |
+| `COL2` | `316` | mốc cột phải của mục I (Loại xe · Ngày GĐ · SĐT GĐV) |
+| `FS` `LH` | `11.5` `16.3` | cỡ chữ & giãn dòng phần chữ thường |
+| `H1` `H2` `HIND` | `16` `12.5` `36` | tiêu đề lớn · `I.`/`II.` · thụt đầu dòng tên mục |
+| `TL` `TCOL` | `30.9` `[34.8, 297, 100.4, 99.7]` | bảng **tràn ra ngoài lề chữ** cả hai bên, đúng như mẫu |
+| `THH` `TRH` | `24` `18.9` | cao hàng tiêu đề / hàng dữ liệu bảng |
+| `LOGO_W` `LOGO_R` | `62` `1.0879` | logo `pti Insurance`: bề ngang + tỷ lệ `w/h` của file PNG |
+| `FOOT_H` | `23.2` | dải cam chân trang |
+
+Màu: `BB_ORANGE()` `#ED7D31` (tiêu đề) · `BB_ORANGE2()` `#C65911` (`I.` `II.`) ·
+`BB_BLUE()` `#5B9BD5` (nền hàng tiêu đề bảng, chữ trắng). `WHITE()` **dùng chung** với khối dựng
+bản ảnh — đã khai báo ở đó, khai lại là lỗi `Identifier 'WHITE' has already been declared`
+(các `<script>` cổ điển dùng chung một phạm vi toàn cục).
+
 `bbBuild()` tự **chảy nội dung qua nhiều trang** bằng `need(h)` → `newPage()`; bảng tràn trang thì
-`drawHead()` vẽ lại đầu bảng. Chân trang (`Quy trình giám định … – BM.PTI.CG.02.08a` + `Trang n/m`)
-vẽ **sau cùng** cho mọi trang vì lúc đó mới biết tổng số trang.
+`drawHead()` vẽ lại đầu bảng. Dải cam + số trang vẽ **sau cùng** cho mọi trang vì lúc đó mới biết
+tổng số trang.
 
 **Bẫy đã sửa, đừng lặp lại:**
-1. `cols2()` phải **tự co cỡ chữ** (tới 7.2pt) trước khi cắt bớt, kẻo đuôi dòng `1/ …` và `2/ …`
-   bị mất chữ.
-2. Tên ga-ra người dùng gõ thường đã có sẵn chữ "Gara" → mục 4 kiểm tra `/^gara\b/i` để không in
-   thành `Gara Gara Toyota…`.
+1. `fld()` phải cộng lại `' '` sau nhãn — `T()` gộp khoảng trắng nên `T('Biển số: ')` mất dấu cách
+   cuối và in ra `Biển số:15K-547.64` dính liền.
+2. Giá trị dài (loại xe, địa điểm) phải **tự co cỡ chữ** (tới 7,5pt) **trước khi** cắt bớt.
+
+**Hai ảnh riêng của biên bản** (`embedAssets(pdfDoc, 'bb')`):
+- `assets/logo-pti-insurance.png` — logo `pti Insurance` 297×273, **cắt từ chính file mẫu**.
+  Thiếu file thì lùi về `logo-pti-bienban.png` (logo PTI SOS bản cũ), thiếu nốt thì huy hiệu vuông.
+- `assets/bb-footer.png` — dải cam 1260×49, **lấy nguyên từ file mẫu** nên khớp 100%.
+  Thiếu file thì `bbBuild()` tự vẽ lại dải cam bằng `BB_ORG` / `BB_ADDR` / `BB_TEL`.
 
 `embedAssets(pdfDoc, want)` nạp font Be Vietnam Pro + **đúng một** logo, dùng chung cho
-`generatePDF()` (`want` bỏ trống → huy hiệu vuông) và `bbBuild()` (`'bb'` → logo ngang).
-**Đừng nhúng cả hai** — logo vuông là PNG 614×614 nên mỗi biên bản sẽ cõng thêm ~130KB chết
-(biên bản 10 dòng: 110KB thay vì 233KB).
+`generatePDF()` (`want` bỏ trống → huy hiệu vuông) và `bbBuild()` (`'bb'` → logo + dải cam).
+**Đừng nhúng cả hai logo** — logo vuông là PNG 614×614 nên mỗi biên bản sẽ cõng thêm ~130KB chết.
 
 ### Hệ màu giao diện — xanh nhạt + vàng nhạt
 
@@ -421,6 +478,8 @@ section, bảng còn `min-width:430px`).
 - **Dark mode** (nút 🌙, lưu localStorage, mặc định theo hệ điều hành)
 - Danh sách GĐV lưu localStorage (`pti_gdv_list`) và danh sách **Phòng / Khu vực** (`pti_phong_list`);
   tên mới nhập được tự thêm vào. Phòng/khu vực là dòng in ở **chân mỗi trang bản ảnh** (`footerText()`)
+- **Số điện thoại GĐV** (`pti_gdv_tel`) nhớ theo **tên GĐV** chứ không theo hồ sơ — xem
+  *Nguồn dữ liệu mục I* ở phần Biên bản giám định
 - **Không có "phòng mặc định"** (hằng `PHONG_DEFAULT` đã bỏ) — lần đầu dùng app thì ô Phòng
   **để trống**. Thay vào đó `pti_phong_last` nhớ tên dùng lần gần nhất: `rememberPhong()` ghi
   (gọi từ sự kiện `change` của `#fPhong`, từ `pickCombo()` vì bấm droplist **không** sinh `change`,

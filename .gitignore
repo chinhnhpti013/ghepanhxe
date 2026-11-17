@@ -25,3 +25,5 @@ desktop.ini
 # Riêng docs/output.txt là ghi chú kỹ thuật, vẫn theo dõi bình thường.
 docs/*.docx
 docs/*.xlsx
+# docs/bien_ban_giam_dinh.pdf là MẪU GIẤY có dữ liệu khách hàng thật (tên, BKS, SĐT)
+docs/*.pdf

@@ -811,13 +811,15 @@ main > .foot{margin-top:auto}
 :root[data-theme="dark"] .bb-h .n{color:#07121F}
 .bb-h .sp{flex:1}
 .bb-wrap{overflow-x:auto;border:1px solid var(--sky-b);border-radius:var(--r-sm);background:var(--surface)}
-.bb-tb{width:100%;min-width:560px;border-collapse:collapse;font-size:.8rem}
+.bb-tb{width:100%;min-width:430px;border-collapse:collapse;font-size:.8rem}
 .bb-tb th,.bb-tb td{border:1px solid var(--sky-b);padding:5px 6px;text-align:center;vertical-align:middle}
 .bb-tb th{background:var(--sky);color:var(--text-2);font-size:.71rem;font-weight:700;line-height:1.3}
 .bb-tb td.tx{text-align:left;font-weight:600}
 .bb-tb td.no{width:36px;color:var(--text-3);font-size:.76rem}
-.bb-tb td.mk{width:62px;font-weight:800;color:var(--brand);font-size:.95rem}
-.bb-tb td.hv{width:96px}
+/* Cột "Phương án" giờ in CHỮ (Sửa chữa / Thay thế) đúng như mẫu BM.PTI.CG.02.08a,
+   không còn 2 cột đánh dấu "x" — nên phải rộng hơn và cỡ chữ thường. */
+.bb-tb td.mk{width:96px;font-weight:700;color:var(--brand);font-size:.78rem}
+.bb-tb td.hv{width:104px}
 .bb-nores{padding:16px 12px !important;color:var(--text-3);font-size:.78rem;line-height:1.55}
 .bb-tb input,.bb-tb select{width:100%;border:1.5px solid var(--border-s);border-radius:var(--r-xs);
   padding:6px 7px;font-size:.82rem;font-family:inherit;background:var(--surface);color:var(--text)}
@@ -874,7 +876,7 @@ main > .foot{margin-top:auto}
   .sig-acts .btn{flex:1 1 calc(50% - 4px)}
 }
 @media(max-width:620px){
-  .bb-tb{min-width:520px}
+  .bb-tb{min-width:400px}
   .bb-pv{max-height:60vh;padding:10px 6px}
   .sig-bar .note{display:none}
   .sig-bar .btn{flex:1}
@@ -886,7 +888,7 @@ main > .foot{margin-top:auto}
   .bb-tb th{font-size:.64rem;line-height:1.25}
   .bb-tb td.tx{font-size:.72rem;word-break:break-word}
   .bb-tb td.no{width:26px;font-size:.68rem}
-  .bb-tb td.mk{width:38px}
+  .bb-tb td.mk{width:64px;font-size:.7rem}
   .bb-tb td.hv{width:64px}
   .bb-tb select{padding:5px 2px;font-size:.74rem}
   .bb-pv{padding:8px 5px;max-height:56vh}
@@ -1053,6 +1055,13 @@ main > .foot{margin-top:auto}
                   <button class="btn btn-n btn-icon" onclick="openPhongMgr()" title="Quản lý danh sách Phòng/khu vực">⚙️</button>
                 </div>
               </div>
+              <!-- Điện thoại GĐV — in lên Biên bản giám định (mục I). Nhớ theo từng GĐV
+                   ở localStorage pti_gdv_tel nên chọn lại tên là số tự điền. -->
+              <div class="fg">
+                <label>Điện thoại GĐV</label>
+                <input type="tel" id="fSdtGdv" inputmode="tel" placeholder="0888955677"
+                       autocomplete="off" onchange="rememberGdvTel()"/>
+              </div>
             </div>
           </div>
 
@@ -1099,6 +1108,10 @@ main > .foot{margin-top:auto}
                 <input type="text" id="fLaiXe" placeholder="Nguyễn Văn A"/>
               </div>
               <div class="fg">
+                <label>Loại xe</label>
+                <input type="text" id="fLoaiXe" placeholder="FORD/RANGER XLS 2.0L 4X2 AT"/>
+              </div>
+              <div class="fg">
                 <label>Ngày tổn thất</label>
                 <div class="row">
                   <input type="date" id="fNgayTtPick" onchange="onDateTtPick()"/>
@@ -1112,7 +1125,8 @@ main > .foot{margin-top:auto}
               </div>
             </div>
             <span class="hint" id="ttHint" style="display:none;margin-top:8px">
-              Ba ô trên <b>không bắt buộc</b>, không in lên bản ảnh — bỏ trống thì biên bản in
+              Bốn ô trên <b>không bắt buộc</b>, không in lên bản ảnh — chỉ dùng cho
+              <b>mục I · Thông tin cơ bản</b> của biên bản; bỏ trống thì biên bản in
               dòng chấm để điền tay.</span>
           </div>
 
@@ -1243,26 +1257,25 @@ main > .foot{margin-top:auto}
           <div class="bb-h"><span class="n">1</span>Hạng mục giám định
             <span class="sp"></span>
             <button class="btn btn-o btn-sm" onclick="bbReloadRows()"
-                    title="Lấy lại danh sách hạng mục từ các nút Thay thế / Sửa chữa ở màn hình 1, đồng thời đặt lại cột Hiện vật thu hồi về mặc định">🔄 Lấy lại từ ảnh</button>
+                    title="Lấy lại danh sách hạng mục từ các nút Thay thế / Sửa chữa ở màn hình 1, đồng thời đặt lại cột Thu hồi về mặc định">🔄 Lấy lại từ ảnh</button>
           </div>
           <div class="bb-wrap">
             <table class="bb-tb">
               <thead>
                 <tr>
-                  <th rowspan="2">STT</th>
-                  <th rowspan="2">Chi tiết thiệt hại</th>
-                  <th colspan="2">Phương án giải quyết</th>
-                  <th colspan="2">Hiện vật thu hồi</th>
+                  <th>STT</th>
+                  <th>Chi tiết thiệt hại</th>
+                  <th>Phương án</th>
+                  <th>Thu hồi</th>
                 </tr>
-                <tr><th>Sửa chữa</th><th>Thay thế</th><th colspan="2">Có / Không</th></tr>
               </thead>
               <tbody id="bbRows"></tbody>
             </table>
           </div>
           <div class="tipbox" style="margin-top:10px">
             <span class="hint">💡 Bảng <b>lấy tự động</b> từ dải nút <b>Thay thế / Sửa chữa / Không</b>
-              dưới mỗi ảnh ở màn hình 1; trùng tên + trùng phương án chỉ ra một dòng. Biên bản luôn in
-              tối thiểu 10 dòng để điền tay tại hiện trường.</span>
+              dưới mỗi ảnh ở màn hình 1; trùng tên + trùng phương án chỉ ra một dòng. Chưa ảnh nào được
+              tích thì biên bản in <b>10 dòng trống</b> để điền tay tại hiện trường.</span>
           </div>
 
           <div class="bb-h"><span class="n">2</span>Xem trước biên bản (PDF)
@@ -1577,7 +1590,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-17a';
+const APP_BUILD   = '2026-11-17b';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -1811,6 +1824,33 @@ const setGdvList = a => localStorage.setItem(GDV_KEY, JSON.stringify(a));
 
 /** Danh sách GĐV đổi → vẽ lại droplist nếu đang mở */
 function refreshGdvDatalist() { if (comboCur === 'fGdv') renderCombo('fGdv'); }
+
+// ──────── Số điện thoại GĐV — nhớ theo TÊN, cùng nếp với pti_phong_last ────────
+// Biên bản giám định in "Điện thoại GĐV", mà mỗi GĐV chỉ có một số → nhớ theo tên
+// để lần sau chọn lại tên là số tự điền, khỏi gõ lại mỗi hồ sơ.
+const GDVTEL_KEY = 'pti_gdv_tel';
+const getGdvTelMap = () => { try { return JSON.parse(localStorage.getItem(GDVTEL_KEY)) || {}; } catch { return {}; } };
+const gdvTelKey = n => String(n || '').trim().toLowerCase();
+/** Ghi số đang gõ vào bộ nhớ của GĐV đang chọn (bỏ trống thì xóa khỏi bộ nhớ) */
+function rememberGdvTel() {
+  const name = gdvTelKey($('fGdv').value), tel = $('fSdtGdv').value.trim();
+  if (!name) return;
+  const m = getGdvTelMap();
+  if (tel) m[name] = tel; else delete m[name];
+  try { localStorage.setItem(GDVTEL_KEY, JSON.stringify(m)); } catch (e) {}
+}
+/** Đổi tên GĐV → điền số đã nhớ của tên mới.
+ *  CHỈ ghi đè khi ô số đang trống hoặc đang giữ số của GĐV trước đó — người dùng
+ *  tự gõ một số khác thì giữ nguyên, kẻo đang sửa tay lại bị nhảy số. */
+function fillGdvTel() {
+  const el = $('fSdtGdv');
+  if (!el) return;
+  const map = getGdvTelMap(), tel = map[gdvTelKey($('fGdv').value)] || '';
+  const cur = el.value.trim();
+  const isOld = !cur || Object.values(map).includes(cur);
+  if (tel && tel !== cur && isOld) { el.value = tel; return; }
+  if (!tel && cur && isOld) el.value = '';
+}
 function openGdvMgr() { renderGdvMgr(); openOverlay('gdvModal'); setTimeout(() => $('gdvNew').focus(), 80); }
 function renderGdvMgr() {
   const list = getGdvList();
@@ -1838,6 +1878,7 @@ function delGdv(i) {
 }
 function useGdv(i) {
   $('fGdv').value = getGdvList()[i];
+  fillGdvTel();                       // chọn GĐV từ hộp quản lý → điền số đã nhớ
   closeModal('gdvModal'); updateSummaries();
 }
 
@@ -1988,6 +2029,7 @@ function pickCombo(id, i) {
   $(id).value = v;
   $(id).dispatchEvent(new Event('input'));   // chạy đúng các việc như khi gõ tay
   if (id === 'fPhong') rememberPhong();      // bấm droplist không sinh 'change'
+  if (id === 'fGdv')   fillGdvTel();         // chọn GĐV khác → điền số điện thoại đã nhớ
   $(id).focus();
 }
 function comboMgr(id) { const c = COMBOS[id]; closeCombo(); c.mgr(); }
@@ -2082,6 +2124,7 @@ function currentInfo() {
     capSrc:state.capSrc, useFileName:state.useFileName,
     // Thông tin vụ tổn thất (không bắt buộc) + toàn bộ dữ liệu Biên bản giám định
     laiXe:$('fLaiXe').value.trim(), ngayTt:$('fNgayTt').value.trim(), ddTt:$('fDdTt').value.trim(),
+    loaiXe:$('fLoaiXe').value.trim(), sdtGdv:$('fSdtGdv').value.trim(),
     bbOn: state.bbOn, bb: bbSnapshot(),
   };
 }
@@ -2203,7 +2246,9 @@ async function loadRecord(id) {
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
     state.bbOn = !!i.bbOn;
     $('fLaiXe').value = i.laiXe || ''; $('fDdTt').value = i.ddTt || '';
-    $('fNgayTt').value = i.ngayTt || '';
+    $('fNgayTt').value = i.ngayTt || ''; $('fLoaiXe').value = i.loaiXe || '';
+    // Hồ sơ cũ không có sdtGdv → lấy số đã nhớ của chính GĐV đó
+    $('fSdtGdv').value = i.sdtGdv || (getGdvTelMap()[gdvTelKey(i.gdv)] || '');
     syncNgayPicker(); syncNgayTtPicker(); bbRestore(i.bb);
     state.layout = i.layout || 'doc';
     state.perPage = i.perPage || PERPAGE_DEFAULT[state.layout];
@@ -2352,7 +2397,9 @@ async function restoreDraft() {
     $('fNgay').value = i.ngay || ''; $('fLoai').value = normLoai(i.loai);
     state.bbOn = !!i.bbOn;
     $('fLaiXe').value = i.laiXe || ''; $('fDdTt').value = i.ddTt || '';
-    $('fNgayTt').value = i.ngayTt || '';
+    $('fNgayTt').value = i.ngayTt || ''; $('fLoaiXe').value = i.loaiXe || '';
+    // Hồ sơ cũ không có sdtGdv → lấy số đã nhớ của chính GĐV đó
+    $('fSdtGdv').value = i.sdtGdv || (getGdvTelMap()[gdvTelKey(i.gdv)] || '');
     syncNgayPicker(); syncNgayTtPicker(); bbRestore(i.bb);
     state.layout  = i.layout || 'doc';
     state.perPage = i.perPage || PERPAGE_DEFAULT[state.layout];
@@ -3973,7 +4020,9 @@ function updateSummaries() {
     // 3 ô tổn thất chỉ hiện khi đang lập biên bản → tóm tắt cũng theo đúng điều kiện đó,
     // kẻo bỏ tích rồi mà tóm tắt vẫn in tên lái xe đã gõ trước đó
     (bbEnabled()
-      ? rowIf('Lái/chủ xe', $('fLaiXe').value.trim()) +
+      ? rowIf('Điện thoại GĐV', $('fSdtGdv').value.trim()) +
+        rowIf('Lái/chủ xe', $('fLaiXe').value.trim()) +
+        rowIf('Loại xe', $('fLoaiXe').value.trim()) +
         rowIf('Ngày tổn thất', $('fNgayTt').value.trim()) +
         rowIf('Địa điểm tổn thất', $('fDdTt').value.trim())
       : '') +
@@ -3989,10 +4038,12 @@ function updateSummaries() {
   $('readyMsg').textContent  = `${nImg} ảnh sẽ được ghép thành ${pages.length} trang A4.`;
 }
 
-['fMaHs','fBks','fGara','fGdv','fPhong'].forEach(id =>
+['fMaHs','fBks','fGara','fGdv','fPhong','fSdtGdv','fLoaiXe'].forEach(id =>
   $(id).addEventListener('input', () => { updateLoaiPreview(); updateSummaries(); scheduleDraftSave(false); }));
 // Gõ tay xong rời ô Phòng → ghi nhớ cho phiên sau ('change' chỉ nổ khi giá trị đổi thật)
 $('fPhong').addEventListener('change', rememberPhong);
+// Gõ tay tên GĐV xong → điền số điện thoại đã nhớ của tên đó (bấm droplist thì pickCombo lo)
+$('fGdv').addEventListener('change', () => { fillGdvTel(); updateSummaries(); scheduleDraftSave(false); bbTouch(); });
 // Đổi kiểu bản ảnh → vẽ lại gallery: chú thích mặc định của ảnh chưa phân loại
 // lấy theo tiền tố giấy tờ nên placeholder phải cập nhật theo
 $('fLoai').addEventListener('change', () => {
@@ -4128,22 +4179,25 @@ async function embedAssets(pdfDoc, want) {
   } catch (e) {
     throw new Error('Không nạp được font tiếng Việt. Hãy mở app qua địa chỉ web (GitHub Pages / Render) thay vì mở file trực tiếp.');
   }
-  // logo   = huy hiệu vuông, dùng cho header bản ảnh (ô 17mm × 17mm)
-  // logoBb  = logo ngang có dòng chữ, dùng cho đầu trang Biên bản giám định
+  // logo     = huy hiệu vuông PTI SOS, dùng cho header bản ảnh (ô 17mm × 17mm)
+  // logoBb    = logo "pti Insurance" ở góc trái Biên bản giám định (theo mẫu BM.PTI.CG.02.08a)
+  // footerBb  = dải cam chân trang biên bản (tên tổng công ty + địa chỉ + hotline)
   const png = async p => {
     try {
       const b = await fetch(p).then(r => { if (!r.ok) throw new Error(''); return r.arrayBuffer(); });
       return await pdfDoc.embedPng(b);
     } catch (e) { return null; }
   };
-  let logo = null, logoBb = null;
+  let logo = null, logoBb = null, footerBb = null;
   if (want === 'bb') {
-    logoBb = await png('assets/logo-pti-bienban.png');
-    if (!logoBb) logo = await png('assets/logo-ptisos.png');   // thiếu file → lùi về huy hiệu vuông
+    logoBb = await png('assets/logo-pti-insurance.png')
+          || await png('assets/logo-pti-bienban.png');        // thiếu file → logo ngang bản cũ
+    if (!logoBb) logo = await png('assets/logo-ptisos.png');  // thiếu nốt → huy hiệu vuông
+    footerBb = await png('assets/bb-footer.png');             // thiếu thì vẽ dải cam bằng chữ
   } else {
     logo = await png('assets/logo-ptisos.png');
   }
-  return { reg, bold, logo, logoBb };
+  return { reg, bold, logo, logoBb, footerBb };
 }
 
 function setProgress(pct, msg) {
@@ -4501,7 +4555,7 @@ function resetApp() {
   state.sel.clear(); state.lastSelId = null;
   clearDraftStores().catch(() => {});
   setDraftBar('off', 'Bản nháp tự lưu sẽ bật khi có ảnh.', false);
-  ['fMaHs','fBks','fGara','fGdv','fNgay','fNgayPick',
+  ['fMaHs','fBks','fGara','fGdv','fNgay','fNgayPick','fSdtGdv','fLoaiXe',
    'fLaiXe','fNgayTt','fNgayTtPick','fDdTt'].forEach(id => { $(id).value = ''; $(id).classList.remove('ok'); });
   bbReset();
   $('fPhong').value = getLastPhong();
@@ -4719,29 +4773,41 @@ window.addEventListener('keydown', e => {
 //  bằng pdf.js — nên bản xem trước CHÍNH LÀ file sẽ tải về, khớp 100%.
 // ════════════════════════════════════════════════════════
 const BB_FORM     = 'BM.PTI.CG.02.08a';
-const BB_MIN_ROWS = 10;                 // biên bản luôn in tối thiểu 10 dòng hạng mục
+const BB_MIN_ROWS = 10;                 // CHƯA hạng mục nào → in 10 dòng trống để ghi tay
 const BB_PDF_NAME = 'Bien ban giam dinh xe';
 const BB_PV_SCALE = 1.6;                // độ phân giải canvas xem trước (595pt → ~950px)
+// Chỉ dùng khi thiếu assets/bb-footer.png — bình thường dải cam chân trang là ảnh
 const BB_ORG  = 'TỔNG CÔNG TY CỔ PHẦN BẢO HIỂM BƯU ĐIỆN';
-const BB_ADDR = 'Số 95, Trần Thái Tông, Cầu Giấy, Hà nội';
-const BB_TEL  = 'Tel: 1900545475   Website : pti.com.vn';
+const BB_ADDR = 'Số 95 Trần Thái Tông, Phường Cầu Giấy, TP Hà Nội';
+const BB_TEL  = 'pti.com.vn   ·   1900 54 54 75';
 
-/** Khoảng cách từ MÉP PHẢI logo PTI SOS tới khối chữ đầu trang biên bản — 60mm */
-const BB_HEAD_GAP = 60 * MM;
+/** Nhãn in ra bảng hạng mục — dùng chung cho màn hình 2 và file PDF */
+const BB_PA_LBL = { sua:'Sửa chữa', thay:'Thay thế' };
+const BB_HV_LBL = { co:'Có', khong:'Không' };
 
-// Bố cục biên bản (point). Tổng bề rộng 6 cột = 499 = 595 - 48 - 48
+// ──── Bố cục biên bản (point) ────
+// Mọi số đo đong từ chính file mẫu docs/bien_ban_giam_dinh.pdf, nên bản dựng ra
+// đặt chồng lên mẫu là khớp. Đổi số ở đây, đừng sửa rải rác trong bbBuild().
 const BBC = {
-  ML:48, MR:48, MT:30, MB:30,
-  FS:10.5, LH:14, SM:8,
-  COLS:[34, 205, 65, 65, 65, 65],   // STT · Chi tiết thiệt hại · Sửa chữa · Thay thế · Có · Không
+  ML:48.6, MR:32.5,            // lề chữ trái / phải
+  MT:30,   MB:42,              // MB chừa chỗ cho dải cam (23,2pt) + dòng số trang
+  COL2:316,                    // mốc cột phải của mục I (Loại xe / Ngày GĐ / SĐT GĐV)
+  FS:11.5, LH:16.3,            // cỡ chữ & giãn dòng phần chữ thường
+  H1:16,   H2:12.5,            // cỡ chữ "BIÊN BẢN GIÁM ĐỊNH" / "I." "II."
+  HIND:36,                     // thụt đầu dòng của tiêu đề mục (I.  ⟶  THÔNG TIN…)
+  TL:30.9, TCOL:[34.8, 297, 100.4, 99.7],   // STT · Chi tiết thiệt hại · Phương án · Thu hồi
+  THH:24,  TRH:18.9,           // cao hàng tiêu đề bảng / hàng dữ liệu
+  LOGO_W:62, LOGO_R:1.0879,    // logo "pti Insurance": bề ngang + tỷ lệ w/h của file PNG
+  FOOT_H:23.2,                 // dải cam chân trang
 };
-
-/** Ý kiến của các bên — câu cố định, không còn ô nhập ở màn hình 2 */
-const BB_YKIEN = 'Chúng tôi đồng ý với nội dung phương án sửa chữa như trên';
+/** Màu theo đúng mẫu: tiêu đề #ed7d31 · "I."/"II." #c65911 · nền tiêu đề bảng #5b9bd5 */
+const BB_ORANGE  = () => PDFLib.rgb(0xED/255, 0x7D/255, 0x31/255);
+const BB_ORANGE2 = () => PDFLib.rgb(0xC6/255, 0x59/255, 0x11/255);
+const BB_BLUE    = () => PDFLib.rgb(0x5B/255, 0x9B/255, 0xD5/255);
+// WHITE() dùng chung với khối dựng bản ảnh — đã khai báo ở đó, đừng khai lại.
 
 /** Toàn bộ dữ liệu riêng của biên bản. Lưu kèm hồ sơ và bản nháp qua currentInfo().bb */
 const bb = {
-  yKien:'',                    // hồ sơ cũ có thể còn ý kiến gõ tay; rỗng → in BB_YKIEN
   rows: [],                    // [{tx, pa:'sua'|'thay', hv:''|'co'|'khong'}] — DẪN XUẤT từ ảnh
   agree:true, agreeAt:'',      // luôn đồng ý — ô tích "Tôi đã đọc và đồng ý" đã bỏ khỏi giao diện
   sigCus:null, sigCusAt:'',    // chữ ký PNG nền trong suốt (dataURL) + thời điểm ký
@@ -4779,16 +4845,15 @@ function bbReadForm() {
 function bbSnapshot() {
   bbReadForm();
   const o = {};
-  ['yKien','agree','agreeAt','sigCus','sigCusAt','sigGdv','sigGdvAt','fileHash']
+  ['agree','agreeAt','sigCus','sigCusAt','sigGdv','sigGdvAt','fileHash']
     .forEach(k => { o[k] = bb[k]; });
-  // Bảng hạng mục dẫn xuất từ ảnh; chỉ lưu để giữ lại cột "Hiện vật thu hồi" người dùng đã chọn
+  // Bảng hạng mục dẫn xuất từ ảnh; chỉ lưu để giữ lại cột "Thu hồi" người dùng đã chọn
   o.rows = bb.rows.map(r => ({ tx:r.tx, pa:r.pa, hv:r.hv }));
   return o;
 }
 function bbRestore(o) {
   o = o || {};
   Object.assign(bb, {
-    yKien:o.yKien||'',
     rows: Array.isArray(o.rows) ? o.rows.map(r => ({ tx:r.tx||'', pa:r.pa||'', hv:r.hv||'' })) : [],
     agree:true, agreeAt:o.agreeAt||'',
     sigCus:o.sigCus||null, sigCusAt:o.sigCusAt||'',
@@ -4827,7 +4892,7 @@ function bbSyncChip() {
 // ──────── Bảng hạng mục giám định — DẪN XUẤT từ nút Thay thế / Sửa chữa của từng ảnh ────────
 /** Mỗi ảnh tích "Thay thế" / "Sửa chữa" thành một dòng, theo đúng thứ tự ảnh.
  *  Ảnh tích "Không" bị bỏ qua; trùng cả tên lẫn phương án thì chỉ lấy một dòng. */
-/** Mặc định cột "Hiện vật thu hồi": Thay thế → Có (có phụ tùng cũ để thu hồi),
+/** Mặc định cột "Thu hồi": Thay thế → Có (có phụ tùng cũ để thu hồi),
  *  Sửa chữa → Không. Người dùng vẫn đổi được trong bảng. */
 const bbHvDefault = pa => (pa === 'thay' ? 'co' : 'khong');
 
@@ -4847,7 +4912,7 @@ function bbRowsFromImages() {
   }));
   return out;
 }
-/** Dựng lại bb.rows từ ảnh, giữ nguyên cột "Hiện vật thu hồi" người dùng đã chọn.
+/** Dựng lại bb.rows từ ảnh, giữ nguyên cột "Thu hồi" người dùng đã chọn.
  *  Dùng old.has() chứ không phải `|| mặc định` — người dùng chọn "—" (rỗng) là một
  *  lựa chọn thật, không được hiểu là "chưa đặt" rồi điền lại giá trị mặc định. */
 function bbSyncRows(resetHv) {
@@ -4863,7 +4928,7 @@ function bbRenderRows() {
   const host = $('bbRows');
   if (!host) return;
   if (!bb.rows.length) {
-    host.innerHTML = '<tr><td colspan="6" class="bb-nores">Chưa có hạng mục nào.<br>' +
+    host.innerHTML = '<tr><td colspan="4" class="bb-nores">Chưa có hạng mục nào.<br>' +
       'Về <b>màn hình 1 › Quản lý ảnh &amp; chú thích</b> và tích <b>Thay thế</b> hoặc ' +
       '<b>Sửa chữa</b> dưới những ảnh cần đưa vào biên bản.<br>' +
       '<span class="hint">Biên bản vẫn in được với 10 dòng trống để ghi tay.</span></td></tr>';
@@ -4873,14 +4938,13 @@ function bbRenderRows() {
   host.innerHTML = bb.rows.map((r, i) => `<tr>
     <td class="no">${i + 1}</td>
     <td class="tx">${esc(r.tx)}</td>
-    <td class="mk">${r.pa === 'sua'  ? 'x' : ''}</td>
-    <td class="mk">${r.pa === 'thay' ? 'x' : ''}</td>
-    <td colspan="2" class="hv"><select onchange="bbSetRow(${i},'hv',this.value)">
+    <td class="mk">${BB_PA_LBL[r.pa] || ''}</td>
+    <td class="hv"><select onchange="bbSetRow(${i},'hv',this.value)">
       ${opt('', r.hv, '—')}${opt('co', r.hv, 'Có')}${opt('khong', r.hv, 'Không')}</select></td>
   </tr>`).join('');
 }
 function bbSetRow(i, k, v) { if (bb.rows[i]) { bb.rows[i][k] = v; bbTouch(); } }
-/** Nút "Lấy lại từ ảnh" — dựng lại bảng VÀ trả cột Hiện vật thu hồi về mặc định
+/** Nút "Lấy lại từ ảnh" — dựng lại bảng VÀ trả cột Thu hồi về mặc định
  *  (Thay thế → Có · Sửa chữa → Không). Đây là đường duy nhất để lấy lại mặc định
  *  sau khi đã tự đổi, và cũng để hồ sơ lưu từ bản cũ (cột thu hồi còn trống) điền lại được. */
 function bbReloadRows() {
@@ -4901,11 +4965,13 @@ function bbRecap() {
     row('Số HSBT / Mã hồ sơ', bbVal('fMaHs')) +
     row('Biển kiểm soát', bbVal('fBks')) +
     row('Tên lái/chủ xe', bbVal('fLaiXe')) +
+    row('Loại xe', bbVal('fLoaiXe')) +
     row('Ngày tổn thất', bbVal('fNgayTt')) +
     row('Địa điểm tổn thất', bbVal('fDdTt')) +
     row('Ngày giám định', bbVal('fNgay')) +
     row('Ga-ra / Địa điểm', bbVal('fGara')) +
     row('Giám định viên', [bbVal('fGdv'), bbVal('fPhong')].filter(Boolean).join(' — ')) +
+    row('Điện thoại GĐV', bbVal('fSdtGdv')) +
     `<div class="sum-r big"><span class="l">Hạng mục thiệt hại</span><span class="v">${nHm} hạng mục đã ghi</span></div>`;
 }
 
@@ -5026,278 +5092,200 @@ const DGRAY = () => PDFLib.rgb(.35, .38, .42);
 async function bbBuild() {
   bbReadForm();
   bbSyncRows();      // bảng hạng mục luôn khớp với các nút Thay thế / Sửa chữa ở màn hình 1
-  const { PDFDocument, rgb } = PDFLib;
+  const { PDFDocument } = PDFLib;
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
   const A = await embedAssets(pdfDoc, 'bb');
-  const reg = A.reg, bold = A.bold, logo = A.logo, logoBb = A.logoBb;
+  const reg = A.reg, bold = A.bold, logo = A.logo, logoBb = A.logoBb, footImg = A.footerBb;
 
   const sigCusImg = bb.sigCus ? await pdfDoc.embedPng(dataUrlToBytes(bb.sigCus)) : null;
   const sigGdvImg = bb.sigGdv ? await pdfDoc.embedPng(dataUrlToBytes(bb.sigGdv)) : null;
 
   // ── Dữ liệu điền vào mẫu ──
   const V = {
-    bks: bbVal('fBks'), gara: bbVal('fGara'),
-    gdv: bbVal('fGdv'), phong: bbVal('fPhong'), ngay: bbVal('fNgay'),
-    laiXe: bbVal('fLaiXe'), ngayTt: bbVal('fNgayTt'), ddTt: bbVal('fDdTt'),
+    bks: bbVal('fBks'), gdv: bbVal('fGdv'), sdtGdv: bbVal('fSdtGdv'), ngay: bbVal('fNgay'),
+    laiXe: bbVal('fLaiXe'), loaiXe: bbVal('fLoaiXe'),
+    ngayTt: bbVal('fNgayTt'), ddTt: bbVal('fDdTt'),
   };
   const CW = A4.w - BBC.ML - BBC.MR;
+  const TW = BBC.TCOL.reduce((a, b) => a + b, 0);     // bề ngang bảng hạng mục
   const T = s => cleanText(s).replace(/\s+/g, ' ').trim();
 
   // ── Máy "chảy" nội dung qua nhiều trang ──
   const pages = [];
   let page = null, y = 0;
   const newPage = () => { page = pdfDoc.addPage([A4.w, A4.h]); pages.push(page); y = A4.h - BBC.MT; };
-  const need = h => { if (!page || y - h < BBC.MB + 16) newPage(); };
+  const need = h => { if (!page || y - h < BBC.MB) newPage(); };
+  const gap  = h => { y -= h; };
   newPage();
 
-  const wrap = (txt, font, size, maxW) => {
-    const words = T(txt).split(' ').filter(Boolean);
-    if (!words.length) return [''];
-    const out = []; let cur = '';
-    for (const w of words) {
-      const t = cur ? cur + ' ' + w : w;
-      if (font.widthOfTextAtSize(t, size) <= maxW || !cur) cur = t;
-      else { out.push(cur); cur = w; }
-    }
-    if (cur) out.push(cur);
-    return out;
-  };
-  /** Một đoạn chữ căn trái (tự xuống dòng) hoặc căn giữa */
-  const para = (txt, o) => {
-    o = o || {};
-    const font = o.bold ? bold : reg, size = o.size || BBC.FS, lh = o.lh || BBC.LH;
-    const x0 = BBC.ML + (o.x || 0), maxW = o.w || (CW - (o.x || 0));
-    for (const ln of wrap(txt, font, size, maxW)) {
-      need(lh);
-      const x = o.center ? x0 + (maxW - font.widthOfTextAtSize(ln, size)) / 2 : x0;
-      page.drawText(ln, { x, y: y - size * .82, size, font, color: o.color || BLACK() });
-      y -= lh;
-    }
-  };
-  /** Dòng 2 cột của mẫu: "1/ {GĐV}   |   GĐV {phòng}, SĐT: …" */
-  const cols2 = (left, right, xr) => {
-    need(BBC.LH);
-    const size = BBC.FS, off = xr || 200, bx = BBC.ML + off;
-    // Đoạn bên phải hay dài (phòng + SĐT + GPLX) — TỰ CO CỠ CHỮ trước, cắt bớt là bước cuối,
-    // kẻo số điện thoại / số GPLX bị mất đuôi.
-    const fit = (t, maxW) => {
-      let s = T(t), fs = size;
-      while (fs > 7.2 && reg.widthOfTextAtSize(s, fs) > maxW) fs -= .3;
-      while (s.length > 1 && reg.widthOfTextAtSize(s, fs) > maxW) s = s.slice(0, -1);
-      return { s, fs };
-    };
-    const L = fit(left, off - 8), R = fit(right, A4.w - BBC.MR - bx);
-    page.drawText(L.s, { x: BBC.ML, y: y - size * .82, size: L.fs, font: reg, color: BLACK() });
-    page.drawText(R.s, { x: bx,     y: y - size * .82, size: R.fs, font: reg, color: BLACK() });
-    y -= BBC.LH;
-  };
-  /** Dòng chấm để điền tay, bắt đầu sau một nhãn */
-  const dotted = (label, text, size) => {
-    size = size || BBC.FS;
-    need(BBC.LH);
-    const lb = T(label);
-    const lw = reg.widthOfTextAtSize(lb, size);
-    if (lb) page.drawText(lb, { x: BBC.ML, y: y - size * .82, size, font: reg, color: BLACK() });
-    const rest = CW - lw;
-    if (T(text)) {
-      page.drawText(clipTo(T(text), rest), { x: BBC.ML + lw, y: y - size * .82, size, font: reg, color: BLACK() });
-    } else {
-      const dw = reg.widthOfTextAtSize('.', size);
-      const n = Math.max(0, Math.floor(rest / dw) - 1);
-      page.drawText('.'.repeat(n), { x: BBC.ML + lw, y: y - size * .82, size, font: reg, color: DGRAY() });
-    }
-    y -= BBC.LH;
-  };
+  /** Cắt bớt cho vừa bề ngang — bước cuối, sau khi đã thử co cỡ chữ */
   const clipTo = (t, maxW, size, font) => {
     size = size || BBC.FS; font = font || reg;
     let s = T(t);
     while (s.length > 1 && font.widthOfTextAtSize(s, size) > maxW) s = s.slice(0, -1);
     return s;
   };
-  const gap = h => { y -= h; };
+  /** Vẽ một dòng chữ với mốc y là MÉP TRÊN của dòng (baseline = top − 0,82 × cỡ chữ) */
+  const put = (t, x, size, font, color, top) =>
+    page.drawText(t, { x, y: (top === undefined ? y : top) - size * .82, size, font, color: color || BLACK() });
 
-  // ════ Khối đầu trang 1: logo + tên tổng công ty ════
-  // Biên bản dùng logo NGANG (có dòng chữ "Cứu hộ & Bảo hiểm"), khác huy hiệu vuông của bản ảnh.
-  // Khối chữ bắt đầu cách MÉP PHẢI logo đúng BB_HEAD_GAP (60mm) — xem hằng ở đầu khối biên bản.
-  const LG_W = 72, LG_H = 39;
-  if (logoBb)   page.drawImage(logoBb, { x: BBC.ML, y: y - LG_H - 2, width: LG_W, height: LG_H });
-  else if (logo) page.drawImage(logo,  { x: BBC.ML, y: y - 42, width: 42, height: 42 });
-  {
-    const logoW = logoBb ? LG_W : (logo ? 42 : 0);
-    const hx = BBC.ML + logoW + BB_HEAD_GAP;
-    const hw = A4.w - BBC.MR - hx;              // bề ngang còn lại cho khối chữ
-    // Đẩy sang phải 60mm thì chỗ cho chữ hẹp đi → tự co cỡ chữ cho vừa, đừng để cụt đuôi
-    const put = (t, dy, size, font, color) => {
+  /** Một ô "Nhãn: giá trị" của mục I. Bỏ trống thì in dòng chấm để điền tay. */
+  const fld = (label, value, x, w) => {
+    // T() gộp khoảng trắng nên PHẢI cộng lại dấu cách sau dấu hai chấm,
+    // kẻo in ra "Biển số:15K-547.64" dính liền.
+    const lb = T(label) + ' ', size = BBC.FS;
+    const lw = reg.widthOfTextAtSize(lb, size);
+    put(lb, x, size, reg);
+    const rest = w - lw, val = T(value);
+    if (val) {
       let fs = size;
-      while (fs > 5.5 && font.widthOfTextAtSize(t, fs) > hw) fs -= .2;
-      page.drawText(t, { x: hx, y: y - dy, size: fs, font, color });
-    };
-    put(BB_ORG,  10, 10.5, bold, PDFLib.rgb(.05, .18, .35));
-    put(BB_ADDR, 22,  8.5, reg,  DGRAY());
-    put(BB_TEL,  33,  8.5, reg,  DGRAY());
+      while (fs > 7.5 && reg.widthOfTextAtSize(val, fs) > rest) fs -= .3;
+      page.drawText(clipTo(val, rest, fs), { x: x + lw, y: y - size * .82, size: fs, font: reg, color: BLACK() });
+    } else {
+      const dw = reg.widthOfTextAtSize('.', size);
+      page.drawText('.'.repeat(Math.max(0, Math.floor(rest / dw) - 1)),
+        { x: x + lw, y: y - size * .82, size, font: reg, color: DGRAY() });
+    }
+  };
+  const row1 = (l, v) => { need(BBC.LH); fld(l, v, BBC.ML, CW); y -= BBC.LH; };
+  const row2 = (l1, v1, l2, v2) => {
+    need(BBC.LH);
+    fld(l1, v1, BBC.ML, BBC.COL2 - BBC.ML - 10);
+    fld(l2, v2, BBC.COL2, A4.w - BBC.MR - BBC.COL2);
+    y -= BBC.LH;
+  };
+  /** Tiêu đề mục: số La Mã ở lề, tên mục thụt vào BBC.HIND — cam đậm, in đậm */
+  const heading = (num, txt) => {
+    need(20 + BBC.TRH);                 // đừng để tiêu đề mục rơi một mình cuối trang
+    put(num, BBC.ML, BBC.H2, bold, BB_ORANGE2());
+    put(txt, BBC.ML + BBC.HIND, BBC.H2, bold, BB_ORANGE2());
+    y -= 20;
+  };
+
+  // ════ Đầu trang 1: logo "pti Insurance" + tiêu đề ════
+  {
+    const lw = BBC.LOGO_W, lh = lw / BBC.LOGO_R;
+    if (logoBb)    page.drawImage(logoBb, { x: BBC.ML, y: y - lh, width: lw, height: lh });
+    else if (logo) page.drawImage(logo,   { x: BBC.ML, y: y - 46, width: 46, height: 46 });
+    // Tiêu đề căn giữa KHOẢNG TRỐNG BÊN PHẢI logo (đúng như mẫu — không phải giữa trang)
+    const x0 = BBC.ML + lw + 44, x1 = A4.w - BBC.MR;
+    const tt = 'BIÊN BẢN GIÁM ĐỊNH';
+    let fs = BBC.H1;
+    while (fs > 10 && bold.widthOfTextAtSize(tt, fs) > x1 - x0) fs -= .4;
+    put(tt, (x0 + x1 - bold.widthOfTextAtSize(tt, fs)) / 2, fs, bold, BB_ORANGE(), y - 30);
+    y -= 90;
   }
-  y -= 54;
 
-  // ════ Tiêu đề ════
-  para('BIÊN BẢN GIÁM ĐỊNH THIỆT HẠI', { bold:true, size:15.5, lh:26, center:true });
-  gap(4);
+  // ════ I. THÔNG TIN CƠ BẢN ════
+  heading('I.', 'THÔNG TIN CƠ BẢN');
+  gap(6);
+  row1('Tên chủ xe/Lái xe: ', V.laiXe);
+  row2('Biển số: ',      V.bks,    'Loại xe: ',        V.loaiXe);
+  row2('Ngày tai nạn: ', V.ngayTt, 'Ngày giám định: ', V.ngay);
+  row2('Tên GĐV: ',      V.gdv,    'Điện thoại GĐV: ', V.sdtGdv);
+  // Mẫu không có dòng này — chỉ in thêm khi người dùng đã nhập, để biên bản bỏ trống
+  // vẫn giống hệt mẫu BM.PTI.CG.02.08a.
+  if (T(V.ddTt)) row1('Địa điểm tai nạn: ', V.ddTt);
+  gap(14);
 
-  // ════ Phần mở đầu ════
-  dotted(`Hôm nay, ngày ${V.ngay || '…………'} tại : `, V.gara);
-  para('Chúng tôi gồm có:', { bold:true });
-  cols2(`1/ ${V.gdv || '…………'}`, `GĐV ${V.phong || '…………'}`, 172);
-  cols2(`2/ ${V.laiXe || '…………………'}`,
-        `là Đại diện: Chủ xe/lái xe BKS : ${V.bks || '…………'}`, 172);
-  para(`Giám định thiệt hại xe ô tô BKS ${V.bks || '…………'} bị tổn thất ngày : ${V.ngayTt || '…………………'}`);
-  dotted('Tại : ', V.ddTt);
-  para('1. Thông tin tai nạn : Theo Thông báo tai nạn và yêu cầu bồi thường', { bold:true });
-  gap(2);
-  para('2. Hạng mục giám định : ( Theo các phụ lục đính kèm )', { bold:true });
-  gap(4);
+  // ════ II. THÔNG TIN THIỆT HẠI ════
+  heading('II.', 'THÔNG TIN THIỆT HẠI');
+  gap(8);
 
-  // ════ Bảng hạng mục ════
-  const W = BBC.COLS, xs = [];
-  { let x = BBC.ML; for (const w of W) { xs.push(x); x += w; } }
-  const H1 = 16, H2 = 14, HR = 16;
+  const xs = []; { let x = BBC.TL; for (const w of BBC.TCOL) { xs.push(x); x += w; } }
   const bx = (x, top, w, h) => page.drawRectangle({ x, y: top - h, width: w, height: h,
-    borderColor: BLACK(), borderWidth: .8 });
+    borderColor: BLACK(), borderWidth: .5 });
+  /** Chữ trong ô bảng — canh giữa, hoặc canh trái khi o.left; tự co cỡ chữ cho vừa ô */
   const cTx = (s, x, top, w, h, o) => {
     o = o || {};
     const font = o.bold ? bold : reg;
-    let fs = o.size || 9, t = T(s);
+    let fs = o.size || 11, t = T(s);
     if (!t) return;
-    while (fs > 5 && font.widthOfTextAtSize(t, fs) > w - 6) fs -= .4;
-    const tw = font.widthOfTextAtSize(t, fs);
-    const x0 = o.left ? x + 4 : x + (w - tw) / 2;
-    page.drawText(o.left ? clipTo(t, w - 8, fs, font) : t,
-      { x: x0, y: top - h / 2 - fs * .33, size: fs, font, color: BLACK() });
+    while (fs > 5 && font.widthOfTextAtSize(t, fs) > w - 8) fs -= .4;
+    const x0 = o.left ? x + 5 : x + (w - font.widthOfTextAtSize(t, fs)) / 2;
+    page.drawText(clipTo(t, w - 8, fs, font),
+      { x: x0, y: top - h / 2 - fs * .33, size: fs, font, color: o.color || BLACK() });
   };
+  const TH = ['STT', 'CHI TIẾT THIỆT HẠI', 'PHƯƠNG ÁN', 'THU HỒI'];
   const drawHead = () => {
     const top = y;
-    bx(xs[0], top, W[0], H1 + H2);  cTx('STT', xs[0], top, W[0], H1 + H2, { bold:true, size:8.6 });
-    bx(xs[1], top, W[1], H1 + H2);  cTx('Chi tiết thiệt hại', xs[1], top, W[1], H1 + H2, { bold:true, size:9.4 });
-    bx(xs[2], top, W[2] + W[3], H1); cTx('Phương án giải quyết', xs[2], top, W[2] + W[3], H1, { bold:true, size:8.8 });
-    bx(xs[4], top, W[4] + W[5], H1); cTx('Hiện vật thu hồi', xs[4], top, W[4] + W[5], H1, { bold:true, size:8.8 });
-    const t2 = top - H1;
-    ['Sửa chữa','Thay thế','Có','Không'].forEach((lbl, k) => {
-      bx(xs[k + 2], t2, W[k + 2], H2);
-      cTx(lbl, xs[k + 2], t2, W[k + 2], H2, { bold:true, size:8.6 });
+    page.drawRectangle({ x: BBC.TL, y: top - BBC.THH, width: TW, height: BBC.THH, color: BB_BLUE() });
+    BBC.TCOL.forEach((w, k) => {
+      bx(xs[k], top, w, BBC.THH);
+      cTx(TH[k], xs[k], top, w, BBC.THH, { bold: true, size: 10, color: WHITE() });
     });
-    y = top - H1 - H2;
+    y = top - BBC.THH;
   };
-  need(H1 + H2 + HR * 2);
+  need(BBC.THH + BBC.TRH * 2);
   drawHead();
-  const rows = bb.rows.slice();
-  while (rows.length < BB_MIN_ROWS) rows.push({ tx:'', pa:'', hv:'' });
-  // STT chỉ đánh cho dòng CÓ hạng mục, chạy đúng như bảng "Hạng mục giám định" ở màn hình 2.
-  // Dòng trống thêm vào cho đủ BB_MIN_ROWS để ghi tay thì BỎ TRỐNG ô STT — đừng in sẵn 1…10.
+
+  // Có hạng mục thì in đúng số hạng mục (như mẫu); chưa có thì in BB_MIN_ROWS dòng
+  // trống để ký giấy rồi ghi tay tại hiện trường.
+  const rows = bb.rows.length ? bb.rows.slice()
+             : Array.from({ length: BB_MIN_ROWS }, () => ({ tx: '', pa: '', hv: '' }));
   let stt = 0;
-  rows.forEach((r) => {
-    if (y - HR < BBC.MB + 16) { newPage(); drawHead(); }
+  rows.forEach(r => {
+    if (y - BBC.TRH < BBC.MB) { newPage(); drawHead(); }
     const top = y;
-    W.forEach((w, k) => bx(xs[k], top, w, HR));
-    if (T(r.tx)) cTx(String(++stt), xs[0], top, W[0], HR, { size:8.8 });
-    cTx(r.tx, xs[1], top, W[1], HR, { size:9, left:true });
-    if (r.pa === 'sua')   cTx('x', xs[2], top, W[2], HR, { bold:true, size:10 });
-    if (r.pa === 'thay')  cTx('x', xs[3], top, W[3], HR, { bold:true, size:10 });
-    if (r.hv === 'co')    cTx('x', xs[4], top, W[4], HR, { bold:true, size:10 });
-    if (r.hv === 'khong') cTx('x', xs[5], top, W[5], HR, { bold:true, size:10 });
-    y = top - HR;
+    BBC.TCOL.forEach((w, k) => bx(xs[k], top, w, BBC.TRH));
+    if (T(r.tx)) cTx(String(++stt), xs[0], top, BBC.TCOL[0], BBC.TRH, { size: 10.5 });
+    cTx(r.tx,                  xs[1], top, BBC.TCOL[1], BBC.TRH, { size: 11, left: true });
+    cTx(BB_PA_LBL[r.pa] || '', xs[2], top, BBC.TCOL[2], BBC.TRH, { size: 11, left: true });
+    cTx(BB_HV_LBL[r.hv] || '', xs[3], top, BBC.TCOL[3], BBC.TRH, { size: 11, left: true });
+    y = top - BBC.TRH;
   });
-  gap(12);
-
-  // ════ Mục 3 — Ý kiến các bên ════
-  // Câu đồng ý là MẶC ĐỊNH, không còn ô nhập ở màn hình 2; hồ sơ cũ có ý kiến gõ tay thì dùng lại.
-  para('3. Ý kiến của các bên tham gia giám định:', { bold:true });
-  para(T(bb.yKien) || BB_YKIEN);
-  gap(2);
-
-  // ════ Mục 4 — Đơn vị sửa chữa ════
-  // Tên ga-ra người dùng gõ thường đã có sẵn chữ "Gara" — đừng in thành "Gara Gara …"
-  const garaTx = !V.gara ? 'Gara …………………'
-               : (/^gara\b/i.test(V.gara) ? V.gara : 'Gara ' + V.gara);
-  para(`4. Đơn vị sửa chữa: ${garaTx}`, { bold:true });
-  {
-    need(BBC.LH);
-    const size = BBC.FS;
-    const l1 = 'Đ/c : ', mid = 'SĐT liên hệ ';
-    const w1 = reg.widthOfTextAtSize(l1, size), wm = reg.widthOfTextAtSize(mid, size);
-    const halfA = CW * .58 - w1, halfB = CW * .42 - wm;
-    const put = (t, x, w) => {
-      if (T(t)) page.drawText(clipTo(t, w), { x, y: y - size * .82, size, font: reg, color: BLACK() });
-      else {
-        const dw = reg.widthOfTextAtSize('.', size);
-        page.drawText('.'.repeat(Math.max(0, Math.floor(w / dw) - 1)),
-          { x, y: y - size * .82, size, font: reg, color: DGRAY() });
-      }
-    };
-    page.drawText(l1, { x: BBC.ML, y: y - size * .82, size, font: reg, color: BLACK() });
-    put('', BBC.ML + w1, halfA);           // không còn ô nhập → in dòng chấm điền tay
-    const xm = BBC.ML + CW * .58;
-    page.drawText(mid, { x: xm, y: y - size * .82, size, font: reg, color: BLACK() });
-    put('', xm + wm, halfB);
-    y -= BBC.LH;
-  }
-  gap(8);
-
-  // ════ Phần kết ════
-  para('Biên bản này được lập với sự xác nhận của các bên liên quan cùng tham gia giám định bao gồm ' +
-       '…………… phụ lục đính kèm làm cơ sở xây dựng Báo giá sửa chữa');
-  para('Đại diện chủ xe/ lái xe giữ bản sao/chụp ảnh làm cơ sở theo dõi nội dung sửa chữa');
-  gap(10);
 
   // ════ Khối chữ ký ════
   {
-    const SIG_H = 128;
-    need(SIG_H);
-    const half = CW / 2;
-    const cL = BBC.ML + half / 2, cR = BBC.ML + half + half / 2;
+    const SIG_H = 112;
+    need(26 + SIG_H);
+    gap(26);
+    const cL = BBC.TL + TW / 4, cR = BBC.TL + TW * 3 / 4;
     const ctr = (t, cx, size, font, color) => {
       const s = T(t); if (!s) return;
-      page.drawText(s, { x: cx - font.widthOfTextAtSize(s, size) / 2, y: y - size * .82,
-                         size, font, color: color || BLACK() });
+      put(s, cx - font.widthOfTextAtSize(s, size) / 2, size, font, color);
     };
-    ctr('LÁI XE/CHỦ XE', cL, 11, bold);
-    ctr('GIÁM ĐỊNH VIÊN PTI', cR, 11, bold);
-    y -= 18;
+    ctr('Xác nhận của chủ xe/lái xe', cL, 11.5, bold);
+    ctr('Xác nhận của đại diện PTI',  cR, 11.5, bold);
+    y -= 14.5;
+    ctr('(Chữ ký và ghi rõ họ tên)', cL, 10.5, reg, DGRAY());
+    ctr('(Ký và ghi rõ họ tên)',     cR, 10.5, reg, DGRAY());
+    y -= 15;
 
-    // Ô đặt chữ ký (placeholder sẵn trong mẫu) — ảnh PNG nền trong suốt vẽ đè lên
-    const boxH = 54, boxW = half - 54;
+    // Ô đặt chữ ký — ảnh PNG nền trong suốt, thu vừa khung và canh giữa
+    const boxH = 50, boxW = TW / 2 - 60;
     const slot = (img, cx) => {
-      if (img) {
-        const k = Math.min(boxW / img.width, boxH / img.height);
-        const w = img.width * k, h = img.height * k;
-        page.drawImage(img, { x: cx - w / 2, y: y - boxH + (boxH - h) / 2, width: w, height: h });
-      } else {
-        // căn giữa theo chiều dọc của ô ký, không dính lên mép trên
-        const ph = '(chưa ký)';
-        page.drawText(ph, { x: cx - reg.widthOfTextAtSize(ph, 9) / 2,
-          y: y - boxH / 2 - 3, size: 9, font: reg, color: PDFLib.rgb(.62, .66, .7) });
-      }
-      const dw = reg.widthOfTextAtSize('.', 10);
-      const n = Math.max(0, Math.floor(boxW / dw));
-      page.drawText('.'.repeat(n), { x: cx - boxW / 2, y: y - boxH - 2, size: 10, font: reg, color: DGRAY() });
+      if (!img) return;
+      const k = Math.min(boxW / img.width, boxH / img.height);
+      page.drawImage(img, { x: cx - img.width * k / 2, y: y - boxH + (boxH - img.height * k) / 2,
+        width: img.width * k, height: img.height * k });
     };
     slot(sigCusImg, cL);
     slot(sigGdvImg, cR);
-    y -= boxH + 12;
-
-    ctr(V.laiXe, cL, 10.5, bold);
-    ctr(V.gdv,   cR, 10.5, bold);
-    y -= 13;
-    ctr(bb.sigCusAt ? 'Ký lúc ' + bbDT(bb.sigCusAt) : '', cL, 7.5, reg, DGRAY());
-    ctr(bb.sigGdvAt ? 'Ký lúc ' + bbDT(bb.sigGdvAt) : '', cR, 7.5, reg, DGRAY());
-    y -= 14;
+    y -= boxH + 4;
+    // Mẫu ghi "(Ký và ghi rõ họ tên)" — ký giấy thì tên do người ký tự viết.
+    // Chỉ in sẵn tên khi bên đó đã ký điện tử, để chữ ký ảnh có tên đi kèm.
+    if (sigCusImg) ctr(V.laiXe, cL, 11, reg);
+    if (sigGdvImg) ctr(V.gdv,   cR, 11, reg);
+    y -= 15;
   }
 
-  // ════ Chân trang mọi trang ════
+  // ════ Chân trang mọi trang: số trang + dải cam ════
   pages.forEach((p, i) => {
-    const ft = `Quy trình giám định bảo hiểm xe cơ giới – ${BB_FORM}`;
-    p.drawText(ft, { x: BBC.ML, y: 18, size: 7.6, font: reg, color: DGRAY() });
-    const pn = `Trang ${i + 1}/${pages.length}`;
-    p.drawText(pn, { x: A4.w - BBC.MR - reg.widthOfTextAtSize(pn, 7.6), y: 18, size: 7.6,
-      font: reg, color: DGRAY() });
+    const pn = (i + 1) + '/' + pages.length;
+    p.drawText(pn, { x: A4.w - BBC.MR - 11 - reg.widthOfTextAtSize(pn, 9),
+      y: BBC.FOOT_H + 6, size: 9, font: reg, color: BLACK() });
+    if (footImg) {
+      p.drawImage(footImg, { x: 0, y: 0, width: A4.w, height: BBC.FOOT_H });
+    } else {
+      // Thiếu assets/bb-footer.png → vẽ lại dải cam bằng chữ cho khỏi trống chân trang
+      p.drawRectangle({ x: 0, y: 0, width: A4.w, height: BBC.FOOT_H, color: BB_ORANGE() });
+      p.drawText(BB_ORG + '   |   ' + BB_ADDR,
+        { x: BBC.ML, y: BBC.FOOT_H / 2 - 2.6, size: 7.4, font: bold, color: WHITE() });
+      p.drawText(BB_TEL, { x: A4.w - BBC.MR - reg.widthOfTextAtSize(BB_TEL, 7.4),
+        y: BBC.FOOT_H / 2 - 2.6, size: 7.4, font: reg, color: WHITE() });
+    }
   });
 
   // Ngày tạo cố định theo thời điểm ký → cùng nội dung thì cùng mã băm file
@@ -5305,8 +5293,8 @@ async function bbBuild() {
   const fixed = isNaN(stamp) ? new Date('2020-01-01T00:00:00Z') : stamp;
   pdfDoc.setCreationDate(fixed);
   pdfDoc.setModificationDate(fixed);
-  pdfDoc.setTitle('Biên bản giám định thiệt hại ' + (V.bks || ''));
-  pdfDoc.setSubject(BB_FORM + ' — Biên bản giám định thiệt hại xe ' + (V.bks || ''));
+  pdfDoc.setTitle('Biên bản giám định ' + (V.bks || ''));
+  pdfDoc.setSubject(BB_FORM + ' — Biên bản giám định xe ' + (V.bks || ''));
   pdfDoc.setProducer('PTI SOS — Tiện ích ghép ảnh giám định ' + APP_VERSION);
 
   const bytes = await pdfDoc.save();
@@ -5384,7 +5372,8 @@ async function bbDownload() {
 
 // ──────── Gắn sự kiện ────────
 BB_FIELDS.forEach(id => { const el = $(id); if (el) el.addEventListener('input', bbTouch); });
-['fLaiXe','fDdTt'].forEach(id => $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); bbTouch(); }));
+['fLaiXe','fDdTt','fLoaiXe','fSdtGdv'].forEach(id =>
+  $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); bbTouch(); }));
 ['fMaHs','fBks','fGara','fGdv','fPhong'].forEach(id =>
   $(id).addEventListener('input', () => { bbRecap(); bbRenderSigs(); }));
 

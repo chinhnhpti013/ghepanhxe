@@ -315,7 +315,8 @@ td{color:var(--text-2)}
   <ol class="steps">
     <li><b>❶ Kiểu bản ảnh</b> — chọn 1 trong 3 kiểu.</li>
     <li><b>❷ Hồ sơ &amp; xe</b> — Số HSBT · Biển kiểm soát · Ngày giám định.</li>
-    <li><b>❸ Nơi giám định &amp; người thực hiện</b> — Ga-ra · Giám định viên · Phòng/Khu vực.</li>
+    <li><b>❸ Nơi giám định &amp; người thực hiện</b> — Ga-ra · Giám định viên · Phòng/Khu vực ·
+        Điện thoại GĐV.</li>
     <li><b>❹ Bố cục trang in</b> — khổ giấy và số ảnh mỗi trang (mục <a href="#bo-cuc">4</a>).</li>
     <li><b>❺ Biên bản giám định</b> <i>(khung vàng)</i> — chỉ hiện ở kiểu
         <i>chi tiết thiệt hại</i>; tích vào đây mới có biên bản.</li>
@@ -336,8 +337,8 @@ td{color:var(--text-2)}
             <br>• bước 2 mới có thẻ <a href="#bien-ban">Biên bản giám định</a>;
             <br>• mỗi ảnh ở mục <a href="#quan-ly-anh">Chọn và chỉnh từng ảnh</a> mới hiện
               dải nút <b>Thay thế / Sửa chữa / Không</b>;
-            <br>• ba ô <b>Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất</b> mới hiện ra
-              ngay trong khung ❺ này.
+            <br>• bốn ô <b>Tên Lái/chủ xe · Loại xe · Ngày tổn thất · Địa điểm tổn thất</b>
+              mới hiện ra ngay trong khung ❺ này.
             <br>Không tích thì ứng dụng chạy y như cũ, chỉ xuất bản ảnh.</td></tr>
     <tr><td>Số HSBT / Mã hồ sơ</td>
         <td>Ví dụ <code>XCG.2026.001234</code>. In ở <b>dòng 2</b> của tiêu đề, trước tên giám định viên.
@@ -356,6 +357,11 @@ td{color:var(--text-2)}
     <tr><td><b>Giám định viên *</b></td>
         <td>Chọn trong danh sách đã lưu hoặc gõ tên mới — tên mới tự được thêm vào danh sách
             cho lần sau.</td></tr>
+    <tr><td>Điện thoại GĐV</td>
+        <td>Số điện thoại in vào mục <b>I · Thông tin cơ bản</b> của
+            <a href="#bien-ban">Biên bản giám định</a> — <b>không in lên bản ảnh</b>.
+            Ứng dụng <b>nhớ số theo từng tên giám định viên</b>: gõ một lần, những lần sau
+            chọn lại đúng tên đó là số tự điền. Đổi sang GĐV khác thì số cũng đổi theo.</td></tr>
     <tr><td><b>Phòng / Khu vực giám định *</b></td>
         <td>In ở <b>chân mỗi trang</b> (góc trái). <b>Lần đầu dùng app ô này để trống</b> —
             bạn chọn hoặc gõ tên phòng <b>một lần</b>, những lần mở app sau ô tự điền lại
@@ -363,17 +369,22 @@ td{color:var(--text-2)}
     <tr><td colspan="2" style="background:var(--surface-2)">
         <b>Thông tin vụ tổn thất</b> (trong khung ❺) — <b>chỉ hiện khi đã tích
         <i>Lập Biên bản giám định</i></b>.
-        Không bắt buộc, không in lên bản ảnh; chỉ dùng cho
-        <a href="#bien-ban">Biên bản giám định</a> ở bước 2. Bỏ tích thì ba ô này tự ẩn đi.</td></tr>
+        Không bắt buộc, không in lên bản ảnh; chỉ dùng cho mục <b>I · Thông tin cơ bản</b> của
+        <a href="#bien-ban">Biên bản giám định</a> ở bước 2. Bỏ tích thì bốn ô này tự ẩn đi.
+        <b>Ô nào bỏ trống thì biên bản in dòng chấm</b> để điền tay.</td></tr>
     <tr><td>Tên Lái/chủ xe</td>
-        <td>Người đại diện chủ xe/lái xe ký vào biên bản. In ở dòng <code>2/ …</code>
-            và dưới ô chữ ký bên trái của biên bản.</td></tr>
+        <td>Người đại diện chủ xe/lái xe ký vào biên bản. In ở dòng
+            <code>Tên chủ xe/Lái xe: …</code>.</td></tr>
+    <tr><td>Loại xe</td>
+        <td>Hiệu xe và phiên bản, ví dụ <code>FORD/RANGER XLS 2.0L 4X2 AT</code>.
+            In ở dòng <code>Loại xe: …</code>, cạnh biển số.</td></tr>
     <tr><td>Ngày tổn thất</td>
-        <td>Ô chọn ngày, nút <span class="btn-ex">✖</span> để bỏ trống. In vào câu
-            <i>"… bị tổn thất ngày : …"</i> của biên bản.</td></tr>
+        <td>Ô chọn ngày, nút <span class="btn-ex">✖</span> để bỏ trống. In vào dòng
+            <code>Ngày tai nạn: …</code>.</td></tr>
     <tr><td>Địa điểm tổn thất</td>
-        <td>Nơi xảy ra tổn thất, in vào dòng <code>Tại : …</code> của biên bản.
-            Bỏ trống thì biên bản in dòng chấm để điền tay.</td></tr>
+        <td>Nơi xảy ra tổn thất. Mẫu biên bản <b>không có dòng này</b>, nên ứng dụng chỉ in thêm
+            dòng <code>Địa điểm tai nạn: …</code> khi bạn có nhập — bỏ trống thì biên bản giống
+            hệt mẫu giấy.</td></tr>
     <tr><td>Bố cục trang + Số ảnh/trang</td>
         <td>A4 dọc hay ngang và số ảnh mỗi trang. Xem mục <a href="#bo-cuc">Bố cục trang</a>.</td></tr>
   </table>
@@ -656,11 +667,11 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
   <table>
     <tr><th style="width:18%">Nút</th><th>Tác dụng</th></tr>
     <tr><td><b>Thay thế</b></td>
-        <td>Hạng mục của ảnh này vào biên bản, cột <i>Phương án giải quyết → Thay thế</i>,
-            và cột <i>Hiện vật thu hồi</i> tự điền <b>Có</b>.</td></tr>
+        <td>Hạng mục của ảnh này vào biên bản, cột <i>Phương án → Thay thế</i>,
+            và cột <i>Thu hồi</i> tự điền <b>Có</b>.</td></tr>
     <tr><td><b>Sửa chữa</b></td>
-        <td>Vào biên bản, cột <i>Phương án giải quyết → Sửa chữa</i>,
-            cột <i>Hiện vật thu hồi</i> tự điền <b>Không</b>.</td></tr>
+        <td>Vào biên bản, cột <i>Phương án → Sửa chữa</i>,
+            cột <i>Thu hồi</i> tự điền <b>Không</b>.</td></tr>
     <tr><td><b>Không</b> <i>(mặc định)</i></td>
         <td>Ảnh <b>không vào biên bản</b>. Dùng cho ảnh nhận dạng xe, ảnh chụp cận cảnh phụ,
             ảnh hiện trường… — chúng vẫn nằm trong bản ảnh như thường.</td></tr>
@@ -786,6 +797,11 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
   <p>Thẻ <b>📄 Biên bản giám định thiệt hại</b> ở <b>bước 2</b> lập biên bản theo mẫu
      <code>BM.PTI.CG.02.08a</code> từ chính thông tin đã nhập ở bước 1, ký tay ngay trên điện
      thoại rồi tải về dưới dạng <b>file PDF riêng</b>.</p>
+  <p>Biên bản in ra gọn <b>một trang A4</b>, đúng mẫu giấy đang dùng: logo PTI góc trái,
+     tiêu đề <b>BIÊN BẢN GIÁM ĐỊNH</b>, mục <b>I · Thông tin cơ bản</b> (chủ xe · biển số ·
+     loại xe · ngày tai nạn · ngày giám định · GĐV · điện thoại GĐV), mục
+     <b>II · Thông tin thiệt hại</b> là bảng 4 cột
+     <i>STT · Chi tiết thiệt hại · Phương án · Thu hồi</i>, hai ô ký ở dưới và dải cam chân trang.</p>
   <div class="warn">
     ⚠️ Thẻ này <b>chỉ xuất hiện</b> khi ở bước 1 bạn chọn kiểu
     <i>"Ảnh giám định chi tiết thiệt hại"</i> <b>và</b> tích <b>Lập Biên bản giám định</b>.
@@ -804,11 +820,13 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
         <td>Bảng này <b>lấy tự động</b> từ dải nút
             <a href="#phuong-an">Thay thế / Sửa chữa / Không</a> dưới mỗi ảnh ở bước 1 —
             không gõ tay. Ảnh tích <b>Không</b> không có trong biên bản.
-            Cột <i>Hiện vật thu hồi</i> <b>tự điền sẵn</b>: hạng mục <b>Thay thế → Có</b>,
+            Cột <i>Thu hồi</i> <b>tự điền sẵn</b>: hạng mục <b>Thay thế → Có</b>,
             hạng mục <b>Sửa chữa → Không</b>; cần khác thì đổi ngay trong bảng.
             Nút <span class="btn-ex">🔄 Lấy lại từ ảnh</span> dựng lại bảng nếu bạn vừa sửa ảnh —
-            nút này cũng <b>đặt lại cột Hiện vật thu hồi về mặc định</b>.
-            Biên bản <b>luôn in tối thiểu 10 dòng</b>, dòng thừa để trống ghi tay — <b>STT chỉ đánh cho hạng mục có thật</b>, đúng như bảng trên màn hình, dòng trống bỏ trống ô STT.</td></tr>
+            nút này cũng <b>đặt lại cột Thu hồi về mặc định</b>.
+            Bảng in ra <b>đúng số hạng mục bạn đã tích</b>, không thêm dòng thừa.
+            Chưa tích ảnh nào thì biên bản in <b>10 dòng trống</b> để ký giấy rồi ghi tay
+            tại hiện trường.</td></tr>
     <tr><td><b>2 · Xem trước (PDF)</b></td>
         <td>Bấm <span class="btn-ex">👁️ Dựng bản xem trước</span> — ứng dụng dựng
             <b>đúng file PDF sẽ tải về</b> rồi hiển thị lại, nên những gì bạn thấy là bản in thật.
@@ -819,14 +837,10 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
             Cả hai nút <b>luôn bấm được</b> — ký tức là đã đồng ý, không còn ô tích riêng.</td></tr>
   </table>
   </div>
-  <div class="note">
-    ℹ️ Mục <b>"3. Ý kiến của các bên tham gia giám định"</b> trên biên bản <b>luôn in sẵn</b> câu
-    <i>"Chúng tôi đồng ý với nội dung phương án sửa chữa như trên"</i> — không phải gõ,
-    nên màn hình 2 không còn ô nhập ý kiến và cũng không còn mục xác thực trước khi ký.
-  </div>
   <div class="tip">
-    💡 Những ô biên bản không có chỗ nhập trong ứng dụng — địa chỉ và SĐT đơn vị sửa chữa,
-    số phụ lục đính kèm — được in thành <b>dòng chấm</b> để điền tay tại hiện trường.
+    💡 <b>Ô nào bỏ trống thì in dòng chấm</b> — nên bạn in biên bản trắng ra giấy rồi điền tay
+    tại hiện trường cũng được. Dưới mỗi ô ký, tên chỉ được in sẵn khi bên đó
+    <b>đã ký điện tử</b>; ký giấy thì người ký tự ghi rõ họ tên như mẫu yêu cầu.
   </div>
 
   <h4>Màn hình ký tay</h4>
