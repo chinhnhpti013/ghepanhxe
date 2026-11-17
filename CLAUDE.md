@@ -63,17 +63,23 @@ mỗi lần cập nhật hướng dẫn** để người dùng thấy nhắc.
 
 **Bước 1 — Lập bản ảnh** (một cột, toàn chiều rộng; thông tin ở trên cùng rồi tới ảnh)
 
-*Thẻ "Thông tin giám định"* xếp gọn theo 5 hàng:
-1. Kiểu bản ảnh (3 lựa chọn: chi tiết thiệt hại · hiện trường/xác minh · giấy tờ xe) — toàn chiều rộng,
-   kèm công tắc **`#fBbOn` — Lập Biên bản giám định** (`#bbSwitchRow`, nền vàng) chỉ hiện khi
-   `fLoai === 'chitiet'`
-2. Số HSBT / Mã hồ sơ · Biển kiểm soát · Ngày giám định *(3 cột)*
-3. Tên ga-ra / Địa điểm · Giám định viên · **Phòng / Khu vực giám định** *(3 cột)*
-4. **Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất** (`#ttRow`, 3 cột) — **không bắt buộc**,
-   không in lên bản ảnh, chỉ dùng cho Biên bản giám định ở bước 2. **Chỉ hiện khi `bbEnabled()`**;
-   `applyBbVisible()` ẩn/hiện, và `updateSummaries()` cũng gọi `bbEnabled()` trước khi in 3 dòng này
-   vào tóm tắt (bỏ tích rồi thì tóm tắt không được in lại tên lái xe đã gõ trước đó)
-5. Bố cục A4 dọc/ngang · Số ảnh trên mỗi trang *(2 cột cạnh nhau)*
+*Thẻ "Thông tin giám định"* chia thành **5 khung `.fsec` có đánh số**, mỗi khung một nhóm
+thông tin (xem *Khung thông tin `.fsec`* ở phần hệ màu):
+1. **Kiểu bản ảnh** (`#fLoai`, 3 lựa chọn: chi tiết thiệt hại · hiện trường/xác minh · giấy tờ xe)
+   — `<select>` nằm **thẳng trong `.fsec`**, không bọc `.fg`, nên bộ style ô nhập phải kể thêm
+   `.fsec > select`. Khung này chứa luôn `#giaytoNote`
+2. **Hồ sơ & xe** — Số HSBT / Mã hồ sơ · Biển kiểm soát · Ngày giám định *(3 cột)*
+3. **Nơi giám định & người thực hiện** — Tên ga-ra · Giám định viên · Phòng / Khu vực *(3 cột)*
+4. **Bố cục trang in** (`#layoutSection`) — A4 dọc/ngang · Số ảnh trên mỗi trang *(2 cột)*;
+   `#layoutHint` giờ là `<span class="tag">` nằm trong `.fsec-h`
+5. **Biên bản giám định** (`#bbSwitchRow`, `.fsec.warm` nền vàng) — công tắc **`#fBbOn`** +
+   **Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất** (`#ttRow`) + dòng ghi chú `#ttHint`.
+   Cả khung chỉ hiện khi `fLoai === 'chitiet'`; `#ttRow`/`#ttHint` chỉ hiện khi `bbEnabled()`.
+   `updateSummaries()` cũng gọi `bbEnabled()` trước khi in 3 dòng tổn thất vào tóm tắt
+   (bỏ tích rồi thì tóm tắt không được in lại tên lái xe đã gõ trước đó)
+
+> Khung ⑤ đặt **cuối cùng** (sau Bố cục) chứ không phải ngay dưới Kiểu bản ảnh, để khi nó bị ẩn
+> thì số thứ tự ①–④ của các khung còn lại không bị nhảy cóc.
 
 Dưới cùng thẻ là khối **xem trước tiêu đề bản in** (`#loaiPreview`) — hiện đúng các dòng
 sẽ in lên đầu mỗi trang PDF, cập nhật ngay khi gõ.
@@ -81,6 +87,10 @@ sẽ in lên đầu mỗi trang PDF, cập nhật ngay khi gõ.
 Ngày giám định dùng **một ô chọn ngày** (`#fNgayPick`) + nút *Hôm nay* / *Xóa*.
 `#fNgay` là input **ẩn** giữ giá trị chuẩn `DD/MM/YYYY` dùng cho header, tóm tắt, hồ sơ và bản nháp —
 hai ô luôn đồng bộ qua `onDatePick()` và `syncNgayPicker()`.
+**Mặc định là ngày hôm nay** (bớt một thao tác mỗi hồ sơ): `init()` gọi **`fillTodayQuiet()`**,
+`resetApp()` gọi `setToday()`. Phải dùng bản *quiet* lúc khởi động vì `setToday()` → `onDatePick()`
+→ `scheduleDraftSave()`, mà lúc đó **chưa có ảnh** nên 1,5 giây sau `doDraftSave()` chạy nhánh
+"không còn ảnh → xóa nháp" và **xóa đúng bản nháp `checkDraft()` vừa mời mở**.
 **Ngày tổn thất** dùng đúng nếp đó: `#fNgayTtPick` + `#fNgayTt` (ẩn) + `onDateTtPick()` /
 `clearDateTt()` / `syncNgayTtPicker()`.
 
@@ -96,9 +106,14 @@ Nút **Tiếp tục** luôn bấm được; thiếu gì thì báo đúng chỗ �
 đầu trang sẽ đè lên). `resetGenerate()` xóa lỗi này mỗi lần vào lại bước 2.
 
 **Bước 2 — Xem & Xuất**
-- **Tóm tắt** (`#sumRows3`) — chỉ hiển thị ở bước này, không còn ở bước 1
-- **Preview A4 trực tiếp** đúng tỷ lệ, header, chú thích và cách cắt ảnh như PDF thật
+- **Preview A4 trực tiếp** (cột trái) đúng tỷ lệ, header, chú thích và cách cắt ảnh như PDF thật
   (ảnh preview đi qua chính hàm `processImage()` của PDF nên khớp 100%)
+- Cột phải xếp **theo thứ tự việc cần làm**: `⚡ Xuất PDF` → `📋 Tóm tắt` → `💾 Hồ sơ lưu trên máy`.
+  Thẻ Xuất PDF mang class **`.card.act`** (đầu thẻ nền vàng) vì đó là việc chính của màn hình —
+  trước đây nó nằm **dưới** Tóm tắt nên nút `Tạo file PDF` bị đẩy khỏi tầm nhìn đầu tiên
+- **Tóm tắt** (`#sumRows3`) — chỉ hiển thị ở bước này, không còn ở bước 1. `updateSummaries()` dùng
+  **`rowIf()`** cho các dòng không bắt buộc (Mã hồ sơ, 3 dòng tổn thất): **trống thì không in dòng**.
+  Dòng `Chú thích` chỉ in khi `capSrc !== 'auto'`, dòng `Biên bản giám định` chỉ in khi `bbEnabled()`
 - Tạo PDF → tải xuống → tùy chọn **lưu hồ sơ trên máy**
 - **Biên bản giám định** (`#cardBienBan`) — xem mục riêng bên dưới
 
@@ -169,13 +184,24 @@ dùng chung một luật `GIAYTO_RULES`. Đường dẫn ảnh có hậu tố `#
   bỏ trống = dùng chú thích mặc định (hiện ở placeholder)
 - **Dải nút phương án `.th-pa`** dưới mỗi ảnh — **Thay thế · Sửa chữa · Không** (`it.pa`,
   mặc định `'khong'`; `paOf(it)` chuẩn hóa giá trị cũ/thiếu). Ẩn/hiện bằng **class `bb-on` trên
-  `<body>`** chứ không vẽ lại gallery. Đây là **nguồn duy nhất** của bảng hạng mục trong biên bản
+  `<body>`** chứ không vẽ lại gallery. Đây là **nguồn duy nhất** của bảng hạng mục trong biên bản.
+  Dải nút là **lưới 3 cột bằng nhau** (`display:grid`) và cho chữ xuống dòng, **không phải**
+  `flex` + `white-space:nowrap` — thẻ ảnh trên điện thoại chỉ rộng ~150px nên chữ "Thay thế" dài
+  hơn ô nút và tràn đè lên nút bên cạnh
 - **Chú thích gộp** cho nhiều ảnh cùng lúc, có xem trước **AutoCorrect**
-- Công tắc **"Lấy tên file làm chú thích"** đổi nguồn chú thích mặc định
+- **Một thanh công cụ duy nhất** (`.toolbar`) cho cả 3 nút `#btnSelAll` · `#btnBulkCap` ·
+  `#btnDelSel` + chip `#chipSel`; nguồn chú thích mặc định tách ra khung `.fsec` riêng ở trên
+- **Đã bỏ băng `#alertStats`** (`✅ n hạng mục — m ảnh`): con số đó đã có ở chip `#chipSrc` của thẻ
+  *Nguồn ảnh* ngay phía trên và ở `#abMeta` dưới thanh nút. Phần duy nhất chưa có chỗ khác —
+  số ảnh nhận dạng `0.` — nay ghép thẳng vào `#chipSrc`. `checkDraft()` cũng không còn ghi vào đó
+  (lời mời mở bản nháp đã nằm ngay trên `.draft-bar`)
 
-**Nguồn chú thích mặc định** — `state.capSrc ∈ {auto, file, folder}`, hai công tắc
-`#swFileName` / `#swFolderName` loại trừ nhau qua `setCapSrc()`; `syncCapSrcSwitches()` đồng bộ
-khi mở hồ sơ / bản nháp. Hồ sơ cũ chỉ có `useFileName` → đọc thành `capSrc`; vẫn ghi cả 2 khóa.
+**Nguồn chú thích mặc định** — `state.capSrc ∈ {auto, file, folder}`, chọn bằng **dải nút
+`.segm#capSrcSeg`** (3 nút *Tự động · Theo tên file ảnh · Theo tên hạng mục*) đặt trong một khung
+`.fsec` riêng trên danh sách ảnh. **`setCapSrc(src)` nhận MỘT tham số** (trước đây là 2 công tắc
+`#swFileName`/`#swFolderName` loại trừ nhau, phải tắt cả hai mới ra `auto` — không ai đoán được).
+`syncCapSrcSwitches()` giữ nguyên tên nhưng giờ tô lại dải nút; **`init()` phải gọi nó** để nút
+*Tự động* sáng ngay từ đầu. Hồ sơ cũ chỉ có `useFileName` → đọc thành `capSrc`; vẫn ghi cả 2 khóa.
 
 **Chú thích mặc định** (`defaultCapOf`, dùng bởi cả placeholder và `capOf`):
 `capSrc='file'` → tên file · `capSrc='folder'` → tên hạng mục · `capSrc='auto'` →
@@ -233,7 +259,8 @@ Lập **file PDF RIÊNG** theo mẫu `BM.PTI.CG.02.08a` (`BB_FORM`), tên
 Toàn bộ mã nằm ở **khối `<script>` cuối cùng** của `index.html`.
 
 **Chỉ có khi `bbEnabled()`** = `fLoai === 'chitiet'` **và** `state.bbOn`. `applyBbVisible()` là nơi
-duy nhất bật/tắt: ẩn/hiện `#bbSwitchRow` (công tắc ở bước 1), **`#ttRow`** (3 ô thông tin tổn thất ở
+duy nhất bật/tắt: ẩn/hiện `#bbSwitchRow` (cả khung ⑤ ở bước 1), **`#ttRow` + `#ttHint`**
+(3 ô thông tin tổn thất và dòng ghi chú của chúng ở
 bước 1), `#cardBienBan` (bước 2) và class `bb-on` trên `<body>` (dải nút phương án dưới mỗi ảnh).
 Gọi từ `onLoaiChange()` và `setBbOn()`.
 
@@ -341,6 +368,22 @@ và `:root[data-theme="dark"]`.
 | `--bg-grad` | chuyển sắc xanh dọc trang | `body{background-image}` + `background-attachment:fixed` |
 | `--r` `--r-sm` `--r-xs` | `16px` `11px` `8px` | bo góc (đã nới từ 14/9/6) |
 
+**Khung thông tin `.fsec`** — mỗi nhóm ô nhập nằm trong MỘT khung có màu, thay cho một dải ô
+rời rạc: `.fsec` (xanh nhạt `--sky-2`) = dữ liệu sẽ in ra bản ảnh · `.fsec.warm` (vàng nhạt
+`--sand-2`) = tùy chọn / cần để ý. Tiêu đề khung là `.fsec-h` với huy hiệu số `.n`, phần đuôi
+`.tag` (chữ mờ, giải thích ngắn) và `.sp` đẩy `.tag` sang phải. Ô nhập **vẫn nền trắng** trong
+khung màu, đúng quy ước đọc màu bên dưới.
+
+**Dải nút `.segm`** — chọn 1 trong N bằng một dải nút liền nhau, nút đang chọn mang class `on`
+(nền `--brand`). Dùng cho nguồn chú thích; **ưu tiên nó hơn nhiều công tắc loại trừ nhau**.
+Trên ≤700px mỗi nút chiếm trọn một hàng (`flex:1 1 100%` + viền trên thay viền trái).
+
+**Khối gấp gọn `details.fold`** — bảng tra cứu dài (bảng tiền tố giấy tờ trong `#giaytoNote`)
+để **đóng sẵn**, `summary` nền `--sky-2` có mũi `▾` tự xoay. Bảng bên trong dùng `.gt-tb`.
+
+**Thẻ việc chính `.card.act`** — đầu thẻ tô vàng (`--sand-2` → `--sand`) thay cho xanh, dành cho
+thẻ mang hành động chính của màn hình (hiện chỉ `⚡ Xuất PDF` ở bước 2).
+
 **Quy ước đọc màu** (giải thích cho người dùng ở `huong-dan.html` mục 1):
 xanh nhạt = khung chứa dữ liệu · ô nhập liệu luôn **nền trắng** trong khung xanh ·
 vàng nhạt = khối cần thao tác hoặc cần để ý · `.grp.is-cover` (hạng mục tiền tố `0.`) nền vàng ·
@@ -359,7 +402,8 @@ nền xanh của appbar (trước đây dùng `var(--amber)`, sau khi đổi san
 
 Các điểm ngắt: **≤980px** (bỏ cột phải) · **≤760px** (`fgrid3` 2 cột, `lay-wrap` 1 cột) ·
 **≤700px** (khối RESPONSIVE chính: nút cao ≥42px, ô nhập 16px để iOS không tự phóng to,
-`.toolbar`/`.draft-bar` ẩn `.sp` cho nút xếp 2 cái/hàng, `#btnCam` lên đầu `.dz-btns`) ·
+`.toolbar`/`.draft-bar` ẩn `.sp` cho nút xếp 2 cái/hàng, `#btnCam` lên đầu `.dz-btns`,
+`.fsec` thu lề trong, `.segm` xếp dọc mỗi nút một hàng) ·
 **≤620px** (bảng hạng mục + thanh ký) · **≤480px** (`fgrid3` 1 cột, thumbnail 132px,
 `#btnCam` chiếm trọn một hàng, **bảng hạng mục bỏ `min-width` để vừa màn hình, không phải vuốt
 ngang**) · **≤400px** (ẩn nhãn phụ của appbar/stepper) ·

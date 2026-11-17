@@ -289,11 +289,13 @@ td{color:var(--text-2)}
   <table>
     <tr><th style="width:26%">Màu</th><th>Nghĩa</th></tr>
     <tr><td><b>Xanh nhạt</b></td>
-        <td>Nền trang, <b>thanh tiêu đề mỗi thẻ</b> và tiêu đề mỗi hạng mục ảnh —
-            đây là khung chứa dữ liệu. Ô nhập liệu luôn <b>nền trắng</b> nằm trong khung xanh.</td></tr>
+        <td>Nền trang, <b>thanh tiêu đề mỗi thẻ</b>, tiêu đề mỗi hạng mục ảnh và
+            <b>khung thông tin có đánh số</b> (❶ ❷ ❸ …) — đây là khung chứa dữ liệu.
+            Ô nhập liệu luôn <b>nền trắng</b> nằm trong khung xanh.</td></tr>
     <tr><td><b>Vàng nhạt</b></td>
-        <td>Những khối <b>bạn cần để ý hoặc thao tác</b>: vùng kéo thả ảnh, thanh công cụ chọn ảnh,
-            thanh công cụ xem trước, khối tóm tắt ở bước 2 và các ghi chú 💡.</td></tr>
+        <td>Những khối <b>bạn cần để ý hoặc thao tác</b>: khung ❺ <i>Biên bản giám định</i>,
+            vùng kéo thả ảnh, thanh công cụ chọn ảnh, thanh công cụ xem trước, thẻ
+            <i>Xuất PDF</i> và khối tóm tắt ở bước 2, các ghi chú 💡.</td></tr>
     <tr><td><b>Vàng nhạt ở tiêu đề hạng mục</b></td>
         <td>Hạng mục <b>ảnh nhận dạng xe</b> (thư mục có tiền tố <code>0.</code>) — nhóm này được
             in ra <b>trang đầu riêng</b> khi chọn kiểu <i>chi tiết thiệt hại</i>.</td></tr>
@@ -308,22 +310,34 @@ td{color:var(--text-2)}
   </div>
 
   <h3 id="thong-tin">2. Thẻ "Thông tin giám định"</h3>
+  <p>Thẻ này chia thành <b>5 khung có đánh số</b>, mỗi khung một nhóm thông tin — điền lần lượt
+     từ trên xuống là xong:</p>
+  <ol class="steps">
+    <li><b>❶ Kiểu bản ảnh</b> — chọn 1 trong 3 kiểu.</li>
+    <li><b>❷ Hồ sơ &amp; xe</b> — Số HSBT · Biển kiểm soát · Ngày giám định.</li>
+    <li><b>❸ Nơi giám định &amp; người thực hiện</b> — Ga-ra · Giám định viên · Phòng/Khu vực.</li>
+    <li><b>❹ Bố cục trang in</b> — khổ giấy và số ảnh mỗi trang (mục <a href="#bo-cuc">4</a>).</li>
+    <li><b>❺ Biên bản giám định</b> <i>(khung vàng)</i> — chỉ hiện ở kiểu
+        <i>chi tiết thiệt hại</i>; tích vào đây mới có biên bản.</li>
+  </ol>
   <p>Các ô có dấu <b style="color:var(--red)">*</b> là bắt buộc. Nội dung các ô này được in lên
-     <b>đầu mỗi trang</b> bản ảnh, trừ Phòng/Khu vực được in ở <b>chân trang</b>.</p>
+     <b>đầu mỗi trang</b> bản ảnh, trừ Phòng/Khu vực được in ở <b>chân trang</b>.
+     Dưới cùng thẻ là khối <b>Xem trước tiêu đề bản in</b> — đúng những dòng sẽ in ra, cập nhật
+     ngay khi bạn gõ.</p>
   <div class="tbl-wrap">
   <table>
     <tr><th style="width:27%">Ô nhập</th><th>Ý nghĩa &amp; cách nhập</th></tr>
     <tr><td><b>Kiểu bản ảnh giám định *</b></td>
         <td>Chọn 1 trong 3 kiểu — quyết định tiêu đề in ra và cách chia trang. Xem mục
             <a href="#kieu-ban-anh">Kiểu bản ảnh</a>.</td></tr>
-    <tr><td>Lập Biên bản giám định</td>
+    <tr><td>Lập Biên bản giám định<br><i>(khung ❺, nền vàng)</i></td>
         <td><b>Chỉ hiện khi chọn kiểu "Ảnh giám định chi tiết thiệt hại"</b> — ba kiểu còn lại
             không có biên bản. Tích ô này thì:
             <br>• bước 2 mới có thẻ <a href="#bien-ban">Biên bản giám định</a>;
             <br>• mỗi ảnh ở mục <a href="#quan-ly-anh">Chọn và chỉnh từng ảnh</a> mới hiện
               dải nút <b>Thay thế / Sửa chữa / Không</b>;
-            <br>• ba ô <b>Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất</b> mới hiện ra ở
-              ngay thẻ này.
+            <br>• ba ô <b>Tên Lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất</b> mới hiện ra
+              ngay trong khung ❺ này.
             <br>Không tích thì ứng dụng chạy y như cũ, chỉ xuất bản ảnh.</td></tr>
     <tr><td>Số HSBT / Mã hồ sơ</td>
         <td>Ví dụ <code>XCG.2026.001234</code>. In ở <b>dòng 2</b> của tiêu đề, trước tên giám định viên.
@@ -332,8 +346,9 @@ td{color:var(--text-2)}
     <tr><td><b>Biển kiểm soát *</b></td>
         <td>Ví dụ <code>14C-402.84</code>. In ở dòng tiêu đề lớn nhất và <b>dùng để đặt tên file PDF</b>.</td></tr>
     <tr><td>Ngày giám định</td>
-        <td>Bấm vào ô chọn ngày hoặc nút <span class="btn-ex">Hôm nay</span>; nút
-            <span class="btn-ex">Xóa</span> để bỏ trống. In ở <b>cuối dòng tiêu đề thứ nhất</b>,
+        <td><b>Ứng dụng tự điền ngày hôm nay</b> nên thường không phải đụng tới. Muốn ngày khác
+            thì bấm vào ô chọn ngày; nút <span class="btn-ex">Hôm nay</span> đưa về hôm nay,
+            nút <span class="btn-ex">✖</span> bỏ trống. In ở <b>cuối dòng tiêu đề thứ nhất</b>,
             ngay sau biển kiểm soát, dạng <code>- Ngày: DD/MM/YYYY</code>. Để trống thì không in ngày.</td></tr>
     <tr><td><b>Tên ga-ra / Địa điểm *</b></td>
         <td>Ví dụ <code>Gara Toyota Quảng Ninh</code>. Với kiểu <i>chi tiết thiệt hại</i>, dòng này
@@ -346,7 +361,8 @@ td{color:var(--text-2)}
             bạn chọn hoặc gõ tên phòng <b>một lần</b>, những lần mở app sau ô tự điền lại
             đúng tên đó nên không phải nhập lại.</td></tr>
     <tr><td colspan="2" style="background:var(--surface-2)">
-        <b>Thông tin vụ tổn thất</b> — <b>chỉ hiện khi đã tích <i>Lập Biên bản giám định</i></b>.
+        <b>Thông tin vụ tổn thất</b> (trong khung ❺) — <b>chỉ hiện khi đã tích
+        <i>Lập Biên bản giám định</i></b>.
         Không bắt buộc, không in lên bản ảnh; chỉ dùng cho
         <a href="#bien-ban">Biên bản giám định</a> ở bước 2. Bỏ tích thì ba ô này tự ẩn đi.</td></tr>
     <tr><td>Tên Lái/chủ xe</td>
@@ -399,7 +415,8 @@ td{color:var(--text-2)}
   </div>
 
   <h3 id="bo-cuc">4. Bố cục trang và số ảnh mỗi trang</h3>
-  <p>Chọn <b>A4 Dọc</b> hoặc <b>A4 Ngang</b>, sau đó chọn số ảnh mỗi trang. Lưới tương ứng:</p>
+  <p>Ở khung <b>❹ Bố cục trang in</b>: chọn <b>A4 Dọc</b> hoặc <b>A4 Ngang</b>, sau đó chọn số ảnh
+     mỗi trang. Lưới tương ứng:</p>
   <div class="tbl-wrap">
   <table>
     <tr><th style="width:22%">Khổ giấy</th><th>Số ảnh mỗi trang (cột × hàng)</th></tr>
@@ -424,6 +441,9 @@ td{color:var(--text-2)}
   </ul>
 
   <h3 id="tien-to">5. Tiền tố số cho kiểu "Ảnh và file Giấy tờ xe"</h3>
+  <p class="note">Bảng tra cứu rút gọn của mục này <b>có sẵn ngay trong ứng dụng</b>: chọn kiểu
+     <i>Ảnh và file Giấy tờ xe</i> rồi bấm dòng
+     <span class="btn-ex">📑 Bảng tiền tố → bố cục &amp; tên giấy tờ</span> trong khung ❶ để mở ra.</p>
   <p>Khi chọn kiểu này, ứng dụng <b>tự nhận tiền tố số</b> ở đầu tên ảnh (nếu tên ảnh không có
      tiền tố thì lấy tiền tố của <b>tên thư mục</b> chứa ảnh) để chọn khổ giấy và số ảnh mỗi trang
      cho phù hợp với cỡ giấy tờ thật:</p>
@@ -594,7 +614,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
   <h4>Chọn ảnh</h4>
   <p>Chọn ảnh là bước chuẩn bị cho <b>2 việc làm hàng loạt</b>:
      <b>chú thích gộp</b> và <b>xóa nhiều ảnh cùng lúc</b>. Ảnh đang chọn có viền xanh,
-     ô tick sáng màu, và số ảnh đang chọn hiện ở nhãn <i>"… ảnh đã chọn"</i>.</p>
+     ô tick sáng màu, và số ảnh đang chọn hiện ở nhãn <i>"… ảnh đã chọn"</i>.
+     Cả ba nút này nằm chung <b>một thanh công cụ màu vàng</b> ngay trên danh sách hạng mục.</p>
   <ul>
     <li>Bấm <b>ô vuông ☐ ở góc trên-phải mỗi ảnh</b> để chọn ảnh đó; bấm lần nữa để bỏ chọn.</li>
     <li><span class="kbd">Shift</span> + bấm ô vuông — chọn <b>cả dải</b> từ ảnh chọn trước đó
@@ -656,8 +677,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
      Thứ tự ưu tiên khi lấy nội dung:</p>
   <ol class="steps">
     <li><b>Chú thích riêng</b> — chữ bạn gõ vào ô ngay dưới ảnh, luôn thắng mọi trường hợp.</li>
-    <li><b>Theo công tắc bạn chọn</b> — tên file ảnh hoặc tên thư mục (xem bảng ngay dưới).</li>
-    <li><b>Tên giấy tờ theo tiền tố</b> — khi không bật công tắc nào và đang dùng kiểu
+    <li><b>Theo nguồn bạn chọn ở dải nút</b> — tên file ảnh hoặc tên hạng mục (xem bảng ngay dưới).</li>
+    <li><b>Tên giấy tờ theo tiền tố</b> — khi để <i>Tự động</i> và đang dùng kiểu
         <i>Giấy tờ xe</i>, chú thích lấy theo bảng <a href="#tien-to">Tiền tố giấy tờ xe</a>.
         Nếu bạn đã đổi tên hạng mục thành tên <b>không còn tiền tố số</b> thì tên hạng mục
         đó được ưu tiên.</li>
@@ -669,17 +690,17 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
      tự sinh ở đầu chú thích. Ví dụ thư mục <code>1. Cốp sau lõm bẹp, rách</code> →
      chú thích <code>5. Cốp sau lõm bẹp rách</code>. Tên <b>toàn số</b> thì giữ nguyên để
      chú thích không bị trống, và chữ bạn <b>tự gõ</b> vào ô dưới ảnh thì không bị làm sạch.</p>
-  <h4>Hai công tắc chọn nguồn chú thích</h4>
-  <p>Ở thanh công cụ trên danh sách ảnh có 2 công tắc, <b>loại trừ nhau</b> (bật cái này tự tắt cái kia;
-     tắt cả hai = chế độ tự động):</p>
+  <h4>Dải nút chọn nguồn chú thích</h4>
+  <p>Trong khung <b>✍️ Chú thích mặc định cho mọi ảnh</b> (ngay trên danh sách hạng mục) có
+     <b>một dải 3 nút</b> — bấm một nút là đổi ngay cho toàn bộ ảnh, nút đang dùng được tô xanh:</p>
   <div class="tbl-wrap">
   <table>
-    <tr><th style="width:34%">Công tắc</th><th>Chú thích mặc định lấy từ</th></tr>
-    <tr><td><i>tắt cả hai</i> — tự động</td>
-        <td>Kiểu <b>Giấy tờ xe</b>: tên giấy tờ theo tiền tố số · các kiểu khác: tên thư mục</td></tr>
-    <tr><td><b>Lấy tên file làm chú thích</b></td>
+    <tr><th style="width:30%">Nút</th><th>Chú thích mặc định lấy từ</th></tr>
+    <tr><td><b>Tự động</b> <i>(mặc định)</i></td>
+        <td>Kiểu <b>Giấy tờ xe</b>: tên giấy tờ theo tiền tố số · các kiểu khác: tên hạng mục</td></tr>
+    <tr><td><b>Theo tên file ảnh</b></td>
         <td>Tên file ảnh (bỏ phần mở rộng, bỏ chữ số và dấu câu)</td></tr>
-    <tr><td><b>Lấy tên thư mục làm chú thích</b></td>
+    <tr><td><b>Theo tên hạng mục</b></td>
         <td>Tên thư mục / tên hạng mục (bỏ chữ số và dấu câu) — kể cả với kiểu Giấy tờ xe
             (bỏ qua bảng tiền tố)</td></tr>
   </table>
@@ -708,12 +729,15 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 
   <h3 id="xuat-pdf">9. Bước 2 — Xem trước và xuất PDF</h3>
   <ol class="steps">
-    <li>Bấm <span class="btn-ex">Tiếp tục →</span> để sang bước 2. Khung <b>Preview bản ảnh</b>
+    <li>Bấm <span class="btn-ex">Tiếp tục →</span> để sang bước 2. Cột bên phải xếp theo thứ tự
+        việc cần làm: <b>Xuất PDF</b> (thẻ vàng, trên cùng) → <b>Tóm tắt</b> →
+        <b>Hồ sơ lưu trên máy</b>. Khung <b>Preview bản ảnh</b>
         dựng đúng tỷ lệ A4, đúng tiêu đề, đúng cách cắt ảnh và chú thích <b>y như file PDF</b>.
         Dùng <span class="btn-ex">➖</span> <span class="btn-ex">➕</span> để thu nhỏ / phóng to,
         <span class="btn-ex">🔄 Dựng lại preview</span> nếu vừa sửa gì ở bước 1.</li>
-    <li>Đối chiếu thẻ <b>Tóm tắt</b>: kiểu bản ảnh, mã hồ sơ, BKS, ga-ra, GĐV, phòng, ngày,
-        bố cục, số ảnh và số trang.</li>
+    <li>Đối chiếu thẻ <b>Tóm tắt</b>: kiểu bản ảnh, BKS, ga-ra, GĐV, phòng, ngày, bố cục,
+        số ảnh và số trang. Tóm tắt <b>chỉ in những dòng có dữ liệu</b> — ô nào bỏ trống
+        thì không hiện ra, nên nhìn một cái là biết đã nhập những gì.</li>
     <li>Bấm <span class="btn-ex">⚡ Tạo file PDF</span> và chờ thanh tiến trình chạy xong.</li>
     <li>Bấm <span class="btn-ex">⬇️ Tải file gốc (PDF)</span>. Tên file dạng
         <code>Anh GD chi tiet xe {BKS}.pdf</code> (kiểu hiện trường → <code>Anh GD hien truong xe …</code>,

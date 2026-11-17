@@ -151,6 +151,10 @@ main{max-width:1180px;margin:26px auto 0;padding:0 20px calc(77px + env(safe-are
   border-bottom:1px solid var(--sky-b);color:var(--brand-d);letter-spacing:-.01em}
 .card-hd .ico{font-size:1.1rem;line-height:1}
 .card-hd .sp{flex:1}
+/* Thẻ "việc chính" của màn hình — đầu thẻ tô vàng theo quy ước: vàng = cần thao tác */
+.card.act{border-color:var(--sand-b)}
+.card.act > .card-hd{background:linear-gradient(180deg,var(--sand-2) 0,var(--sand) 100%);
+  border-bottom-color:var(--sand-b);color:var(--sand-tx)}
 .card-bd{padding:20px}
 .card-bd.tight{padding:16px}
 /* Khối form "Thông tin giám định" dùng TRỌN bề ngang thẻ, y như thẻ Nguồn ảnh và
@@ -279,12 +283,17 @@ input[type=file]{display:none}
 .th-acts button.act-r:hover{background:var(--red-soft);color:var(--red);border-color:var(--red)}
 /* Phương án giải quyết của từng ảnh — chuyển thẳng sang bảng hạng mục của Biên bản.
    Chỉ hiện khi đang lập biên bản (body.bb-on) nên đổi công tắc không phải vẽ lại gallery. */
+/* LƯỚI 3 cột bằng nhau (không phải flex + white-space:nowrap) — thẻ ảnh trên điện thoại
+   chỉ rộng ~150px nên chữ "Thay thế" dài hơn ô nút, nowrap làm chữ tràn ra chồng lên nút
+   bên cạnh. Grid + cho chữ xuống dòng: hết tràn ở mọi bề ngang, và vì grid item mặc định
+   kéo bằng nhau nên 3 nút vẫn cao đều khi một nút phải xuống 2 dòng. */
 .th-pa{display:none;gap:4px;padding:0 7px 7px;background:var(--sky-2)}
-body.bb-on .th-pa{display:flex}
-.th-pa button{flex:1;min-width:0;height:27px;border-radius:var(--r-xs);border:1px solid var(--border-s);
+body.bb-on .th-pa{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.th-pa button{min-width:0;min-height:27px;border-radius:var(--r-xs);border:1px solid var(--border-s);
   background:var(--surface);color:var(--text-3);font-size:.68rem;font-weight:700;cursor:pointer;
   font-family:inherit;display:flex;align-items:center;justify-content:center;transition:var(--t);
-  line-height:1;padding:0 2px;white-space:nowrap}
+  line-height:1.15;padding:3px 2px;text-align:center;white-space:normal;
+  overflow-wrap:break-word;word-break:break-word;overflow:hidden}
 .th-pa button:hover{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
 .th-pa button.on[data-pa="thay"]{background:var(--red);border-color:var(--red);color:#fff}
 .th-pa button.on[data-pa="sua"]{background:var(--green);border-color:var(--green);color:#fff}
@@ -407,6 +416,54 @@ body.bb-on .th-pa{display:flex}
 @media(max-width:760px){.lay-wrap{grid-template-columns:1fr}}
 .lay-wrap > div{display:flex;flex-direction:column;gap:6px}
 
+/* ════════ KHUNG THÔNG TIN (.fsec) ════════
+   Mỗi nhóm ô nhập nằm trong MỘT khung có màu riêng, thay cho một dải ô rời rạc:
+   xanh nhạt = dữ liệu sẽ in ra bản ảnh · vàng nhạt = tùy chọn / cần để ý.
+   Ô nhập vẫn nền trắng trong khung màu, đúng quy ước đọc màu của cả app. */
+.fsec{border:1px solid var(--sky-b);background:var(--sky-2);border-radius:var(--r-sm);
+  padding:12px 14px 14px;margin-bottom:12px}
+.fsec:last-child{margin-bottom:0}
+.fsec-h{display:flex;align-items:center;gap:8px;margin-bottom:11px;font-size:.73rem;
+  font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--brand-d);flex-wrap:wrap}
+.fsec-h .n{width:19px;height:19px;border-radius:50%;background:var(--brand);color:#fff;
+  font-size:.67rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+:root[data-theme="dark"] .fsec-h .n{color:#07121F}
+.fsec-h .sp{flex:1;min-width:4px}
+.fsec-h .tag{text-transform:none;letter-spacing:0;font-weight:600;font-size:.71rem;color:var(--text-3)}
+.fsec.warm{background:var(--sand-2);border-color:var(--sand-b)}
+.fsec.warm .fsec-h{color:var(--sand-tx)}
+.fsec.warm .fsec-h .n{background:var(--amber)}
+.fsec.warm .fsec-h .tag{color:var(--sand-tx);opacity:.9}
+
+/* ════════ DẢI NÚT CHỌN 1 TRONG N (segmented) ════════
+   Thay cho nhiều công tắc loại trừ nhau — nhìn là thấy đang chọn gì, bấm 1 lần là đổi. */
+.segm{display:flex;border:1.5px solid var(--border-s);border-radius:var(--r-xs);
+  overflow:hidden;background:var(--surface);flex-wrap:wrap}
+.segm button{flex:1 1 120px;min-width:0;border:none;border-left:1px solid var(--border);
+  background:var(--surface);color:var(--text-2);font-family:inherit;font-weight:700;
+  font-size:.78rem;padding:9px 8px;cursor:pointer;transition:var(--t);line-height:1.25}
+.segm button:first-child{border-left:none}
+.segm button:hover{background:var(--brand-soft);color:var(--brand)}
+.segm button.on{background:var(--brand);color:#fff}
+:root[data-theme="dark"] .segm button.on{color:#07121F}
+
+/* ════════ KHỐI GẤP GỌN — bảng tra cứu dài ════════
+   Bảng tiền tố giấy tờ chỉ cần khi tra cứu; để mở sẵn thì nó chiếm nửa màn hình. */
+details.fold{border:1px solid var(--sky-b);border-radius:var(--r-sm);background:var(--surface);
+  margin-top:10px;overflow:hidden}
+details.fold > summary{cursor:pointer;list-style:none;padding:9px 13px;font-size:.78rem;
+  font-weight:700;color:var(--brand-d);background:var(--sky-2);display:flex;align-items:center;gap:8px}
+details.fold > summary::-webkit-details-marker{display:none}
+details.fold > summary::after{content:'▾';margin-left:auto;transition:var(--t)}
+details.fold[open] > summary::after{transform:rotate(180deg)}
+details.fold .fold-bd{padding:11px 13px;font-size:.77rem;line-height:1.6;color:var(--text-2)}
+.gt-tb{width:100%;border-collapse:collapse;font-size:.76rem}
+.gt-tb th,.gt-tb td{border:1px solid var(--border);padding:5px 8px;text-align:left;vertical-align:top}
+.gt-tb th{background:var(--sky-2);color:var(--brand-d);font-size:.72rem}
+.gt-tb td:first-child{white-space:nowrap}
+.gt-tb code{background:var(--sky-2);border:1px solid var(--sky-b);padding:0 4px;
+  border-radius:4px;color:var(--brand);font-size:.95em}
+
 /* ════════ XEM TRƯỚC TIÊU ĐỀ BẢN IN ════════ */
 .title-prev{margin-top:15px;border:1px solid var(--brand);border-radius:var(--r-sm);
   overflow:hidden;background:var(--brand-soft)}
@@ -425,10 +482,17 @@ body.bb-on .th-pa{display:flex}
 .fg.span2{grid-column:1/-1}
 .fg label{font-size:.78rem;font-weight:700;color:var(--text-2);display:flex;align-items:center;gap:4px}
 .fg label .req{color:var(--red)}
-.fg input,.fg select,.fg textarea{border:1.5px solid var(--border-s);border-radius:var(--r-xs);
+.fg input,.fg select,.fg textarea,
+.fsec > select{border:1.5px solid var(--border-s);border-radius:var(--r-xs);
   padding:10px 12px;font-size:.9rem;font-family:inherit;color:var(--text);background:var(--surface);
   transition:var(--t);width:100%}
-.fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--brand);box-shadow:var(--ring)}
+.fg input:focus,.fg select:focus,.fg textarea:focus,
+.fsec > select:focus{outline:none;border-color:var(--brand);box-shadow:var(--ring)}
+/* Nhãn + dòng ghi chú nằm thẳng trong khung .fsec (ngoài .fg) */
+.lay-wrap label{font-size:.78rem;font-weight:700;color:var(--text-2)}
+.fsec > .hint{display:block;font-size:.73rem;line-height:1.5;color:var(--text-3)}
+.fsec.warm > .hint{color:var(--sand-tx)}
+.fsec + .title-prev{margin-top:4px}
 .fg input.ok{border-color:var(--green);background:var(--green-soft)}
 .fg .hint{font-size:.72rem;color:var(--text-3)}
 .fg .row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
@@ -680,6 +744,10 @@ main > .foot{margin-top:auto}
   .actbar-in .btn{flex:1}
   /* ── Thao tác bằng ngón tay: nút rộng hết hàng, vùng bấm cao hơn ── */
   .card-bd.tight{padding:12px}
+  .fsec{padding:11px 11px 12px;margin-bottom:11px}
+  .segm button{flex:1 1 100%;padding:12px 8px;font-size:.82rem;
+    border-left:none;border-top:1px solid var(--border)}
+  .segm button:first-child{border-top:none}
   /* Bỏ khoảng đệm giãn giữa các nút, cho nút xếp 2 cái một hàng và rộng hết bề ngang */
   .toolbar{padding:10px 11px;gap:7px}
   .toolbar .sp{display:none}
@@ -689,7 +757,10 @@ main > .foot{margin-top:auto}
   .draft-bar .btn{flex:1 1 calc(50% - 5px)}
   .grp-hd{padding:10px 11px;gap:9px}
   .cnt{padding:10px 0;min-width:42px}
-  .th-pa button{height:34px;font-size:.72rem}  /* nút Thay thế / Sửa chữa / Không */
+  /* nút Thay thế / Sửa chữa / Không — vùng bấm cao hơn cho ngón tay, chữ nhỏ lại
+     một chút để vẫn đủ một dòng trong ô nút hẹp của thẻ ảnh trên điện thoại */
+  .th-pa button{min-height:34px;font-size:.66rem;padding:3px 1px}
+  .th-pa{gap:3px;padding:0 7px 7px}
   .title-prev .tp-l1{font-size:.86rem}
   .title-prev .tp-b{padding:9px 11px}
   /* Danh sách hồ sơ đã lưu — nút xuống hàng riêng cho dễ bấm */
@@ -704,6 +775,9 @@ main > .foot{margin-top:auto}
   .card-hd{padding:10px 12px}
   #btnCam{flex:1 1 100%}            /* việc hay làm nhất ngoài hiện trường → một hàng riêng */
   .thumbs{grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+  /* Thẻ ảnh hẹp nhất là ở đây → chữ nút phương án nhỏ thêm một nấc, lề trong sát hơn */
+  .th-pa button{font-size:.62rem;padding:3px 0}
+  .th-pa{gap:3px;padding:0 6px 6px}
   .lay-row{gap:7px}
   .lay{padding:9px 5px}
 }
@@ -876,108 +950,120 @@ main > .foot{margin-top:auto}
         <div class="card-bd narrow">
           <div class="alert alert-e" id="alertErr2"></div>
 
-          <div class="fg" style="margin-bottom:13px">
-            <label>Kiểu bản ảnh giám định <span class="req">*</span></label>
+          <!-- (1) KIỂU BẢN ẢNH — quyết định tiêu đề in ra và cách chia trang -->
+          <div class="fsec">
+            <div class="fsec-h"><span class="n">1</span>Kiểu bản ảnh
+              <span class="sp"></span>
+              <span class="tag">quyết định tiêu đề in &amp; cách chia trang</span></div>
             <select id="fLoai">
               <option value="chitiet">Ảnh giám định chi tiết thiệt hại</option>
-              <option value="hientruong">Ảnh giám định hiện trường/Xác minh hiện trường</option>
-              <option value="giayto">Ảnh và file Giấy tờ xe (jpg, pdf...)</option>
+              <option value="hientruong">Ảnh giám định hiện trường / Xác minh hiện trường</option>
+              <option value="giayto">Ảnh và file Giấy tờ xe (jpg, pdf…)</option>
             </select>
-          </div>
 
-          <!-- Biên bản giám định CHỈ có ở kiểu "chi tiết thiệt hại", và chỉ khi người dùng tích -->
-          <div class="tipbox" id="bbSwitchRow" style="margin-bottom:13px;display:none">
-            <label class="sw" title="Lập thêm Biên bản giám định thiệt hại (file PDF riêng) ở màn hình 2">
-              <input type="checkbox" id="fBbOn" onchange="setBbOn(this.checked)"/>
-              <span class="sw-t"></span>
-              <span><strong>Lập Biên bản giám định</strong> theo mẫu BM.PTI.CG.02.08a</span>
-            </label>
-            <span class="hint" style="display:block;margin-top:6px">
-              Tích ô này thì màn hình 2 mới có thẻ Biên bản giám định, và mỗi ảnh ở phần
-              <b>Quản lý ảnh &amp; chú thích</b> mới có nút chọn <b>Thay thế / Sửa chữa / Không</b>.
-            </span>
-          </div>
-
-          <div class="fgrid3">
-            <div class="fg">
-              <label>Số HSBT / Mã hồ sơ</label>
-              <input type="text" id="fMaHs" placeholder="XCG.2026.001234"/>
-            </div>
-            <div class="fg">
-              <label>Biển kiểm soát <span class="req">*</span></label>
-              <input type="text" id="fBks" placeholder="14C-402.84"/>
-            </div>
-            <div class="fg">
-              <label>Ngày giám định</label>
-              <div class="row">
-                <input type="date" id="fNgayPick" onchange="onDatePick()"/>
-                <button class="btn btn-o btn-sm" onclick="setToday()">Hôm nay</button>
-                <button class="btn btn-n btn-sm" onclick="clearDate()" title="Xóa ngày">✖</button>
-              </div>
-              <input type="hidden" id="fNgay"/>
-            </div>
-          </div>
-
-          <div class="fgrid3" style="margin-top:13px">
-            <div class="fg">
-              <label>Tên ga-ra / Địa điểm <span class="req">*</span></label>
-              <input type="text" id="fGara" placeholder="Gara Toyota Quảng Ninh"/>
-            </div>
-            <div class="fg">
-              <label>Giám định viên / Thụ lý <span class="req">*</span></label>
-              <div class="row">
-                <div class="combo" id="fGdvCombo">
-                  <input type="text" id="fGdv" placeholder="Chọn hoặc nhập tên GĐV" autocomplete="off"/>
-                  <button type="button" class="combo-ar" onclick="toggleCombo('fGdv')"
-                          title="Xem danh sách Giám định viên đã thêm">▼</button>
-                  <div class="combo-pop hidden" id="fGdvPop"></div>
+            <div class="alert alert-i show" id="giaytoNote" style="display:none">
+              ℹ️ Bố cục từng trang <strong>tự nhận theo tiền tố số</strong> của tên ảnh (không có thì
+              lấy tiền tố tên thư mục); ảnh cùng bố cục được dồn chung trang. Kiểu này nhận thêm
+              <strong>file PDF</strong> — mỗi trang PDF thành một ảnh.
+              <details class="fold">
+                <summary>📑 Bảng tiền tố → bố cục &amp; tên giấy tờ</summary>
+                <div class="fold-bd">
+                  <table class="gt-tb">
+                    <tr><th style="width:22%">Tiền tố</th><th>Giấy tờ</th><th style="width:33%">Bố cục</th></tr>
+                    <tr><td><code>1.1</code>–<code>1.6</code></td>
+                        <td>Đăng ký xe, bằng lái, căn cước lái xe</td>
+                        <td>4 ảnh/trang — A4 ngang</td></tr>
+                    <tr><td><code>2.x</code></td>
+                        <td>Đăng kiểm, bảo hiểm khổ A5</td>
+                        <td>2 ảnh/trang — A4 dọc</td></tr>
+                    <tr><td><code>3.x</code></td>
+                        <td>Ảnh xác minh bằng lái</td>
+                        <td>4 ảnh/trang — A4 dọc</td></tr>
+                    <tr><td><code>4</code> trở lên</td>
+                        <td>Bảo hiểm A4, kiểm định XCG, biên bản bàn giao, xác nhận ngân hàng…</td>
+                        <td>1 ảnh/trang — A4 dọc</td></tr>
+                    <tr><td><i>không có tiền tố</i></td>
+                        <td>Giấy tờ khác — chú thích gõ tay</td>
+                        <td>theo khung <b>Bố cục trang in</b></td></tr>
+                  </table>
+                  <p style="margin-top:8px">PDF nhiều trang tên <code>1.1 …</code> thì trang sau nhận
+                    tiền tố kế tiếp (<code>1.2</code>, <code>1.3</code>…). Chú thích tự lấy theo tên
+                    giấy tờ của tiền tố — gõ vào ô dưới ảnh để ghi đè.</p>
                 </div>
-                <button class="btn btn-n btn-icon" onclick="openGdvMgr()" title="Quản lý danh sách GĐV">⚙️</button>
-              </div>
+              </details>
             </div>
-            <div class="fg">
-              <label>Phòng / Khu vực giám định <span class="req">*</span></label>
-              <div class="row">
-                <div class="combo" id="fPhongCombo">
-                  <input type="text" id="fPhong" placeholder="Chọn hoặc nhập tên mã Phòng/khu vực giám định" autocomplete="off"/>
-                  <button type="button" class="combo-ar" onclick="toggleCombo('fPhong')"
-                          title="Xem danh sách Phòng / Khu vực đã thêm">▼</button>
-                  <div class="combo-pop hidden" id="fPhongPop"></div>
+          </div>
+
+          <!-- (2) HỒ SƠ & XE -->
+          <div class="fsec">
+            <div class="fsec-h"><span class="n">2</span>Hồ sơ &amp; xe<span class="sp"></span>
+              <span class="tag">in ở đầu mỗi trang bản ảnh</span></div>
+            <div class="fgrid3">
+              <div class="fg">
+                <label>Số HSBT / Mã hồ sơ</label>
+                <input type="text" id="fMaHs" placeholder="XCG.2026.001234"/>
+              </div>
+              <div class="fg">
+                <label>Biển kiểm soát <span class="req">*</span></label>
+                <input type="text" id="fBks" placeholder="14C-402.84"/>
+              </div>
+              <div class="fg">
+                <label>Ngày giám định</label>
+                <div class="row">
+                  <input type="date" id="fNgayPick" onchange="onDatePick()"/>
+                  <button class="btn btn-o btn-sm" onclick="setToday()">Hôm nay</button>
+                  <button class="btn btn-n btn-sm" onclick="clearDate()" title="Xóa ngày">✖</button>
                 </div>
-                <button class="btn btn-n btn-icon" onclick="openPhongMgr()" title="Quản lý danh sách Phòng/khu vực">⚙️</button>
+                <input type="hidden" id="fNgay"/>
               </div>
-              <span class="hint">In ở chân mỗi trang bản ảnh</span>
             </div>
           </div>
 
-          <!-- Thông tin vụ tổn thất — KHÔNG bắt buộc, CHỈ hiện khi đang lập Biên bản giám định.
-               applyBbVisible() là nơi duy nhất ẩn/hiện khối này. -->
-          <div class="fgrid3" id="ttRow" style="margin-top:13px;display:none">
-            <div class="fg">
-              <label>Tên Lái/chủ xe</label>
-              <input type="text" id="fLaiXe" placeholder="Nguyễn Văn A"/>
-              <span class="hint">Không bắt buộc — dùng cho Biên bản giám định</span>
-            </div>
-            <div class="fg">
-              <label>Ngày tổn thất</label>
-              <div class="row">
-                <input type="date" id="fNgayTtPick" onchange="onDateTtPick()"/>
-                <button class="btn btn-n btn-sm" onclick="clearDateTt()" title="Xóa ngày tổn thất">✖</button>
+          <!-- (3) NƠI GIÁM ĐỊNH & NGƯỜI THỰC HIỆN -->
+          <div class="fsec">
+            <div class="fsec-h"><span class="n">3</span>Nơi giám định &amp; người thực hiện
+              <span class="sp"></span>
+              <span class="tag">Phòng / Khu vực in ở chân trang</span></div>
+            <div class="fgrid3">
+              <div class="fg">
+                <label>Tên ga-ra / Địa điểm <span class="req">*</span></label>
+                <input type="text" id="fGara" placeholder="Gara Toyota Quảng Ninh"/>
               </div>
-              <input type="hidden" id="fNgayTt"/>
-              <span class="hint">Không bắt buộc</span>
-            </div>
-            <div class="fg">
-              <label>Địa điểm tổn thất</label>
-              <input type="text" id="fDdTt" placeholder="QL18, TP Hạ Long, Quảng Ninh"/>
-              <span class="hint">Không bắt buộc</span>
+              <div class="fg">
+                <label>Giám định viên / Thụ lý <span class="req">*</span></label>
+                <div class="row">
+                  <div class="combo" id="fGdvCombo">
+                    <input type="text" id="fGdv" placeholder="Chọn hoặc nhập tên GĐV" autocomplete="off"/>
+                    <button type="button" class="combo-ar" onclick="toggleCombo('fGdv')"
+                            title="Xem danh sách Giám định viên đã thêm">▼</button>
+                    <div class="combo-pop hidden" id="fGdvPop"></div>
+                  </div>
+                  <button class="btn btn-n btn-icon" onclick="openGdvMgr()" title="Quản lý danh sách GĐV">⚙️</button>
+                </div>
+              </div>
+              <div class="fg">
+                <label>Phòng / Khu vực giám định <span class="req">*</span></label>
+                <div class="row">
+                  <div class="combo" id="fPhongCombo">
+                    <input type="text" id="fPhong" placeholder="Chọn hoặc nhập Phòng / Khu vực" autocomplete="off"/>
+                    <button type="button" class="combo-ar" onclick="toggleCombo('fPhong')"
+                            title="Xem danh sách Phòng / Khu vực đã thêm">▼</button>
+                    <div class="combo-pop hidden" id="fPhongPop"></div>
+                  </div>
+                  <button class="btn btn-n btn-icon" onclick="openPhongMgr()" title="Quản lý danh sách Phòng/khu vực">⚙️</button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="fg" id="layoutSection" style="margin-top:14px">
+          <!-- (4) BỐ CỤC TRANG IN -->
+          <div class="fsec" id="layoutSection">
+            <div class="fsec-h"><span class="n">4</span>Bố cục trang in<span class="sp"></span>
+              <span class="tag" id="layoutHint" style="display:none">chỉ áp dụng cho giấy tờ
+                <b>không có tiền tố số</b></span></div>
             <div class="lay-wrap">
               <div>
-                <label>Bố cục trang</label>
+                <label>Khổ giấy</label>
                 <div class="lay-row">
                   <div class="lay sel" id="layDoc" onclick="selectLayout('doc')">
                     <div class="lay-mini"><div class="lay-pg" id="miniDoc"></div></div>
@@ -994,30 +1080,40 @@ main > .foot{margin-top:auto}
                 <div class="cnt-row" id="cntRow"></div>
               </div>
             </div>
-            <span class="hint" id="layoutHint" style="display:none">
-              Chỉ áp dụng cho giấy tờ <strong>không có tiền tố số</strong> — các tiền tố trong danh sách
-              dưới đây tự chọn khổ giấy và số ảnh mỗi trang.
-            </span>
           </div>
 
-          <div class="alert alert-i show" id="giaytoNote" style="display:none">
-            ℹ️ <strong>Ảnh và file Giấy tờ xe</strong> — bố cục từng trang <strong>tự nhận theo tiền tố số</strong>
-            của tên ảnh (không có thì lấy tiền tố tên thư mục); ảnh cùng bố cục được dồn chung trang:
-            <br>
-            <code>1.1</code>–<code>1.6</code> đăng ký xe, bằng lái, căn cước công dân
-            → <strong>4 ảnh/trang A4 ngang</strong> ·
-            <code>2.x</code> đăng kiểm, bảo hiểm khổ A5 → <strong>2 ảnh/trang A4 dọc</strong> ·
-            <code>3.x</code> xác minh bằng lái → <strong>4 ảnh/trang A4 dọc</strong> ·
-            <code>4</code> trở lên (bảo hiểm A4, kiểm định, biên bản bàn giao, xác nhận ngân hàng…)
-            → <strong>1 ảnh/trang A4 dọc</strong>.
-            <br>
-            Giấy tờ khác <strong>không có tiền tố</strong> thì nhập tay chú thích và dùng
-            <strong>bố cục chọn ở trên</strong>.
-            <br>
-            Kiểu này nhận thêm <strong>file PDF</strong> — mỗi trang PDF thành một ảnh;
-            PDF nhiều trang tên <code>1.1 …</code> thì trang sau nhận tiền tố kế tiếp
-            (<code>1.2</code>, <code>1.3</code>…). <strong>Chú thích tự lấy theo tên giấy tờ
-            của tiền tố</strong>, gõ vào ô dưới ảnh để ghi đè.
+          <!-- (5) BIÊN BẢN GIÁM ĐỊNH — chỉ có ở kiểu "chi tiết thiệt hại".
+               applyBbVisible() ẩn/hiện cả khung này (#bbSwitchRow) và 3 ô tổn thất (#ttRow). -->
+          <div class="fsec warm" id="bbSwitchRow" style="display:none">
+            <div class="fsec-h"><span class="n">5</span>Biên bản giám định<span class="sp"></span>
+              <span class="tag">file PDF riêng, mẫu BM.PTI.CG.02.08a</span></div>
+            <label class="sw" title="Lập thêm Biên bản giám định thiệt hại (file PDF riêng) ở màn hình 2">
+              <input type="checkbox" id="fBbOn" onchange="setBbOn(this.checked)"/>
+              <span class="sw-t"></span>
+              <span><strong>Lập Biên bản giám định</strong> cho hồ sơ này</span>
+            </label>
+
+            <div class="fgrid3" id="ttRow" style="margin-top:13px;display:none">
+              <div class="fg">
+                <label>Tên Lái/chủ xe</label>
+                <input type="text" id="fLaiXe" placeholder="Nguyễn Văn A"/>
+              </div>
+              <div class="fg">
+                <label>Ngày tổn thất</label>
+                <div class="row">
+                  <input type="date" id="fNgayTtPick" onchange="onDateTtPick()"/>
+                  <button class="btn btn-n btn-sm" onclick="clearDateTt()" title="Xóa ngày tổn thất">✖</button>
+                </div>
+                <input type="hidden" id="fNgayTt"/>
+              </div>
+              <div class="fg">
+                <label>Địa điểm tổn thất</label>
+                <input type="text" id="fDdTt" placeholder="QL18, TP Hạ Long, Quảng Ninh"/>
+              </div>
+            </div>
+            <span class="hint" id="ttHint" style="display:none;margin-top:8px">
+              Ba ô trên <b>không bắt buộc</b>, không in lên bản ảnh — bỏ trống thì biên bản in
+              dòng chấm để điền tay.</span>
           </div>
 
           <div class="title-prev" id="loaiPreview"></div>
@@ -1034,9 +1130,7 @@ main > .foot{margin-top:auto}
             <div class="dz-main">
               <h3><span class="d-desk">Kéo thả thư mục hoặc ảnh vào đây</span><span class="d-mob" style="display:none">Chụp ảnh hoặc chọn ảnh có sẵn</span></h3>
               <p><span class="d-desk">Mỗi thư mục con = một hạng mục · </span><span id="dzFmt">JPG ·
-                PNG · BMP · WEBP</span> — thêm được nhiều lần<br>
-                <span class="d-desk">Không có ảnh sẵn? Bấm </span><strong>📷 Chụp ảnh</strong><span class="d-desk"> để chụp
-                thẳng bằng camera điện thoại / webcam</span><span class="d-mob" style="display:none"> để chụp bằng camera</span></p>
+                PNG · BMP · WEBP</span> · thêm được nhiều lần</p>
             </div>
             <div class="dz-btns">
               <button class="btn btn-p btn-sm" onclick="event.stopPropagation();pickFolder()">📂 Chọn thư mục</button>
@@ -1057,9 +1151,9 @@ main > .foot{margin-top:auto}
 
           <div id="emptyState" class="empty" style="display:none">
             <span class="ei">⚠️</span>
-            <p><strong>Chưa có ảnh.</strong> Chọn thư mục <strong>cha</strong> chứa các thư mục con —
-              mỗi thư mục con là một hạng mục (vd. <code>0. Số khung xe/</code>, <code>1. Cốp sau lõm bẹp/</code>).
-              Ảnh lẻ sẽ vào nhóm <code>Ảnh chưa phân loại</code>.</p>
+            <p><strong>Chưa có ảnh.</strong> Chọn thư mục <b>cha</b> — mỗi thư mục con bên trong
+              là một hạng mục (<code>1. Cốp sau lõm bẹp/</code>). Ảnh lẻ vào nhóm
+              <code>Ảnh chưa phân loại</code>.</p>
           </div>
         </div>
       </div>
@@ -1068,8 +1162,6 @@ main > .foot{margin-top:auto}
         <div class="card-hd"><span class="ico">🎞️</span>Quản lý ảnh &amp; chú thích<span class="sp"></span>
           <button class="btn btn-n btn-sm" onclick="toggleAllGroups()" id="btnToggleAll">Mở tất cả</button></div>
         <div class="card-bd tight">
-          <div class="alert alert-o show" id="alertStats"></div>
-
           <div class="draft-bar off" id="draftBar">
             <span id="draftMsg">Bản nháp tự lưu sẽ bật khi có ảnh.</span>
             <span class="sp"></span>
@@ -1077,32 +1169,35 @@ main > .foot{margin-top:auto}
             <button class="btn btn-n btn-sm" onclick="discardDraft()" id="btnDraftDel" style="display:none">🗑️ Xóa nháp</button>
           </div>
 
-          <div class="toolbar">
-            <label class="sw" title="Dùng tên file ảnh làm chú thích mặc định cho mọi ảnh">
-              <input type="checkbox" id="swFileName" onchange="setCapSrc('file', this.checked)"/>
-              <span class="sw-t"></span><span>Lấy tên file làm chú thích</span>
-            </label>
-            <label class="sw" title="Dùng tên thư mục (tên hạng mục) làm chú thích mặc định — bỏ qua bảng tên giấy tờ theo tiền tố">
-              <input type="checkbox" id="swFolderName" onchange="setCapSrc('folder', this.checked)"/>
-              <span class="sw-t"></span><span>Lấy tên thư mục làm chú thích</span>
-            </label>
-            <span class="sp"></span>
-            <span class="chip chip-b" id="chipSel">0 ảnh đã chọn</span>
+          <!-- Khung chú thích mặc định: một dải nút 3 lựa chọn thay cho 2 công tắc
+               loại trừ nhau (bấm 1 lần là đổi, nhìn là biết đang dùng nguồn nào). -->
+          <div class="fsec">
+            <div class="fsec-h">✍️ Chú thích mặc định cho mọi ảnh
+              <span class="sp"></span>
+              <span class="tag">gõ vào ô dưới từng ảnh để ghi đè</span></div>
+            <div class="segm" id="capSrcSeg">
+              <button data-src="auto" class="on" onclick="setCapSrc('auto')"
+                      title="Kiểu Giấy tờ xe: tên giấy tờ theo tiền tố · các kiểu khác: tên hạng mục">Tự động</button>
+              <button data-src="file" onclick="setCapSrc('file')"
+                      title="Dùng tên file ảnh làm chú thích mặc định">Theo tên file ảnh</button>
+              <button data-src="folder" onclick="setCapSrc('folder')"
+                      title="Dùng tên thư mục (tên hạng mục) làm chú thích mặc định">Theo tên hạng mục</button>
+            </div>
           </div>
 
+          <!-- Một thanh công cụ duy nhất cho việc chọn ảnh và 2 việc làm hàng loạt -->
           <div class="toolbar">
             <button class="btn btn-n btn-sm" id="btnSelAll" onclick="toggleSelectAll()"
                     title="Chọn toàn bộ ảnh của mọi hạng mục (Ctrl/Cmd + A)">☑️ Chọn tất cả</button>
-            <span class="sp"></span>
             <button class="btn btn-o btn-sm" id="btnBulkCap" onclick="openBulkCap()" disabled>✍️ Chú thích gộp</button>
             <button class="btn btn-r btn-sm" id="btnDelSel" onclick="deleteSelected()" disabled>🗑️ Xóa ảnh đã chọn</button>
+            <span class="sp"></span>
+            <span class="chip chip-n" id="chipSel">0 ảnh đã chọn</span>
           </div>
-          <div class="fg tipbox">
-            <span class="hint">💡 Bấm <b>ô vuông ☐ ở góc trên-phải mỗi ảnh</b> để chọn ảnh đó ·
-              <b>Shift + bấm ô vuông</b> chọn cả dải · ô vuông cạnh <b>tên hạng mục</b> chọn/bỏ cả nhóm.
-              Chọn ảnh để dùng <b>Chú thích gộp</b> hoặc <b>Xóa nhiều ảnh</b>.<br/>
-              Gõ thẳng vào ô dưới mỗi ảnh để đặt chú thích riêng (<b>Tab</b> sang ô kế tiếp, bỏ trống = dùng mặc định).
-              Nút trên thẻ ảnh: 🖼️ thay ảnh · ↻ xoay 90° · ＋ chèn ảnh sau · 👁 xem lớn · 🗑 xóa.</span>
+          <div class="tipbox">
+            <span class="hint">💡 Chọn ảnh bằng <b>ô vuông ☐ góc trên-phải</b> (Shift + bấm = chọn cả dải,
+              ô vuông cạnh tên hạng mục = cả nhóm) · nút trên thẻ ảnh: 🖼️ thay · ↻ xoay ·
+              ＋ chèn · 👁 xem lớn · 🗑 xóa.</span>
           </div>
 
           <div id="groupList"></div>
@@ -1132,7 +1227,6 @@ main > .foot{margin-top:auto}
           <div class="pv-scroll" id="pvScroll">
             <div class="empty"><div class="ei">🖼️</div><p>Chưa có preview.</p></div>
           </div>
-          <div class="foot" style="padding-top:10px">Preview mô phỏng đúng tỷ lệ A4, header, chú thích và cắt ảnh như file PDF.</div>
         </div>
       </div>
 
@@ -1142,12 +1236,8 @@ main > .foot{margin-top:auto}
           <span class="chip chip-n" id="bbChip">chưa dựng</span></div>
         <div class="card-bd tight">
           <div class="alert alert-i show">
-            ℹ️ Biên bản theo mẫu <strong>BM.PTI.CG.02.08a</strong>, lập từ thông tin đã nhập ở màn hình 1.
-            Đây là <strong>file PDF riêng</strong>, không nằm trong bản ảnh giám định.
-            Các ô bỏ trống thì biên bản in <strong>dòng chấm để điền tay</strong>.
-            Mục <em>Ý kiến của các bên</em> luôn in sẵn câu
-            “<em>Chúng tôi đồng ý với nội dung phương án sửa chữa như trên</em>”,
-            nên hai bên chỉ cần ký là xong.
+            ℹ️ <strong>File PDF riêng</strong> theo mẫu <strong>BM.PTI.CG.02.08a</strong>, lập từ thông tin
+            ở màn hình 1 — không nằm trong bản ảnh. Ô bỏ trống thì in <strong>dòng chấm để điền tay</strong>.
           </div>
 
           <div class="bb-h"><span class="n">1</span>Hạng mục giám định
@@ -1169,11 +1259,10 @@ main > .foot{margin-top:auto}
               <tbody id="bbRows"></tbody>
             </table>
           </div>
-          <div class="fg tipbox" style="margin-top:10px">
-            <span class="hint">💡 Bảng này <b>lấy tự động</b> từ phần <b>Quản lý ảnh &amp; chú thích</b> ở màn hình 1 —
-              mỗi ảnh tích <b>Thay thế</b> hoặc <b>Sửa chữa</b> thành một dòng, theo đúng thứ tự ảnh;
-              ảnh tích <b>Không</b> không vào biên bản. Hạng mục trùng tên và trùng phương án chỉ in một dòng.
-              Biên bản luôn in <b>tối thiểu 10 dòng</b> — các dòng trống để điền tay tại hiện trường, <b>không đánh sẵn STT</b>: số thứ tự trong biên bản chạy đúng theo bảng này.</span>
+          <div class="tipbox" style="margin-top:10px">
+            <span class="hint">💡 Bảng <b>lấy tự động</b> từ dải nút <b>Thay thế / Sửa chữa / Không</b>
+              dưới mỗi ảnh ở màn hình 1; trùng tên + trùng phương án chỉ ra một dòng. Biên bản luôn in
+              tối thiểu 10 dòng để điền tay tại hiện trường.</span>
           </div>
 
           <div class="bb-h"><span class="n">2</span>Xem trước biên bản (PDF)
@@ -1220,12 +1309,7 @@ main > .foot{margin-top:auto}
     </div>
 
     <div class="sticky-side">
-      <div class="card">
-        <div class="card-hd"><span class="ico">📋</span>Tóm tắt</div>
-        <div class="card-bd tight"><div class="sum"><div id="sumRows3"></div></div></div>
-      </div>
-
-      <div class="card">
+      <div class="card act">
         <div class="card-hd"><span class="ico">⚡</span>Xuất PDF</div>
         <div class="card-bd">
           <div class="alert alert-e" id="alertErr3"></div>
@@ -1264,10 +1348,15 @@ main > .foot{margin-top:auto}
       </div>
 
       <div class="card">
+        <div class="card-hd"><span class="ico">📋</span>Tóm tắt</div>
+        <div class="card-bd tight"><div class="sum"><div id="sumRows3"></div></div></div>
+      </div>
+
+      <div class="card">
         <div class="card-hd"><span class="ico">💾</span>Hồ sơ lưu trên máy</div>
         <div class="card-bd tight">
           <p style="font-size:.79rem;color:var(--text-2);margin-bottom:11px">
-            Lưu toàn bộ ảnh + thông tin vào trình duyệt máy này để mở lại sau. Không tải lên internet.</p>
+            Lưu ảnh + thông tin ngay trong máy này để mở lại sau — <b>không tải lên internet</b>.</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-o btn-sm" style="flex:1" onclick="openSaveRecord()">💾 Lưu hồ sơ</button>
             <button class="btn btn-n btn-sm" style="flex:1" onclick="openRecords()">🗂️ Danh sách</button>
@@ -1488,7 +1577,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-16e';
+const APP_BUILD   = '2026-11-17a';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -2230,7 +2319,6 @@ async function checkDraft() {
     setDraftBar('busy',
       `📝 Có bản nháp chưa hoàn tất: ${meta.nImgs} ảnh${i.bks ? ' · ' + i.bks : ''} · lưu lúc ${d}`, true);
     $('cardGallery').style.display = '';      // hiện thanh nháp dù chưa có ảnh
-    $('alertStats').innerHTML = 'Chọn <strong>Mở bản nháp</strong> để tiếp tục công việc dở dang.';
     $('groupList').innerHTML = '';
   } catch (e) { console.warn('[draft check]', e); }
 }
@@ -2447,10 +2535,6 @@ function renderGroups() {
   const coverN = state.groups.filter(g => /^0/.test(g.src)).reduce((s, g) => s + g.items.length, 0);
   const mainN = totalImgs() - coverN;
 
-  $('alertStats').innerHTML =
-    `✅ <strong>${state.groups.length}</strong> hạng mục — <strong>${totalImgs()}</strong> ảnh` +
-    (coverN ? ` (<strong>${coverN}</strong> ảnh nhận dạng xe <code>0.</code> + <strong>${mainN}</strong> ảnh hạng mục)` : '');
-
   const noMap = printNoMap();   // số thứ tự đúng như sẽ in ra bản ảnh
   $('groupList').innerHTML = state.groups.map(g => {
     const isCover = /^0/.test(g.src);
@@ -2517,7 +2601,8 @@ function renderGroups() {
   $('emptyState').style.display = 'none';
   loadThumbs();
   $('btnClearAll').style.display = '';
-  $('chipSrc').textContent = `${totalImgs()} ảnh · ${state.groups.length} hạng mục`;
+  $('chipSrc').textContent = `${totalImgs()} ảnh · ${state.groups.length} hạng mục` +
+    (coverN ? ` (${coverN} nhận dạng + ${mainN} hạng mục)` : '');
   $('chipSrc').className = 'chip chip-g';
   updateToggleAllLabel(); paintSel(); updateActionBar(); updateSummaries();
 }
@@ -2683,7 +2768,8 @@ function applyBbVisible() {
   if ($('fBbOn')) $('fBbOn').checked = !!state.bbOn;
   $('bbSwitchRow').style.display = isCt ? '' : 'none';
   // Tên lái/chủ xe · Ngày tổn thất · Địa điểm tổn thất chỉ phục vụ Biên bản giám định
-  if ($('ttRow')) $('ttRow').style.display = on ? '' : 'none';
+  if ($('ttRow'))  $('ttRow').style.display  = on ? '' : 'none';
+  if ($('ttHint')) $('ttHint').style.display = on ? 'block' : 'none';
   $('cardBienBan').style.display = on ? '' : 'none';
   document.body.classList.toggle('bb-on', on);
 }
@@ -2899,17 +2985,20 @@ const CAPSRC_LBL = {
   file:   'Theo tên file ảnh',
   folder: 'Theo tên thư mục (hạng mục)',
 };
-/** Chọn nguồn chú thích mặc định — hai công tắc loại trừ nhau, tắt cả hai = 'auto' */
-function setCapSrc(src, on) {
-  state.capSrc = on ? src : 'auto';
-  state.useFileName = state.capSrc === 'file';
+/** Chọn nguồn chú thích mặc định — dải nút 3 lựa chọn (auto | file | folder).
+ *  Trước đây là 2 công tắc loại trừ nhau: tắt cả hai mới ra 'auto', không ai đoán được. */
+function setCapSrc(src) {
+  if (!CAPSRC_LBL[src] || state.capSrc === src) { syncCapSrcSwitches(); return; }
+  state.capSrc = src;
+  state.useFileName = src === 'file';
   syncCapSrcSwitches();
   clearPvCache(); renderGroups(); updateSummaries(); scheduleDraftSave(false);
-  toast('Chú thích mặc định: ' + CAPSRC_LBL[state.capSrc].toLowerCase());
+  toast('Chú thích mặc định: ' + CAPSRC_LBL[src].toLowerCase());
 }
+/** Tô lại dải nút theo state (giữ tên hàm cũ — loadRecord/restoreDraft/resetApp đều gọi) */
 function syncCapSrcSwitches() {
-  $('swFileName').checked   = state.capSrc === 'file';
-  $('swFolderName').checked = state.capSrc === 'folder';
+  document.querySelectorAll('#capSrcSeg button')
+    .forEach(b => b.classList.toggle('on', b.dataset.src === state.capSrc));
 }
 
 // ──────── Chú thích gộp ────────
@@ -3573,9 +3662,17 @@ function onDatePick() {
   updateLoaiPreview(); updateSummaries(); scheduleDraftSave(false);
 }
 function setToday() {
-  const n = new Date();
-  $('fNgayPick').value = `${n.getFullYear()}-${_pad(n.getMonth()+1)}-${_pad(n.getDate())}`;
+  fillTodayQuiet();
   onDatePick();
+}
+/** Điền ngày hôm nay nhưng KHÔNG hẹn giờ lưu nháp — dùng lúc khởi động app.
+ *  (setToday() → onDatePick() → scheduleDraftSave(); lúc đó chưa có ảnh nên lượt lưu
+ *  đó sẽ xóa đúng bản nháp mà checkDraft() vừa mời người dùng mở lại.) */
+function fillTodayQuiet() {
+  const n = new Date();
+  const d = _pad(n.getDate()), m = _pad(n.getMonth()+1), y = n.getFullYear();
+  $('fNgayPick').value = `${y}-${m}-${d}`;
+  $('fNgay').value = `${d}/${m}/${y}`;
 }
 function clearDate() {
   $('fNgayPick').value = '';
@@ -3840,6 +3937,8 @@ function updateSummaries() {
   const pages = buildPages();
   const nImg  = pages.reduce((s,p) => s + p.cells.length, 0);
   const row = (l, v) => `<div class="sum-r"><span class="l">${l}</span><span class="v">${esc(v)||'—'}</span></div>`;
+  // Dòng không bắt buộc: bỏ trống thì KHÔNG in ra, để tóm tắt chỉ còn thông tin thật
+  const rowIf = (l, v) => (String(v || '').trim() ? row(l, v) : '');
   let extra = '';
 
   if (loai === 'chitiet') {
@@ -3865,7 +3964,7 @@ function updateSummaries() {
 
   const html =
     row('Kiểu bản ảnh', LOAI_LBL[loai]) +
-    row('Mã hồ sơ', $('fMaHs').value.trim()) +
+    rowIf('Mã hồ sơ', $('fMaHs').value.trim()) +
     row('Biển kiểm soát', $('fBks').value.trim()) +
     row('Ga-ra / Địa điểm', $('fGara').value.trim()) +
     row('Giám định viên', $('fGdv').value.trim()) +
@@ -3873,15 +3972,15 @@ function updateSummaries() {
     row('Ngày giám định', $('fNgay').value.trim() || '(không in)') +
     // 3 ô tổn thất chỉ hiện khi đang lập biên bản → tóm tắt cũng theo đúng điều kiện đó,
     // kẻo bỏ tích rồi mà tóm tắt vẫn in tên lái xe đã gõ trước đó
-    ((bbEnabled() && ($('fLaiXe').value.trim() || $('fNgayTt').value.trim() || $('fDdTt').value.trim()))
-      ? row('Lái/chủ xe', $('fLaiXe').value.trim()) +
-        row('Ngày tổn thất', $('fNgayTt').value.trim()) +
-        row('Địa điểm tổn thất', $('fDdTt').value.trim())
+    (bbEnabled()
+      ? rowIf('Lái/chủ xe', $('fLaiXe').value.trim()) +
+        rowIf('Ngày tổn thất', $('fNgayTt').value.trim()) +
+        rowIf('Địa điểm tổn thất', $('fDdTt').value.trim())
       : '') +
     layRow +
-    row('Chú thích', CAPSRC_LBL[state.capSrc]) +
-    (loai === 'chitiet'
-      ? row('Biên bản giám định', state.bbOn ? 'Có lập (file PDF riêng)' : 'Không lập') : '') +
+    // 'auto' là mặc định — chỉ nhắc khi người dùng đã đổi nguồn chú thích
+    (state.capSrc === 'auto' ? '' : row('Chú thích', CAPSRC_LBL[state.capSrc])) +
+    (bbEnabled() ? row('Biên bản giám định', 'Có lập (file PDF riêng)') : '') +
     extra +
     `<div class="sum-r big"><span class="l">Kết quả</span><span class="v">${nImg} ảnh · ${pages.length} trang</span></div>`;
 
@@ -4415,6 +4514,7 @@ function resetApp() {
   $('chipSrc').textContent = 'chưa có ảnh'; $('chipSrc').className = 'chip chip-n';
   $('pvScroll').innerHTML = '<div class="empty"><div class="ei">🖼️</div><p>Chưa có preview.</p></div>';
   state.layout = 'doc'; state.perPage = 6;
+  setToday();                       // bản mới cũng mặc định ngày hôm nay
   onLoaiChange(); selectLayout('doc', true); resetGenerate();
   state.step = 2; goStep(1); updateSummaries();
 }
@@ -4595,9 +4695,13 @@ window.addEventListener('keydown', e => {
   }
   refreshGdvDatalist();
   refreshPhongDatalist();
+  syncCapSrcSwitches();          // tô nút "Tự động" của dải chọn nguồn chú thích
   if (!$('fPhong').value) $('fPhong').value = getLastPhong();
   state.perPage = PERPAGE_DEFAULT.doc;
   selectLayout('doc', true);
+  // Ngày giám định mặc định = hôm nay (vẫn xóa được bằng nút ✖) — hồ sơ gần như
+  // luôn lập trong ngày, để trống thì mỗi lần dùng lại mất một thao tác chọn ngày.
+  if (!$('fNgay').value) fillTodayQuiet();
   onLoaiChange();
   showEmpty();
   resetGenerate();
