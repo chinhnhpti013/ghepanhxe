@@ -45,8 +45,9 @@ File HTML đơn, không cần build. Phải mở qua **địa chỉ web** (GitHu
 **không mở trực tiếp bằng `file://`** — vì cần `fetch()` font tiếng Việt và logo.
 
 Thư viện CDN: `pdf-lib` + `@pdf-lib/fontkit` (dựng PDF) nạp sẵn ở `<head>`;
-`pdf.js` (`PDFJS_VER`, cdnjs) **nạp lười** bởi `loadPdfjs()` ở lần đầu người dùng nạp file PDF.
-Không dùng thư viện nào khác.
+`pdf.js` (`PDFJS_VER`, cdnjs) **nạp lười** bởi `loadPdfjs()` ở lần đầu người dùng nạp file PDF;
+`firebase-app` + `firebase-database` (ESM, gstatic) **nạp lười** cho bộ đếm lượt truy cập, và
+**chỉ khi `FB_CFG` đã được điền** — xem *Bộ đếm lượt truy cập*. Không dùng thư viện nào khác.
 
 **Hướng dẫn sử dụng** nằm ở `huong-dan.html` — trang HTML độc lập, tự chứa CSS, không phụ thuộc
 `index.html`. Nút `Help` (ngoài cùng bên phải thanh tiêu đề, cạnh 🌙) và phím `F1` mở nó trong
@@ -431,6 +432,48 @@ Nhờ in đúng mặt chữ của mẫu nên **cỡ chữ cũng lấy thẳng s�
 Thiếu file Tinos thì `embedAssets()` tự lùi về Be Vietnam Pro — biên bản vẫn ra, chỉ khác mặt chữ.
 Mẫu in dòng *(Ký và ghi rõ họ tên)* và số trang bằng **chữ nghiêng**; bản dựng để chữ đứng vì
 nhúng thêm `Tinos-Italic` sẽ cõng thêm ~60KB cho đúng một dòng.
+
+### Bộ đếm lượt truy cập (`#abCnt`)
+
+Dòng chữ mờ ở **góc dưới-phải nền thanh tiêu đề**: `{tổng} lượt · {n} đang dùng`.
+Toàn bộ mã nằm trong **IIFE ở khối `<script>` cuối cùng** của `index.html` (sau khối Biên bản),
+không để lọt biến nào ra phạm vi toàn cục.
+
+- **Vị trí**: `position:absolute` neo vào `.appbar-in` (đã thêm `position:relative`), nằm trong
+  khoảng trống **dưới** dải nút. **Đừng đưa nó vào `.ab-acts`** — `🌙` và `Help` phải giữ nguyên
+  vị trí ngoài cùng bên phải. Trên ≤700px `.appbar-in` được nới `padding-bottom` lên `15px`
+  để có chỗ riêng cho dòng này (logo 38px quyết định chiều cao, chỉ còn ~11px trống là không đủ).
+- **Màu**: `rgba(255,255,255,.38)` — cố ý mờ để "ẩn mà mắt thường vẫn nhìn ra"; hover lên `.88`.
+  Hạ thấp hơn nữa là mất hẳn. Không theo token sáng/tối vì luôn nằm trên nền xanh của appbar.
+- `.ab-cnt` là `display:flex` nên phải có rule `.ab-cnt[hidden]{display:none}` — dự án **không có
+  rule `.hidden` chung** (xem bẫy droplist ở mục *Khác*). Thiếu nó thì lúc chưa có số vẫn hiện
+  `– lượt · – đang dùng`.
+
+**Hai chế độ, tự chọn ở `boot()`:**
+
+| | Nguồn | Tổng lượt | Đang dùng |
+|---|---|---|---|
+| **CHUNG** | Firebase Realtime DB, nhánh `pti_ghepanh_counter` | `runTransaction` trên `/total` | số con của `/online`, dọn bằng `onDisconnect().remove()` |
+| **CỤC BỘ** (dự phòng) | `localStorage` + `sessionStorage` | `pti_vis_total` | số tab trên **máy này**, nhịp 20s vào `pti_vis_online` |
+
+Chế độ CHUNG chỉ chạy khi `FB_CFG.apiKey` + `FB_CFG.databaseURL` **đã điền** và
+`window.isSecureContext`; nhập/ghi hỏng ở bất cứ bước nào thì `catch` lùi về CỤC BỘ.
+Hướng dẫn tạo project + **Rules cần dán** nằm trong khối chú thích HTML ngay trên khối script đó.
+Rule `total` chỉ cho **tăng đúng 1 đơn vị** mỗi lần nên không ai đặt số bừa được;
+`apiKey` của Firebase client là khóa **công khai** — chỗ chặn thật là Rules, đừng tìm cách che nó.
+
+**Bẫy đã sửa, đừng lặp lại:**
+1. "Lượt truy cập" = **một phiên tab** (`firstHit()` dùng `sessionStorage`), nên F5 không cộng thêm.
+   Mã phiên `pti_vis_sid` cũng giữ trong `sessionStorage` để F5 không đẻ thêm bản ghi `/online`.
+2. Ở chế độ cục bộ, handler `storage` **chỉ vẽ lại**, tuyệt đối không ghi tiếp — hai tab ghi qua
+   ghi lại sẽ thành vòng lặp sự kiện vô tận.
+3. `onDisconnect()` phải đăng ký **trước** `set()` đầu tiên, kẻo mất mạng ngay sau đó là để lại
+   một "người đang dùng" ảo vĩnh viễn. Vẫn lọc thêm bản ghi quá `STALE_MS * 4` cho trường hợp
+   trình duyệt bị tắt cứng.
+4. `boot()` chạy trong `requestIdleCallback` — bộ đếm là thứ phụ, không được làm chậm lúc mở app.
+
+Dòng này **không có trong `huong-dan.html`**: nó cố ý kín đáo, và không phải thao tác người dùng
+cần biết. Vì vậy sửa nó **không cần** tăng `APP_BUILD`.
 
 ### Hệ màu giao diện — xanh nhạt + vàng nhạt
 

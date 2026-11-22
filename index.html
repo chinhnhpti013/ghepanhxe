@@ -87,7 +87,9 @@ body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);backgro
   position:sticky;top:0;z-index:60;padding-top:env(safe-area-inset-top);box-shadow:var(--sh-2);
   border-bottom:3px solid #F2C86A}
 :root[data-theme="dark"] .appbar{background:linear-gradient(135deg,#0A1A2E 0%,#102B47 55%,#16395C 100%)}
-.appbar-in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+/* position:relative để bộ đếm lượt truy cập (.ab-cnt) neo được vào góc dưới-phải */
+.appbar-in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;
+  position:relative}
 /* Logo để nền trong suốt, hiện thẳng trên nền xanh như trong bản ảnh PDF */
 .ab-logo{width:46px;height:46px;flex-shrink:0;background:transparent;padding:0;
   object-fit:contain}
@@ -112,6 +114,24 @@ body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);backgro
   background:rgba(242,200,106,.22);border-color:rgba(242,200,106,.55);color:#FFF3D6}
 .ab-btn-new:hover{background:rgba(242,200,106,.36)}
 .ab-btn-new .sn-ico{font-size:.95rem;line-height:1}
+
+/* ── BỘ ĐẾM LƯỢT TRUY CẬP ──
+   Nằm ở khoảng trống BÊN DƯỚI dải nút (.ab-acts cao 38px, .appbar-in cao 70px → thừa 16px),
+   neo theo .appbar-in nên thẳng mép phải với nội dung trang. Vì position:absolute nên nó
+   KHÔNG đẩy nút nào sang trái — Help vẫn ngoài cùng bên phải.
+   Chữ cố ý mờ (.38) cho "ẩn mà vẫn nhìn ra"; đừng hạ thấp hơn nữa kẻo mất hẳn. */
+.ab-cnt{position:absolute;right:20px;bottom:2px;display:flex;align-items:center;gap:4px;
+  font-size:.6rem;line-height:1.1;font-weight:600;letter-spacing:.02em;white-space:nowrap;
+  color:rgba(255,255,255,.38);font-variant-numeric:tabular-nums;
+  transition:color .18s ease;pointer-events:auto;cursor:default;user-select:none}
+.ab-cnt:hover{color:rgba(255,255,255,.88)}
+.ab-cnt .sep{opacity:.7}
+.ab-cnt .dot{width:5px;height:5px;border-radius:50%;background:currentColor;margin-right:2px;
+  animation:cntPulse 2.4s ease-in-out infinite}
+@keyframes cntPulse{0%,100%{opacity:.45}50%{opacity:1}}
+/* Dự án KHÔNG có rule .hidden chung (xem CLAUDE.md) — .ab-cnt là display:flex nên phải
+   tự tắt thuộc tính hidden, không thì bộ đếm chưa có số vẫn hiện ra "– lượt · – đang dùng" */
+.ab-cnt[hidden]{display:none}
 
 /* ════════ STEPPER ════════ */
 .stepper-wrap{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;
@@ -696,7 +716,10 @@ main > .foot{margin-top:auto}
 
 /* ════════ RESPONSIVE ════════ */
 @media(max-width:700px){
-  .appbar-in{padding:9px 13px;gap:10px}
+  /* Nới lề dưới 15px để bộ đếm có chỗ riêng: nút .ab-btn thu còn 34px nhưng logo 38px
+     vẫn quyết định chiều cao, chỉ còn ~11px trống — không đủ cho dòng chữ đọc được */
+  .appbar-in{padding:9px 13px 15px;gap:10px}
+  .ab-cnt{right:13px;bottom:1px;font-size:.56rem}
   .ab-logo,.ab-logo-fb{width:38px;height:38px;border-radius:10px}
   .ab-txt h1{font-size:.93rem}
   .ab-txt p{font-size:.68rem}
@@ -925,6 +948,15 @@ main > .foot{margin-top:auto}
       <button class="ab-btn" id="btnTheme" onclick="toggleTheme()" title="Chế độ sáng / tối">🌙</button>
       <button class="ab-btn ab-btn-h" id="btnGuide" onclick="openGuide()"
               title="Hướng dẫn sử dụng (F1)">Help</button>
+    </div>
+    <!-- Bộ đếm lượt truy cập — đặt TUYỆT ĐỐI ở góc dưới-phải nền tiêu đề, KHÔNG nằm trong
+         .ab-acts: Help và 🌙 phải giữ nguyên vị trí ngoài cùng bên phải (xem CLAUDE.md).
+         Màu chữ mờ (trắng ~38%) để chìm vào nền xanh nhưng vẫn đọc được bằng mắt thường;
+         trỏ chuột vào thì rõ hẳn. Mã dựng nằm ở khối script CUỐI file. -->
+    <div class="ab-cnt" id="abCnt" hidden>
+      <span id="abCntTot">–</span> lượt
+      <span class="sep">·</span>
+      <i class="dot"></i><span id="abCntOn">–</span> đang dùng
     </div>
   </div>
 </header>
@@ -5419,6 +5451,212 @@ BB_FIELDS.forEach(id => { const el = $(id); if (el) el.addEventListener('input',
 })();
 
 bbRenderRows(); bbRenderSigs(); bbRecap(); bbSyncChip();
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════════════════
+     BỘ ĐẾM LƯỢT TRUY CẬP  (góc dưới-phải thanh tiêu đề, chữ mờ)
+
+     Hai chế độ, tự chọn:
+       • CHUNG (Firebase Realtime Database) — số THẬT của mọi người, cập nhật realtime.
+         Bật bằng cách điền FB_CFG ngay dưới đây. "Đang dùng" dựa trên onDisconnect()
+         nên tab đóng / mất mạng là tự trừ, không cần người dùng làm gì.
+       • CỤC BỘ (dự phòng) — chạy khi CHƯA điền FB_CFG, hoặc khi mạng/CDN Firebase bị chặn,
+         hoặc khi mở bằng file://. Tổng = số lần MÁY NÀY mở app (localStorage),
+         Đang dùng = số tab đang mở trên máy này. Không gọi mạng.
+     Hỏng ở bất cứ bước nào thì bộ đếm chỉ im lặng (lùi về cục bộ) — KHÔNG làm app lỗi.
+
+     ── CÁCH BẬT ĐẾM CHUNG (làm 1 lần, ~3 phút) ──
+     1. console.firebase.google.com → Add project (gói Spark miễn phí là đủ).
+     2. Menu trái → Databases & Storage → Realtime Database (KHÔNG phải Firestore!)
+        → Create Database → vùng Singapore `asia-southeast1` → Start in locked mode.
+     3. Tab Rules, dán đúng khối này rồi Publish — chỉ mở quyền cho 1 nhánh đếm,
+        và `total` CHỈ được tăng đúng 1 đơn vị mỗi lần nên không ai đặt số bừa được:
+
+        {
+          "rules": {
+            "pti_ghepanh_counter": {
+              "total": {
+                ".read": true,
+                ".write": "newData.isNumber() && ((!data.exists() && newData.val() === 1) || newData.val() === data.val() + 1)"
+              },
+              "online": {
+                ".read": true,
+                "$sid": { ".write": true, ".validate": "!newData.exists() || newData.isNumber()" }
+              }
+            }
+          }
+        }
+
+     4. Settings → General → kéo xuống "Your apps" → Web → Register app
+        → copy `apiKey` và `databaseURL` vào FB_CFG dưới đây. KHÔNG cần sửa gì thêm.
+        Phải tạo database Ở BƯỚC 2 TRƯỚC, nếu không đoạn config sẽ thiếu `databaseURL`.
+
+     Khóa apiKey của Firebase client là khóa CÔNG KHAI (nó luôn nằm trong HTML, mọi
+     trang Firebase đều vậy) — chỗ chặn thật là Rules ở bước 3, nên đừng tìm cách che nó.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  /* ═══ CẤU HÌNH — điền 2 dòng này để đếm CHUNG; để trống thì đếm cục bộ ═══ */
+  const FB_CFG = {
+    // Project 'pti-ghep-anh' (gói Spark, vùng asia-southeast1 / Singapore).
+    // apiKey của Firebase client là khóa CÔNG KHAI — tường chắn thật là Rules của
+    // nhánh 'pti_ghepanh_counter' trong Realtime Database (xem chú thích trên).
+    apiKey:      'AIzaSyAVN6QgEPDfpA1RDodF49zKLD35Xfcmy0Y',
+    databaseURL: 'https://pti-ghep-anh-default-rtdb.asia-southeast1.firebasedatabase.app'
+  };
+
+  const FB_VER   = '10.12.5';            // phiên bản SDK nạp lười từ gstatic
+  const DB_PATH  = 'pti_ghepanh_counter';
+  const HB_MS    = 20000;                // nhịp báo "còn sống"
+  const STALE_MS = 90000;                // quá hạn này coi như đã rời đi
+  const LS_TOT   = 'pti_vis_total';      // tổng lượt của máy này (chế độ cục bộ)
+  const LS_ON    = 'pti_vis_online';     // bản đồ tab đang mở trên máy này
+  const SS_HIT   = 'pti_vis_counted';    // đã tính lượt cho phiên tab này chưa
+
+  const NOTE_FB = 'Tổng số lượt mở tiện ích và số người đang dùng (tính chung cho mọi người).';
+  const NOTE_LS = 'Bộ đếm CỤC BỘ: tổng số lần máy này mở tiện ích và số tab đang mở trên máy này.\n'
+                + '(Chưa cấu hình Firebase nên chưa đếm chung cho mọi người được.)';
+
+  const box = document.getElementById('abCnt');
+  const oT  = document.getElementById('abCntTot');
+  const oO  = document.getElementById('abCntOn');
+  if (!box || !oT || !oO) return;
+
+  const vi = n => (n == null ? '–' : Number(n).toLocaleString('vi-VN'));
+
+  function paint(tot, on, note) {
+    oT.textContent = vi(tot);
+    oO.textContent = vi(on);
+    box.title = note;
+    box.hidden = false;
+  }
+
+  /* Mã phiên: mỗi tab một mã riêng, giữ qua F5 để không dồn rác trên /online */
+  function sessionId() {
+    try {
+      let s = sessionStorage.getItem('pti_vis_sid');
+      if (!s) {
+        s = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+        sessionStorage.setItem('pti_vis_sid', s);
+      }
+      return s;
+    } catch (e) {
+      return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+    }
+  }
+  /* "Lượt truy cập" = một phiên tab, nên F5 KHÔNG cộng thêm lượt */
+  function firstHit() {
+    try {
+      if (sessionStorage.getItem(SS_HIT)) return false;
+      sessionStorage.setItem(SS_HIT, '1');
+      return true;
+    } catch (e) { return true; }
+  }
+
+  /* ════════ CHẾ ĐỘ CỤC BỘ ════════ */
+  function startLocal() {
+    const sid = sessionId();
+    const readTot = () => {
+      try { return parseInt(localStorage.getItem(LS_TOT) || '0', 10) || 0; } catch (e) { return 0; }
+    };
+    let tot = readTot();
+    if (firstHit()) {
+      tot++;
+      try { localStorage.setItem(LS_TOT, String(tot)); } catch (e) {}
+    }
+    tot = Math.max(tot, 1);
+
+    const readMap = () => {
+      let m = {};
+      try { m = JSON.parse(localStorage.getItem(LS_ON) || '{}') || {}; } catch (e) { m = {}; }
+      const now = Date.now();
+      for (const k in m) if (typeof m[k] !== 'number' || now - m[k] > STALE_MS) delete m[k];
+      return m;
+    };
+    /* Đọc LẠI tổng mỗi lần vẽ: tab khác mở app sẽ tăng số trong localStorage, giữ biến
+       cũ thì tab này đứng yên mãi ở con số lúc nó mới mở. Math.max giữ lượt của chính
+       tab này phòng khi localStorage ghi hỏng (chế độ riêng tư / hết dung lượng). */
+    const show = m => paint(Math.max(tot, readTot()), Math.max(1, Object.keys(m).length), NOTE_LS);
+
+    function beat() {
+      const m = readMap();
+      m[sid] = Date.now();
+      try { localStorage.setItem(LS_ON, JSON.stringify(m)); } catch (e) {}
+      show(m);
+    }
+    beat();
+    setInterval(beat, HB_MS);
+    /* Tab khác ghi nhịp → chỉ VẼ LẠI, không ghi tiếp, kẻo hai tab đẩy sự kiện
+       storage qua lại cho nhau thành vòng lặp */
+    window.addEventListener('storage', e => {
+      if (e.key === LS_ON || e.key === LS_TOT) show(readMap());
+    });
+    window.addEventListener('pagehide', () => {
+      const m = readMap(); delete m[sid];
+      try { localStorage.setItem(LS_ON, JSON.stringify(m)); } catch (e) {}
+    });
+  }
+
+  /* ════════ CHẾ ĐỘ CHUNG (Firebase) ════════ */
+  async function startFirebase() {
+    const base = 'https://www.gstatic.com/firebasejs/' + FB_VER + '/';
+    const [A, D] = await Promise.all([
+      import(base + 'firebase-app.js'),
+      import(base + 'firebase-database.js')
+    ]);
+    /* Đặt tên app riêng 'ptiCounter' để không chạm vào app Firebase nào khác về sau */
+    const db   = D.getDatabase(A.initializeApp(FB_CFG, 'ptiCounter'));
+    const root = D.ref(db, DB_PATH);
+    const rTot = D.child(root, 'total');
+    const rOn  = D.child(root, 'online');
+    const me   = D.child(rOn, sessionId());
+
+    /* onDisconnect đăng ký TRƯỚC khi ghi: nếu mất mạng ngay sau đó thì server vẫn
+       biết phải dọn, không để lại "người đang dùng" ảo */
+    D.onDisconnect(me).remove();
+    const beat = () => D.set(me, D.serverTimestamp()).catch(() => {});
+    await beat();
+    setInterval(beat, HB_MS);
+    window.addEventListener('pagehide', () => { D.remove(me).catch(() => {}); });
+
+    if (firstHit()) {
+      /* runTransaction: nhiều người mở cùng lúc vẫn không mất lượt nào */
+      D.runTransaction(rTot, v => (typeof v === 'number' ? v : 0) + 1).catch(() => {});
+    }
+
+    let tot = null, on = null, swept = false;
+    D.onValue(rTot, s => { tot = s.val() || 0; paint(tot, on, NOTE_FB); });
+    D.onValue(rOn, s => {
+      const v = s.val() || {}, now = Date.now();
+      const keys  = Object.keys(v);
+      /* Lọc bản ghi quá hạn: onDisconnect lo gần hết, nhưng trình duyệt bị tắt cứng
+         đúng lúc mất mạng vẫn có thể để sót một mục */
+      const alive = keys.filter(k => typeof v[k] !== 'number' || now - v[k] < STALE_MS * 4);
+      on = Math.max(1, alive.length);
+      paint(tot, on, NOTE_FB);
+      if (!swept && alive.length < keys.length) {           // dọn 1 lần mỗi phiên
+        swept = true;
+        keys.filter(k => alive.indexOf(k) < 0)
+            .forEach(k => D.remove(D.child(rOn, k)).catch(() => {}));
+      }
+    });
+  }
+
+  /* ════════ KHỞI ĐỘNG ════════
+     Hoãn tới khi trang rảnh: bộ đếm là thứ phụ, không được làm chậm lúc mở app. */
+  function boot() {
+    const ready = FB_CFG.apiKey && FB_CFG.databaseURL && window.isSecureContext;
+    if (!ready) { startLocal(); return; }
+    startFirebase().catch(err => {
+      console.warn('[đếm lượt] Firebase không dùng được, lùi về đếm cục bộ:', err);
+      startLocal();
+    });
+  }
+  if ('requestIdleCallback' in window) requestIdleCallback(boot, { timeout: 2500 });
+  else setTimeout(boot, 1200);
+})();
 </script>
 
 </body>
