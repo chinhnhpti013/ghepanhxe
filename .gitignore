@@ -27,3 +27,9 @@ docs/*.docx
 docs/*.xlsx
 # docs/bien_ban_giam_dinh.pdf là MẪU GIẤY có dữ liệu khách hàng thật (tên, BKS, SĐT)
 docs/*.pdf
+
+# Bộ kiểm thử: thư viện tải về (npm i dựng lại) và file kết quả.
+# tests/.out chứa PDF dẫn xuất từ docs/ nên TUYỆT ĐỐI không đẩy lên repo public.
+# package-lock.json THÌ GIỮ: nó ghim pdfjs-dist đúng bản PDFJS_VER mà app nạp từ CDN.
+tests/node_modules/
+tests/.out/

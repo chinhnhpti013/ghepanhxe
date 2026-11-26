@@ -923,6 +923,120 @@ main > .foot{margin-top:auto}
 @media(max-height:560px) and (orientation:landscape){
   .bb-pv{max-height:none}
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   MÀN HÌNH 3 — CÔNG CỤ FILE (nối · tách · nén · chuyển đổi)
+   Khối này đặt SAU phần CSS của Biên bản, nên media query riêng của nó
+   (ở cuối khối) nằm sau mọi khai báo gốc — xem bẫy thứ tự CSS ở CLAUDE.md.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* Vách dọc tách "công cụ file" khỏi 2 bước của luồng lập bản ảnh:
+   bước 1→2 là tuần tự, còn mục 3 vào tự do nên KHÔNG dùng .stp-line */
+.stp-sep{width:1px;height:28px;background:var(--border-s);margin:0 12px;flex-shrink:0}
+.stp.free .stp-dot{border-style:dashed}
+.stp.free.active .stp-dot{border-style:solid}
+
+/* ── Lưới ô công cụ ── */
+.tool-sec{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--text-3);margin:4px 0 10px;display:flex;align-items:center;gap:9px}
+.tool-sec::after{content:'';flex:1;height:1px;background:var(--border)}
+.tool-sec + .tool-grid{margin-bottom:22px}
+.tool-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(224px,1fr))}
+.tool-tile{display:flex;align-items:flex-start;gap:11px;text-align:left;padding:14px;
+  background:var(--surface);border:1px solid var(--sky-b);border-radius:var(--r-sm);
+  cursor:pointer;font-family:inherit;transition:var(--t);box-shadow:var(--sh-1)}
+.tool-tile:hover{border-color:var(--brand);background:var(--brand-soft);
+  transform:translateY(-2px);box-shadow:var(--sh-2)}
+.tool-tile:active{transform:none}
+.tool-tile .ti-ico{width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:var(--sky);display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+.tool-tile:hover .ti-ico{background:#fff}
+.tool-tile .ti-tx{min-width:0;flex:1}
+.tool-tile .ti-tx b{display:block;font-size:.86rem;font-weight:700;color:var(--text);
+  letter-spacing:-.01em;line-height:1.3}
+.tool-tile .ti-tx span{display:block;font-size:.73rem;color:var(--text-3);line-height:1.45;margin-top:2px}
+
+/* ── Vùng làm việc của một công cụ ── */
+.tw-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tw-hd .tw-nm{font-weight:700;font-size:.92rem;color:var(--brand-d)}
+.tz-dz{border:2px dashed var(--sand-b);border-radius:var(--r);padding:16px 18px;cursor:pointer;
+  transition:var(--t);background:var(--sand-2);display:flex;align-items:center;gap:15px;text-align:left}
+.tz-dz:hover,.tz-dz.drag{border-color:var(--brand);background:var(--brand-soft)}
+.tz-dz .dz-ico{font-size:1.7rem;line-height:1;flex-shrink:0}
+.tz-dz h3{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:1px}
+.tz-dz p{font-size:.76rem;color:var(--text-2);line-height:1.45}
+
+/* ── Danh sách file đã nạp ── */
+.tz-files{margin-top:14px;display:flex;flex-direction:column;gap:7px}
+.tz-f{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--sky-2);
+  border:1px solid var(--sky-b);border-radius:var(--r-sm)}
+.tz-f .fi-n{width:22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;
+  font-size:.7rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tz-f .fi-tx{flex:1;min-width:0}
+.tz-f .fi-tx b{display:block;font-size:.81rem;font-weight:600;color:var(--text);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tz-f .fi-tx span{display:block;font-size:.71rem;color:var(--text-3)}
+.tz-f .fi-a{display:flex;gap:4px;flex-shrink:0}
+.tz-f .fi-a button{width:28px;height:28px;border-radius:var(--r-xs);border:1px solid var(--border-s);
+  background:var(--surface);color:var(--text-2);cursor:pointer;font-size:.8rem;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.tz-f .fi-a button:hover:not(:disabled){border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}
+.tz-f .fi-a button:disabled{opacity:.35;cursor:not-allowed}
+.tz-f .fi-a .x:hover{border-color:var(--red);color:var(--red);background:var(--red-soft)}
+
+/* ── Thanh chạy + kết quả ── */
+.tz-run{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px;
+  padding-top:16px;border-top:1px solid var(--border)}
+.tz-run .sp{flex:1;min-width:6px}
+.tz-run .meta{font-size:.76rem;color:var(--text-3)}
+.tz-out{margin-top:16px;background:var(--green-soft);border:1px solid var(--green);
+  border-radius:var(--r-sm);padding:15px 17px}
+.tz-out h4{font-size:.88rem;font-weight:700;color:var(--green);margin-bottom:4px;
+  display:flex;align-items:center;gap:7px}
+.tz-out p{font-size:.78rem;color:var(--text-2);margin-bottom:12px}
+.tz-out .btns{display:flex;gap:9px;flex-wrap:wrap}
+
+/* ── Lưới trang PDF (công cụ Sắp xếp & xoá trang) ── */
+.pg-grid{display:grid;gap:11px;grid-template-columns:repeat(auto-fill,minmax(124px,1fr));margin-top:14px}
+.pg{border:2px solid var(--sky-b);border-radius:var(--r-sm);background:var(--surface);
+  overflow:hidden;transition:var(--t);position:relative}
+.pg.gone{opacity:.32;border-color:var(--red);border-style:dashed}
+.pg-cv{background:#fff;display:flex;align-items:center;justify-content:center;
+  height:132px;overflow:hidden}
+.pg-cv canvas{max-width:100%;max-height:100%;display:block;box-shadow:var(--sh-1)}
+.pg-no{position:absolute;top:5px;left:5px;background:var(--brand);color:#fff;font-size:.66rem;
+  font-weight:800;border-radius:20px;padding:1px 8px;pointer-events:none}
+.pg-a{display:flex;border-top:1px solid var(--sky-b);background:var(--sky-2)}
+.pg-a button{flex:1;border:none;border-left:1px solid var(--sky-b);background:none;cursor:pointer;
+  padding:6px 0;font-size:.82rem;color:var(--text-2);font-family:inherit;transition:var(--t)}
+.pg-a button:first-child{border-left:none}
+.pg-a button:hover:not(:disabled){background:var(--brand-soft);color:var(--brand)}
+.pg-a button:disabled{opacity:.3;cursor:not-allowed}
+
+/* ── Khung tùy chọn của từng công cụ ── */
+.tz-opt{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(186px,1fr))}
+.tz-opt .span2{grid-column:1/-1}
+.tz-ck{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--text-2);
+  font-weight:600;cursor:pointer;user-select:none}
+.tz-ck input{width:17px;height:17px;accent-color:var(--brand);cursor:pointer;flex-shrink:0}
+.tz-note{font-size:.78rem;line-height:1.62;color:var(--sand-tx)}
+.tz-note b{color:var(--sand-tx)}
+.tz-warn{font-size:.76rem;line-height:1.6;color:var(--amber);margin-top:9px}
+
+@media(max-width:700px){
+  .stp-sep{margin:0 6px;height:24px}
+  .tool-grid{grid-template-columns:1fr;gap:10px}
+  .tz-dz{flex-direction:column;align-items:stretch;text-align:center;gap:11px}
+  .tz-run .btn{flex:1 1 100%}
+  .tz-run .meta{flex:1 1 100%;text-align:center}
+  .pg-grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+  .pg-cv{height:112px}
+}
+@media(max-width:400px){
+  .tool-tile{padding:11px}
+  .tool-tile .ti-ico{width:33px;height:33px;font-size:1.1rem}
+}
+
 @media print{.appbar,.stepper-wrap,.actbar,.toasts,.pv-bar{display:none!important}}
 </style>
 </head>
@@ -972,6 +1086,13 @@ main > .foot{margin-top:auto}
     <button class="stp" id="stp2" onclick="goStep(2)">
       <span class="stp-dot">2</span>
       <span class="stp-lbl"><b>Xem &amp; Xuất</b><span>Preview → PDF</span></span>
+    </button>
+    <!-- Vách dọc, không phải .stp-line: mục 3 là bộ công cụ riêng, vào tự do,
+         không phải bước nối tiếp của luồng lập bản ảnh -->
+    <span class="stp-sep"></span>
+    <button class="stp free" id="stp3" onclick="goStep(3)">
+      <span class="stp-dot">3</span>
+      <span class="stp-lbl"><b>Công cụ file</b><span>Nối · tách · nén · đổi</span></span>
     </button>
   </div>
 </div>
@@ -1412,6 +1533,95 @@ main > .foot{margin-top:auto}
   </div>
 </div>
 
+
+<!-- ════════════════════════════════════════════════════════
+     BƯỚC 3 — CÔNG CỤ FILE (nối · tách · nén · chuyển đổi)
+     Độc lập với luồng lập bản ảnh: không đọc state.groups, không đụng
+     hồ sơ / bản nháp. Mọi việc chạy trong trình duyệt, file không rời máy.
+════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel3">
+
+  <!-- ── Trang chủ: lưới ô công cụ ── -->
+  <div id="toolHome">
+    <div class="card">
+      <div class="card-hd"><span class="ico">🧰</span>Công cụ file
+        <span class="sp"></span>
+        <span class="tag">Word · Excel · JPG · PNG · PDF</span></div>
+      <div class="card-bd">
+        <div class="tipbox" style="margin-bottom:20px">
+          <div class="tz-note">
+            Chạy <b>hoàn toàn trong máy bạn</b> — file không được tải lên internet, không cần cài gì thêm.
+            Chọn một công cụ, nạp file rồi tải kết quả về.
+          </div>
+        </div>
+
+        <div class="tool-sec">Làm việc với PDF</div>
+        <div class="tool-grid" id="tgPdf"></div>
+
+        <div class="tool-sec">Chuyển đổi định dạng</div>
+        <div class="tool-grid" id="tgConv"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Vùng làm việc của công cụ đang chọn ── -->
+  <div id="toolWork" style="display:none">
+    <div class="card">
+      <div class="card-hd tw-hd">
+        <button class="btn btn-n btn-sm" onclick="tzHome()">← Tất cả công cụ</button>
+        <span class="ico" id="twIco">🧰</span>
+        <span class="tw-nm" id="twName">Công cụ</span>
+        <span class="sp"></span>
+        <span class="tag" id="twDesc"></span>
+      </div>
+      <div class="card-bd">
+        <div class="alert alert-e" id="tzAlert"></div>
+
+        <!-- Nạp file -->
+        <div class="tz-dz" id="tzDz" onclick="$('tzFile').click()">
+          <span class="dz-ico">📂</span>
+          <div class="dz-main">
+            <h3 id="tzDzT">Kéo thả file vào đây</h3>
+            <p id="tzDzP">hoặc bấm để chọn từ máy</p>
+          </div>
+          <div class="dz-btns">
+            <button class="btn btn-p btn-sm" id="tzPick" onclick="event.stopPropagation();$('tzFile').click()">
+              Chọn file</button>
+          </div>
+        </div>
+        <input type="file" id="tzFile" multiple/>
+
+        <!-- Danh sách file đã nạp -->
+        <div class="tz-files" id="tzList"></div>
+
+        <!-- Tùy chọn riêng của từng công cụ -->
+        <div id="tzOpts"></div>
+
+        <!-- Thanh chạy -->
+        <div class="tz-run" id="tzRunBar" style="display:none">
+          <button class="btn btn-p btn-lg" id="tzGo" onclick="tzRun()">⚡ Chạy</button>
+          <button class="btn btn-n btn-sm" onclick="tzClearFiles()">🗑 Bỏ hết file</button>
+          <span class="sp"></span>
+          <span class="meta" id="tzMeta"></span>
+        </div>
+
+        <!-- Tiến trình -->
+        <div class="prog" id="tzProgBox" style="display:none">
+          <div class="prog-bg"><div class="prog-fill" id="tzProgFill" style="width:0"></div></div>
+          <div class="prog-tx" id="tzProgTx">Đang xử lý…</div>
+        </div>
+
+        <!-- Kết quả -->
+        <div class="tz-out" id="tzOut" style="display:none">
+          <h4><span>✅</span><span id="tzOutT">Xong</span></h4>
+          <p id="tzOutP"></p>
+          <div class="btns" id="tzOutBtns"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="foot">
   Tiện ích ghép ảnh - phát triển bằng AI Claude Code<br>
   Mọi ý kiến đóng góp xin liên hệ Chinh05
@@ -1421,7 +1631,7 @@ main > .foot{margin-top:auto}
 <!-- ════════ ACTION BAR ════════ -->
 <div class="actbar">
   <div class="actbar-in">
-    <button class="btn btn-n" id="abBack" onclick="goStep(state.step-1)" style="display:none">← Quay lại</button>
+    <button class="btn btn-n" id="abBack" onclick="abGoBack()" style="display:none">← Quay lại</button>
     <span class="meta" id="abMeta"></span>
     <span class="sp"></span>
     <button class="btn btn-p" id="abNext" onclick="goStep(state.step+1)" disabled>Tiếp tục →</button>
@@ -1622,7 +1832,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-17d';
+const APP_BUILD   = '2026-11-26a';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -2462,8 +2672,9 @@ async function discardDraft() {
 // ════════════════════════════════════════════════════════
 // Bước 1 gộp cả thông tin lẫn ảnh, nên sang bước 2 phải đạt CẢ HAI điều kiện.
 function goStep(n) {
-  n = Math.max(1, Math.min(2, n));
-  if (n === 2 && state.step === 1) {
+  n = Math.max(1, Math.min(3, n));
+  // Mục 3 (công cụ file) vào tự do — không đòi thông tin hồ sơ hay ảnh
+  if (n === 2 && state.step !== 2) {
     if (!validateInfo()) return;
     if (!hasImages()) {
       toast('Chưa có ảnh nào — hãy chọn thư mục hoặc ảnh', 'e');
@@ -2474,28 +2685,42 @@ function goStep(n) {
 
   state.step = n;
   document.querySelectorAll('.panel').forEach((p, i) => p.classList.toggle('active', i + 1 === n));
+  // Ở mục 3 thì hai bước của luồng bản ảnh về trạng thái thường, không đánh dấu "xong"
   [1, 2].forEach(i => {
-    $('stp' + i).className = 'stp' + (i === n ? ' active' : i < n ? ' done' : '');
+    $('stp' + i).className = 'stp' + (n === 3 ? '' : (i === n ? ' active' : i < n ? ' done' : ''));
   });
-  $('stpLine1').className = 'stp-line' + (n > 1 ? ' done' : '');
+  $('stp3').className = 'stp free' + (n === 3 ? ' active' : '');
+  $('stpLine1').className = 'stp-line' + (n === 2 ? ' done' : '');
 
   if (n === 2) {
     resetGenerate(); renderPreview();
     bbSyncRows(); bbRenderRows(); bbRecap(); bbRenderSigs(); bbSyncChip();
   }
+  if (n === 3 && typeof renderToolGrid === 'function') renderToolGrid();
   updateSummaries(); updateActionBar();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+/** Nút ← của thanh dưới: từ mục 3 phải về thẳng bước 1,
+ *  vì goStep(2) sẽ đòi đủ thông tin hồ sơ và ảnh. */
+function abGoBack() { goStep(state.step === 3 ? 1 : state.step - 1); }
+
 function updateActionBar() {
   const n = state.step;
   $('abBack').style.display = n > 1 ? '' : 'none';
+  $('abBack').innerHTML = (n === 3) ? '← Về Lập bản ảnh' : '← Quay lại';
   const next = $('abNext');
-  if (n === 2) { next.style.display = 'none'; }
+  if (n >= 2) { next.style.display = 'none'; }
   else {
     next.style.display = '';
     next.disabled = false;      // luôn bấm được — lỗi thiếu gì sẽ chỉ rõ chỗ đó
     next.innerHTML = 'Tiếp tục → Xem &amp; Xuất';
+  }
+  // tzBarMeta() nằm ở khối script CUỐI file — lúc init() chạy nó chưa tồn tại,
+  // nên phải hỏi typeof chứ không gọi thắng
+  if (n === 3) {
+    $('abMeta').textContent = (typeof tzBarMeta === 'function') ? tzBarMeta() : '';
+    return;
   }
   const t = totalImgs();
   $('abMeta').textContent = t ? `${t} ảnh · ${state.groups.length} hạng mục` : 'Chưa có ảnh';
@@ -4725,8 +4950,9 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && k === 'a' && state.step === 1 && totalImgs()) { e.preventDefault(); selectAllImgs(); }
   else if (k === 'delete' && state.step === 1 && state.sel.size) { e.preventDefault(); deleteSelected(); }
   else if (k === 'escape' && state.sel.size) clearSel();
-  else if (e.key === 'ArrowRight' && state.step < 2) goStep(2);
-  else if (e.key === 'ArrowLeft'  && state.step > 1) goStep(1);
+  // chỉ đi lại giữa bước 1 và 2 — mục 3 là bộ công cụ riêng, không nằm trên luồng đó
+  else if (e.key === 'ArrowRight' && state.step === 1) goStep(2);
+  else if (e.key === 'ArrowLeft'  && state.step === 2) goStep(1);
 });
 
 // ════════════════════════════════════════════════════════
@@ -4747,6 +4973,8 @@ function closeTopLayer() {
   if (!$('viewer').classList.contains('hidden'))   { closeViewer(); return true; }
   const ovs = document.querySelectorAll('.ov:not(.hidden)');
   if (ovs.length) { ovs[ovs.length - 1].classList.add('hidden'); return true; }
+  // Đang mở một công cụ ở mục 3 → Back là "về lưới công cụ", chưa phải rời mục 3
+  if (state.step === 3 && typeof tzTool === 'function' && tzTool()) { tzHome(); return true; }
   return false;
 }
 
@@ -5657,6 +5885,2092 @@ bbRenderRows(); bbRenderSigs(); bbRecap(); bbSyncChip();
   if ('requestIdleCallback' in window) requestIdleCallback(boot, { timeout: 2500 });
   else setTimeout(boot, 1200);
 })();
+</script>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+//  MÀN HÌNH 3 — CÔNG CỤ FILE (nối · tách · nén · chuyển đổi)
+//
+//  Hoàn toàn độc lập với luồng lập bản ảnh: không đọc state.groups,
+//  không ghi hồ sơ / bản nháp. Mọi việc chạy trong trình duyệt bằng đúng
+//  3 thư viện app đã có — pdf-lib (dựng PDF), @pdf-lib/fontkit (nhúng
+//  font tiếng Việt) và pdf.js (đọc / raster hóa PDF, nạp lười).
+//
+//  Word (.docx) và Excel (.xlsx) đọc bằng mã TỰ VIẾT: hai định dạng đó là
+//  ZIP chứa XML, mà app đã có sẵn zipStore()/crc32() để GHI zip, còn ĐỌC
+//  thì dùng DecompressionStream('deflate-raw') của chính trình duyệt.
+//  Nhờ vậy không phải thêm thư viện ngoài nào.
+//
+//  Mọi tên hàm/biến của khối này mang tiền tố tz/TZ — các <script> cổ điển
+//  dùng chung một phạm vi toàn cục, khai lại tên đã có là lỗi cú pháp.
+// ════════════════════════════════════════════════════════════════════
+
+const TZ_PDF  = ['.pdf'];
+const TZ_IMG  = ['.jpg', '.jpeg', '.png'];
+const TZ_DOCX = ['.docx'];
+const TZ_XLSX = ['.xlsx'];
+const TZ_MAXF  = 80;     // số file tối đa nạp một lượt
+const TZ_MAXMB = 120;    // tổng dung lượng (MB) vượt mức này thì cảnh báo hết RAM tab
+
+/** Trạng thái màn hình 3. `files` là mảng {id, f}; `pages` chỉ dùng cho công cụ sắp xếp trang. */
+const tz = { id: null, files: [], busy: false, pages: null, thumbs: null };
+
+// ════════ TIỆN ÍCH CHUNG ════════
+
+const tzBase = n => String(n).replace(/\.[^.]+$/, '');
+/** Bỏ ký tự Windows cấm trong tên file (giống cách đặt tên PDF của bản ảnh) */
+const tzSafe = n => String(n).replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim() || 'ket qua';
+
+/** Số nguyên đọc từ ô nhập, kẹp trong [lo, hi]; ô trống hoặc sai → def */
+function tzInt(id, def, lo, hi) {
+  const v = parseInt(($(id) ? $(id).value : '').trim(), 10);
+  if (!isFinite(v)) return def;
+  return Math.max(lo, Math.min(hi, v));
+}
+const tzSel = (id, def) => (($(id) && $(id).value) || def);
+const tzChk = id => !!($(id) && $(id).checked);
+
+/** "1-3, 5, 8-10" → [{a:1,b:3},{a:5,b:5},{a:8,b:10}], đã kẹp trong [1, total] */
+function tzRanges(txt, total) {
+  const out = [];
+  for (const part of String(txt || '').split(/[,;\n]+/)) {
+    const s = part.trim();
+    if (!s) continue;
+    const m = s.match(/^(\d+)\s*(?:[-–—:]\s*(\d+))?$/);
+    if (!m) continue;
+    let a = parseInt(m[1], 10);
+    let b = m[2] ? parseInt(m[2], 10) : a;
+    if (a > b) { const t = a; a = b; b = t; }
+    a = Math.max(1, a); b = Math.min(total, b);
+    if (a <= b) out.push({ a, b });
+  }
+  return out;
+}
+
+/** Vẽ lại ảnh qua canvas — dùng khi cần đổi định dạng, nén, thu nhỏ, và khi
+ *  pdf-lib không nhận nổi JPEG lạ (CMYK / progressive). */
+async function tzReencode(file, type, q, maxEdge) {
+  const img = await loadImage(file);
+  let w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+  if (maxEdge && Math.max(w, h) > maxEdge) {
+    const k = maxEdge / Math.max(w, h);
+    w = Math.max(1, Math.round(w * k)); h = Math.max(1, Math.round(h * k));
+  }
+  const cv = document.createElement('canvas');
+  cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d');
+  // JPEG không có kênh trong suốt — nền trong của PNG phải tô trắng, kẻo ra nền đen
+  if (type === 'image/jpeg') { ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, w, h); }
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0, w, h);
+  const blob = await new Promise(r => cv.toBlob(r, type, type === 'image/jpeg' ? (q || .85) : undefined));
+  cv.width = cv.height = 0;
+  if (!blob) throw new Error('Không nén được ảnh: ' + file.name);
+  return { blob, w, h };
+}
+
+/** Nhúng một file ảnh vào tài liệu pdf-lib, tự chữa JPEG lạ bằng cách vẽ lại qua canvas */
+async function tzEmbedImg(doc, file) {
+  const buf = await file.arrayBuffer();
+  if (extOf(file.name) === '.png') { try { return await doc.embedPng(buf); } catch (_) {} }
+  else                             { try { return await doc.embedJpg(buf); } catch (_) {} }
+  const r = await tzReencode(file, 'image/jpeg', .92);
+  return doc.embedJpg(await r.blob.arrayBuffer());
+}
+
+/** Cặp font tiếng Việt cho các công cụ phải vẽ chữ (đánh số trang, watermark,
+ *  Word/Excel → PDF). KHÔNG dùng embedAssets() vì hàm đó nhúng kèm logo PNG,
+ *  cõng thêm ~130KB chết vào mỗi file kết quả. */
+let _tzFontBuf = null;
+async function tzFonts(doc) {
+  if (!_tzFontBuf) {
+    const g = p => fetch(p).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.arrayBuffer(); });
+    try {
+      _tzFontBuf = await Promise.all([
+        g('fonts/BeVietnamPro-Regular.ttf'), g('fonts/BeVietnamPro-Bold.ttf')]);
+    } catch (e) {
+      throw new Error('Không nạp được font tiếng Việt. Hãy mở app qua địa chỉ web '
+                    + '(GitHub Pages / Render) thay vì mở file trực tiếp.');
+    }
+  }
+  doc.registerFontkit(fontkit);
+  const [reg, bold] = await Promise.all([
+    doc.embedFont(_tzFontBuf[0], { subset: true }),
+    doc.embedFont(_tzFontBuf[1], { subset: true })]);
+  return { reg, bold };
+}
+
+/** Lọc chữ trước khi đưa cho pdf-lib: bỏ ký tự điều khiển và ký tự ngoài
+ *  Latin + tiếng Việt (emoji, chữ Hán…) — font của app không có glyph cho chúng,
+ *  để nguyên thì drawText báo lỗi và mất cả trang. */
+function tzClean(s) {
+  s = String(s == null ? '' : s).normalize('NFC').replace(/\t/g, '    ');
+  let o = '';
+  for (const ch of s) {
+    const c = ch.codePointAt(0);
+    if (c === 10) { o += '\n'; continue; }
+    if (c < 32) continue;
+    if (c <= 0x24F || (c >= 0x1E00 && c <= 0x1EFF) || (c >= 0x2010 && c <= 0x205E)
+        || (c >= 0x20A0 && c <= 0x20BF) || c === 0x2122) o += ch;
+  }
+  return o;
+}
+
+/** Bề ngang chữ, không bao giờ ném lỗi (glyph thiếu → ước lượng) */
+function tzW(font, s, size) {
+  try { return font.widthOfTextAtSize(s, size); } catch (_) { return String(s).length * size * .52; }
+}
+
+/** Ngắt dòng cho pdf-lib: giữ nguyên dòng trống, cắt cả "từ" dài hơn một dòng */
+function tzWrap(text, font, size, maxW) {
+  const lines = [];
+  for (const para of String(text == null ? '' : text).split('\n')) {
+    let line = '';
+    for (const w of para.split(/\s+/)) {
+      if (!w) continue;
+      const t = line ? line + ' ' + w : w;
+      if (tzW(font, t, size) <= maxW) { line = t; continue; }
+      if (line) { lines.push(line); line = ''; }
+      if (tzW(font, w, size) <= maxW) { line = w; continue; }
+      let cur = '';                           // từ dài hơn cả dòng → cắt theo ký tự
+      for (const ch of w) {
+        if (cur && tzW(font, cur + ch, size) > maxW) { lines.push(cur); cur = ch; } else cur += ch;
+      }
+      line = cur;
+    }
+    lines.push(line);
+  }
+  return lines;
+}
+
+/** Cắt bớt chữ cho vừa bề ngang, thêm "…" */
+function tzEllip(font, s, size, maxW) {
+  if (tzW(font, s, size) <= maxW) return s;
+  let cur = '';
+  for (const ch of s) {
+    if (tzW(font, cur + ch + '…', size) > maxW) break;
+    cur += ch;
+  }
+  return cur ? cur + '…' : '';
+}
+
+// ════════ ĐỌC ZIP (cho .docx / .xlsx) ════════
+//  Tự đọc để không thêm thư viện: tìm mục lục trung tâm (EOCD) từ cuối file,
+//  duyệt từng mục rồi giải nén bằng DecompressionStream của trình duyệt.
+
+async function tzInflate(u8) {
+  if (!('DecompressionStream' in window))
+    throw new Error('Trình duyệt này chưa giải nén được file Office. '
+                  + 'Hãy dùng Chrome/Edge 80+, Safari 16.4+ hoặc Firefox 113+.');
+  const st = new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(st).arrayBuffer());
+}
+
+/** Uint8Array của file .docx/.xlsx → Map<tên trong zip, {method, raw}> */
+function tzUnzip(u8) {
+  const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  let eo = -1;
+  const floor = Math.max(0, u8.length - 66000);          // vùng chú thích zip tối đa 64KB
+  for (let i = u8.length - 22; i >= floor; i--) {
+    if (dv.getUint32(i, true) === 0x06054b50) { eo = i; break; }
+  }
+  if (eo < 0) throw new Error('File không phải định dạng Office hợp lệ (không thấy mục lục ZIP).');
+  const n = dv.getUint16(eo + 10, true);
+  let p = dv.getUint32(eo + 16, true);
+  const dec = new TextDecoder('utf-8');
+  const out = new Map();
+  for (let k = 0; k < n; k++) {
+    if (p + 46 > u8.length || dv.getUint32(p, true) !== 0x02014b50) break;
+    const method = dv.getUint16(p + 10, true);
+    const csize  = dv.getUint32(p + 20, true);
+    const nmLen  = dv.getUint16(p + 28, true);
+    const exLen  = dv.getUint16(p + 30, true);
+    const cmLen  = dv.getUint16(p + 32, true);
+    const lho    = dv.getUint32(p + 42, true);
+    const name   = dec.decode(u8.subarray(p + 46, p + 46 + nmLen));
+    const lnm = dv.getUint16(lho + 26, true), lex = dv.getUint16(lho + 28, true);
+    const ds  = lho + 30 + lnm + lex;
+    out.set(name, { method, raw: u8.subarray(ds, ds + csize) });
+    p += 46 + nmLen + exLen + cmLen;
+  }
+  if (!out.size) throw new Error('File Office rỗng hoặc đã hỏng.');
+  return out;
+}
+
+async function tzZGet(zip, name) {
+  const e = zip.get(name);
+  if (!e) return null;
+  return e.method === 0 ? e.raw : await tzInflate(e.raw);
+}
+async function tzZXml(zip, name) {
+  const b = await tzZGet(zip, name);
+  if (!b) return null;
+  const d = new DOMParser().parseFromString(new TextDecoder('utf-8').decode(b), 'application/xml');
+  if (d.getElementsByTagName('parsererror').length) throw new Error('Không đọc được ' + name);
+  return d;
+}
+
+// Duyệt XML theo localName nên không phụ thuộc tiền tố namespace (w:, a:, r:…)
+const tzKids = (el, ln) => el ? Array.from(el.children).filter(c => c.localName === ln) : [];
+const tzKid  = (el, ln) => el ? (Array.from(el.children).find(c => c.localName === ln) || null) : null;
+function tzAt(el, ln) {
+  if (!el) return null;
+  for (const a of el.attributes) if (a.localName === ln) return a.value;
+  return null;
+}
+/** Đi theo chuỗi localName lồng nhau: tzPath(p, 'pPr', 'jc') */
+function tzPath(el) {
+  let cur = el;
+  for (let i = 1; i < arguments.length && cur; i++) cur = tzKid(cur, arguments[i]);
+  return cur;
+}
+const TZ_TW  = 1 / 20;        // 1 twip = 1/20 pt
+const TZ_EMU = 1 / 12700;     // 1 EMU  = 1/12700 pt
+
+// ════════ MÀU DÙNG CHUNG ════════
+// BLUE()/GRAY()/WHITE()/BLACK()/DGRAY() đã khai ở các khối trước — KHÔNG khai lại.
+const TZ_RED = () => PDFLib.rgb(.78, .16, .16);
+
+// ════════════════════════════════════════════════════════════════════
+//  ĐỊNH NGHĨA CÁC CÔNG CỤ
+//  mỗi mục: ico · grp · name · desc · tip · exts · multi · min · go · opts() · run()
+// ════════════════════════════════════════════════════════════════════
+const TOOLS = {
+
+  merge: {
+    ico: '🔗', grp: 'pdf', name: 'Nối PDF', desc: 'Ghép nhiều file thành một',
+    tip: 'Nạp nhiều file PDF — nạp thêm được cả JPG/PNG — rồi sắp thứ tự bằng ▲ ▼. '
+       + 'Kết quả là một file PDF duy nhất.',
+    exts: TZ_PDF.concat(TZ_IMG), multi: true, min: 2, go: '🔗 Nối thành 1 PDF',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Trang cho ảnh JPG/PNG
+          <span class="sp"></span><span class="tag">chỉ áp dụng cho file ảnh</span></div>
+        <div class="tz-opt">
+          <div class="fg"><label>Khổ trang</label>
+            <select id="tzMgImg">
+              <option value="fit">Vừa đúng khổ ảnh</option>
+              <option value="auto" selected>A4 tự chọn dọc/ngang theo ảnh</option>
+              <option value="a4">A4 dọc, ảnh canh giữa</option>
+              <option value="a4l">A4 ngang, ảnh canh giữa</option>
+            </select></div>
+          <div class="fg"><label>Lề trang (mm)</label>
+            <input type="number" id="tzMgPad" value="0" min="0" max="40" step="1"/>
+            <span class="hint">chỉ dùng khi chọn khổ A4</span></div>
+        </div>
+      </div>`,
+    run: tzRunMerge
+  },
+
+  split: {
+    ico: '✂️', grp: 'pdf', name: 'Tách PDF', desc: 'Chia một PDF thành nhiều file',
+    tip: 'Nạp một file PDF rồi chọn cách tách. Ra nhiều file thì tải về dưới dạng một file ZIP.',
+    exts: TZ_PDF, multi: false, min: 1, go: '✂️ Tách file',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Cách tách</div>
+        <div class="segm" id="tzSpSeg">
+          <button type="button" onclick="tzSpMode('ranges')" id="tzSpB_ranges">Theo khoảng trang</button>
+          <button type="button" onclick="tzSpMode('every')"  id="tzSpB_every">Mỗi N trang một file</button>
+          <button type="button" onclick="tzSpMode('each')"   id="tzSpB_each">Mỗi trang một file</button>
+        </div>
+        <div class="tz-opt" style="margin-top:14px">
+          <div class="fg span2" id="tzSpRow_ranges">
+            <label>Các khoảng trang <span class="req">*</span></label>
+            <input type="text" id="tzSpRanges" placeholder="1-3, 5, 8-10"/>
+            <span class="hint">Mỗi khoảng cách nhau bằng dấu phẩy và ra một file riêng.
+              Tổng số trang của file hiện ở dòng chữ dưới thanh nút.</span></div>
+          <div class="fg" id="tzSpRow_every" style="display:none">
+            <label>Số trang mỗi file</label>
+            <input type="number" id="tzSpEvery" value="1" min="1" max="999" step="1"/></div>
+        </div>
+      </div>`,
+    run: tzRunSplit
+  },
+
+  pages: {
+    ico: '🗂', grp: 'pdf', name: 'Sắp xếp & xoá trang', desc: 'Đổi thứ tự, xoay, bỏ trang',
+    tip: 'Nạp một file PDF để xem từng trang, rồi đổi thứ tự bằng ◀ ▶, xoay bằng ↻ và bỏ trang bằng 🗑. '
+       + 'Bấm 🗑 lần nữa thì lấy lại trang đã bỏ.',
+    exts: TZ_PDF, multi: false, min: 1, go: '💾 Lưu PDF mới',
+    opts: () => `<div id="tzPgWrap"></div>`,
+    run: tzRunPages
+  },
+
+  compress: {
+    ico: '🗜', grp: 'pdf', name: 'Nén PDF', desc: 'Giảm dung lượng để gửi email',
+    tip: 'Mỗi trang được vẽ lại thành ảnh JPEG rồi dựng lại file — đây là cách duy nhất nén được ngay '
+       + 'trong trình duyệt. Đổi lại, chữ trong file kết quả không còn chọn / tìm kiếm được nữa.',
+    exts: TZ_PDF, multi: true, min: 1, go: '🗜 Nén file',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Mức nén</div>
+        <div class="segm" id="tzCpSeg">
+          <button type="button" onclick="tzCpMode('low')"  id="tzCpB_low">Nhẹ — nét nhất</button>
+          <button type="button" onclick="tzCpMode('mid')"  id="tzCpB_mid">Vừa — khuyến nghị</button>
+          <button type="button" onclick="tzCpMode('high')" id="tzCpB_high">Mạnh — nhỏ nhất</button>
+        </div>
+        <div class="tz-warn" id="tzCpHint"></div>
+      </div>`,
+    run: tzRunCompress
+  },
+
+  number: {
+    ico: '#️⃣', grp: 'pdf', name: 'Đánh số trang', desc: 'In số trang vào file có sẵn',
+    tip: 'Thêm số trang vào một hoặc nhiều file PDF. Mỗi file được đánh số riêng từ đầu.',
+    exts: TZ_PDF, multi: true, min: 1, go: '#️⃣ Đánh số trang',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Kiểu số trang</div>
+        <div class="tz-opt">
+          <div class="fg"><label>Dạng chữ</label>
+            <select id="tzNbFmt">
+              <option value="{n}">1</option>
+              <option value="{n} / {t}" selected>1 / 12</option>
+              <option value="Trang {n}">Trang 1</option>
+              <option value="Trang {n} / {t}">Trang 1 / 12</option>
+              <option value="- {n} -">- 1 -</option>
+            </select></div>
+          <div class="fg"><label>Vị trí</label>
+            <select id="tzNbPos">
+              <option value="bc" selected>Chân trang, giữa</option>
+              <option value="br">Chân trang, bên phải</option>
+              <option value="bl">Chân trang, bên trái</option>
+              <option value="tc">Đầu trang, giữa</option>
+              <option value="tr">Đầu trang, bên phải</option>
+              <option value="tl">Đầu trang, bên trái</option>
+            </select></div>
+          <div class="fg"><label>Cỡ chữ (pt)</label>
+            <input type="number" id="tzNbSize" value="10" min="6" max="28" step="1"/></div>
+          <div class="fg"><label>Số đầu tiên</label>
+            <input type="number" id="tzNbFrom" value="1" min="0" max="9999" step="1"/></div>
+          <div class="fg"><label>Lề (mm)</label>
+            <input type="number" id="tzNbMg" value="12" min="3" max="40" step="1"/></div>
+          <div class="fg"><label>Màu chữ</label>
+            <select id="tzNbColor">
+              <option value="gray" selected>Xám</option>
+              <option value="black">Đen</option>
+              <option value="blue">Xanh dương</option>
+            </select></div>
+          <div class="fg span2">
+            <label class="tz-ck"><input type="checkbox" id="tzNbSkip1"/>
+              Không in số lên trang đầu (trang bìa)</label></div>
+        </div>
+      </div>`,
+    run: tzRunNumber
+  },
+
+  wmark: {
+    ico: '💧', grp: 'pdf', name: 'Đóng dấu chữ', desc: 'In chữ mờ lên mọi trang',
+    tip: 'In một dòng chữ mờ (BẢN SAO, HỒ SƠ GỐC, tên đơn vị…) lên tất cả các trang.',
+    exts: TZ_PDF, multi: true, min: 1, go: '💧 Đóng dấu',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Nội dung dấu</div>
+        <div class="tz-opt">
+          <div class="fg span2"><label>Dòng chữ <span class="req">*</span></label>
+            <input type="text" id="tzWmTx" value="BẢN SAO" maxlength="60"/></div>
+          <div class="fg"><label>Cỡ chữ (pt)</label>
+            <input type="number" id="tzWmSize" value="60" min="8" max="200" step="2"/></div>
+          <div class="fg"><label>Độ mờ (%)</label>
+            <input type="number" id="tzWmOp" value="18" min="3" max="100" step="1"/></div>
+          <div class="fg"><label>Góc nghiêng</label>
+            <select id="tzWmRot">
+              <option value="45" selected>Nghiêng 45°</option>
+              <option value="0">Nằm ngang</option>
+              <option value="90">Dọc</option>
+            </select></div>
+          <div class="fg"><label>Màu</label>
+            <select id="tzWmColor">
+              <option value="gray" selected>Xám</option>
+              <option value="red">Đỏ</option>
+              <option value="blue">Xanh dương</option>
+            </select></div>
+          <div class="fg span2"><label>Cách rải</label>
+            <select id="tzWmTile">
+              <option value="one" selected>Một dấu giữa trang</option>
+              <option value="tile">Rải kín trang (3 × 3)</option>
+            </select></div>
+        </div>
+      </div>`,
+    run: tzRunWmark
+  },
+
+  pdf2img: {
+    ico: '🖼', grp: 'conv', name: 'PDF → JPG / PNG', desc: 'Mỗi trang thành một ảnh',
+    tip: 'Mỗi trang PDF ra một file ảnh. Nhiều ảnh thì tải về dưới dạng một file ZIP.',
+    exts: TZ_PDF, multi: true, min: 1, go: '🖼 Xuất ảnh',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Ảnh xuất ra</div>
+        <div class="tz-opt">
+          <div class="fg"><label>Định dạng</label>
+            <select id="tzP2Fmt">
+              <option value="jpg" selected>JPG — nhẹ, dùng để gửi</option>
+              <option value="png">PNG — nét nhất, file lớn</option>
+            </select></div>
+          <div class="fg"><label>Độ phân giải</label>
+            <select id="tzP2Dpi">
+              <option value="96">96 DPI — xem trên màn hình</option>
+              <option value="150" selected>150 DPI — khuyến nghị</option>
+              <option value="200">200 DPI — in rõ</option>
+              <option value="300">300 DPI — in chất lượng cao</option>
+            </select></div>
+          <div class="fg"><label>Chất lượng JPG (%)</label>
+            <input type="number" id="tzP2Q" value="90" min="40" max="100" step="5"/></div>
+        </div>
+      </div>`,
+    run: tzRunPdf2Img
+  },
+
+  img2pdf: {
+    ico: '📄', grp: 'conv', name: 'JPG / PNG → PDF', desc: 'Gộp ảnh thành một file PDF',
+    tip: 'Nạp nhiều ảnh, sắp thứ tự bằng ▲ ▼ rồi gộp thành một PDF — mỗi ảnh một trang. '
+       + 'Cần bản ảnh giám định có tiêu đề, chú thích và số trang thì dùng màn hình 1 và 2, không dùng công cụ này.',
+    exts: TZ_IMG, multi: true, min: 1, go: '📄 Tạo file PDF',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Khổ trang</div>
+        <div class="tz-opt">
+          <div class="fg"><label>Kích thước trang</label>
+            <select id="tzI2Size">
+              <option value="auto" selected>A4 tự chọn dọc/ngang theo ảnh</option>
+              <option value="a4">A4 dọc cho mọi trang</option>
+              <option value="a4l">A4 ngang cho mọi trang</option>
+              <option value="fit">Vừa đúng khổ ảnh (không có lề)</option>
+            </select></div>
+          <div class="fg"><label>Lề trang (mm)</label>
+            <input type="number" id="tzI2Pad" value="8" min="0" max="40" step="1"/></div>
+          <div class="fg span2">
+            <label class="tz-ck"><input type="checkbox" id="tzI2Jpg" checked/>
+              Nén ảnh thành JPEG khi nhúng (file PDF nhẹ hơn nhiều)</label></div>
+        </div>
+      </div>`,
+    run: tzRunImg2Pdf
+  },
+
+  imgconv: {
+    ico: '🔄', grp: 'conv', name: 'Đổi định dạng / nén ảnh', desc: 'JPG ⇄ PNG, thu nhỏ, nén',
+    tip: 'Đổi JPG sang PNG hoặc ngược lại, nén bớt dung lượng và thu nhỏ ảnh quá lớn.',
+    exts: TZ_IMG, multi: true, min: 1, go: '🔄 Chuyển đổi',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Ảnh xuất ra</div>
+        <div class="tz-opt">
+          <div class="fg"><label>Định dạng đích</label>
+            <select id="tzIcFmt">
+              <option value="jpg" selected>JPG</option>
+              <option value="png">PNG</option>
+            </select></div>
+          <div class="fg"><label>Chất lượng JPG (%)</label>
+            <input type="number" id="tzIcQ" value="85" min="30" max="100" step="5"/></div>
+          <div class="fg"><label>Cạnh dài tối đa (px)</label>
+            <input type="number" id="tzIcMax" value="0" min="0" max="12000" step="100"/>
+            <span class="hint">0 = giữ nguyên kích thước</span></div>
+        </div>
+      </div>`,
+    run: tzRunImgConv
+  },
+
+  doc2pdf: {
+    ico: '📝', grp: 'conv', name: 'Word → PDF', desc: 'File .docx thành PDF',
+    tip: 'Giữ chữ tiếng Việt, cỡ chữ, in đậm, gạch chân, căn lề, danh sách, bảng và ảnh nhúng. '
+       + 'Bố cục phức tạp (nhiều cột, khung chữ, đầu/chân trang, chữ nghiêng) chỉ ra GẦN ĐÚNG — '
+       + 'văn bản phải in đúng từng milimet thì vẫn nên mở bằng Word rồi “Lưu thành PDF”.',
+    exts: TZ_DOCX, multi: true, min: 1, go: '📝 Chuyển sang PDF',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Trang in</div>
+        <div class="tz-opt">
+          <div class="fg"><label>Khổ giấy</label>
+            <select id="tzDcSize">
+              <option value="doc" selected>Theo đúng file Word</option>
+              <option value="a4">A4 dọc</option>
+              <option value="a4l">A4 ngang</option>
+            </select></div>
+          <div class="fg"><label>Cỡ chữ mặc định (pt)</label>
+            <input type="number" id="tzDcSz" value="0" min="0" max="36" step="1"/>
+            <span class="hint">0 = theo đúng file Word</span></div>
+          <div class="fg span2">
+            <label class="tz-ck"><input type="checkbox" id="tzDcImg" checked/>
+              Đưa cả ảnh nhúng trong file Word vào PDF</label></div>
+        </div>
+      </div>`,
+    run: tzRunDoc2Pdf
+  },
+
+  xls2pdf: {
+    ico: '📊', grp: 'conv', name: 'Excel → PDF', desc: 'File .xlsx thành bảng PDF',
+    tip: 'In giá trị từng ô thành bảng có kẻ lưới, mỗi sheet bắt đầu một trang mới. '
+       + 'Không giữ màu nền, biểu đồ và công thức — chỉ in kết quả đang hiện trong ô.',
+    exts: TZ_XLSX, multi: true, min: 1, go: '📊 Chuyển sang PDF',
+    opts: () => `
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Trang in</div>
+        <div class="tz-opt">
+          <div class="fg"><label>Khổ giấy</label>
+            <select id="tzXlSize">
+              <option value="auto" selected>Tự chọn theo bề ngang bảng</option>
+              <option value="a4l">A4 ngang</option>
+              <option value="a4">A4 dọc</option>
+            </select></div>
+          <div class="fg"><label>Cỡ chữ (pt)</label>
+            <input type="number" id="tzXlSz" value="9" min="5" max="20" step="1"/></div>
+          <div class="fg span2">
+            <label class="tz-ck"><input type="checkbox" id="tzXlFit" checked/>
+              Co bảng cho vừa bề ngang trang</label>
+            <label class="tz-ck"><input type="checkbox" id="tzXlHead" checked/>
+              Lặp lại hàng đầu tiên ở mỗi trang</label>
+            <label class="tz-ck"><input type="checkbox" id="tzXlGrid" checked/>
+              Kẻ lưới ô</label></div>
+        </div>
+      </div>`,
+    run: tzRunXls2Pdf
+  }
+};
+
+// ════════ KHUNG GIAO DIỆN ════════
+
+let _tzGridDone = false;
+function renderToolGrid() {
+  if (_tzGridDone) return;
+  const tile = (id, T) => `
+    <button class="tool-tile" onclick="tzOpen('${id}')">
+      <span class="ti-ico">${T.ico}</span>
+      <span class="ti-tx"><b>${esc(T.name)}</b><span>${esc(T.desc)}</span></span>
+    </button>`;
+  const html = g => Object.keys(TOOLS).filter(k => TOOLS[k].grp === g)
+                          .map(k => tile(k, TOOLS[k])).join('');
+  $('tgPdf').innerHTML  = html('pdf');
+  $('tgConv').innerHTML = html('conv');
+  _tzGridDone = true;
+}
+
+const tzTool = () => (tz.id ? TOOLS[tz.id] : null);
+
+/** Dòng chữ giữa thanh nút dưới khi đang ở mục 3.
+ *  updateActionBar() (khối script thứ 2) gọi hàm này qua `typeof`, vì lúc init()
+ *  chạy thì khối script cuối chưa thực thi. */
+function tzBarMeta() {
+  const T = tzTool();
+  if (!T) return '\uD83E\uDDF0 Công cụ file — chọn một công cụ';
+  const n = tz.files.length;
+  return `${T.ico} ${T.name}` + (n ? ` · ${n} file` : ' — chưa nạp file');
+}
+
+function tzOpen(id) {
+  if (!TOOLS[id]) return;
+  tz.id = id; tz.files = []; tz.pages = null; tz.thumbs = null;
+  const T = TOOLS[id];
+  $('toolHome').style.display = 'none';
+  $('toolWork').style.display = '';
+  $('twIco').textContent  = T.ico;
+  $('twName').textContent = T.name;
+  $('twDesc').textContent = T.desc;
+  $('tzFile').accept   = T.exts.join(',');
+  $('tzFile').multiple = !!T.multi;
+  $('tzDzT').textContent  = T.multi ? 'Kéo thả file vào đây' : 'Kéo một file vào đây';
+  $('tzDzP').innerHTML    = 'hoặc bấm để chọn từ máy · nhận <b>' + T.exts.join(' · ') + '</b>';
+  $('tzPick').textContent = T.multi ? 'Chọn file' : 'Chọn 1 file';
+  $('tzOpts').innerHTML = `<div class="tipbox" style="margin:16px 0 14px"><div class="tz-note">${T.tip}</div></div>`
+                        + (T.opts ? T.opts() : '');
+  tzErr('');
+  tzHideOut();
+  if (id === 'split')    tzSpMode('ranges');
+  if (id === 'compress') tzCpMode('mid');
+  tzRenderList();
+  updateActionBar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function tzHome() {
+  if (tz.busy) { toast('Đang xử lý — chờ xong đã', 'w'); return; }
+  tz.id = null; tz.files = []; tz.pages = null; tz.thumbs = null;
+  $('toolWork').style.display = 'none';
+  $('toolHome').style.display = '';
+  tzHideOut();
+  updateActionBar();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function tzErr(msg) {
+  const el = $('tzAlert');
+  el.textContent = msg || '';
+  // .alert mặc định display:none, hiện bằng class .show — giống #alertErr2/#alertErr3
+  el.className = 'alert alert-e' + (msg ? ' show' : '');
+  if (msg) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function tzProg(pct, msg) {
+  $('tzProgBox').style.display = '';
+  $('tzProgFill').style.width = Math.max(0, Math.min(100, pct)) + '%';
+  $('tzProgTx').textContent = msg || '';
+}
+const tzHideProg = () => { $('tzProgBox').style.display = 'none'; };
+const tzHideOut  = () => { $('tzOut').style.display = 'none'; $('tzOutBtns').innerHTML = ''; };
+
+/** Hiện khối kết quả. `outs` = [{blob, name, label}] — mỗi mục một nút tải. */
+function tzDone(title, note, outs) {
+  tzHideProg();
+  $('tzOutT').textContent = title;
+  $('tzOutP').textContent = note || '';
+  $('tzOutBtns').innerHTML = '';
+  outs.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.className = 'btn ' + (i ? 'btn-o' : 'btn-g');
+    b.textContent = o.label || ('⬇ Tải ' + o.name);
+    b.onclick = () => { saveBlob(o.blob, o.name); toast('Đã tải ' + o.name, 'o'); };
+    $('tzOutBtns').appendChild(b);
+  });
+  $('tzOut').style.display = '';
+  $('tzOut').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/** Nhiều file kết quả → một ZIP; đúng một file → tải thẳng */
+async function tzPack(items, zipName) {
+  if (items.length === 1) return [{ blob: items[0].blob, name: items[0].name }];
+  const files = [];
+  for (const it of items) files.push({ name: it.name, data: new Uint8Array(await it.blob.arrayBuffer()) });
+  return [{ blob: zipStore(files), name: zipName, label: `⬇ Tải ZIP (${items.length} file)` }];
+}
+
+// ════════ NẠP FILE ════════
+
+async function tzAddFiles(list) {
+  const T = tzTool();
+  if (!T) return;
+  const all = Array.from(list || []);
+  if (!all.length) return;
+  const ok  = all.filter(f => T.exts.indexOf(extOf(f.name)) >= 0);
+  const bad = all.length - ok.length;
+  if (bad) toast(`${bad} file bị bỏ qua — công cụ này chỉ nhận ${T.exts.join(' · ')}`, 'e');
+  if (!ok.length) return;
+
+  let add = ok;
+  if (!T.multi) { add = [ok[0]]; tz.files = []; tz.pages = null; tz.thumbs = null; }
+  const room = TZ_MAXF - tz.files.length;
+  if (add.length > room) {
+    add = add.slice(0, Math.max(0, room));
+    toast(`Chỉ nhận tối đa ${TZ_MAXF} file một lượt`, 'e');
+  }
+  if (!add.length) return;
+  tz.files = tz.files.concat(add.map(f => ({ id: uid(), f })));
+
+  const mb = tz.files.reduce((s, x) => s + x.f.size, 0) / 1048576;
+  if (mb > TZ_MAXMB)
+    toast(`Tổng ${mb.toFixed(0)}MB — vượt ${TZ_MAXMB}MB, trình duyệt có thể hết bộ nhớ`, 'e');
+
+  tzErr('');
+  tzHideOut();
+  tzRenderList();
+  if (tz.id === 'pages')   await tzPgLoad();     // dựng ngay lưới trang
+  if (tz.id === 'split')   await tzSpCount();    // đếm tổng số trang để gợi ý khoảng
+}
+
+function tzRenderList() {
+  const T = tzTool();
+  const host = $('tzList');
+  if (!T) { host.innerHTML = ''; return; }
+  const n = tz.files.length;
+  host.innerHTML = tz.files.map((x, i) => `
+    <div class="tz-f">
+      <span class="fi-n">${i + 1}</span>
+      <span class="fi-tx"><b>${esc(x.f.name)}</b><span>${fmtBytes(x.f.size)}</span></span>
+      <span class="fi-a">
+        ${T.multi ? `<button onclick="tzMove(${i},-1)" ${i === 0 ? 'disabled' : ''} title="Lên trên">▲</button>
+        <button onclick="tzMove(${i},1)" ${i === n - 1 ? 'disabled' : ''} title="Xuống dưới">▼</button>` : ''}
+        <button class="x" onclick="tzDelFile(${i})" title="Bỏ file này">🗑</button>
+      </span>
+    </div>`).join('');
+  $('tzRunBar').style.display = n ? '' : 'none';
+  $('tzGo').disabled = n < (T.min || 1);
+  $('tzGo').textContent = T.go;
+  const tot = tz.files.reduce((s, x) => s + x.f.size, 0);
+  let meta = n ? `${n} file · ${fmtBytes(tot)}` : '';
+  if (n && n < (T.min || 1)) meta += ` · cần ít nhất ${T.min} file`;
+  if (tz.pages) meta += ` · giữ ${tz.pages.filter(p => !p.gone).length}/${tz.pages.length} trang`;
+  else if (_tzSpTotal) meta += ` · ${_tzSpTotal} trang`;
+  $('tzMeta').textContent = meta;
+  updateActionBar();
+}
+
+function tzMove(i, d) {
+  const j = i + d;
+  if (j < 0 || j >= tz.files.length) return;
+  const t = tz.files[i]; tz.files[i] = tz.files[j]; tz.files[j] = t;
+  tzRenderList();
+}
+function tzDelFile(i) {
+  tz.files.splice(i, 1);
+  if (tz.id === 'pages') { tz.pages = null; tz.thumbs = null; const w = $('tzPgWrap'); if (w) w.innerHTML = ''; }
+  if (tz.id === 'split') _tzSpTotal = 0;
+  tzHideOut();
+  tzRenderList();
+}
+function tzClearFiles() {
+  tz.files = []; tz.pages = null; tz.thumbs = null; _tzSpTotal = 0;
+  const w = $('tzPgWrap'); if (w) w.innerHTML = '';
+  tzErr(''); tzHideOut(); tzRenderList();
+}
+
+// ════════ CHẠY ════════
+
+async function tzRun() {
+  const T = tzTool();
+  if (!T || tz.busy) return;
+  if (tz.files.length < (T.min || 1)) {
+    tzErr(`Cần ít nhất ${T.min || 1} file để chạy công cụ này.`);
+    return;
+  }
+  tz.busy = true;
+  tzErr(''); tzHideOut();
+  busyBtn('tzGo', '⏳ Đang xử lý…');
+  tzProg(2, 'Bắt đầu…');
+  try {
+    await T.run();
+  } catch (err) {
+    console.error('[công cụ file]', tz.id, err);
+    tzHideProg();
+    tzErr((err && err.message) ? err.message : 'Không xử lý được — mở Console (F12) để xem chi tiết.');
+  } finally {
+    tz.busy = false;
+    freeBtn('tzGo');
+    $('tzGo').textContent = T.go;
+  }
+}
+
+// ════════ KÉO THẢ ════════
+(function tzDzInit() {
+  const dz = $('tzDz');
+  if (!dz) return;
+  ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation(); dz.classList.add('drag');
+  }));
+  ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation(); dz.classList.remove('drag');
+  }));
+  dz.addEventListener('drop', e => {
+    const fs = e.dataTransfer && e.dataTransfer.files;
+    if (fs && fs.length) tzAddFiles(fs);
+  });
+  $('tzFile').addEventListener('change', e => {
+    const fs = e.target.files;
+    if (fs && fs.length) tzAddFiles(fs);
+    e.target.value = '';
+  });
+})();
+
+// ════════ DẢI NÚT RIÊNG CỦA TỪNG CÔNG CỤ ════════
+
+let _tzSpMode = 'ranges', _tzSpTotal = 0;
+function tzSpMode(m) {
+  _tzSpMode = m;
+  ['ranges', 'every', 'each'].forEach(k => {
+    const b = $('tzSpB_' + k); if (b) b.className = (k === m ? 'on' : '');
+    const r = $('tzSpRow_' + k); if (r) r.style.display = (k === m ? '' : 'none');
+  });
+}
+/** Đếm số trang của file vừa nạp để hiện ở dòng chữ dưới thanh nút */
+async function tzSpCount() {
+  _tzSpTotal = 0;
+  if (!tz.files.length) { tzRenderList(); return; }
+  try {
+    const d = await PDFLib.PDFDocument.load(await tz.files[0].f.arrayBuffer(), { ignoreEncryption: true });
+    _tzSpTotal = d.getPageCount();
+    const inp = $('tzSpRanges');
+    if (inp && !inp.value.trim()) inp.placeholder = `1-${Math.min(3, _tzSpTotal)}, ${_tzSpTotal}`;
+  } catch (_) {}
+  tzRenderList();
+}
+
+const TZ_CP = {
+  low:  { dpi: 150, q: .82, lbl: 'Nhẹ — 150 DPI, chất lượng 82%: chữ vẫn nét khi in A4.' },
+  mid:  { dpi: 120, q: .72, lbl: 'Vừa — 120 DPI, chất lượng 72%: nhỏ gọn mà vẫn đọc tốt trên màn hình và in thường.' },
+  high: { dpi: 96,  q: .58, lbl: 'Mạnh — 96 DPI, chất lượng 58%: nhỏ nhất, dùng khi cần gửi email gấp.' }
+};
+let _tzCpMode = 'mid';
+function tzCpMode(m) {
+  _tzCpMode = m;
+  Object.keys(TZ_CP).forEach(k => { const b = $('tzCpB_' + k); if (b) b.className = (k === m ? 'on' : ''); });
+  const h = $('tzCpHint'); if (h) h.textContent = TZ_CP[m].lbl;
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  CÁC CÔNG CỤ PDF + ẢNH
+// ════════════════════════════════════════════════════════════════════
+
+const TZ_PDFT = { type: 'application/pdf' };
+const TZ_XL_MAXROW = 3000;      // số hàng tối đa in ra từ một sheet Excel
+const tzPdfBlob = bytes => new Blob([bytes], TZ_PDFT);
+
+/** Kích thước trang NHƯ MẮT NGƯỜI XEM THẤY (đã tính /Rotate của trang) cùng
+ *  kích thước thật để quy đổi toạ độ. Trang 90°/270° thì bề ngang ↔ chiều cao. */
+function tzDisp(pg) {
+  const s = pg.getSize();
+  const R = ((pg.getRotation().angle % 360) + 360) % 360;
+  const swap = (R === 90 || R === 270);
+  return { W: swap ? s.height : s.width, H: swap ? s.width : s.height, R, pw: s.width, ph: s.height };
+}
+/** Điểm (u,v) trong hệ MẮT NGƯỜI XEM → toạ độ thật của trang.
+ *  Cùng với rotate = R độ, chữ vẽ ra nằm đúng chỗ kể cả trên trang đã xoay. */
+function tzMap(d, u, v) {
+  if (d.R === 90)  return { x: d.pw - v,  y: u };
+  if (d.R === 180) return { x: d.pw - u,  y: d.ph - v };
+  if (d.R === 270) return { x: v,         y: d.ph - u };
+  return { x: u, y: v };
+}
+
+/** Thêm MỘT trang chứa đúng một ảnh.
+ *  mode: fit = trang bằng khổ ảnh (quy ở 96 DPI) · a4 / a4l / auto = A4 có lề, ảnh canh giữa */
+function tzImgPage(doc, img, mode, pad) {
+  const iw = Math.max(1, img.width), ih = Math.max(1, img.height);
+  if (mode === 'fit') {
+    const w = Math.max(12, iw * .75), h = Math.max(12, ih * .75);   // 96 DPI → point
+    doc.addPage([w, h]).drawImage(img, { x: 0, y: 0, width: w, height: h });
+    return;
+  }
+  let pw = A4.w, ph = A4.h;
+  if (mode === 'a4l' || (mode === 'auto' && iw > ih)) { pw = A4.h; ph = A4.w; }
+  const pg = doc.addPage([pw, ph]);
+  const aw = Math.max(10, pw - 2 * pad), ah = Math.max(10, ph - 2 * pad);
+  const k = Math.min(aw / iw, ah / ih);
+  const w = iw * k, h = ih * k;
+  pg.drawImage(img, { x: (pw - w) / 2, y: (ph - h) / 2, width: w, height: h });
+}
+
+// ──────────────────────────────────────────────────────── NỐI PDF
+async function tzRunMerge() {
+  const { PDFDocument } = PDFLib;
+  const out  = await PDFDocument.create();
+  const mode = tzSel('tzMgImg', 'auto');
+  const pad  = tzInt('tzMgPad', 0, 0, 40) * MM;
+  let np = 0, skipped = [];
+
+  for (let i = 0; i < tz.files.length; i++) {
+    const f = tz.files[i].f;
+    tzProg(4 + Math.round(i / tz.files.length * 88), `Đang nối ${f.name}…`);
+    try {
+      if (extOf(f.name) === '.pdf') {
+        const src = await PDFDocument.load(await f.arrayBuffer(), { ignoreEncryption: true });
+        const cp  = await out.copyPages(src, src.getPageIndices());
+        cp.forEach(p => { out.addPage(p); np++; });
+      } else {
+        tzImgPage(out, await tzEmbedImg(out, f), mode, pad);
+        np++;
+      }
+    } catch (err) {
+      console.warn('nối PDF — bỏ qua', f.name, err);
+      skipped.push(f.name);
+    }
+  }
+  if (!np) throw new Error('Không đọc được file nào. File PDF có mật khẩu mở thì phải bỏ mật khẩu trước.');
+
+  tzProg(95, 'Đang ghi file…');
+  const bytes = await out.save();
+  const name  = tzSafe(tzBase(tz.files[0].f.name) + ' (da noi)') + '.pdf';
+  let note = `${tz.files.length - skipped.length} file → ${np} trang · ${fmtBytes(bytes.length)}`;
+  if (skipped.length) note += ` · bỏ qua: ${skipped.join(', ')}`;
+  tzDone('Đã nối xong', note, [{ blob: tzPdfBlob(bytes), name }]);
+}
+
+// ──────────────────────────────────────────────────────── TÁCH PDF
+async function tzRunSplit() {
+  const { PDFDocument } = PDFLib;
+  const f   = tz.files[0].f;
+  const src = await PDFDocument.load(await f.arrayBuffer(), { ignoreEncryption: true });
+  const total = src.getPageCount();
+  if (!total) throw new Error('File PDF này không có trang nào.');
+
+  let parts = [];
+  if (_tzSpMode === 'each') {
+    for (let i = 1; i <= total; i++) parts.push({ a: i, b: i });
+  } else if (_tzSpMode === 'every') {
+    const n = tzInt('tzSpEvery', 1, 1, 999);
+    for (let i = 1; i <= total; i += n) parts.push({ a: i, b: Math.min(total, i + n - 1) });
+  } else {
+    const txt = $('tzSpRanges') ? $('tzSpRanges').value : '';
+    parts = tzRanges(txt, total);
+    if (!parts.length)
+      throw new Error(`Chưa nhập khoảng trang hợp lệ. File này có ${total} trang — `
+                    + `ví dụ: 1-${Math.min(3, total)}, ${total}`);
+    // khoảng gõ sai hoặc vượt quá số trang bị bỏ — phải nói ra, không âm thầm
+    const asked = String(txt).split(/[,;\n]+/).filter(x => x.trim()).length;
+    if (parts.length < asked)
+      toast(`Bỏ qua ${asked - parts.length} khoảng không hợp lệ hoặc vượt quá ${total} trang`, 'e');
+  }
+  if (parts.length > 200)
+    throw new Error(`Cách tách này ra ${parts.length} file — quá 200 file một lượt, hãy chia nhỏ lại.`);
+
+  const base = tzSafe(tzBase(f.name));
+  const outs = [];
+  for (let k = 0; k < parts.length; k++) {
+    const P = parts[k];
+    tzProg(4 + Math.round(k / parts.length * 90),
+           `Đang tách trang ${P.a}${P.b > P.a ? '–' + P.b : ''}…`);
+    const d   = await PDFDocument.create();
+    const idx = [];
+    for (let p = P.a; p <= P.b; p++) idx.push(p - 1);
+    (await d.copyPages(src, idx)).forEach(p => d.addPage(p));
+    const bytes = await d.save();
+    outs.push({ blob: tzPdfBlob(bytes),
+                name: `${base} (trang ${P.a}${P.b > P.a ? '-' + P.b : ''}).pdf` });
+  }
+  tzProg(97, 'Đang đóng gói…');
+  const packed = await tzPack(outs, base + ' (da tach).zip');
+  tzDone('Đã tách xong', `${total} trang → ${outs.length} file`, packed);
+}
+
+// ──────────────────────────────────────────────────────── SẮP XẾP & XOÁ TRANG
+const TZ_PG_MAX = 150;      // quá số này thì dựng lưới ảnh nhỏ sẽ treo tab
+
+/** Đọc file vừa nạp, vẽ ảnh nhỏ từng trang rồi dựng lưới */
+async function tzPgLoad() {
+  const wrap = $('tzPgWrap');
+  if (!wrap) return;
+  if (!tz.files.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<div class="prog-tx">Đang mở file PDF…</div>';
+  try {
+    const lib = await loadPdfjs();
+    const buf = await tz.files[0].f.arrayBuffer();
+    const doc = await lib.getDocument({ data: new Uint8Array(buf) }).promise;
+    if (doc.numPages > TZ_PG_MAX) {
+      await doc.destroy();
+      throw new Error(`File có ${doc.numPages} trang — công cụ này xem được tối đa ${TZ_PG_MAX} trang. `
+                    + 'Hãy dùng “Tách PDF” để chia nhỏ trước.');
+    }
+    tz.pages = []; tz.thumbs = [];
+    for (let n = 1; n <= doc.numPages; n++) {
+      wrap.innerHTML = `<div class="prog-tx">Đang đọc trang ${n}/${doc.numPages}…</div>`;
+      const pg = await doc.getPage(n);
+      const v1 = pg.getViewport({ scale: 1 });
+      const sc = Math.min(1, 170 / Math.max(v1.width, v1.height));
+      const vp = pg.getViewport({ scale: sc });
+      const cv = document.createElement('canvas');
+      cv.width  = Math.max(1, Math.round(vp.width));
+      cv.height = Math.max(1, Math.round(vp.height));
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, cv.width, cv.height);
+      await pg.render({ canvasContext: ctx, viewport: vp }).promise;
+      pg.cleanup();
+      tz.thumbs.push(cv);
+      tz.pages.push({ i: n - 1, rot: 0, gone: false });
+    }
+    await doc.destroy();
+    tzPgRender();
+  } catch (err) {
+    wrap.innerHTML = '';
+    tz.pages = null; tz.thumbs = null;
+    tzErr('Không mở được file PDF này: ' + ((err && err.message) || err));
+  }
+  tzRenderList();
+}
+
+function tzPgRender() {
+  const wrap = $('tzPgWrap');
+  if (!wrap) return;
+  if (!tz.pages) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `
+    <div class="fsec">
+      <div class="fsec-h"><span class="n">1</span>Các trang
+        <span class="sp"></span><span class="tag" id="tzPgTag"></span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-n btn-sm" onclick="tzPgAll()">↺ Lấy lại mọi trang</button>
+        <button class="btn btn-n btn-sm" onclick="tzPgRotAll()">↻ Xoay tất cả 90°</button>
+      </div>
+      <div class="pg-grid" id="tzPgGrid"></div>
+    </div>`;
+  const g = $('tzPgGrid');
+  tz.pages.forEach((p, k) => {
+    const d = document.createElement('div');
+    d.className = 'pg' + (p.gone ? ' gone' : '');
+    d.innerHTML = `<span class="pg-no">${p.i + 1}</span>
+      <div class="pg-cv"></div>
+      <div class="pg-a">
+        <button onclick="tzPgMove(${k},-1)" ${k === 0 ? 'disabled' : ''} title="Sang trái">◀</button>
+        <button onclick="tzPgRot(${k})" title="Xoay 90°">↻</button>
+        <button onclick="tzPgGone(${k})" title="${p.gone ? 'Lấy lại trang' : 'Bỏ trang'}">${p.gone ? '↺' : '🗑'}</button>
+        <button onclick="tzPgMove(${k},1)" ${k === tz.pages.length - 1 ? 'disabled' : ''} title="Sang phải">▶</button>
+      </div>`;
+    const cv = tz.thumbs[p.i];
+    cv.style.transform  = `rotate(${p.rot}deg)`;
+    // trang xoay 90°/270° thì chiều dài đổi chỗ chiều rộng — hãm lại cho vừa ô
+    cv.style.maxWidth   = (p.rot % 180) ? '92px' : '100%';
+    cv.style.maxHeight  = (p.rot % 180) ? '92px' : '100%';
+    d.querySelector('.pg-cv').appendChild(cv);
+    g.appendChild(d);
+  });
+  $('tzPgTag').textContent = `giữ ${tz.pages.filter(p => !p.gone).length}/${tz.pages.length} trang`;
+  tzRenderList();
+}
+
+function tzPgMove(k, d) {
+  if (!tz.pages) return;
+  const j = k + d;
+  if (j < 0 || j >= tz.pages.length) return;
+  const t = tz.pages[k]; tz.pages[k] = tz.pages[j]; tz.pages[j] = t;
+  tzPgRender();
+}
+function tzPgRot(k) {
+  if (!tz.pages || !tz.pages[k]) return;
+  tz.pages[k].rot = (tz.pages[k].rot + 90) % 360;
+  tzPgRender();
+}
+function tzPgGone(k) {
+  if (!tz.pages || !tz.pages[k]) return;
+  tz.pages[k].gone = !tz.pages[k].gone;
+  tzHideOut();
+  tzPgRender();
+}
+function tzPgAll() {
+  if (!tz.pages) return;
+  tz.pages.forEach(p => p.gone = false);
+  tzPgRender();
+}
+function tzPgRotAll() {
+  if (!tz.pages) return;
+  tz.pages.forEach(p => p.rot = (p.rot + 90) % 360);
+  tzPgRender();
+}
+
+async function tzRunPages() {
+  if (!tz.pages || !tz.pages.length)
+    throw new Error('Chưa đọc được trang nào — hãy nạp lại file PDF.');
+  const keep = tz.pages.filter(p => !p.gone);
+  if (!keep.length) throw new Error('Mọi trang đều đã bị bỏ — phải giữ lại ít nhất một trang.');
+
+  const { PDFDocument, degrees } = PDFLib;
+  tzProg(20, 'Đang dựng file mới…');
+  const src = await PDFDocument.load(await tz.files[0].f.arrayBuffer(), { ignoreEncryption: true });
+  const out = await PDFDocument.create();
+  const cp  = await out.copyPages(src, keep.map(p => p.i));
+  cp.forEach((pg, k) => {
+    const r = keep[k].rot % 360;
+    if (r) pg.setRotation(degrees((pg.getRotation().angle + r) % 360));
+    out.addPage(pg);
+  });
+  tzProg(90, 'Đang ghi file…');
+  const bytes = await out.save();
+  const nRot = keep.filter(p => p.rot).length;
+  let note = `giữ ${keep.length}/${tz.pages.length} trang · ${fmtBytes(bytes.length)}`;
+  if (nRot) note += ` · xoay ${nRot} trang`;
+  tzDone('Đã lưu PDF mới', note,
+         [{ blob: tzPdfBlob(bytes), name: tzSafe(tzBase(tz.files[0].f.name) + ' (da sap xep)') + '.pdf' }]);
+}
+
+// ──────────────────────────────────────────────────────── NÉN PDF
+async function tzRunCompress() {
+  const cfg = TZ_CP[_tzCpMode] || TZ_CP.mid;
+  const lib = await loadPdfjs();
+  const { PDFDocument } = PDFLib;
+  const outs = [];
+  let before = 0, after = 0, nPage = 0;
+
+  for (let i = 0; i < tz.files.length; i++) {
+    const f = tz.files[i].f;
+    before += f.size;
+    const doc = await lib.getDocument({ data: new Uint8Array(await f.arrayBuffer()) }).promise;
+    const nd  = await PDFDocument.create();
+    for (let n = 1; n <= doc.numPages; n++) {
+      tzProg(3 + Math.round(((i + n / doc.numPages) / tz.files.length) * 92),
+             `${f.name} — trang ${n}/${doc.numPages}`);
+      const pg = await doc.getPage(n);
+      const v1 = pg.getViewport({ scale: 1 });
+      const vp = pg.getViewport({ scale: cfg.dpi / 72 });
+      const cv = document.createElement('canvas');
+      cv.width  = Math.max(1, Math.round(vp.width));
+      cv.height = Math.max(1, Math.round(vp.height));
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, cv.width, cv.height);
+      await pg.render({ canvasContext: ctx, viewport: vp }).promise;
+      const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', cfg.q));
+      cv.width = cv.height = 0;
+      pg.cleanup();
+      if (!blob) continue;
+      const img  = await nd.embedJpg(await blob.arrayBuffer());
+      const page = nd.addPage([v1.width, v1.height]);
+      page.drawImage(img, { x: 0, y: 0, width: v1.width, height: v1.height });
+      nPage++;
+    }
+    await doc.destroy();
+    const bytes = await nd.save();
+    after += bytes.length;
+    outs.push({ blob: tzPdfBlob(bytes), name: tzSafe(tzBase(f.name) + ' (da nen)') + '.pdf' });
+  }
+  if (!nPage) throw new Error('Không đọc được trang nào — file có thể bị khoá bằng mật khẩu.');
+
+  tzProg(97, 'Đang đóng gói…');
+  const packed = await tzPack(outs, 'PDF da nen.zip');
+  const pct = before ? Math.round((1 - after / before) * 100) : 0;
+  let note = `${fmtBytes(before)} → ${fmtBytes(after)}`;
+  note += pct > 0 ? ` · nhỏ hơn ${pct}%`
+                  : ` · KHÔNG nhỏ hơn được (file gốc đã nén tốt sẵn) — nên dùng file gốc`;
+  tzDone('Đã nén xong', note, packed);
+}
+
+// ──────────────────────────────────────────────────────── ĐÁNH SỐ TRANG
+async function tzRunNumber() {
+  const { PDFDocument, degrees } = PDFLib;
+  const fmt  = tzSel('tzNbFmt', '{n} / {t}');
+  const pos  = tzSel('tzNbPos', 'bc');
+  const size = tzInt('tzNbSize', 10, 6, 28);
+  const from = tzInt('tzNbFrom', 1, 0, 9999);
+  const mg   = tzInt('tzNbMg', 12, 3, 40) * MM;
+  const skip = tzChk('tzNbSkip1');
+  const col  = { gray: GRAY(), black: BLACK(), blue: BLUE() }[tzSel('tzNbColor', 'gray')] || GRAY();
+  const outs = [];
+  let nStamp = 0;
+
+  for (let i = 0; i < tz.files.length; i++) {
+    const f = tz.files[i].f;
+    tzProg(4 + Math.round(i / tz.files.length * 88), `Đang đánh số ${f.name}…`);
+    const doc = await PDFDocument.load(await f.arrayBuffer(), { ignoreEncryption: true });
+    const F   = await tzFonts(doc);
+    const pgs = doc.getPages();
+    const tot = pgs.length + from - 1;
+    pgs.forEach((pg, k) => {
+      if (skip && k === 0) return;
+      const t = tzClean(fmt.replace('{n}', String(from + k)).replace('{t}', String(tot)));
+      if (!t) return;
+      const d  = tzDisp(pg);
+      const tw = tzW(F.reg, t, size);
+      let u = (d.W - tw) / 2;
+      if (pos[1] === 'l') u = mg;
+      if (pos[1] === 'r') u = Math.max(mg, d.W - mg - tw);
+      const v = (pos[0] === 'b') ? mg : (d.H - mg - size * .8);
+      const p = tzMap(d, u, v);
+      pg.drawText(t, { x: p.x, y: p.y, size, font: F.reg, color: col, rotate: degrees(d.R) });
+      nStamp++;
+    });
+    const bytes = await doc.save();
+    outs.push({ blob: tzPdfBlob(bytes), name: tzSafe(tzBase(f.name) + ' (da danh so)') + '.pdf' });
+  }
+  tzProg(97, 'Đang đóng gói…');
+  const packed = await tzPack(outs, 'PDF da danh so.zip');
+  tzDone('Đã đánh số trang', `${nStamp} trang được in số`, packed);
+}
+
+// ──────────────────────────────────────────────────────── ĐÓNG DẤU CHỮ
+async function tzRunWmark() {
+  const { PDFDocument, degrees } = PDFLib;
+  const raw = ($('tzWmTx') ? $('tzWmTx').value : '').trim();
+  const txt = tzClean(raw);
+  if (!txt) { $('tzWmTx').focus(); throw new Error('Chưa nhập dòng chữ cần đóng dấu.'); }
+
+  const size0 = tzInt('tzWmSize', 60, 8, 200);
+  const op    = tzInt('tzWmOp', 18, 3, 100) / 100;
+  const ang   = parseInt(tzSel('tzWmRot', '45'), 10) || 0;
+  const tile  = tzSel('tzWmTile', 'one') === 'tile';
+  const col   = { gray: GRAY(), red: TZ_RED(), blue: BLUE() }[tzSel('tzWmColor', 'gray')] || GRAY();
+  const outs  = [];
+  let nStamp = 0;
+
+  for (let i = 0; i < tz.files.length; i++) {
+    const f = tz.files[i].f;
+    tzProg(4 + Math.round(i / tz.files.length * 88), `Đang đóng dấu ${f.name}…`);
+    const doc = await PDFDocument.load(await f.arrayBuffer(), { ignoreEncryption: true });
+    const F   = await tzFonts(doc);
+    for (const pg of doc.getPages()) {
+      const d  = tzDisp(pg);
+      const grid = tile ? [0, 1, 2] : [1];
+      const size = tile ? Math.max(8, Math.round(size0 * .55)) : size0;
+      // chữ dài hơn trang thì tự co lại cho vừa đường chéo
+      let sz = size;
+      const room = Math.max(40, (tile ? Math.min(d.W, d.H) / 3 : Math.hypot(d.W, d.H) * .86));
+      while (sz > 7 && tzW(F.bold, txt, sz) > room) sz -= 1;
+      const a = ang * Math.PI / 180;
+      const tw = tzW(F.bold, txt, sz);
+      for (const gx of grid) for (const gy of grid) {
+        const cx = tile ? d.W * (gx + .5) / 3 : d.W / 2;
+        const cy = tile ? d.H * (gy + .5) / 3 : d.H / 2;
+        const u = cx - tw / 2 * Math.cos(a) + sz * .35 * Math.sin(a);
+        const v = cy - tw / 2 * Math.sin(a) - sz * .35 * Math.cos(a);
+        const p = tzMap(d, u, v);
+        pg.drawText(txt, { x: p.x, y: p.y, size: sz, font: F.bold, color: col,
+                           opacity: op, rotate: degrees((d.R + ang) % 360) });
+      }
+      nStamp++;
+    }
+    const bytes = await doc.save();
+    outs.push({ blob: tzPdfBlob(bytes), name: tzSafe(tzBase(f.name) + ' (da dong dau)') + '.pdf' });
+  }
+  tzProg(97, 'Đang đóng gói…');
+  const packed = await tzPack(outs, 'PDF da dong dau.zip');
+  tzDone('Đã đóng dấu', `“${raw}” trên ${nStamp} trang`, packed);
+}
+
+// ──────────────────────────────────────────────────────── PDF → ẢNH
+const TZ_IMG_MAX = 300;     // số ảnh tối đa một lượt
+
+async function tzRunPdf2Img() {
+  const lib  = await loadPdfjs();
+  const fmt  = tzSel('tzP2Fmt', 'jpg');
+  const dpi  = parseInt(tzSel('tzP2Dpi', '150'), 10) || 150;
+  const q    = tzInt('tzP2Q', 90, 40, 100) / 100;
+  const type = fmt === 'png' ? 'image/png' : 'image/jpeg';
+  const outs = [];
+
+  for (let i = 0; i < tz.files.length; i++) {
+    const f    = tz.files[i].f;
+    const base = tzSafe(tzBase(f.name));
+    const doc  = await lib.getDocument({ data: new Uint8Array(await f.arrayBuffer()) }).promise;
+    if (outs.length + doc.numPages > TZ_IMG_MAX) {
+      await doc.destroy();
+      throw new Error(`Quá ${TZ_IMG_MAX} ảnh một lượt — hãy bớt file hoặc tách PDF trước.`);
+    }
+    for (let n = 1; n <= doc.numPages; n++) {
+      tzProg(3 + Math.round(((i + n / doc.numPages) / tz.files.length) * 92),
+             `${f.name} — trang ${n}/${doc.numPages}`);
+      const pg = await doc.getPage(n);
+      const vp = pg.getViewport({ scale: dpi / 72 });
+      const cv = document.createElement('canvas');
+      cv.width  = Math.max(1, Math.round(vp.width));
+      cv.height = Math.max(1, Math.round(vp.height));
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, cv.width, cv.height);
+      await pg.render({ canvasContext: ctx, viewport: vp }).promise;
+      const blob = await new Promise(r => cv.toBlob(r, type, type === 'image/jpeg' ? q : undefined));
+      cv.width = cv.height = 0;
+      pg.cleanup();
+      if (!blob) continue;
+      const nm = doc.numPages > 1
+        ? `${base} - trang ${String(n).padStart(2, '0')}.${fmt}`
+        : `${base}.${fmt}`;
+      outs.push({ blob, name: nm });
+    }
+    await doc.destroy();
+  }
+  if (!outs.length) throw new Error('Không vẽ được trang nào — file có thể bị khoá bằng mật khẩu.');
+
+  tzProg(97, 'Đang đóng gói…');
+  const packed = await tzPack(outs, tzSafe(tzBase(tz.files[0].f.name)) + ` (${fmt}).zip`);
+  const tot = outs.reduce((s, o) => s + o.blob.size, 0);
+  tzDone('Đã xuất ảnh', `${outs.length} ảnh ${fmt.toUpperCase()} · ${dpi} DPI · ${fmtBytes(tot)}`, packed);
+}
+
+// ──────────────────────────────────────────────────────── ẢNH → PDF
+async function tzRunImg2Pdf() {
+  const { PDFDocument } = PDFLib;
+  const out  = await PDFDocument.create();
+  const mode = tzSel('tzI2Size', 'auto');
+  const pad  = (mode === 'fit' ? 0 : tzInt('tzI2Pad', 8, 0, 40)) * MM;
+  const asJpg = tzChk('tzI2Jpg');
+  let n = 0, skipped = [];
+
+  for (let i = 0; i < tz.files.length; i++) {
+    const f = tz.files[i].f;
+    tzProg(4 + Math.round(i / tz.files.length * 88), `Đang thêm ${f.name}…`);
+    try {
+      let img;
+      if (asJpg) {
+        const r = await tzReencode(f, 'image/jpeg', .85);
+        img = await out.embedJpg(await r.blob.arrayBuffer());
+      } else {
+        img = await tzEmbedImg(out, f);
+      }
+      tzImgPage(out, img, mode, pad);
+      n++;
+    } catch (err) {
+      console.warn('ảnh → PDF, bỏ qua', f.name, err);
+      skipped.push(f.name);
+    }
+  }
+  if (!n) throw new Error('Không đọc được ảnh nào trong số file đã nạp.');
+
+  tzProg(95, 'Đang ghi file…');
+  const bytes = await out.save();
+  let note = `${n} ảnh → ${n} trang · ${fmtBytes(bytes.length)}`;
+  if (skipped.length) note += ` · bỏ qua: ${skipped.join(', ')}`;
+  tzDone('Đã tạo file PDF', note,
+         [{ blob: tzPdfBlob(bytes), name: tzSafe(tzBase(tz.files[0].f.name) + ' (anh)') + '.pdf' }]);
+}
+
+// ──────────────────────────────────────────────────────── ĐỔI ĐỊNH DẠNG / NÉN ẢNH
+async function tzRunImgConv() {
+  const fmt  = tzSel('tzIcFmt', 'jpg');
+  const q    = tzInt('tzIcQ', 85, 30, 100) / 100;
+  const max  = tzInt('tzIcMax', 0, 0, 12000);
+  const type = fmt === 'png' ? 'image/png' : 'image/jpeg';
+  const outs = [];
+  let before = 0, after = 0;
+
+  for (let i = 0; i < tz.files.length; i++) {
+    const f = tz.files[i].f;
+    tzProg(3 + Math.round(i / tz.files.length * 90), `Đang chuyển ${f.name}…`);
+    const r = await tzReencode(f, type, q, max || 0);
+    before += f.size; after += r.blob.size;
+    outs.push({ blob: r.blob, name: tzSafe(tzBase(f.name)) + '.' + fmt, w: r.w, h: r.h });
+  }
+  tzProg(97, 'Đang đóng gói…');
+  const packed = await tzPack(outs, `Anh ${fmt.toUpperCase()}.zip`);
+  const pct = before ? Math.round((1 - after / before) * 100) : 0;
+  let note = `${outs.length} ảnh · ${fmtBytes(before)} → ${fmtBytes(after)}`;
+  if (pct > 0) note += ` · nhỏ hơn ${pct}%`;
+  if (outs.length === 1) note += ` · ${outs[0].w} × ${outs[0].h} px`;
+  tzDone('Đã chuyển đổi xong', note, packed);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  WORD (.docx) → PDF  và  EXCEL (.xlsx) → PDF
+//
+//  Cả hai định dạng là ZIP chứa XML, nên đọc thẳng bằng tzUnzip() + DOMParser
+//  rồi dựng lại trang bằng pdf-lib — không thư viện ngoài nào.
+//
+//  GIỚI HẠN đã biết và CỐ Ý (đừng coi là lỗi):
+//   · Word: không có font chữ nghiêng trong dự án nên chữ nghiêng in ra chữ đứng;
+//     đầu/chân trang, khung chữ (text box), nhiều cột, tab-stop tự đặt và ngắt
+//     trang do Word tính đều KHÔNG được dựng lại — văn bản phải in đúng từng
+//     milimet thì vẫn mở bằng Word rồi "Lưu thành PDF".
+//   · Excel: in GIÁ TRỊ đang hiện trong ô (công thức đã tính sẵn bởi Excel),
+//     không giữ màu nền, viền riêng, biểu đồ, ảnh và ô gộp — chữ dài chỉ tràn
+//     sang các ô rỗng bên phải giống Excel.
+// ════════════════════════════════════════════════════════════════════
+
+// ──────────────────────────────── tiện ích chung cho trang chữ
+
+/** Bộ dựng trang có lề, tự sang trang khi hết chỗ */
+function tzWriter(doc, pw, ph, ml, mrt, mt, mb) {
+  const st = { pw, ph, ml, mr: mrt, mt, mb, pg: null, y: 0, n: 0 };
+  st.W = pw - ml - mrt;
+  st.newPage = () => { st.pg = doc.addPage([pw, ph]); st.y = ph - mt; st.n++; return st.pg; };
+  st.need = h => { if (!st.pg || st.y - h < st.mb) st.newPage(); };
+  return st;
+}
+
+/** Dàn các run thành dòng. run = {t, sz, b, u} | {br:true} | {img:{…}}
+ *  Trả về [{parts:[{t,font,sz,u}], w, sz} | {img}] */
+function tzLayout(runs, F, maxW, indent0) {
+  const lines = [];
+  let cur = [], curW = indent0 || 0, maxSz = 0;
+  const flush = () => {
+    // khoảng trắng thừa ở cuối dòng phải bỏ, kẻo canh giữa / canh phải lệch đi một dấu cách
+    while (cur.length && !cur[cur.length - 1].t.trim()) {
+      const p = cur.pop();
+      curW -= tzW(p.font, p.t, p.sz);
+    }
+    lines.push({ parts: cur, w: curW, sz: maxSz || 11 }); cur = []; curW = 0; maxSz = 0;
+  };
+  const add = (t, font, sz, u) => { cur.push({ t, font, sz, u }); curW += tzW(font, t, sz); maxSz = Math.max(maxSz, sz); };
+
+  for (const r of runs) {
+    if (r.br)  { flush(); continue; }
+    if (r.img) { if (cur.length) flush(); lines.push({ img: r.img }); continue; }
+    const txt = tzClean(r.t);
+    if (!txt) continue;
+    const font = r.b ? F.bold : F.reg;
+    const sz   = Math.max(4, r.sz || 11);
+    for (const tk of txt.split(/(\s+)/)) {
+      if (!tk) continue;
+      const blank = /^\s+$/.test(tk);
+      if (blank && !cur.length) continue;                  // bỏ khoảng trắng đầu dòng
+      const w = tzW(font, tk, sz);
+      if (!blank && curW + w > maxW && cur.length) flush();
+      if (w > maxW) {                                      // "từ" dài hơn cả dòng → cắt ký tự
+        let acc = '';
+        for (const ch of tk) {
+          if (curW + tzW(font, acc + ch, sz) > maxW && (acc || cur.length)) {
+            if (acc) add(acc, font, sz, r.u);
+            flush(); acc = ch;
+          } else acc += ch;
+        }
+        if (acc) add(acc, font, sz, r.u);
+        continue;
+      }
+      add(tk, font, sz, r.u);
+    }
+  }
+  flush();
+  return lines;
+}
+
+/** Vẽ một dòng đã dàn, canh theo jc (left/center/right/both) */
+function tzDrawLine(pg, ln, x0, y, availW, jc) {
+  let x = x0;
+  if (jc === 'center')             x = x0 + (availW - ln.w) / 2;
+  else if (jc === 'right' || jc === 'end') x = x0 + (availW - ln.w);
+  if (x < x0) x = x0;
+  // GỘP các đoạn liền nhau cùng mặt chữ rồi vẽ MỘT lần, kể cả đoạn chỉ có dấu cách.
+  // Vẽ từng đoạn rời và bỏ qua dấu cách thì bản in vẫn đúng, nhưng file PDF
+  // không chứa ký tự dấu cách nào — chép chữ ra sẽ dính liền ("CỔPHẦN").
+  const segs = [];
+  for (const p of ln.parts) {
+    const last = segs[segs.length - 1];
+    if (last && last.font === p.font && last.sz === p.sz && last.u === p.u) last.t += p.t;
+    else segs.push({ t: p.t, font: p.font, sz: p.sz, u: p.u });
+  }
+  for (const p of segs) {
+    const w = tzW(p.font, p.t, p.sz);
+    if (p.t) {
+      pg.drawText(p.t, { x, y, size: p.sz, font: p.font, color: BLACK() });
+      if (p.u && p.t.trim())
+        pg.drawLine({ start: { x, y: y - p.sz * .14 }, end: { x: x + w, y: y - p.sz * .14 },
+                      thickness: Math.max(.5, p.sz * .055), color: BLACK() });
+    }
+    x += w;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  WORD → PDF
+// ════════════════════════════════════════════════════════════════════
+
+/** Thông tin chung của một file .docx */
+async function tzDocxOpen(file) {
+  const zip  = tzUnzip(new Uint8Array(await file.arrayBuffer()));
+  const xdoc = await tzZXml(zip, 'word/document.xml');
+  if (!xdoc) throw new Error(`${file.name}: không thấy word/document.xml — `
+                           + 'file này có thể là .doc đời cũ, hãy mở bằng Word rồi lưu lại thành .docx.');
+  const relMap = new Map();
+  const rels = await tzZXml(zip, 'word/_rels/document.xml.rels');
+  if (rels) for (const r of tzKids(rels.documentElement, 'Relationship'))
+    relMap.set(tzAt(r, 'Id'), String(tzAt(r, 'Target') || ''));
+  return { zip, xdoc, relMap,
+           styles: tzDocxStyles(await tzZXml(zip, 'word/styles.xml')),
+           numb:   tzDocxNumb(await tzZXml(zip, 'word/numbering.xml')) };
+}
+
+/** Cỡ chữ mặc định + thuộc tính của từng style đoạn (Heading 1, Title…) */
+function tzDocxStyles(sd) {
+  const out = { defSz: 22, byId: new Map() };     // sz tính bằng NỬA point (quy ước OOXML)
+  if (!sd) return out;
+  const root = sd.documentElement;
+  const dd = tzPath(root, 'docDefaults', 'rPrDefault', 'rPr');
+  const dsz = tzAt(tzKid(dd, 'sz'), 'val');
+  if (dsz) out.defSz = parseFloat(dsz) || 22;
+  for (const st of tzKids(root, 'style')) {
+    if (tzAt(st, 'type') !== 'paragraph') continue;
+    const id = tzAt(st, 'styleId');
+    if (!id) continue;
+    const o = {}, rPr = tzKid(st, 'rPr'), pPr = tzKid(st, 'pPr');
+    if (rPr) {
+      const sz = tzAt(tzKid(rPr, 'sz'), 'val'); if (sz) o.sz = parseFloat(sz);
+      const b  = tzKid(rPr, 'b');
+      if (b) o.b = (tzAt(b, 'val') !== '0' && tzAt(b, 'val') !== 'false');
+    }
+    if (pPr) {
+      const jc = tzAt(tzKid(pPr, 'jc'), 'val'); if (jc) o.jc = jc;
+      const sp = tzKid(pPr, 'spacing');
+      if (sp) {
+        const bf = tzAt(sp, 'before'), af = tzAt(sp, 'after');
+        if (bf) o.before = parseFloat(bf) * TZ_TW;
+        if (af) o.after  = parseFloat(af) * TZ_TW;
+      }
+    }
+    // Heading 1/2/3 trong file không khai cỡ chữ thì vẫn phải to hơn chữ thường
+    const m = /^Heading([1-6])$/i.exec(id.replace(/\s/g, ''));
+    if (m && !o.sz) { o.sz = [32, 28, 26, 24, 24, 24][parseInt(m[1], 10) - 1]; o.b = true; }
+    if (/^Title$/i.test(id) && !o.sz) { o.sz = 36; o.b = true; }
+    out.byId.set(id, o);
+  }
+  return out;
+}
+
+/** Số thứ tự theo đúng kiểu Word đã khai: 1. · I. · a) … */
+function tzNumLbl(fmt, n) {
+  const roman = v => {
+    const T = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],
+               [40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+    let o = '';
+    for (const [x, c] of T) while (v >= x) { o += c; v -= x; }
+    return o || 'I';
+  };
+  const letter = v => {
+    let o = '';
+    v = Math.max(1, v);
+    while (v > 0) { v--; o = String.fromCharCode(65 + (v % 26)) + o; v = Math.floor(v / 26); }
+    return o;
+  };
+  if (fmt === 'upperRoman') return roman(n) + '.';
+  if (fmt === 'lowerRoman') return roman(n).toLowerCase() + '.';
+  if (fmt === 'upperLetter') return letter(n) + '.';
+  if (fmt === 'lowerLetter') return letter(n).toLowerCase() + ')';
+  return n + '.';
+}
+
+/** numId → kiểu đánh dấu của từng cấp (bullet hay số) */
+function tzDocxNumb(nd) {
+  const out = { fmt: new Map(), count: new Map() };
+  if (!nd) return out;
+  const root = nd.documentElement;
+  const abs = new Map();
+  for (const a of tzKids(root, 'abstractNum')) {
+    const id = tzAt(a, 'abstractNumId');
+    const lv = new Map();
+    for (const l of tzKids(a, 'lvl'))
+      lv.set(parseInt(tzAt(l, 'ilvl'), 10) || 0, String(tzAt(tzKid(l, 'numFmt'), 'val') || 'bullet'));
+    abs.set(id, lv);
+  }
+  for (const n of tzKids(root, 'num')) {
+    const id = tzAt(n, 'numId');
+    const a  = tzAt(tzKid(n, 'abstractNumId'), 'val');
+    if (id && abs.has(a)) out.fmt.set(id, abs.get(a));
+  }
+  return out;
+}
+
+/** Ảnh nhúng của một <w:drawing> / <w:pict> */
+function tzDocxImgRef(el) {
+  const all  = Array.from(el.getElementsByTagName('*'));
+  const blip = all.find(n => n.localName === 'blip' || n.localName === 'imagedata');
+  if (!blip) return null;
+  const id = tzAt(blip, 'embed') || tzAt(blip, 'link') || tzAt(blip, 'id');
+  if (!id) return null;
+  const ex = all.find(n => n.localName === 'extent');
+  const cx = ex ? parseFloat(tzAt(ex, 'cx')) * TZ_EMU : 0;
+  const cy = ex ? parseFloat(tzAt(ex, 'cy')) * TZ_EMU : 0;
+  return { id, cx: isFinite(cx) ? cx : 0, cy: isFinite(cy) ? cy : 0 };
+}
+
+/** Các run của một đoạn <w:p>, đã gộp thuộc tính của style đoạn */
+function tzDocxRuns(p, S, styleId) {
+  const base = S.byId.get(styleId) || {};
+  const out = [];
+  const walk = node => {
+    for (const c of Array.from(node.children)) {
+      const ln = c.localName;
+      if (ln === 'r') {
+        const rPr = tzKid(c, 'rPr');
+        let sz = base.sz || S.defSz, b = !!base.b, u = false;
+        if (rPr) {
+          const s2 = tzAt(tzKid(rPr, 'sz'), 'val'); if (s2) sz = parseFloat(s2) || sz;
+          const be = tzKid(rPr, 'b');
+          if (be) b = (tzAt(be, 'val') !== '0' && tzAt(be, 'val') !== 'false');
+          const ue = tzKid(rPr, 'u');
+          if (ue && tzAt(ue, 'val') !== 'none') u = true;
+          if (tzKid(rPr, 'vanish')) continue;          // chữ ẩn trong Word thì không in
+        }
+        for (const t of Array.from(c.children)) {
+          const tn = t.localName;
+          if (tn === 't')        out.push({ t: t.textContent || '', sz: sz / 2, b, u });
+          else if (tn === 'br')  out.push({ br: true });
+          else if (tn === 'tab') out.push({ t: '    ', sz: sz / 2, b, u: false });
+          else if (tn === 'drawing' || tn === 'pict' || tn === 'object') {
+            const im = tzDocxImgRef(t); if (im) out.push({ img: im });
+          }
+        }
+      } else if (ln === 'hyperlink' || ln === 'smartTag' || ln === 'sdt'
+              || ln === 'sdtContent' || ln === 'ins' || ln === 'bookmarkStart') {
+        walk(c);
+      }
+    }
+  };
+  walk(p);
+  return out;
+}
+
+/** Khổ giấy + lề lấy từ <w:sectPr> cuối thân văn bản */
+function tzDocxSect(body, force) {
+  const sp = tzKid(body, 'sectPr');
+  const sz = tzKid(sp, 'pgSz'), mr = tzKid(sp, 'pgMar');
+  const g = (el, a, d) => { const v = el ? tzAt(el, a) : null; const n = parseFloat(v); return isFinite(n) ? n * TZ_TW : d; };
+  let w = g(sz, 'w', A4.w), h = g(sz, 'h', A4.h);
+  if (force === 'a4')  { w = A4.w; h = A4.h; }
+  if (force === 'a4l') { w = A4.h; h = A4.w; }
+  const mg = 2 * MM * 10;                              // 20mm — lề dự phòng khi file không khai
+  return { w: Math.max(200, w), h: Math.max(200, h),
+           ml: g(mr, 'left', mg), mr: g(mr, 'right', mg),
+           mt: g(mr, 'top', mg),  mb: g(mr, 'bottom', mg) };
+}
+
+/** Một file .docx → Uint8Array của PDF */
+async function tzDocxToPdf(file, opt, rep) {
+  const { PDFDocument } = PDFLib;
+  const D   = await tzDocxOpen(file);
+  const doc = await PDFDocument.create();
+  const F   = await tzFonts(doc);
+  const body = tzKid(D.xdoc.documentElement, 'body');
+  if (!body) throw new Error(file.name + ': thân văn bản rỗng.');
+
+  if (opt.sz) D.styles.defSz = opt.sz * 2;
+  const sect = tzDocxSect(body, opt.size);
+  const wr   = tzWriter(doc, sect.w, sect.h, sect.ml, sect.mr, sect.mt, sect.mb);
+  wr.newPage();
+
+  // ảnh nhúng: nhúng MỘT LẦN cho mỗi rId, dùng lại ở mọi chỗ xuất hiện
+  const imgCache = new Map();
+  const getImg = async rid => {
+    if (!opt.withImg) return null;
+    if (imgCache.has(rid)) return imgCache.get(rid);
+    let em = null;
+    try {
+      let tgt = D.relMap.get(rid) || '';
+      if (tgt) {
+        tgt = tgt.replace(/^\.\//, '');
+        const path = tgt.charAt(0) === '/' ? tgt.slice(1) : 'word/' + tgt;
+        const bytes = await tzZGet(D.zip, path);
+        if (bytes) {
+          const ext = extOf(path);
+          if (ext === '.png')  em = await doc.embedPng(bytes);
+          else if (ext === '.jpg' || ext === '.jpeg') em = await doc.embedJpg(bytes);
+          else {                                        // emf/wmf/gif/tiff → vẽ lại qua canvas
+            const r = await tzReencode(new File([bytes], 'x' + ext), 'image/jpeg', .9);
+            em = await doc.embedJpg(await r.blob.arrayBuffer());
+          }
+        }
+      }
+    } catch (e) { console.warn('Word → PDF: bỏ qua ảnh', rid, e); }
+    imgCache.set(rid, em);
+    return em;
+  };
+
+  const blocks = Array.from(body.children).filter(c => c.localName === 'p' || c.localName === 'tbl');
+  const nb = blocks.length || 1;
+  const listCnt = new Map();
+
+  for (let bi = 0; bi < blocks.length; bi++) {
+    if (!(bi % 12)) rep(Math.round(bi / nb * 100));
+    const el = blocks[bi];
+    if (el.localName === 'tbl') { await tzDocxTable(el, D, F, wr, getImg); listCnt.clear(); continue; }
+
+    const pPr = tzKid(el, 'pPr');
+    const sid = tzAt(tzKid(pPr, 'pStyle'), 'val') || '';
+    const sty = D.styles.byId.get(sid) || {};
+    const jc  = tzAt(tzKid(pPr, 'jc'), 'val') || sty.jc || 'left';
+    const ind = tzKid(pPr, 'ind');
+    let indL = 0, ind1 = 0;
+    if (ind) {
+      const l = parseFloat(tzAt(ind, 'left') || tzAt(ind, 'start'));
+      const f = parseFloat(tzAt(ind, 'firstLine'));
+      if (isFinite(l)) indL = Math.max(0, Math.min(wr.W * .6, l * TZ_TW));
+      if (isFinite(f)) ind1 = Math.max(0, Math.min(wr.W * .4, f * TZ_TW));
+    }
+    const sp = tzKid(pPr, 'spacing');
+    let before = sty.before || 0, after = sty.after != null ? sty.after : 3;
+    if (sp) {
+      const bf = parseFloat(tzAt(sp, 'before')), af = parseFloat(tzAt(sp, 'after'));
+      if (isFinite(bf)) before = bf * TZ_TW;
+      if (isFinite(af)) after  = af * TZ_TW;
+    }
+    // giãn dòng: w:line theo đơn vị 1/240 dòng khi lineRule = auto
+    let lhMul = 1.32;
+    if (sp) {
+      const line = parseFloat(tzAt(sp, 'line'));
+      const rule = tzAt(sp, 'lineRule') || 'auto';
+      if (isFinite(line) && rule === 'auto') lhMul = Math.max(1, Math.min(3, line / 240 * 1.32));
+    }
+    if (tzKid(pPr, 'pageBreakBefore')) wr.newPage();
+
+    // đánh dấu danh sách
+    let bullet = '';
+    const np = tzKid(pPr, 'numPr');
+    if (np) {
+      const numId = tzAt(tzKid(np, 'numId'), 'val');
+      const ilvl  = parseInt(tzAt(tzKid(np, 'ilvl'), 'val'), 10) || 0;
+      const lv    = D.numb.fmt.get(numId);
+      const fmt   = lv ? (lv.get(ilvl) || 'bullet') : 'bullet';
+      if (fmt === 'bullet') bullet = ilvl ? '◦  ' : '•  ';
+      else {
+        const key = numId + '|' + ilvl;
+        const n = (listCnt.get(key) || 0) + 1;
+        listCnt.set(key, n);
+        bullet = tzNumLbl(fmt, n) + '  ';
+      }
+      indL += ilvl * 18 + 14;
+    }
+
+    const runs = tzDocxRuns(el, D.styles, sid);
+    const hasImg = runs.some(r => r.img);
+    if (!runs.length || (!hasImg && !runs.some(r => (r.t || '').trim()))) {
+      wr.need(D.styles.defSz / 2 * 1.2);
+      wr.y -= (D.styles.defSz / 2) * 1.2 + after;        // đoạn trống = một dòng trống
+      continue;
+    }
+    if (bullet) runs.unshift({ t: bullet, sz: (runs[0].sz || D.styles.defSz / 2), b: false });
+
+    wr.y -= before;
+    const availW = Math.max(40, wr.W - indL);
+    const lines  = tzLayout(runs, F, availW, ind1);
+    for (const ln of lines) {
+      if (ln.img) {
+        const em = await getImg(ln.img.id);
+        if (!em) continue;
+        let iw = ln.img.cx || em.width * .75, ih = ln.img.cy || em.height * .75;
+        const k = Math.min(1, availW / iw, (wr.ph - wr.mt - wr.mb) / ih);
+        iw *= k; ih *= k;
+        wr.need(ih + 4);
+        const x = (jc === 'center') ? wr.ml + indL + (availW - iw) / 2
+                : (jc === 'right')  ? wr.ml + indL + (availW - iw) : wr.ml + indL;
+        wr.pg.drawImage(em, { x, y: wr.y - ih, width: iw, height: ih });
+        wr.y -= ih + 4;
+        continue;
+      }
+      const lh = ln.sz * lhMul;
+      wr.need(lh);
+      tzDrawLine(wr.pg, ln, wr.ml + indL, wr.y - ln.sz * .86, availW, jc);
+      wr.y -= lh;
+    }
+    wr.y -= after;
+  }
+  rep(100);
+  return doc.save();
+}
+
+/** Một bảng <w:tbl> — kẻ lưới, chữ trong ô tự ngắt dòng, hàng không vừa thì sang trang */
+async function tzDocxTable(tbl, D, F, wr, getImg) {
+  const grid = tzKids(tzKid(tbl, 'tblGrid'), 'gridCol')
+                 .map(g => Math.max(10, (parseFloat(tzAt(g, 'w')) || 0) * TZ_TW));
+  const rows = tzKids(tbl, 'tr');
+  if (!rows.length) return;
+  let nCol = grid.length;
+  if (!nCol) nCol = Math.max.apply(null, rows.map(r => tzKids(r, 'tc').length));
+  let cw = grid.length ? grid.slice() : new Array(nCol).fill(wr.W / nCol);
+  const tot = cw.reduce((s, x) => s + x, 0) || wr.W;
+  if (tot > wr.W) { const k = wr.W / tot; cw = cw.map(x => x * k); }   // bảng rộng hơn lề → co lại
+
+  const PAD = 3;
+  wr.y -= 3;
+  for (const tr of rows) {
+    const cells = tzKids(tr, 'tc');
+    // dàn chữ từng ô trước để biết chiều cao hàng
+    const laid = [];
+    let ci = 0;
+    for (const tc of cells) {
+      const span = parseInt(tzAt(tzPath(tc, 'tcPr', 'gridSpan'), 'val'), 10) || 1;
+      let w = 0;
+      for (let k = 0; k < span; k++) w += (cw[ci + k] || cw[cw.length - 1] || 60);
+      const runs = [];
+      for (const p of tzKids(tc, 'p')) {
+        const sid = tzAt(tzPath(p, 'pPr', 'pStyle'), 'val') || '';
+        if (runs.length) runs.push({ br: true });
+        runs.push.apply(runs, tzDocxRuns(p, D.styles, sid));
+      }
+      const jc = tzAt(tzPath(tzKids(tc, 'p')[0] || tc, 'pPr', 'jc'), 'val') || 'left';
+      const lines = tzLayout(runs.length ? runs : [{ t: ' ', sz: D.styles.defSz / 2 }],
+                             F, Math.max(16, w - 2 * PAD), 0);
+      laid.push({ x: ci, span, w, lines, jc });
+      ci += span;
+    }
+    const rowH = Math.max(14, laid.reduce((m, c) => {
+      const h = c.lines.reduce((s, l) => s + (l.img ? 12 : l.sz * 1.3), 0) + 2 * PAD;
+      return Math.max(m, h);
+    }, 0));
+    // hàng cao hơn cả vùng in thì không có cách nào chia — cứ in ở trang mới
+    wr.need(Math.min(rowH, wr.ph - wr.mt - wr.mb - 1));
+
+    let x = wr.ml;
+    const top = wr.y;
+    for (const c of laid) {
+      wr.pg.drawRectangle({ x, y: top - rowH, width: c.w, height: rowH,
+                            borderColor: LGRAY(), borderWidth: .6 });
+      let ty = top - PAD;
+      for (const ln of c.lines) {
+        if (ln.img) { ty -= 12; continue; }
+        if (ty - ln.sz < top - rowH) break;
+        tzDrawLine(wr.pg, ln, x + PAD, ty - ln.sz * .86, Math.max(10, c.w - 2 * PAD), c.jc);
+        ty -= ln.sz * 1.3;
+      }
+      x += c.w;
+    }
+    wr.y = top - rowH;
+  }
+  wr.y -= 6;
+}
+
+async function tzRunDoc2Pdf() {
+  const opt = { size: tzSel('tzDcSize', 'doc'), sz: tzInt('tzDcSz', 0, 0, 36),
+                withImg: tzChk('tzDcImg') };
+  const outs = [];
+  for (let i = 0; i < tz.files.length; i++) {
+    const f = tz.files[i].f;
+    const bump = p => tzProg(3 + Math.round(((i + p / 100) / tz.files.length) * 92),
+                             `${f.name} — ${p}%`);
+    bump(0);
+    const bytes = await tzDocxToPdf(f, opt, bump);
+    outs.push({ blob: tzPdfBlob(bytes), name: tzSafe(tzBase(f.name)) + '.pdf' });
+  }
+  tzProg(97, 'Đang đóng gói…');
+  const packed = await tzPack(outs, 'Word sang PDF.zip');
+  const tot = outs.reduce((s, o) => s + o.blob.size, 0);
+  tzDone('Đã chuyển sang PDF',
+         `${outs.length} file · ${fmtBytes(tot)} · chữ nghiêng in ra chữ đứng, `
+       + 'đầu/chân trang của Word không được dựng lại', packed);
+}
+
+// ════════════════════════════════════════════════════════════════════
+//  EXCEL → PDF
+// ════════════════════════════════════════════════════════════════════
+
+/** "BC12" → 54 (chỉ số cột tính từ 0) */
+function tzColIdx(ref) {
+  let n = 0;
+  for (const ch of String(ref)) {
+    const c = ch.charCodeAt(0);
+    if (c >= 65 && c <= 90) n = n * 26 + (c - 64);
+    else if (c >= 97 && c <= 122) n = n * 26 + (c - 96);
+    else break;
+  }
+  return Math.max(0, n - 1);
+}
+
+/** Số serial của Excel → chuỗi ngày DD/MM/YYYY (kèm giờ nếu có phần thập phân) */
+function tzSerialDate(n) {
+  if (!isFinite(n) || n < 1 || n > 2958466) return String(n);
+  // 25569 = 01/01/1970 theo lịch Excel. Excel coi 29/02/1900 là ngày thật (lỗi của chính nó),
+  // nên mọi số từ 60 trở xuống lệch đi một ngày so với lịch thật
+  const ms = Math.round((n - (n < 61 ? 25568 : 25569)) * 86400000);
+  const d  = new Date(ms);
+  if (isNaN(d)) return String(n);
+  const p = x => String(x).padStart(2, '0');
+  const s = `${p(d.getUTCDate())}/${p(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
+  const frac = n - Math.floor(n);
+  if (frac > 1 / 86400) return s + ` ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+  return s;
+}
+
+/** Số thành chuỗi gọn: bỏ đuôi 0 vô nghĩa của số thực nhị phân */
+function tzNumFmt(n) {
+  if (!isFinite(n)) return '';
+  if (Number.isInteger(n)) return String(n);
+  const s = n.toPrecision(12).replace(/0+$/, '').replace(/\.$/, '');
+  return String(parseFloat(s));
+}
+
+/** Tập chỉ số cellXf có định dạng ngày/giờ */
+function tzXlsxDateXf(sd) {
+  const set = new Set();
+  if (!sd) return set;
+  const root = sd.documentElement;
+  const custom = new Map();
+  for (const n of tzKids(tzKid(root, 'numFmts'), 'numFmt')) {
+    const id = parseInt(tzAt(n, 'numFmtId'), 10);
+    if (isFinite(id)) custom.set(id, String(tzAt(n, 'formatCode') || ''));
+  }
+  const isDate = id => {
+    if ((id >= 14 && id <= 22) || (id >= 45 && id <= 47)) return true;
+    if (!custom.has(id)) return false;
+    const code = custom.get(id).replace(/\[[^\]]*\]/g, '').replace(/"[^"]*"/g, '');
+    return /[yY]{2}|[dD]{1,2}|mmm|h{1,2}:/.test(code);
+  };
+  let i = 0;
+  for (const xf of tzKids(tzKid(root, 'cellXfs'), 'xf')) {
+    const id = parseInt(tzAt(xf, 'numFmtId'), 10);
+    if (isFinite(id) && isDate(id)) set.add(i);
+    i++;
+  }
+  return set;
+}
+
+async function tzXlsxOpen(file) {
+  const zip = tzUnzip(new Uint8Array(await file.arrayBuffer()));
+  const wb  = await tzZXml(zip, 'xl/workbook.xml');
+  if (!wb) throw new Error(`${file.name}: không thấy xl/workbook.xml — `
+                         + 'file này có thể là .xls đời cũ, hãy mở bằng Excel rồi lưu lại thành .xlsx.');
+  const rmap = new Map();
+  const rels = await tzZXml(zip, 'xl/_rels/workbook.xml.rels');
+  if (rels) for (const r of tzKids(rels.documentElement, 'Relationship'))
+    rmap.set(tzAt(r, 'Id'), String(tzAt(r, 'Target') || ''));
+
+  const sst = [];
+  const sd  = await tzZXml(zip, 'xl/sharedStrings.xml');
+  if (sd) for (const si of tzKids(sd.documentElement, 'si')) {
+    let s = '';
+    for (const n of Array.from(si.getElementsByTagName('*')))
+      if (n.localName === 't' && n.parentNode.localName !== 'rPh') s += n.textContent || '';
+    sst.push(s);
+  }
+
+  const sheets = [];
+  for (const sh of tzKids(tzKid(wb.documentElement, 'sheets'), 'sheet')) {
+    if (tzAt(sh, 'state') === 'hidden' || tzAt(sh, 'state') === 'veryHidden') continue;
+    let tgt = rmap.get(tzAt(sh, 'id'));
+    if (!tgt) continue;
+    tgt = tgt.replace(/^\.\//, '');
+    sheets.push({ name: String(tzAt(sh, 'name') || 'Sheet'),
+                  path: tgt.charAt(0) === '/' ? tgt.slice(1) : 'xl/' + tgt });
+  }
+  if (!sheets.length) throw new Error(file.name + ': không có sheet nào hiện ra được.');
+  return { zip, sst, dateXf: tzXlsxDateXf(await tzZXml(zip, 'xl/styles.xml')), sheets };
+}
+
+function tzXlsxVal(ctx, c) {
+  const t = tzAt(c, 't');
+  if (t === 'inlineStr') {
+    let s = '';
+    const is = tzKid(c, 'is');
+    if (is) for (const n of Array.from(is.getElementsByTagName('*')))
+      if (n.localName === 't') s += n.textContent || '';
+    return s;
+  }
+  const vEl = tzKid(c, 'v');
+  const v = vEl ? (vEl.textContent || '') : '';
+  if (t === 's')   { const i = parseInt(v, 10); return ctx.sst[i] != null ? ctx.sst[i] : ''; }
+  if (t === 'str') return v;
+  if (t === 'b')   return v === '1' ? 'TRUE' : 'FALSE';
+  if (t === 'e')   return v;
+  if (v === '')    return '';
+  const num = parseFloat(v);
+  if (!isFinite(num)) return v;
+  const xf = parseInt(tzAt(c, 's'), 10);
+  if (isFinite(xf) && ctx.dateXf.has(xf)) return tzSerialDate(num);
+  return tzNumFmt(num);
+}
+
+/** Một sheet → {name, cols:[pt], rows:[[chuỗi]]} */
+async function tzXlsxSheet(ctx, sh) {
+  const d = await tzZXml(ctx.zip, sh.path);
+  if (!d) return null;
+  const root = d.documentElement;
+
+  const colCh = new Map();                       // chỉ số cột → bề ngang (ký tự)
+  for (const c of tzKids(tzKid(root, 'cols'), 'col')) {
+    const a = parseInt(tzAt(c, 'min'), 10), b = parseInt(tzAt(c, 'max'), 10);
+    const w = parseFloat(tzAt(c, 'width'));
+    if (!isFinite(a) || !isFinite(w)) continue;
+    for (let i = a; i <= Math.min(isFinite(b) ? b : a, a + 400); i++) colCh.set(i - 1, w);
+  }
+
+  const dense = [];
+  let maxC = 0, lastR = 0;
+  for (const r of tzKids(tzKid(root, 'sheetData'), 'row')) {
+    const ri = parseInt(tzAt(r, 'r'), 10);
+    if (!isFinite(ri)) continue;
+    const cells = [];
+    for (const c of tzKids(r, 'c')) {
+      const ci = tzColIdx(tzAt(c, 'r') || '');
+      const v  = tzXlsxVal(ctx, c);
+      if (v === '' || v == null) continue;
+      cells[ci] = String(v);
+      if (ci + 1 > maxC) maxC = ci + 1;
+    }
+    if (cells.length) { dense[ri - 1] = cells; lastR = ri; }
+  }
+  if (!maxC || !lastR) return { name: sh.name, cols: [], rows: [] };
+
+  // Sheet khổng lồ thì cắt bớt, kẻo ra PDF nghìn trang và treo tab
+  const cap = Math.min(lastR, TZ_XL_MAXROW);
+  const rows = [];
+  for (let i = 0; i < cap; i++) {
+    const src = dense[i] || [];
+    const row = new Array(maxC);
+    for (let j = 0; j < maxC; j++) row[j] = src[j] || '';
+    rows.push(row);
+  }
+  const cut = lastR - cap;
+  // bỏ các hàng trống ở cuối đã xử lý bởi lastR; bỏ hàng trống đầu bảng
+  while (rows.length && rows[0].every(x => !x)) rows.shift();
+
+  // bề ngang: 1 ký tự ≈ 7px, +5px lề trong của Excel; px → pt là × 0.75
+  const cols = [];
+  for (let j = 0; j < maxC; j++) {
+    const ch = colCh.has(j) ? colCh.get(j) : 8.43;
+    cols.push(Math.max(14, Math.min(380, (ch * 7 + 5) * .75)));
+  }
+  return { name: sh.name, cols, rows, cut };
+}
+
+/** Vẽ một sheet thành các trang PDF */
+function tzXlsxDraw(doc, F, sheet, o) {
+  const pw = o.land ? A4.h : A4.w, ph = o.land ? A4.w : A4.h;
+  const mg = 10 * MM;
+  const wr = tzWriter(doc, pw, ph, mg, mg, mg, mg);
+  const sz = o.sz, rowH = Math.max(11, sz * 1.65), hdrH = sz * 1.5;
+
+  if (!sheet.rows.length) {
+    wr.newPage();
+    wr.pg.drawText(tzClean(sheet.name + ' — sheet trống'),
+                   { x: wr.ml, y: wr.y - sz, size: sz, font: F.bold, color: DGRAY() });
+    return;
+  }
+
+  // chia cột thành các khối vừa bề ngang trang
+  let cols = sheet.cols.slice();
+  const totW = cols.reduce((s, x) => s + x, 0);
+  let k = 1;
+  if (o.fit && totW > wr.W) k = Math.max(.42, wr.W / totW);
+  if (k !== 1) cols = cols.map(x => Math.max(12, x * k));
+
+  const blocks = [];
+  let cur = [], w = 0;
+  cols.forEach((cwi, j) => {
+    if (w + cwi > wr.W && cur.length) { blocks.push(cur); cur = []; w = 0; }
+    cur.push(j); w += cwi;
+  });
+  if (cur.length) blocks.push(cur);
+
+  const head = o.head ? sheet.rows[0] : null;
+  const body = o.head ? sheet.rows.slice(1) : sheet.rows;
+
+  for (let bi = 0; bi < blocks.length; bi++) {
+    const blk = blocks[bi];
+    wr.newPage();
+    const title = () => {
+      const t = tzClean(sheet.name + (blocks.length > 1 ? `  (cột ${blk[0] + 1}–${blk[blk.length - 1] + 1})` : ''));
+      wr.pg.drawText(t, { x: wr.ml, y: wr.y - sz * 1.1, size: sz * 1.15, font: F.bold, color: BLUE() });
+      wr.y -= sz * 1.15 + 6;
+    };
+    const drawRow = (row, bold, h) => {
+      let x = wr.ml;
+      const top = wr.y;
+      blk.forEach((j, idx) => {
+        const cwj = cols[j];
+        if (o.grid) wr.pg.drawRectangle({ x, y: top - h, width: cwj, height: h,
+                                          borderColor: LGRAY(), borderWidth: .5 });
+        let txt = tzClean(row[j] || '');
+        if (txt) {
+          // chữ dài được tràn sang các ô RỖNG bên phải, giống Excel
+          let room = cwj - 4;
+          for (let n = idx + 1; n < blk.length && !(row[blk[n]] || ''); n++) room += cols[blk[n]];
+          const fnt = bold ? F.bold : F.reg;
+          const num = /^[-+]?[\d.,%\s]+$/.test(txt) && txt.trim() !== '';
+          txt = tzEllip(fnt, txt, sz, room);
+          const tw = tzW(fnt, txt, sz);
+          const tx = num ? x + Math.max(2, cwj - 2 - tw) : x + 2;     // số canh phải như Excel
+          wr.pg.drawText(txt, { x: tx, y: top - h + (h - sz) / 2 + sz * .2,
+                                size: sz, font: fnt, color: BLACK() });
+        }
+        x += cwj;
+      });
+      wr.y = top - h;
+    };
+
+    title();
+    if (head) drawRow(head, true, hdrH);
+    for (const row of body) {
+      if (wr.y - rowH < wr.mb) {
+        wr.newPage();
+        title();
+        if (head) drawRow(head, true, hdrH);
+      }
+      drawRow(row, false, rowH);
+    }
+  }
+}
+
+async function tzRunXls2Pdf() {
+  const { PDFDocument } = PDFLib;
+  const want = tzSel('tzXlSize', 'auto');
+  const o = { sz: tzInt('tzXlSz', 9, 5, 20), fit: tzChk('tzXlFit'),
+              head: tzChk('tzXlHead'), grid: tzChk('tzXlGrid') };
+  const outs = [];
+  let nSheet = 0, nCut = 0;
+
+  for (let i = 0; i < tz.files.length; i++) {
+    const f = tz.files[i].f;
+    tzProg(3 + Math.round(i / tz.files.length * 60), `Đang đọc ${f.name}…`);
+    const ctx = await tzXlsxOpen(f);
+    const doc = await PDFDocument.create();
+    const F   = await tzFonts(doc);
+    for (let s = 0; s < ctx.sheets.length; s++) {
+      tzProg(3 + Math.round(((i + (s + 1) / ctx.sheets.length) / tz.files.length) * 92),
+             `${f.name} — sheet ${ctx.sheets[s].name}`);
+      const sheet = await tzXlsxSheet(ctx, ctx.sheets[s]);
+      if (!sheet) continue;
+      if (sheet.cut > 0) nCut += sheet.cut;
+      const totW = sheet.cols.reduce((x, y) => x + y, 0);
+      const land = want === 'a4l' || (want === 'auto' && totW > A4.w - 20 * MM);
+      tzXlsxDraw(doc, F, sheet, Object.assign({ land }, o));
+      nSheet++;
+    }
+    if (!doc.getPageCount()) throw new Error(f.name + ': không đọc được ô nào có dữ liệu.');
+    outs.push({ blob: tzPdfBlob(await doc.save()), name: tzSafe(tzBase(f.name)) + '.pdf' });
+  }
+  tzProg(97, 'Đang đóng gói…');
+  const packed = await tzPack(outs, 'Excel sang PDF.zip');
+  const tot = outs.reduce((s, x) => s + x.blob.size, 0);
+  let note = `${outs.length} file · ${nSheet} sheet · ${fmtBytes(tot)} · `
+           + 'chỉ in giá trị trong ô, không giữ màu nền và biểu đồ';
+  if (nCut) note += ` · ĐÃ CẮT ${nCut} hàng vượt mức ${TZ_XL_MAXROW} hàng/sheet`;
+  tzDone('Đã chuyển sang PDF', note, packed);
+}
 </script>
 
 </body>

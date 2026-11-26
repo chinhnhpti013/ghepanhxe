@@ -227,9 +227,15 @@ td{color:var(--text-2)}
     <a class="lv2" href="#tao-ban-moi">13. Tạo bản mới &amp; nút Back của trình duyệt</a>
   </div>
   <div class="nav-g">
-    <a href="#thiet-ke">B · Thông số bản ảnh</a>
-    <a href="#su-co">C · Xử lý sự cố</a>
-    <a href="#faq">D · Câu hỏi thường gặp</a>
+    <a href="#cong-cu">B · Công cụ file (màn hình 3)</a>
+    <a class="lv2" href="#cc-dung">B1. Cách dùng</a>
+    <a class="lv2" href="#cc-pdf">B2. Nối · tách · sắp xếp · nén · đánh số · đóng dấu</a>
+    <a class="lv2" href="#cc-doi">B3. Chuyển đổi định dạng</a>
+  </div>
+  <div class="nav-g">
+    <a href="#thiet-ke">C · Thông số bản ảnh</a>
+    <a href="#su-co">D · Xử lý sự cố</a>
+    <a href="#faq">E · Câu hỏi thường gặp</a>
   </div>
 </nav>
 
@@ -249,6 +255,12 @@ td{color:var(--text-2)}
      camera</b> điện thoại hay webcam; có xem trước đúng như bản in, sửa chú thích từng ảnh,
      tự đánh số thứ tự ảnh và lưu hồ sơ lại để mở sau. Dùng được trên máy tính, máy tính bảng
      và điện thoại.</p>
+
+  <h3>Thêm một bộ công cụ file</h3>
+  <p>Ngoài việc lập bản ảnh, ứng dụng còn có mục <b>3 · Công cụ file</b> để
+     <b>nối, tách, sắp xếp, nén, đánh số trang, đóng dấu PDF</b> và <b>chuyển đổi</b>
+     giữa Word, Excel, JPG, PNG và PDF — xem mục <a href="#cong-cu">B</a>.
+     Tất cả cũng chạy ngay trong máy, không tải file lên internet.</p>
 
   <div class="note">
     🔒 <b>Toàn bộ ảnh được xử lý ngay trên máy của bạn.</b> Web app không tải ảnh, thông tin
@@ -981,8 +993,117 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 </section>
 
 <!-- ════════════════════════════════════════════════════ -->
+<section id="cong-cu">
+  <h2 class="sec">🧰 B · Công cụ file (màn hình 3)</h2>
+
+  <p>Mục <b>3 · Công cụ file</b> trên thanh bước là một <b>bộ công cụ riêng</b>, không liên quan gì
+     tới bản ảnh giám định đang làm: vào được bất cứ lúc nào, <b>không cần nhập thông tin hồ sơ
+     cũng không cần chọn ảnh</b>, và cũng không làm mất ảnh đang làm dở ở bước 1.</p>
+
+  <div class="note">
+    🔒 <b>File không rời khỏi máy bạn.</b> Mọi việc nối, tách, nén, chuyển đổi đều chạy ngay trong
+    trình duyệt — không tải file lên bất kỳ máy chủ nào. Khác hẳn các trang web cùng loại trên mạng,
+    nên <b>dùng được cho hồ sơ có thông tin khách hàng</b>.
+  </div>
+
+  <h3 id="cc-dung">B1. Cách dùng</h3>
+  <ol class="steps">
+    <li>Bấm mục <b>3 · Công cụ file</b> trên thanh bước.</li>
+    <li>Chọn một ô công cụ trong lưới.</li>
+    <li><b>Kéo thả</b> file vào khung, hoặc bấm <b>Chọn file</b>. Công cụ nào nhận nhiều file thì
+        sắp lại thứ tự bằng nút <b>▲ ▼</b>, bỏ bớt bằng <b>🗑</b>.</li>
+    <li>Chỉnh các tùy chọn rồi bấm nút <b>chạy</b> màu xanh ở dưới.</li>
+    <li>Bấm nút tải ở khối kết quả. <b>Ra nhiều file thì tải về một file ZIP.</b></li>
+  </ol>
+  <p>Bấm <b>← Tất cả công cụ</b> để quay lại lưới, hoặc <b>← Về Lập bản ảnh</b> ở thanh dưới
+     để về bước 1 — ảnh và thông tin đang làm vẫn còn nguyên.</p>
+
+  <h3 id="cc-pdf">B2. Nhóm làm việc với PDF</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:24%">Công cụ</th><th style="width:21%">Nhận</th><th>Làm gì</th></tr>
+    <tr><td>🔗 <b>Nối PDF</b></td><td>PDF · JPG · PNG<br>(từ 2 file)</td>
+        <td>Ghép thành <b>một</b> file PDF theo đúng thứ tự trong danh sách. Ảnh JPG/PNG xen vào
+            cũng được — chọn khổ trang cho ảnh ở phần tùy chọn.</td></tr>
+    <tr><td>✂️ <b>Tách PDF</b></td><td>1 file PDF</td>
+        <td>Ba cách: <b>theo khoảng trang</b> (gõ <code>1-3, 5, 8-10</code> — mỗi khoảng ra một file) ·
+            <b>mỗi N trang một file</b> · <b>mỗi trang một file</b>.</td></tr>
+    <tr><td>🗂 <b>Sắp xếp &amp; xoá trang</b></td><td>1 file PDF<br>(tối đa 150 trang)</td>
+        <td>Xem ảnh nhỏ từng trang rồi đổi thứ tự bằng <b>◀ ▶</b>, xoay bằng <b>↻</b>, bỏ trang bằng
+            <b>🗑</b> (bấm lần nữa để lấy lại). Lưu ra PDF mới.</td></tr>
+    <tr><td>🗜 <b>Nén PDF</b></td><td>PDF (nhiều file)</td>
+        <td>Giảm dung lượng để gửi email. Ba mức <b>Nhẹ · Vừa · Mạnh</b>. Kết quả báo rõ
+            dung lượng trước và sau.</td></tr>
+    <tr><td>#️⃣ <b>Đánh số trang</b></td><td>PDF (nhiều file)</td>
+        <td>In số trang vào file đã có. Chọn dạng chữ (<code>1</code> · <code>1 / 12</code> ·
+            <code>Trang 1</code>…), vị trí 6 góc, cỡ chữ, màu, số bắt đầu, và tuỳ chọn
+            <b>bỏ qua trang bìa</b>.</td></tr>
+    <tr><td>💧 <b>Đóng dấu chữ</b></td><td>PDF (nhiều file)</td>
+        <td>In chữ mờ lên mọi trang (<i>BẢN SAO</i>, <i>HỒ SƠ GỐC</i>…). Chọn cỡ chữ, độ mờ,
+            góc nghiêng, màu, và một dấu giữa trang hay rải kín 3 × 3.</td></tr>
+  </table>
+  </div>
+
+  <div class="warn">
+    ⚠️ <b>Nén PDF làm mất lớp chữ.</b> Mỗi trang được vẽ lại thành ảnh rồi dựng lại file — đó là
+    cách duy nhất nén được ngay trong trình duyệt. Đổi lại, file sau khi nén <b>không bôi chọn
+    hay tìm kiếm chữ được nữa</b>. File gốc cần giữ chữ thì đừng nén, hoặc giữ lại bản gốc.
+    Nếu file vốn đã nén tốt, kết quả có thể <b>không nhỏ hơn</b> — khối kết quả sẽ nói rõ điều đó
+    để bạn dùng lại file gốc.
+  </div>
+
+  <h3 id="cc-doi">B3. Nhóm chuyển đổi định dạng</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:24%">Công cụ</th><th style="width:21%">Nhận</th><th>Làm gì</th></tr>
+    <tr><td>🖼 <b>PDF → JPG / PNG</b></td><td>PDF (nhiều file)</td>
+        <td>Mỗi trang ra một ảnh. Chọn JPG hay PNG, độ phân giải 96 / 150 / 200 / 300 DPI và
+            chất lượng JPG. Tối đa 300 ảnh một lượt.</td></tr>
+    <tr><td>📄 <b>JPG / PNG → PDF</b></td><td>JPG · PNG</td>
+        <td>Gộp ảnh thành một PDF, mỗi ảnh một trang. Chọn khổ A4 dọc / ngang / tự theo chiều ảnh /
+            vừa đúng khổ ảnh, và lề trang.</td></tr>
+    <tr><td>🔄 <b>Đổi định dạng / nén ảnh</b></td><td>JPG · PNG</td>
+        <td>Đổi JPG ⇄ PNG, hạ chất lượng cho nhẹ bớt, và thu nhỏ ảnh quá lớn theo
+            <b>cạnh dài tối đa</b>.</td></tr>
+    <tr><td>📝 <b>Word → PDF</b></td><td>.docx (nhiều file)</td>
+        <td>Giữ chữ tiếng Việt, cỡ chữ, in đậm, gạch chân, căn lề, danh sách đánh số,
+            bảng và ảnh nhúng. Khổ giấy lấy theo đúng file Word, hoặc ép về A4.</td></tr>
+    <tr><td>📊 <b>Excel → PDF</b></td><td>.xlsx (nhiều file)</td>
+        <td>In giá trị từng ô thành bảng có kẻ lưới, mỗi sheet bắt đầu một trang mới.
+            Có co bảng cho vừa bề ngang trang và lặp lại hàng tiêu đề ở mỗi trang.</td></tr>
+  </table>
+  </div>
+
+  <div class="warn">
+    ⚠️ <b>Word → PDF và Excel → PDF chỉ ra GẦN ĐÚNG bản gốc.</b> Trình duyệt không có Microsoft Word,
+    nên ứng dụng tự đọc nội dung file rồi vẽ lại. Những thứ <b>không</b> được dựng lại:
+    chữ nghiêng (in ra chữ đứng) · đầu trang / chân trang · khung chữ (text box) · nhiều cột ·
+    tab tự đặt · chỗ ngắt trang do Word tự tính · với Excel thì thêm màu nền ô, viền riêng,
+    biểu đồ, ảnh và ô gộp.
+    <br><br>
+    👉 Dùng cho việc <b>xem nhanh, gửi tạm, gộp vào hồ sơ</b> thì rất tiện. Còn
+    <b>văn bản phải in đúng từng milimet</b> — công văn gửi ra ngoài, biên bản có đóng dấu —
+    thì vẫn mở bằng Word / Excel rồi chọn <b>Lưu thành PDF</b>.
+  </div>
+
+  <div class="tip">
+    💡 <b>Mẹo dùng cùng bản ảnh giám định.</b> Làm xong bản ảnh ở bước 2, tải PDF về,
+    rồi sang màn hình 3 dùng <b>🔗 Nối PDF</b> để ghép bản ảnh + biên bản giám định +
+    giấy tờ xe thành <b>một file duy nhất</b> gửi đi; nếu file nặng quá thì
+    <b>🗜 Nén PDF</b> mức <i>Vừa</i> trước khi gửi email.
+  </div>
+
+  <div class="note">
+    Ứng dụng nhận <b>.docx</b> và <b>.xlsx</b> (Word / Excel từ 2007 trở đi). File <b>.doc</b> hay
+    <b>.xls</b> đời cũ thì mở bằng Word / Excel rồi <i>Lưu thành</i> .docx / .xlsx trước.
+    Trình duyệt cũng phải thuộc loại mới — Chrome / Edge 80+, Safari 16.4+, Firefox 113+ —
+    nếu không ứng dụng sẽ báo ngay là chưa đọc được file Office.
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
 <section id="thiet-ke">
-  <h2 class="sec">📐 B · Thông số bản ảnh xuất ra</h2>
+  <h2 class="sec">📐 C · Thông số bản ảnh xuất ra</h2>
   <div class="tbl-wrap">
   <table>
     <tr><th style="width:30%">Thành phần</th><th>Thông số</th></tr>
@@ -1012,7 +1133,7 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 
 <!-- ════════════════════════════════════════════════════ -->
 <section id="su-co">
-  <h2 class="sec">🛠️ C · Xử lý sự cố</h2>
+  <h2 class="sec">🛠️ D · Xử lý sự cố</h2>
   <div class="tbl-wrap">
   <table>
     <tr><th style="width:38%">Hiện tượng</th><th>Cách xử lý</th></tr>
@@ -1069,7 +1190,7 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 
 <!-- ════════════════════════════════════════════════════ -->
 <section id="faq">
-  <h2 class="sec">❓ D · Câu hỏi thường gặp</h2>
+  <h2 class="sec">❓ E · Câu hỏi thường gặp</h2>
 
   <details class="faq">
     <summary>Ảnh của tôi có bị tải lên mạng không?</summary>

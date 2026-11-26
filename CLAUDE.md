@@ -34,6 +34,7 @@ anh-giam-dinh-vcx-theo-ten-file/
 ├── dat_ten_file.py               ← Giai đoạn 1 (Python)
 ├── ghep_anh.py                   ← Giai đoạn 2 (Python)
 ├── chay_doc.bat / chay_ngang.bat ← chạy nhanh bằng double-click
+├── tests/                        ← kiểm thử màn hình 3 bằng Node (xem mục riêng ở cuối)
 └── requirements.txt
 ```
 
@@ -44,8 +45,12 @@ anh-giam-dinh-vcx-theo-ten-file/
 File HTML đơn, không cần build. Phải mở qua **địa chỉ web** (GitHub Pages / Render / `python -m http.server`),
 **không mở trực tiếp bằng `file://`** — vì cần `fetch()` font tiếng Việt và logo.
 
+App có **3 màn hình**: `1 · Lập bản ảnh` → `2 · Xem & Xuất` (một luồng tuần tự), và
+`3 · Công cụ file` — bộ công cụ PDF/Office **độc lập**, vào tự do, xem mục riêng ở cuối.
+
 Thư viện CDN: `pdf-lib` + `@pdf-lib/fontkit` (dựng PDF) nạp sẵn ở `<head>`;
-`pdf.js` (`PDFJS_VER`, cdnjs) **nạp lười** bởi `loadPdfjs()` ở lần đầu người dùng nạp file PDF;
+`pdf.js` (`PDFJS_VER`, cdnjs) **nạp lười** bởi `loadPdfjs()` ở lần đầu người dùng nạp file PDF
+(và bởi các công cụ của màn hình 3);
 `firebase-app` + `firebase-database` (ESM, gstatic) **nạp lười** cho bộ đếm lượt truy cập, và
 **chỉ khi `FB_CFG` đã được điền** — xem *Bộ đếm lượt truy cập*. Không dùng thư viện nào khác.
 
@@ -54,8 +59,9 @@ Thư viện CDN: `pdf-lib` + `@pdf-lib/fontkit` (dựng PDF) nạp sẵn ở `<h
 hộp thoại `#guideModal` qua iframe `huong-dan.html?theme={sáng|tối}`; `openGuide()` chỉ dựng
 iframe một lần và nạp lại khi đổi sáng/tối. Trang này cũng mở trực tiếp được bằng link hoặc
 in ra giấy (có `@media print`). Hướng dẫn **chỉ nói về web app** (A · Các bước sử dụng ·
-B · Thông số · C · Xử lý sự cố · D · FAQ; mục **9c** là Biên bản giám định & chữ ký tay, mục **7** có dải nút Thay thế/Sửa chữa/Không) — phần luồng Python đã bỏ khỏi hướng dẫn, chỉ còn
-tài liệu ở CLAUDE.md. **Sửa tính năng thì phải sửa `huong-dan.html` kèm theo** —
+**B · Công cụ file (màn hình 3)** · C · Thông số · D · Xử lý sự cố · E · FAQ; mục **9c** là
+Biên bản giám định & chữ ký tay, mục **7** có dải nút Thay thế/Sửa chữa/Không) — phần luồng
+Python đã bỏ khỏi hướng dẫn, chỉ còn tài liệu ở CLAUDE.md. **Sửa tính năng thì phải sửa `huong-dan.html` kèm theo** —
 bảng tiền tố giấy tờ, bảng lưới ảnh/trang và danh sách phím tắt được nhắc lại ở đó.
 Chấm cam trên nút `Help` hiện khi `localStorage.pti_guide_seen !== APP_BUILD`, nên **tăng `APP_BUILD`
 mỗi lần cập nhật hướng dẫn** để người dùng thấy nhắc.
@@ -432,6 +438,145 @@ Nhờ in đúng mặt chữ của mẫu nên **cỡ chữ cũng lấy thẳng s�
 Thiếu file Tinos thì `embedAssets()` tự lùi về Be Vietnam Pro — biên bản vẫn ra, chỉ khác mặt chữ.
 Mẫu in dòng *(Ký và ghi rõ họ tên)* và số trang bằng **chữ nghiêng**; bản dựng để chữ đứng vì
 nhúng thêm `Tinos-Italic` sẽ cõng thêm ~60KB cho đúng một dòng.
+
+### Màn hình 3 — Công cụ file (`#panel3`)
+
+Bộ công cụ PDF / Office **độc lập hoàn toàn** với luồng lập bản ảnh: không đọc `state.groups`,
+không ghi hồ sơ / bản nháp, không gọi `scheduleDraftSave()`. Toàn bộ mã nằm ở **khối `<script>`
+cuối cùng** của `index.html` (sau khối Bộ đếm lượt truy cập), mọi tên mang tiền tố **`tz` / `TZ`**
+— các `<script>` cổ điển dùng chung một phạm vi toàn cục, khai lại tên đã có là lỗi cú pháp.
+
+**Mục 3 trên thanh bước vào TỰ DO.** Nó là một tab riêng, không phải bước nối tiếp:
+- `goStep()` kẹp `n` trong `1..3` và chỉ chạy `validateInfo()` / `hasImages()` khi `n === 2`;
+- nút `#stp3` mang class `.stp.free` (viền chấm) và tách khỏi 1–2 bằng `.stp-sep` (vạch dọc),
+  **không dùng `.stp-line`** — vạch nối có nghĩa "bước kế tiếp";
+- ở mục 3 thì `#stp1`/`#stp2` về trạng thái thường, **không** đánh dấu `done`;
+- phím `←` `→` chỉ đi lại giữa bước 1 và 2 (`state.step === 1` / `=== 2`), không nhảy vào mục 3;
+- nút `← Quay lại` của thanh dưới gọi **`abGoBack()`** → từ mục 3 về **thẳng bước 1**
+  (gọi `goStep(2)` sẽ bị chặn vì chưa nhập hồ sơ);
+- `closeTopLayer()` coi "đang mở một công cụ" là một lớp phủ: Back lần đầu → `tzHome()`.
+
+> `updateActionBar()` (khối script thứ 2) hỏi **`typeof tzBarMeta === 'function'`** chứ không gọi
+> thẳng: lúc `init()` chạy thì khối script cuối chưa thực thi. Cũng vì vậy `closeTopLayer()` đặt
+> `state.step === 3` **trước** `typeof tzTool` — `tzTool` khai bằng `const`, chạm vào nó trong
+> vùng chết (TDZ) thì ngay cả `typeof` cũng ném lỗi.
+
+#### Khung chung
+| Thành phần | Vai trò |
+|---|---|
+| `TOOLS` | **nguồn sự thật duy nhất** của mọi công cụ: `{ico, grp, name, desc, tip, exts, multi, min, go, opts(), run()}` |
+| `renderToolGrid()` | dựng 2 lưới ô công cụ (`#tgPdf` nhóm `pdf`, `#tgConv` nhóm `conv`), chỉ dựng một lần |
+| `tzOpen(id)` / `tzHome()` | đổi giữa lưới `#toolHome` và vùng làm việc `#toolWork` |
+| `tzAddFiles()` | **cửa duy nhất** nhận file: lọc theo `T.exts`, giới hạn `TZ_MAXF`=80 file / `TZ_MAXMB`=120MB |
+| `tzRenderList()` | danh sách file + nút ▲▼🗑 + chip thông tin; bật/tắt nút chạy theo `T.min` |
+| `tzRun()` | bọc `T.run()` trong `try/catch` — mọi lỗi hiện ở `#tzAlert`, không rơi ra Console im lặng |
+| `tzProg()` · `tzDone()` · `tzErr()` | tiến trình · khối kết quả (mỗi phần tử một nút tải) · báo lỗi |
+| `tzPack(items, zipName)` | **1 file → tải thẳng · nhiều file → một ZIP** bằng `zipStore()` có sẵn |
+| `tzFonts(doc)` | cặp Be Vietnam Pro cho các công cụ phải vẽ chữ |
+
+**`tzFonts()` chứ KHÔNG dùng `embedAssets()`** — `embedAssets()` nhúng kèm logo PNG, cõng thêm
+~130KB chết vào mỗi file kết quả. `_tzFontBuf` nhớ bytes font để chỉ `fetch` một lần cho cả phiên.
+
+`tzErr()` bật/tắt bằng **class `.show`**, không phải `style.display` — `.alert` mặc định là
+`display:none` (giống `#alertErr2` / `#alertErr3`).
+
+#### 11 công cụ
+| id | Tên | Nhận | Ghi chú cài đặt |
+|---|---|---|---|
+| `merge` | 🔗 Nối PDF | PDF + JPG/PNG, ≥2 | `copyPages()`; ảnh đi qua `tzImgPage()`. File hỏng bị **bỏ qua và nêu tên**, không làm hỏng cả lượt |
+| `split` | ✂️ Tách PDF | 1 PDF | 3 chế độ `_tzSpMode`: `ranges` / `every` / `each`; tối đa 200 file |
+| `pages` | 🗂 Sắp xếp & xoá trang | 1 PDF ≤ `TZ_PG_MAX`=150 trang | `tzPgLoad()` raster hóa ảnh nhỏ bằng pdf.js; `tz.pages[] = {i, rot, gone}` |
+| `compress` | 🗜 Nén PDF | PDF | `TZ_CP` 3 mức (dpi + chất lượng JPEG); **mất lớp chữ** |
+| `number` | #️⃣ Đánh số trang | PDF | dạng chữ dùng token **`{n}` / `{t}`** |
+| `wmark` | 💧 Đóng dấu chữ | PDF | 1 dấu giữa trang hoặc rải 3×3; tự co cỡ chữ cho vừa đường chéo trang |
+| `pdf2img` | 🖼 PDF → JPG/PNG | PDF | tối đa `TZ_IMG_MAX`=300 ảnh |
+| `img2pdf` | 📄 JPG/PNG → PDF | JPG/PNG | khổ `auto`/`a4`/`a4l`/`fit` |
+| `imgconv` | 🔄 Đổi định dạng / nén ảnh | JPG/PNG | `tzReencode()` qua canvas |
+| `doc2pdf` | 📝 Word → PDF | .docx | xem *Đọc Office* |
+| `xls2pdf` | 📊 Excel → PDF | .xlsx | xem *Đọc Office* |
+
+**Dạng chữ của số trang dùng `{n}` và `{t}`**, không phải `n`/`t` trơn — `'Trang n'.replace('n', …)`
+sẽ thay đúng chữ `n` trong từ "Trang".
+
+**`tzDisp()` / `tzMap()`** quy đổi toạ độ "như mắt người xem thấy" sang toạ độ thật của trang,
+kèm `rotate: degrees(R)`. Thiếu cặp này thì số trang và dấu đóng trên trang có `/Rotate 90`
+(rất hay gặp, vì chính công cụ `pages` sinh ra) sẽ nằm sai cạnh.
+
+#### Đọc Office (.docx / .xlsx) — tự viết, KHÔNG thêm thư viện
+`.docx` và `.xlsx` là ZIP chứa XML. App đã có `zipStore()`/`crc32()` để **ghi** zip; để **đọc**,
+`tzUnzip()` tự dò mục lục trung tâm (EOCD) từ cuối file rồi `tzInflate()` giải nén bằng
+**`DecompressionStream('deflate-raw')` của chính trình duyệt** (Chrome/Edge 80+, Safari 16.4+,
+Firefox 113+ — thiếu thì báo rõ cho người dùng). XML duyệt theo **`localName`**
+(`tzKid` / `tzKids` / `tzAt` / `tzPath`) nên không phụ thuộc tiền tố namespace `w:` `a:` `r:`.
+
+**Word → PDF** (`tzDocxToPdf`): đọc `word/document.xml` + `styles.xml` + `numbering.xml` +
+`_rels/document.xml.rels`, dựng lại bằng `tzWriter()` (bộ đổ trang có lề, tự sang trang),
+`tzLayout()` (dàn run thành dòng, mỗi run giữ cỡ chữ / đậm / gạch chân riêng) và `tzDrawLine()`.
+Khổ giấy + lề lấy từ `<w:sectPr>`. Bảng `<w:tbl>` vẽ bằng `tzDocxTable()` theo `<w:tblGrid>`.
+Ảnh nhúng nhận qua `rId` → `word/media/*`, **nhúng một lần cho mỗi `rId`**.
+
+**Excel → PDF** (`tzXlsxOpen` / `tzXlsxSheet` / `tzXlsxDraw`): `workbook.xml` + `sharedStrings.xml`
++ `styles.xml`; `tzXlsxDateXf()` nhận ra ô định dạng ngày để `tzSerialDate()` đổi số serial thành
+`DD/MM/YYYY`. Bề ngang cột lấy từ `<cols>` (1 ký tự ≈ 7px, +5px lề trong, px → pt là ×0,75).
+Bảng rộng hơn trang thì **chia thành khối cột in ở các trang sau**. Tối đa
+`TZ_XL_MAXROW`=3000 hàng mỗi sheet, cắt bớt thì nói rõ ở khối kết quả.
+
+**Bẫy đã sửa, đừng lặp lại:**
+1. **`tzDrawLine()` phải GỘP các đoạn liền nhau cùng mặt chữ rồi vẽ MỘT lần, kể cả đoạn chỉ có
+   dấu cách.** Vẽ từng đoạn rời và bỏ qua dấu cách thì bản in vẫn đúng, nhưng file PDF không chứa
+   ký tự dấu cách nào — chép chữ ra là dính liền (`CỔPHẦN`, `Số95`).
+2. `tzLayout()` phải **bỏ dấu cách thừa ở cuối dòng** trước khi chốt dòng, kẻo canh giữa / canh
+   phải lệch đi nửa dấu cách.
+3. Lịch Excel coi **29/02/1900 là ngày thật** (lỗi của chính Excel), nên serial ≤ 60 lệch một ngày:
+   `tzSerialDate()` dùng mốc 25568 cho `n < 61` và 25569 từ 61 trở lên.
+4. `tzClean()` **bắt buộc** cho mọi chữ trước khi đưa vào `drawText` — font của dự án không có
+   glyph cho emoji / chữ Hán, để nguyên thì pdf-lib ném lỗi và mất cả trang.
+5. Đánh số danh sách phải theo `numFmt` của Word (`tzNumLbl`): `upperRoman` → `I.`,
+   `lowerLetter` → `a)`… In cứng `1.` thì mục "I. THÔNG TIN" của mẫu PTI ra sai.
+
+**Giới hạn CỐ Ý** (đã ghi rõ cho người dùng ở `tip` của công cụ, ở khối kết quả và ở
+`huong-dan.html` mục B3 — **đừng coi là lỗi**): chữ nghiêng in ra chữ đứng (dự án không có
+font Italic, nhúng thêm chỉ vì một kiểu chữ là không đáng); đầu/chân trang, khung chữ, nhiều cột,
+tab tự đặt và chỗ ngắt trang do Word tự tính đều không dựng lại; Excel không giữ màu nền, viền
+riêng, biểu đồ, ảnh và ô gộp (chữ dài chỉ **tràn sang các ô rỗng bên phải** như Excel vẫn làm).
+Người dùng được chỉ sang "mở bằng Word rồi Lưu thành PDF" khi cần in đúng từng milimet.
+
+#### Kiểm thử ngoài trình duyệt — `tests/`
+
+Bộ test **nằm trong repo**: `cd tests && npm install && npm test` (xem `tests/README.md`).
+Nó **trích khối `<script>` cuối của `index.html`** rồi chạy bằng **Node + `vm.runInThisContext`**
+với `$`/`document` giả lập — không có bản sao mã nguồn nào, nên sửa app là test theo ngay.
+
+| File | Kiểm gì |
+|---|---|
+| `test.mjs` | hàm tiện ích · đọc ZIP · Word/Excel → PDF (pdf-lib **giả lập**, ghi lại mọi lệnh vẽ) |
+| `test2.mjs` | 6 công cụ PDF + Office → PDF + luồng giao diện (pdf-lib **thật** + font thật) — 20 mục |
+| `test3.mjs` | nén PDF · PDF→ảnh · ảnh→PDF · đổi định dạng ảnh (**node-canvas** + **pdfjs-dist**) — 13 mục |
+| `check.py` | `node --check` từng khối `<script>` + báo tên khai báo trùng giữa các khối |
+| `check_ids.py` | mọi `$('id')` của màn hình 3 có id thật · mọi `onclick=` có hàm thật |
+
+**Ba bẫy đã sửa, đừng lặp lại:**
+1. **Phải dùng `runInThisContext`, không dùng `vm.createContext`** ở `test2`/`test3` — pdf-lib kiểm
+   `instanceof Array`, mà mảng tạo trong realm khác sẽ không qua được phép kiểm đó. Riêng `test.mjs`
+   dùng pdf-lib giả lập nên `createContext` vẫn được.
+2. **File mẫu trong `docs/` đều bị gitignore** (tài liệu nội bộ; `bien_ban_giam_dinh.pdf` có dữ liệu
+   khách thật), nên bản clone từ GitHub không có. Thiếu file mẫu phải **in dấu `–` rồi bỏ qua**,
+   không được tính là lỗi và không được `process.exit(1)`. Mọi file kết quả ghi vào **`tests/.out/`**
+   (đã gitignore) — chúng dẫn xuất từ tài liệu có dữ liệu thật, đừng để lọt lên repo public.
+3. Nhận diện định danh JS phải dùng **`(?![\w$])` chứ không phải `\b`** — `$` không phải ký tự chữ
+   nên `\b` không thấy biên giới sau nó, và `check_ids.py` từng báo oan là hàm `$` thiếu định nghĩa.
+
+`npm run t3` cần biên dịch node-canvas; máy không có bộ build C++ thì bỏ `t3` và kiểm 4 công cụ
+cần canvas bằng mắt trong trình duyệt. `package-lock.json` **được commit** để ghim `pdfjs-dist`
+đúng bản `PDFJS_VER` mà app nạp từ CDN.
+
+#### CSS
+Khối CSS của màn hình 3 nằm **cuối `<style>`, ngay trước `@media print`** — sau phần Biên bản,
+nên media query riêng của nó (`≤700px`, `≤400px`) đặt ở cuối khối là đúng thứ tự.
+Class chính: `.tool-grid` / `.tool-tile` (lưới ô công cụ) · `.tz-dz` (vùng kéo thả) · `.tz-f`
+(một dòng file) · `.tz-opt` (lưới tùy chọn) · `.tz-run` · `.tz-out` (khối kết quả, nền xanh lá)
+· `.pg-grid` / `.pg` (lưới trang PDF) · `.stp-sep` / `.stp.free` (mục 3 của thanh bước).
+Tất cả dùng design token, trừ `.pg-cv` cố ý nền trắng — ảnh nhỏ của trang PDF là tờ giấy trắng.
 
 ### Bộ đếm lượt truy cập (`#abCnt`)
 

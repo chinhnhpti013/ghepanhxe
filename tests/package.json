@@ -1,0 +1,19 @@
+{
+  "name": "pti-ghepanh-tests",
+  "private": true,
+  "description": "Kiểm thử màn hình 3 (Công cụ file) của index.html ngoài trình duyệt",
+  "scripts": {
+    "test": "node test.mjs && node test2.mjs && node test3.mjs",
+    "t1": "node test.mjs",
+    "t2": "node test2.mjs",
+    "t3": "node test3.mjs",
+    "check": "python check.py && python check_ids.py"
+  },
+  "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "@xmldom/xmldom": "^0.9.12",
+    "canvas": "^3.2.3",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^3.11.174"
+  }
+}
