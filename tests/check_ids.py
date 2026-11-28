@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Mọi id mà khối script màn hình 3 gọi qua $() phải thực sự được khai ở đâu đó
-trong index.html — kể cả các id dựng động bằng innerHTML. Không chạy được trình
-duyệt thì đây là cách bắt lỗi gõ sai tên id."""
+"""Mọi id mà hai khối script cuối (màn hình 3 · Công cụ file và màn hình 4 · Quét
+tài liệu) gọi qua $() phải thực sự được khai ở đâu đó trong index.html — kể cả các
+id dựng động bằng innerHTML. Không chạy được trình duyệt thì đây là cách bắt lỗi
+gõ sai tên id."""
 import io, os, re, sys
 
 IDX = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'index.html')
 s = io.open(IDX, encoding='utf-8').read()
 
 blocks = re.findall(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', s, re.S)
-tzcode = blocks[-1]
+# Hai khoi cuoi: man hinh 3 (tien to tz) va man hinh 4 (tien to sc)
+tzcode = blocks[-2] + "\n" + blocks[-1]
 
 # id khai trong HTML tinh VA trong moi chuoi innerHTML cua toan bo file
 declared = set(re.findall(r'\bid="([A-Za-z0-9_\-]+)"', s))
@@ -22,7 +24,7 @@ used = set(re.findall(r"\$\('([A-Za-z0-9_\-]+)'\)", tzcode))
 missing = sorted(i for i in used if i not in declared)
 
 print('id duoc khai trong file     :', len(declared))
-print('id man hinh 3 goi qua $()   :', len(used))
+print('id man hinh 3+4 goi qua $() :', len(used))
 print('tien to id ghep dong        :', sorted(prefixes))
 if missing:
     print('\n!! GOI $() NHUNG KHONG CO ID:')
@@ -33,7 +35,7 @@ if missing:
 print('\nTat ca id deu ton tai.')
 
 # nguoc lai: id nao cua man hinh 3 khai ra ma khong ai dung
-tz_ids = {i for i in declared if i.startswith(('tz', 'tw', 'tg', 'tool'))}
+tz_ids = {i for i in declared if i.startswith(('tz', 'tw', 'tg', 'tool', 'sc'))}
 unused = sorted(i for i in tz_ids if ("'" + i + "'") not in tzcode and ('"' + i + '"') not in tzcode)
 if unused:
     print('id khai ra nhung khong goi  :', unused)

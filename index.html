@@ -1037,6 +1037,141 @@ main > .foot{margin-top:auto}
   .tool-tile .ti-ico{width:33px;height:33px;font-size:1.1rem}
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   MÀN HÌNH 4 — QUÉT TÀI LIỆU (chụp · cắt viền · chỉnh thẳng · làm rõ)
+   Khối này đặt SAU phần CSS của màn hình 3, nên media query riêng của nó
+   (ở cuối khối) nằm sau mọi khai báo gốc — xem bẫy thứ tự CSS ở CLAUDE.md.
+   ──────────────────────────────────────────────────────────────────── */
+
+/* ── Lưới trang đã quét ── */
+.sc-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));margin-top:14px}
+.sc-pg{border:2px solid var(--sky-b);border-radius:var(--r-sm);background:var(--surface);
+  overflow:hidden;position:relative;transition:var(--t);box-shadow:var(--sh-1)}
+.sc-pg:hover{border-color:var(--brand);box-shadow:var(--sh-2)}
+.sc-pg.busy{border-color:var(--amber);border-style:dashed}
+.sc-pv{background:#fff;height:198px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.sc-pv img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.sc-pv .wait{font-size:.72rem;color:var(--text-3);padding:10px;text-align:center;line-height:1.5}
+.sc-no{position:absolute;top:5px;left:5px;background:var(--brand);color:#fff;font-size:.66rem;
+  font-weight:800;border-radius:20px;padding:1px 8px;pointer-events:none}
+.sc-tagq{position:absolute;top:5px;right:5px;background:rgba(16,42,67,.74);color:#fff;
+  font-size:.62rem;font-weight:700;border-radius:20px;padding:1px 7px;pointer-events:none}
+.sc-tagq.warn{background:#9A6700}
+.sc-fil{border-top:1px solid var(--sky-b);background:var(--sky-2);padding:6px 7px}
+.sc-fil select{width:100%;font-family:inherit;font-size:.72rem;padding:4px 6px;
+  border:1px solid var(--border-s);border-radius:var(--r-xs);background:var(--surface);color:var(--text)}
+/* 6 nút chia LƯỚI 3 CỘT (2 hàng), không phải một hàng flex: thẻ trang trên điện
+   thoại chỉ rộng ~142px, 6 nút một hàng thì mỗi nút còn 23px — không bấm nổi. */
+.sc-a{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--sky-b);
+  background:var(--sky-2)}
+.sc-a button{border:none;border-left:1px solid var(--sky-b);border-top:1px solid var(--sky-b);
+  background:none;cursor:pointer;padding:8px 0;font-size:.82rem;color:var(--text-2);
+  font-family:inherit;transition:var(--t);min-height:34px}
+.sc-a button:nth-child(3n+1){border-left:none}
+.sc-a button:nth-child(-n+3){border-top:none}
+.sc-a button sup{font-size:.58rem;font-weight:800;color:var(--brand)}
+.sc-a button:hover:not(:disabled){background:var(--brand-soft);color:var(--brand)}
+.sc-a button:disabled{opacity:.3;cursor:not-allowed}
+.sc-a .x:hover{background:var(--red-soft);color:var(--red)}
+
+/* ── Giới thiệu các việc làm được, chỉ hiện lúc chưa có trang nào ── */
+#scEmpty{margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+.sc-feat-h{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--text-3);margin-bottom:12px;display:flex;align-items:center;gap:9px}
+.sc-feat-h::after{content:'';flex:1;height:1px;background:var(--border)}
+.sc-feat{display:grid;gap:11px;grid-template-columns:repeat(auto-fill,minmax(232px,1fr))}
+.sc-feat > div{padding:12px 14px;background:var(--sky-2);border:1px solid var(--sky-b);
+  border-radius:var(--r-sm)}
+.sc-feat .fi{font-size:1.15rem;line-height:1;display:block;margin-bottom:6px}
+.sc-feat b{display:block;font-size:.83rem;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.sc-feat span:not(.fi){display:block;font-size:.74rem;color:var(--text-2);line-height:1.55;margin-top:3px}
+
+/* ── Dải nút xuất / chia sẻ ── */
+.sc-exp{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));margin-top:4px}
+.sc-exp .btn{width:100%}
+.sc-tx{width:100%;min-height:210px;font-family:ui-monospace,'Cascadia Code',Consolas,monospace;
+  font-size:.79rem;line-height:1.65;padding:12px 13px;border:1px solid var(--border-s);
+  border-radius:var(--r-sm);background:var(--surface);color:var(--text);resize:vertical}
+.sc-tx:focus{outline:none;border-color:var(--brand);box-shadow:var(--ring)}
+
+/* ── Danh sách tài liệu đã lưu trong máy ── */
+.sc-lib{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow:auto;margin:12px 0}
+.sc-lb{display:flex;align-items:center;gap:11px;padding:10px 12px;background:var(--sky-2);
+  border:1px solid var(--sky-b);border-radius:var(--r-sm)}
+.sc-lb .lb-tx{flex:1;min-width:0}
+.sc-lb .lb-tx b{display:block;font-size:.83rem;font-weight:700;color:var(--text);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-lb .lb-tx span{display:block;font-size:.71rem;color:var(--text-3)}
+.sc-lb .lb-a{display:flex;gap:6px;flex-shrink:0}
+
+/* ════════ LỚP PHỦ CẮT VIỀN + ĐẶT CHỮ KÝ / DẤU ════════
+   Dùng MÀU CỐ ĐỊNH TỐI như khối .cam và .sig-ov: ảnh giấy tờ phải nằm trên nền
+   tối mới nhìn rõ mép giấy và khung cắt — đổi hệ màu sáng/tối KHÔNG phải sửa khối này. */
+.sc-ov{position:fixed;inset:0;z-index:920;background:#05080C;color:#fff;display:flex;flex-direction:column}
+.sc-ov.hidden{display:none}
+.sc-ovt{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:10px 13px;
+  background:#13263A;border-bottom:1px solid rgba(255,255,255,.1)}
+.sc-ovt b{font-size:.9rem;font-weight:700}
+.sc-ovt .who{font-size:.74rem;opacity:.78}
+.sc-ovt .sp{flex:1;min-width:4px}
+.sc-ic{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.28);
+  background:rgba(255,255,255,.12);color:#fff;cursor:pointer;font-size:1rem;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.sc-ic:hover{background:rgba(255,255,255,.27)}
+.sc-stage{flex:1;min-height:0;position:relative;overflow:hidden;background:#000;
+  display:flex;align-items:center;justify-content:center;touch-action:none}
+.sc-stage canvas{display:block;max-width:100%;max-height:100%;touch-action:none}
+.sc-loupe{position:absolute;width:118px;height:118px;border-radius:50%;border:2px solid #F2C86A;
+  box-shadow:0 4px 18px rgba(0,0,0,.6);overflow:hidden;pointer-events:none;display:none;background:#000}
+.sc-loupe.on{display:block}
+.sc-loupe canvas{width:100%;height:100%;max-width:none;max-height:none}
+.sc-ovb{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:11px 13px;
+  background:rgba(8,14,22,.96);border-top:1px solid rgba(255,255,255,.1)}
+.sc-ovb .sp{flex:1;min-width:4px}
+.sc-ovb .note{font-size:.72rem;opacity:.76;line-height:1.4}
+.sc-ovopt{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:8px 13px;
+  background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.sc-ovopt label{font-size:.74rem;font-weight:600;opacity:.84;white-space:nowrap}
+.sc-ovopt select,.sc-ovopt input[type=text]{font-family:inherit;font-size:16px;padding:6px 9px;
+  border-radius:8px;border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.1);color:#fff;
+  min-width:0;flex:1 1 150px}
+.sc-ovopt select option{background:#16263A;color:#fff}
+.sc-ovopt input[type=range]{flex:1 1 130px;accent-color:#F2C86A}
+.sc-ovopt .seg{display:flex;gap:0;border:1px solid rgba(255,255,255,.26);border-radius:8px;overflow:hidden}
+.sc-ovopt .seg button{border:none;border-left:1px solid rgba(255,255,255,.2);background:none;color:#fff;
+  font-family:inherit;font-size:.76rem;padding:7px 11px;cursor:pointer;transition:var(--t)}
+.sc-ovopt .seg button:first-child{border-left:none}
+.sc-ovopt .seg button.on{background:#F2C86A;color:#1A1403;font-weight:700}
+
+/* ── Danh sách vật đặt lên trang (chữ ký · ghi chú · dấu) ── */
+.sc-items{display:flex;gap:7px;overflow-x:auto;padding:8px 13px;background:rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.08)}
+.sc-items:empty{display:none}
+.sc-it{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);font-size:.74rem;cursor:pointer}
+.sc-it.on{border-color:#F2C86A;background:rgba(242,200,106,.2)}
+.sc-it button{border:none;background:none;color:#F2847E;cursor:pointer;font-size:.86rem;padding:0 2px}
+
+/* Thanh bước có 4 mục kể từ khi thêm màn hình 4, nên nhãn phải bỏ SỚM HƠN trước đây
+   (nhãn phụ ≤760px, bỏ hẳn nhãn ≤520px thay vì ≤400px) — không thì thanh tràn ngang và
+   kéo theo cả trang trượt ngang. Hai rule này đặt ở cuối <style> nên thắng rule ≤400px
+   khai trước đó — xem bẫy thứ tự CSS ở CLAUDE.md. */
+@media(max-width:760px){ .stp-lbl span{display:none} }
+@media(max-width:520px){ .stp-lbl{display:none} .stp-sep{margin:0 5px} }
+
+@media(max-width:700px){
+  .sc-grid{grid-template-columns:repeat(auto-fill,minmax(142px,1fr));gap:10px}
+  .sc-pv{height:168px}
+  .sc-exp{grid-template-columns:1fr}
+  .sc-ovb .btn{flex:1 1 46%}
+  .sc-ovb .note{flex:1 1 100%;text-align:center;order:9}
+  .sc-loupe{width:96px;height:96px}
+}
+@media(max-width:400px){
+  .sc-grid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+  .sc-pv{height:146px}
+}
+
 @media print{.appbar,.stepper-wrap,.actbar,.toasts,.pv-bar{display:none!important}}
 </style>
 </head>
@@ -1078,21 +1213,26 @@ main > .foot{margin-top:auto}
 <!-- ════════ STEPPER ════════ -->
 <div class="stepper-wrap">
   <div class="stepper">
-    <button class="stp active" id="stp1" onclick="goStep(1)">
+    <button class="stp active" id="stp1" onclick="goStep(1)" title="1 · Lập bản ảnh">
       <span class="stp-dot">1</span>
       <span class="stp-lbl"><b>Lập bản ảnh</b><span>Thông tin &amp; ảnh</span></span>
     </button>
     <span class="stp-line" id="stpLine1"></span>
-    <button class="stp" id="stp2" onclick="goStep(2)">
+    <button class="stp" id="stp2" onclick="goStep(2)" title="2 · Xem &amp; Xuất">
       <span class="stp-dot">2</span>
       <span class="stp-lbl"><b>Xem &amp; Xuất</b><span>Preview → PDF</span></span>
     </button>
     <!-- Vách dọc, không phải .stp-line: mục 3 là bộ công cụ riêng, vào tự do,
          không phải bước nối tiếp của luồng lập bản ảnh -->
     <span class="stp-sep"></span>
-    <button class="stp free" id="stp3" onclick="goStep(3)">
+    <button class="stp free" id="stp3" onclick="goStep(3)" title="3 · Công cụ file">
       <span class="stp-dot">3</span>
       <span class="stp-lbl"><b>Công cụ file</b><span>Nối · tách · nén · đổi</span></span>
+    </button>
+    <span class="stp-sep"></span>
+    <button class="stp free" id="stp4" onclick="goStep(4)" title="4 · Quét tài liệu">
+      <span class="stp-dot">4</span>
+      <span class="stp-lbl"><b>Quét tài liệu</b><span>Cắt viền · OCR · ký</span></span>
     </button>
   </div>
 </div>
@@ -1622,6 +1762,227 @@ main > .foot{margin-top:auto}
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════════════════
+     MÀN HÌNH 4 — QUÉT TÀI LIỆU
+     Vào tự do như mục 3: không đọc state.groups, không ghi hồ sơ / bản nháp
+     của luồng lập bản ảnh. Toàn bộ mã nằm ở khối script CUỐI file, tiền tố sc/SC.
+     (Đừng viết thẻ script nguyên văn trong chú thích HTML: bộ kiểm thử tách các
+      khối script bằng biểu thức chính quy, gặp thẻ lạc là cắt sai khối.)
+════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel4">
+
+  <!-- ── Nguồn tài liệu ── -->
+  <div class="card">
+    <div class="card-hd"><span class="ico">🔍</span>Quét tài liệu
+      <span class="sp"></span>
+      <span class="tag" id="scChip">chưa có trang nào</span></div>
+    <div class="card-bd">
+      <div class="tipbox" style="margin-bottom:18px">
+        <div class="tz-note">
+          Chụp hoặc chọn ảnh giấy tờ — ứng dụng <b>tự tìm mép giấy, cắt viền, chỉnh thẳng và làm rõ
+          chữ</b>, rồi ghép thành một file PDF. Chạy <b>hoàn toàn trong máy bạn</b>, file không được
+          tải lên internet.
+        </div>
+      </div>
+
+      <div class="tz-dz" id="scDz" onclick="$('scFileImg').click()">
+        <span class="dz-ico">📑</span>
+        <div class="dz-main">
+          <h3>Kéo thả ảnh giấy tờ hoặc file PDF vào đây</h3>
+          <p>mỗi ảnh / mỗi trang PDF thành <b>một trang quét</b> · nhận <b>.jpg · .png · .pdf</b></p>
+        </div>
+        <div class="dz-btns">
+          <button class="btn btn-p btn-sm" id="scBtnCam" onclick="event.stopPropagation();scOpenCam()"
+                  title="Chụp bằng khung ngắm trong ứng dụng">📷 Chụp tài liệu</button>
+          <button class="btn btn-n btn-sm" onclick="event.stopPropagation();$('scFileImg').click()">🖼 Chọn ảnh</button>
+          <button class="btn btn-n btn-sm" onclick="event.stopPropagation();$('scFilePdf').click()">📄 Nạp PDF</button>
+          <button class="btn btn-n btn-sm" onclick="event.stopPropagation();$('scNative').click()"
+                  title="Chụp bằng ứng dụng camera của thiết bị — ảnh nét nhất, chạy được cả khi trang mở bằng http">📱 Camera máy</button>
+        </div>
+      </div>
+      <input type="file" id="scFileImg" accept=".jpg,.jpeg,.png" multiple/>
+      <input type="file" id="scFilePdf" accept=".pdf" multiple/>
+      <input type="file" id="scNative" accept="image/*" capture="environment"/>
+
+      <div class="alert alert-e" id="scAlert"></div>
+
+      <div class="prog" id="scProgBox" style="display:none">
+        <div class="prog-bg"><div class="prog-fill" id="scProgFill" style="width:0"></div></div>
+        <div class="prog-tx" id="scProgTx">Đang xử lý…</div>
+      </div>
+
+      <!-- Giới thiệu những việc làm được — CHỈ hiện khi chưa có trang nào.
+           Ba thẻ bên dưới (Các trang · Xuất & chia sẻ · OCR) phải chờ có trang mới
+           hiện ra, nên không có khối này thì màn hình trông như chỉ có mỗi ô nạp file
+           và người dùng không biết là còn ký, OCR, chia sẻ. -->
+      <div id="scEmpty">
+        <div class="sc-feat-h">Nạp trang xong thì làm được tiếp những việc này</div>
+        <div class="sc-feat">
+          <div><span class="fi">✂️</span><b>Cắt viền &amp; chỉnh thẳng</b>
+            <span>Tự tìm 4 mép giấy, bẻ thẳng tờ chụp xiên. Kéo tay lại 4 góc được, có kính lúp.</span></div>
+          <div><span class="fi">✨</span><b>Làm rõ chữ</b>
+            <span>Xoá bóng tay và vệt sáng đèn: nền ra trắng, chữ ra đen. 5 bộ lọc chọn theo loại giấy tờ.</span></div>
+          <div><span class="fi">📄</span><b>Ghép thành PDF</b>
+            <span>Nhiều trang liên tiếp thành một file A4 để lưu, gửi email hay in. Xuất ảnh JPG cũng được.</span></div>
+          <div><span class="fi">✍️</span><b>Ký · ghi chú · đóng dấu</b>
+            <span>Vẽ chữ ký rồi kéo vào đúng chỗ trên trang. Chữ ký được nhớ lại trong máy để dùng tiếp.</span></div>
+          <div><span class="fi">🔍</span><b>Nhận dạng chữ (OCR)</b>
+            <span>Đọc chữ tiếng Việt thành văn bản sao chép được — xuất .txt, Word, hoặc PDF tìm kiếm được.</span></div>
+          <div><span class="fi">📤</span><b>Lưu &amp; chia sẻ</b>
+            <span>Giữ tài liệu trong máy để mở lại, hoặc gửi thẳng qua Zalo · email · Drive.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Các trang đã quét ── -->
+  <div class="card" id="scPagesCard" style="display:none">
+    <div class="card-hd"><span class="ico">📄</span>Các trang
+      <span class="sp"></span>
+      <span class="tag" id="scPagesTag"></span></div>
+    <div class="card-bd">
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Làm cho tất cả các trang
+          <span class="sp"></span><span class="tag">áp dụng một lượt</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-n btn-sm" onclick="scRedetectAll()">🔍 Nhận diện mép giấy lại</button>
+          <button class="btn btn-n btn-sm" onclick="scFullAll()">⬛ Bỏ cắt viền (giữ cả ảnh)</button>
+          <button class="btn btn-n btn-sm" onclick="scRotAll()">↻ Xoay tất cả 90°</button>
+          <button class="btn btn-n btn-sm" onclick="scClearAll()">🗑 Xóa hết trang</button>
+        </div>
+        <div class="tz-opt" style="margin-top:14px">
+          <div class="fg"><label>Bộ lọc làm rõ cho tất cả</label>
+            <select id="scFiltAll" onchange="scFiltAllApply()">
+              <option value="">— giữ riêng từng trang —</option>
+              <option value="auto">Tự động — làm rõ chữ, nền trắng</option>
+              <option value="gray">Xám — ảnh đen trắng mềm</option>
+              <option value="bw">Đen trắng — nét nhất, file nhẹ nhất</option>
+              <option value="color">Màu — giữ màu, bỏ bóng tối</option>
+              <option value="none">Không xử lý — ảnh gốc</option>
+            </select></div>
+          <div class="fg"><label>Độ phân giải trang quét</label>
+            <select id="scQual" onchange="scReprocAll()">
+              <option value="1400">Nhẹ — cạnh dài 1400px (~150 DPI A4)</option>
+              <option value="2000" selected>Chuẩn — cạnh dài 2000px (~180 DPI A4)</option>
+              <option value="2800">Nét — cạnh dài 2800px (~250 DPI A4)</option>
+            </select>
+            <span class="hint">Càng nét thì xử lý càng lâu và file càng nặng.</span></div>
+        </div>
+      </div>
+
+      <div class="sc-grid" id="scGrid"></div>
+    </div>
+  </div>
+
+  <!-- ── Xuất & chia sẻ ── -->
+  <div class="card act" id="scExpCard" style="display:none">
+    <div class="card-hd"><span class="ico">⚡</span>Xuất &amp; chia sẻ
+      <span class="sp"></span>
+      <span class="tag" id="scExpTag"></span></div>
+    <div class="card-bd">
+      <div class="fsec">
+        <div class="fsec-h"><span class="n">1</span>Khổ trang PDF</div>
+        <div class="tz-opt">
+          <div class="fg"><label>Khổ giấy</label>
+            <select id="scPgSize">
+              <option value="auto" selected>A4 tự chọn dọc/ngang theo trang</option>
+              <option value="a4">A4 dọc</option>
+              <option value="a4l">A4 ngang</option>
+              <option value="fit">Vừa đúng khổ ảnh quét</option>
+            </select></div>
+          <div class="fg"><label>Lề trang (mm)</label>
+            <input type="number" id="scPgPad" value="0" min="0" max="40" step="1"/>
+            <span class="hint">chỉ dùng khi chọn khổ A4</span></div>
+          <div class="fg"><label>Chất lượng JPEG trong PDF</label>
+            <input type="number" id="scPgQ" value="82" min="40" max="100" step="1"/>
+            <span class="hint">hạ xuống cho file nhẹ hơn khi gửi email</span></div>
+          <div class="fg"><label>Tên file</label>
+            <input type="text" id="scName" placeholder="Tai lieu quet"/></div>
+        </div>
+      </div>
+
+      <div class="sc-exp">
+        <button class="btn btn-p btn-lg" id="scBtnPdf" onclick="scExportPdf()">📄 Xuất file PDF</button>
+        <button class="btn btn-o" id="scBtnJpg" onclick="scExportJpg()">🖼 Xuất ảnh JPG</button>
+        <button class="btn btn-o" id="scBtnOcr" onclick="scOcrStart()">🔍 Nhận dạng chữ (OCR)</button>
+        <button class="btn btn-n" id="scBtnShare" onclick="scShare()">📤 Chia sẻ PDF</button>
+        <button class="btn btn-g" id="scBtnSave" onclick="scOpenSave()">💾 Lưu vào máy</button>
+        <button class="btn btn-n" onclick="scOpenLib()">🗂 Tài liệu đã lưu</button>
+      </div>
+
+      <div class="tipbox" style="margin-top:16px">
+        <div class="tz-note">
+          <b>📤 Chia sẻ</b> gọi khung chia sẻ của chính thiết bị, nên gửi thẳng được sang
+          <b>Zalo · email · Drive · AirDrop</b> mà không qua máy chủ nào. Trên máy tính không có
+          khung đó thì nút này tải file về để bạn tự gửi.<br>
+          <b>💾 Lưu vào máy</b> giữ tài liệu trong trình duyệt máy này (IndexedDB) — mở lại được
+          bất cứ lúc nào ở <b>🗂 Tài liệu đã lưu</b>.<br>
+          ℹ️ <b>Đồng bộ đám mây và chia sẻ bằng đường liên kết thì ứng dụng chưa có</b>: hai việc
+          đó cần một máy chủ riêng, mà ứng dụng này cố ý chạy hoàn toàn trong máy bạn để hồ sơ
+          khách hàng không rời khỏi thiết bị.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Nhận dạng chữ (OCR) ── -->
+  <div class="card" id="scOcrCard" style="display:none">
+    <div class="card-hd"><span class="ico">🔍</span>Chữ nhận dạng được
+      <span class="sp"></span>
+      <span class="tag" id="scOcrTag"></span></div>
+    <div class="card-bd">
+      <div class="tz-opt" style="margin-bottom:14px">
+        <div class="fg"><label>Ngôn ngữ</label>
+          <select id="scOcrLang">
+            <option value="vie" selected>Tiếng Việt</option>
+            <option value="vie+eng">Tiếng Việt + Anh</option>
+            <option value="eng">Tiếng Anh</option>
+          </select></div>
+        <div class="fg"><label>Quét trang nào</label>
+          <select id="scOcrScope">
+            <option value="all" selected>Tất cả các trang</option>
+            <option value="one">Chỉ trang đầu tiên (thử nhanh)</option>
+          </select></div>
+      </div>
+      <textarea class="sc-tx" id="scOcrTx" placeholder="Chữ nhận dạng được sẽ hiện ở đây…"></textarea>
+      <div class="sc-exp" style="margin-top:14px">
+        <button class="btn btn-n" onclick="scOcrCopy()">📋 Sao chép toàn bộ</button>
+        <button class="btn btn-o" onclick="scOcrTxt()">⬇ Tải file .txt</button>
+        <button class="btn btn-o" onclick="scOcrDocx()">📝 Tải file Word (.docx)</button>
+        <button class="btn btn-g" onclick="scOcrPdf()">📄 PDF tìm kiếm được</button>
+      </div>
+      <div class="tz-warn" id="scOcrWarn"></div>
+    </div>
+  </div>
+
+  <!-- ── Chỉnh sửa PDF: dùng chung bộ công cụ của màn hình 3 ── -->
+  <div class="card" id="scEditCard">
+    <div class="card-hd"><span class="ico">🛠</span>Chỉnh sửa file PDF
+      <span class="sp"></span>
+      <span class="tag">mở bằng bộ công cụ ở mục 3</span></div>
+    <div class="card-bd">
+      <div class="tz-note" style="margin-bottom:14px">
+        Nối file · tách trang · xóa và đổi thứ tự trang · nén dung lượng · đánh số trang ·
+        đóng dấu chữ đều đã có sẵn ở <b>mục 3 · Công cụ file</b> — bấm một nút dưới đây là mở
+        thẳng công cụ đó, không phải đi tìm.
+      </div>
+      <div class="sc-exp">
+        <button class="btn btn-n" onclick="scGoTool('merge')">🔗 Nối PDF</button>
+        <button class="btn btn-n" onclick="scGoTool('split')">✂️ Tách PDF</button>
+        <button class="btn btn-n" onclick="scGoTool('pages')">🗂 Sắp xếp &amp; xóa trang</button>
+        <button class="btn btn-n" onclick="scGoTool('compress')">🗜 Nén PDF</button>
+        <button class="btn btn-n" onclick="scGoTool('number')">#️⃣ Đánh số trang</button>
+        <button class="btn btn-n" onclick="scGoTool('wmark')">💧 Đóng dấu chữ</button>
+      </div>
+      <div class="tz-note" style="margin-top:14px">
+        Còn <b>ghi chú, đóng dấu và chữ ký đặt đúng chỗ trên từng trang</b> thì làm ngay tại đây:
+        nạp file PDF vào khung trên, rồi bấm <b>✍️</b> ở trang cần ký.
+      </div>
+    </div>
+  </div>
+
+</div>
+
 <div class="foot">
   Tiện ích ghép ảnh - phát triển bằng AI Claude Code<br>
   Mọi ý kiến đóng góp xin liên hệ Chinh05
@@ -1744,7 +2105,7 @@ main > .foot{margin-top:auto}
             title="Đổi sang camera khác (trước / sau)">🔄</button>
     <button class="cam-ic" onclick="closeCamera()" title="Đóng (Esc)">✕</button>
   </div>
-  <div class="cam-grp">
+  <div class="cam-grp" id="camGrpRow">
     <label for="camGrp">Ảnh chụp vào hạng mục</label>
     <select id="camGrp" onchange="onCamGrpChange()"></select>
     <input type="text" id="camGrpNew" style="display:none" autocomplete="off"
@@ -1796,6 +2157,120 @@ main > .foot{margin-top:auto}
   </div>
 </div>
 
+<!-- ════════ MÀN HÌNH 4: CẮT VIỀN & CHỈNH THẲNG ════════
+     Lớp phủ dùng MÀU CỐ ĐỊNH TỐI như .cam / .sig-ov — ảnh giấy tờ phải nằm trên
+     nền tối mới nhìn rõ mép giấy; đổi hệ màu sáng/tối KHÔNG phải sửa khối này. -->
+<div class="sc-ov hidden" id="scCropOv">
+  <div class="sc-ovt">
+    <b>✂️ Cắt viền &amp; chỉnh thẳng</b>
+    <span class="who" id="scCropWho"></span>
+    <span class="sp"></span>
+    <button class="sc-ic" onclick="scCropClose()" title="Đóng (Esc)">✕</button>
+  </div>
+  <div class="sc-ovopt">
+    <label for="scCropFilt">Làm rõ</label>
+    <select id="scCropFilt" onchange="scCropFiltChange()">
+      <option value="auto">Tự động — làm rõ chữ, nền trắng</option>
+      <option value="gray">Xám — đen trắng mềm</option>
+      <option value="bw">Đen trắng — nét nhất, nhẹ nhất</option>
+      <option value="color">Màu — giữ màu, bỏ bóng tối</option>
+      <option value="none">Không xử lý — ảnh gốc</option>
+    </select>
+    <span class="sp"></span>
+    <div class="seg">
+      <button type="button" onclick="scCropDetect()" title="Tìm lại mép giấy">🔍 Tự nhận diện</button>
+      <button type="button" onclick="scCropFull()" title="Giữ nguyên cả ảnh, không cắt">⬛ Cả ảnh</button>
+      <button type="button" onclick="scCropRot()" title="Xoay ảnh 90°">↻ Xoay</button>
+    </div>
+  </div>
+  <div class="sc-stage" id="scCropStage">
+    <canvas id="scCropCv"></canvas>
+    <div class="sc-loupe" id="scLoupe"><canvas id="scLoupeCv" width="118" height="118"></canvas></div>
+  </div>
+  <div class="sc-ovb">
+    <button class="btn btn-n" onclick="scCropClose()">Hủy</button>
+    <span class="note">Kéo <b>4 góc</b> vào đúng 4 mép giấy — kéo <b>điểm giữa cạnh</b> để chỉnh cả cạnh một lúc.</span>
+    <span class="sp"></span>
+    <button class="btn btn-g" id="scCropOk" onclick="scCropDone()">✓ Xong — xử lý trang này</button>
+  </div>
+</div>
+
+<!-- ════════ MÀN HÌNH 4: KÝ · GHI CHÚ · ĐÓNG DẤU LÊN TRANG ════════ -->
+<div class="sc-ov hidden" id="scPlaceOv">
+  <div class="sc-ovt">
+    <b>✍️ Ký · ghi chú · đóng dấu</b>
+    <span class="who" id="scPlWho"></span>
+    <span class="sp"></span>
+    <button class="sc-ic" onclick="scPlClose()" title="Đóng (Esc)">✕</button>
+  </div>
+  <div class="sc-ovopt">
+    <div class="seg">
+      <button type="button" onclick="scPlAdd('sig')">✍️ Chữ ký</button>
+      <button type="button" onclick="scPlAdd('text')">🖊 Ghi chú</button>
+      <button type="button" onclick="scPlAdd('stamp')">🔲 Dấu</button>
+      <button type="button" onclick="scPlAdd('date')">📅 Ngày</button>
+    </div>
+    <span class="sp"></span>
+    <label for="scPlSize">Cỡ</label>
+    <input type="range" id="scPlSize" min="4" max="95" value="24" oninput="scPlSizeChange()"/>
+    <label for="scPlRot">Nghiêng</label>
+    <input type="range" id="scPlRot" min="-180" max="180" value="0" oninput="scPlRotChange()"/>
+  </div>
+  <div class="sc-ovopt" id="scPlSigRow" style="display:none">
+    <label for="scPlSigSel">Chữ ký đã lưu trong máy</label>
+    <select id="scPlSigSel" onchange="scPlSigPick()"></select>
+    <button class="btn btn-o btn-sm" onclick="scPlSigNew()">✍️ Vẽ chữ ký mới</button>
+    <button class="btn btn-n btn-sm" onclick="scPlSigDel()">🗑 Xóa chữ ký này</button>
+  </div>
+  <div class="sc-ovopt" id="scPlTextRow" style="display:none">
+    <label for="scPlText">Chữ</label>
+    <input type="text" id="scPlText" oninput="scPlTextChange()" placeholder="Nội dung ghi chú hoặc dấu"/>
+    <label for="scPlColor">Màu</label>
+    <select id="scPlColor" onchange="scPlColorChange()">
+      <option value="#C62828">Đỏ</option>
+      <option value="#0D47A1">Xanh dương</option>
+      <option value="#102A43" selected>Đen</option>
+      <option value="#2E7D32">Xanh lá</option>
+    </select>
+  </div>
+  <div class="sc-items" id="scPlList"></div>
+  <div class="sc-stage" id="scPlStage">
+    <canvas id="scPlCv"></canvas>
+  </div>
+  <div class="sc-ovb">
+    <button class="btn btn-n" onclick="scPlClose()">Hủy</button>
+    <span class="note">Bấm vào một vật rồi <b>kéo để di chuyển</b>. Hai thanh trượt đổi cỡ và độ nghiêng của vật đang chọn.</span>
+    <span class="sp"></span>
+    <button class="btn btn-g" onclick="scPlDone()">✓ Xong — in lên trang</button>
+  </div>
+</div>
+
+<!-- ════════ MÀN HÌNH 4: LƯU TÀI LIỆU VÀO MÁY ════════ -->
+<div class="ov hidden" id="scSaveModal">
+  <div class="mdl">
+    <h2>💾 Lưu tài liệu quét vào máy</h2>
+    <p>Lưu các trang đã quét vào trình duyệt máy này (IndexedDB). Mở lại bất cứ lúc nào ở
+       <b>🗂 Tài liệu đã lưu</b>. Không có gì được tải lên internet.</p>
+    <input type="text" id="scSaveName" placeholder="Tên tài liệu"
+           onkeydown="if(event.key==='Enter')scDoSave()"/>
+    <div style="height:14px"></div>
+    <div class="mdl-f">
+      <button class="btn btn-n" onclick="closeModal('scSaveModal')">Hủy</button>
+      <button class="btn btn-g" onclick="scDoSave()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ MÀN HÌNH 4: DANH SÁCH TÀI LIỆU ĐÃ LƯU ════════ -->
+<div class="ov hidden" id="scLibModal">
+  <div class="mdl wide">
+    <h2>🗂 Tài liệu quét đã lưu trên máy</h2>
+    <p id="scLibNote"></p>
+    <div class="sc-lib" id="scLibList"></div>
+    <div class="mdl-f"><button class="btn btn-p" onclick="closeModal('scLibModal')">Đóng</button></div>
+  </div>
+</div>
+
 <!-- ════════ MODAL: ĐỔI TÊN NHÓM ════════ -->
 <div class="ov hidden" id="grpModal">
   <div class="mdl">
@@ -1832,7 +2307,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-26a';
+const APP_BUILD   = '2026-11-28a';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -2321,7 +2796,7 @@ window.addEventListener('resize', () => { if (comboCur) placeCombo(comboCur); })
 //  INDEXEDDB — HỒ SƠ LƯU TRÊN MÁY
 // ════════════════════════════════════════════════════════
 const DB_NAME = 'pti_ghepanh', DB_STORE = 'records';
-const DRAFT_META = 'draft_meta', DRAFT_BLOBS = 'draft_blobs', DB_VER = 2;
+const DRAFT_META = 'draft_meta', DRAFT_BLOBS = 'draft_blobs', DB_VER = 3;
 let _db = null;
 
 function openDB() {
@@ -2337,6 +2812,10 @@ function openDB() {
       // nhờ vậy gõ chú thích chỉ ghi lại vài KB thay vì toàn bộ ảnh.
       if (!db.objectStoreNames.contains(DRAFT_META))  db.createObjectStore(DRAFT_META,  { keyPath: 'id' });
       if (!db.objectStoreNames.contains(DRAFT_BLOBS)) db.createObjectStore(DRAFT_BLOBS, { keyPath: 'id' });
+      // v3 — tài liệu của màn hình 4 (Quét tài liệu). Tên store ghi thẳng ở đây
+      // chứ không qua hằng SC_STORE: hằng đó khai ở khối <script> CUỐI file,
+      // lúc openDB() chạy lần đầu thì khối ấy có thể chưa thực thi.
+      if (!db.objectStoreNames.contains('scans')) db.createObjectStore('scans', { keyPath: 'id' });
     };
     req.onsuccess = () => { _db = req.result; resolve(_db); };
     req.onerror   = () => reject(req.error || new Error('Không mở được IndexedDB'));
@@ -2672,8 +3151,8 @@ async function discardDraft() {
 // ════════════════════════════════════════════════════════
 // Bước 1 gộp cả thông tin lẫn ảnh, nên sang bước 2 phải đạt CẢ HAI điều kiện.
 function goStep(n) {
-  n = Math.max(1, Math.min(3, n));
-  // Mục 3 (công cụ file) vào tự do — không đòi thông tin hồ sơ hay ảnh
+  n = Math.max(1, Math.min(4, n));
+  // Mục 3 (công cụ file) và mục 4 (quét tài liệu) vào tự do — không đòi thông tin hồ sơ hay ảnh
   if (n === 2 && state.step !== 2) {
     if (!validateInfo()) return;
     if (!hasImages()) {
@@ -2685,11 +3164,13 @@ function goStep(n) {
 
   state.step = n;
   document.querySelectorAll('.panel').forEach((p, i) => p.classList.toggle('active', i + 1 === n));
-  // Ở mục 3 thì hai bước của luồng bản ảnh về trạng thái thường, không đánh dấu "xong"
+  // Ở mục 3 / 4 thì hai bước của luồng bản ảnh về trạng thái thường, không đánh dấu "xong"
+  const free = (n >= 3);
   [1, 2].forEach(i => {
-    $('stp' + i).className = 'stp' + (n === 3 ? '' : (i === n ? ' active' : i < n ? ' done' : ''));
+    $('stp' + i).className = 'stp' + (free ? '' : (i === n ? ' active' : i < n ? ' done' : ''));
   });
   $('stp3').className = 'stp free' + (n === 3 ? ' active' : '');
+  $('stp4').className = 'stp free' + (n === 4 ? ' active' : '');
   $('stpLine1').className = 'stp-line' + (n === 2 ? ' done' : '');
 
   if (n === 2) {
@@ -2697,18 +3178,20 @@ function goStep(n) {
     bbSyncRows(); bbRenderRows(); bbRecap(); bbRenderSigs(); bbSyncChip();
   }
   if (n === 3 && typeof renderToolGrid === 'function') renderToolGrid();
+  if (n === 4 && typeof scRender === 'function') scRender();
   updateSummaries(); updateActionBar();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/** Nút ← của thanh dưới: từ mục 3 phải về thẳng bước 1,
- *  vì goStep(2) sẽ đòi đủ thông tin hồ sơ và ảnh. */
-function abGoBack() { goStep(state.step === 3 ? 1 : state.step - 1); }
+/** Nút ← của thanh dưới: từ mục 3 và mục 4 phải về thẳng bước 1,
+ *  vì goStep(2) sẽ đòi đủ thông tin hồ sơ và ảnh, còn goStep(3) thì nhảy sang
+ *  bộ công cụ file chứ không phải "lùi". */
+function abGoBack() { goStep(state.step >= 3 ? 1 : state.step - 1); }
 
 function updateActionBar() {
   const n = state.step;
   $('abBack').style.display = n > 1 ? '' : 'none';
-  $('abBack').innerHTML = (n === 3) ? '← Về Lập bản ảnh' : '← Quay lại';
+  $('abBack').innerHTML = (n >= 3) ? '← Về Lập bản ảnh' : '← Quay lại';
   const next = $('abNext');
   if (n >= 2) { next.style.display = 'none'; }
   else {
@@ -2720,6 +3203,10 @@ function updateActionBar() {
   // nên phải hỏi typeof chứ không gọi thắng
   if (n === 3) {
     $('abMeta').textContent = (typeof tzBarMeta === 'function') ? tzBarMeta() : '';
+    return;
+  }
+  if (n === 4) {
+    $('abMeta').textContent = (typeof scBarMeta === 'function') ? scBarMeta() : '';
     return;
   }
   const t = totalImgs();
@@ -3450,14 +3937,23 @@ let camShots = [];            // ảnh chụp trong lần mở này: {id, url} �
 let camAdded = 0;             // số ảnh đã thêm vào bản ảnh trong lần mở này
 let _camLastSrc = null;       // hạng mục dùng lần gần nhất
 let _camNativeSrc = null;     // hạng mục đích khi bấm "Camera máy"
+// 'photo' = chụp vào bản ảnh giám định · 'scan' = chụp vào màn hình 4 (Quét tài liệu).
+// Hai đường dùng CHUNG hộp chụp này (khung ngắm, đèn flash, đổi camera, nháy
+// trắng, nút Camera máy) — chỉ khác chỗ ảnh chụp được đi về đâu.
+let camMode = 'photo';
 
 /** '__un__' cho nhóm ảnh chưa phân loại, còn lại dùng chính src của hạng mục */
 const camTok = src => (!src || src === UNGROUPED) ? '__un__' : src;
 
-/** Mở hộp chụp ảnh. gid = id hạng mục muốn chụp thêm vào (bỏ trống = hỏi trong hộp) */
-async function openCamera(gid) {
-  const g0 = gid ? state.groups.find(x => x.id === gid) : null;
-  camBuildGroupSel(camTok(g0 ? g0.src : _camLastSrc));
+/** Mở hộp chụp ảnh. gid = id hạng mục muốn chụp thêm vào (bỏ trống = hỏi trong hộp).
+ *  mode = 'scan' thì ảnh về màn hình 4 và ô chọn hạng mục bị ẩn. */
+async function openCamera(gid, mode) {
+  camMode = (mode === 'scan') ? 'scan' : 'photo';
+  $('camGrpRow').style.display = (camMode === 'scan') ? 'none' : '';
+  document.querySelector('#camModal .cam-lbl').textContent =
+    (camMode === 'scan') ? 'Chụp tài liệu để quét' : 'Chụp ảnh giám định';
+  const g0 = (camMode === 'photo' && gid) ? state.groups.find(x => x.id === gid) : null;
+  if (camMode === 'photo') camBuildGroupSel(camTok(g0 ? g0.src : _camLastSrc));
   // thu hồi url còn sót (ảnh chụp xong SAU khi hộp đã đóng vẫn kịp vào camShots)
   camShots.forEach(sh => { try { (window.URL || window.webkitURL).revokeObjectURL(sh.url); } catch (_) {} });
   camShots = []; camAdded = 0; camRenderStrip();
@@ -3530,8 +4026,11 @@ function closeCamera() {
   camShots.forEach(sh => { try { (window.URL || window.webkitURL).revokeObjectURL(sh.url); } catch (_) {} });
   camShots = [];
   $('camModal').classList.add('hidden');
-  if (camAdded) toast(`Đã thêm ${camAdded} ảnh vừa chụp`, 'o');
+  if (camAdded) toast(camMode === 'scan'
+    ? `Đã thêm ${camAdded} trang vừa chụp` : `Đã thêm ${camAdded} ảnh vừa chụp`, 'o');
   camAdded = 0;
+  camMode = 'photo';
+  $('camGrpRow').style.display = '';
 }
 
 function camShowMsg(ttl, html, retry) {
@@ -3667,6 +4166,7 @@ async function addCapturedFiles(files, g) {
 async function camShoot() {
   const v = $('camVideo');
   if (camBusy || !camStream || !v.videoWidth) return;
+  if (camMode === 'scan') { await camShootScan(v); return; }
   const g = camTargetGroup();
   if (!g) { toast('Nhập tên hạng mục mới trước khi chụp', 'e'); $('camGrpNew').focus(); return; }
   camBusy = true; $('camShoot').disabled = true;
@@ -3698,6 +4198,34 @@ async function camShoot() {
   }
 }
 
+/** Chụp ở chế độ màn hình 4: ảnh thành MỘT TRANG QUÉT, không vào bản ảnh.
+ *  Nháy trắng vẫn chạy ngay khi bắt được khung hình như đường chụp kia. */
+async function camShootScan(v) {
+  camBusy = true; $('camShoot').disabled = true;
+  try {
+    const cv = document.createElement('canvas');
+    cv.width = v.videoWidth; cv.height = v.videoHeight;
+    cv.getContext('2d').drawImage(v, 0, 0, cv.width, cv.height);
+    const fl = $('camFlash');
+    fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+    $('camCount').textContent = 'đang lưu trang…';
+    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', CAM_JPEG_Q));
+    cv.width = cv.height = 0;
+    if (!blob) throw new Error('toBlob trả về rỗng');
+    const p = await scCamShot(blob);
+    if (!p) throw new Error('không thêm được trang');
+    camShots.unshift({ id: p.id, url: (window.URL || window.webkitURL).createObjectURL(p.src) });
+    camAdded++;
+  } catch (err) {
+    console.error('Chụp tài liệu:', err);
+    toast('Không chụp được — thử lại', 'e');
+  } finally {
+    camBusy = false;
+    $('camShoot').disabled = !camStream;
+    camRenderStrip();
+  }
+}
+
 function camPushShot(it) {
   camShots.unshift({ id: it.id, url: (window.URL || window.webkitURL).createObjectURL(it.file) });
   camRenderStrip();
@@ -3706,7 +4234,9 @@ function camRenderStrip() {
   $('camStrip').innerHTML = camShots.map(sh =>
     `<div class="cam-sh"><img src="${sh.url}" alt=""/>` +
     `<button onclick="camUndo('${sh.id}')" title="Xóa ảnh này khỏi bản ảnh">✕</button></div>`).join('');
-  $('camCount').textContent = camAdded ? `${camAdded} ảnh đã chụp` : 'chưa chụp ảnh';
+  $('camCount').textContent = camAdded
+    ? `${camAdded} ${camMode === 'scan' ? 'trang' : 'ảnh'} đã chụp`
+    : (camMode === 'scan' ? 'chưa chụp trang nào' : 'chưa chụp ảnh');
 }
 /** Bỏ một ảnh vừa chụp (chụp lỗi) — xóa khỏi bản ảnh luôn */
 function camUndo(id) {
@@ -3715,6 +4245,12 @@ function camUndo(id) {
     try { (window.URL || window.webkitURL).revokeObjectURL(camShots[i].url); } catch (_) {}
     camShots.splice(i, 1);
   }
+  if (camMode === 'scan') {
+    scCamUndo(id);
+    camAdded = Math.max(0, camAdded - 1);
+    camRenderStrip();
+    return;
+  }
   if (findItem(id)) { deleteOne(id); camAdded = Math.max(0, camAdded - 1); }
   camBuildGroupSel($('camGrp').value);
   camRenderStrip();
@@ -3722,6 +4258,14 @@ function camUndo(id) {
 
 // ──────── Camera hệ thống (<input capture>) ────────
 function useNativeCam() {
+  if (camMode === 'scan') {
+    camStop();                                 // nhả camera, kẻo ứng dụng camera không mở được
+    camShowMsg('Đang chụp bằng camera hệ thống',
+      'Ảnh chụp sẽ thành một <b>trang quét</b>. Chụp xong bấm <b>Dùng ảnh này</b> trên máy.<br>' +
+      'Muốn quay về khung ngắm trong app thì bấm <b>Thử lại</b>.');
+    $('scNative').click();
+    return;
+  }
   const g = camTargetGroup();
   if (!g) { toast('Nhập tên hạng mục mới trước khi chụp', 'e'); $('camGrpNew').focus(); return; }
   _camNativeSrc = g.src;
@@ -4937,6 +5481,16 @@ document.addEventListener('keydown', e => {
     else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); camShoot(); }
     return;
   }
+  // Đang cắt viền / đặt chữ ký ở màn hình 4: chỉ nhận Esc, ← → không được nhảy mục
+  if (!$('scCropOv').classList.contains('hidden')) {
+    if (e.key === 'Escape') { e.preventDefault(); scCropClose(); }
+    return;
+  }
+  if (!$('scPlaceOv').classList.contains('hidden')) {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.key === 'Escape') { e.preventDefault(); scPlClose(); }
+    return;
+  }
   // Đang xem ảnh lớn: ←/→ chuyển ảnh, R xoay
   if (!$('viewer').classList.contains('hidden')) {
     if (e.key === 'ArrowLeft')  { e.preventDefault(); viewerStep(-1); }
@@ -4970,6 +5524,8 @@ let _navPinned = false;
 function closeTopLayer() {
   if (!$('sigModal').classList.contains('hidden')) { closeSign();   return true; }
   if (!$('camModal').classList.contains('hidden')) { closeCamera(); return true; }
+  if (!$('scCropOv').classList.contains('hidden')) { scCropClose(); return true; }
+  if (!$('scPlaceOv').classList.contains('hidden')){ scPlClose();   return true; }
   if (!$('viewer').classList.contains('hidden'))   { closeViewer(); return true; }
   const ovs = document.querySelectorAll('.ov:not(.hidden)');
   if (ovs.length) { ovs[ovs.length - 1].classList.add('hidden'); return true; }
@@ -5253,9 +5809,12 @@ let _sigDrawing = false, _sigLast = null, _sigDirty = false;
 // Không còn ô tích "Tôi đã đọc và đồng ý" — ký là đã đồng ý, nút Ký luôn bấm được
 function openSign(who) {
   _sigWho = who;
-  $('sigTitle').textContent = who === 'cus' ? '✍️ Chữ ký Lái xe / Chủ xe' : '✍️ Chữ ký Giám định viên PTI';
-  $('sigName').textContent = who === 'cus'
-    ? (bbVal('fLaiXe') || '(chưa nhập tên lái/chủ xe)')
+  // who === 'scan' là màn hình 4 (Quét tài liệu) dùng chung bảng ký này —
+  // chữ ký ra PNG nền trong suốt rồi đặt lên trang, không liên quan biên bản.
+  $('sigTitle').textContent = who === 'scan' ? '✍️ Chữ ký điện tử'
+    : who === 'cus' ? '✍️ Chữ ký Lái xe / Chủ xe' : '✍️ Chữ ký Giám định viên PTI';
+  $('sigName').textContent = who === 'scan' ? 'ký xong sẽ được nhớ lại trong máy để dùng tiếp'
+    : who === 'cus' ? (bbVal('fLaiXe') || '(chưa nhập tên lái/chủ xe)')
     : (bbVal('fGdv') || '');
   $('sigModal').classList.remove('hidden');
   requestAnimationFrame(() => setTimeout(sigInit, 30));
@@ -5320,6 +5879,12 @@ async function sigConfirm() {
   if (!url) { toast('Chưa có nét ký nào', 'e'); return; }
   const who = _sigWho;
   const now = new Date().toISOString();
+  // Màn hình 4: chữ ký không vào biên bản, mà thành một vật đặt lên trang quét
+  if (who === 'scan') {
+    closeSign();
+    if (typeof scSigDone === 'function') scSigDone(url);
+    return;
+  }
   // Chữ ký của lái/chủ xe CHÍNH LÀ sự đồng ý — không còn ô tích riêng
   if (who === 'cus') { bb.sigCus = url; bb.sigCusAt = now; bb.agree = true; bb.agreeAt = now; }
   else               { bb.sigGdv = url; bb.sigGdvAt = now; }
@@ -7971,6 +8536,2057 @@ async function tzRunXls2Pdf() {
   if (nCut) note += ` · ĐÃ CẮT ${nCut} hàng vượt mức ${TZ_XL_MAXROW} hàng/sheet`;
   tzDone('Đã chuyển sang PDF', note, packed);
 }
+</script>
+<script>
+// ════════════════════════════════════════════════════════════════════
+//  MÀN HÌNH 4 — QUÉT TÀI LIỆU
+//
+//  Vào tự do như mục 3: không đọc state.groups, không ghi hồ sơ / bản nháp
+//  của luồng lập bản ảnh. Mọi việc chạy trong trình duyệt.
+//
+//  Đường đi của MỘT trang quét:
+//      ảnh gốc (src)
+//        → xoay theo it.rot          (scSrcCv)
+//        → tìm 4 góc mép giấy        (scDetectQuad — Sobel + biến đổi Hough)
+//        → chỉnh thẳng phối cảnh     (scHomo + scWarp — nội suy song tuyến tính)
+//        → làm rõ chữ                (scEnhance — chia cho nền + giãn tương phản)
+//        → page.out  (ảnh JPEG sạch, CHƯA có chữ ký / dấu)
+//        → scComposite()             in chữ ký · ghi chú · dấu lên bản sao
+//        → xuất PDF / JPG / OCR
+//
+//  Chữ ký và dấu KHÔNG nung vào page.out, nhờ vậy đổi lại được bất cứ lúc nào;
+//  chúng chỉ được in lên bản sao khi dựng ảnh nhỏ, khi xuất file và khi xem.
+//
+//  Mọi tên hàm/biến của khối này mang tiền tố sc/SC — các <script> cổ điển
+//  dùng chung một phạm vi toàn cục, khai lại tên đã có là lỗi cú pháp.
+//  (scheduleDraftSave của luồng bản ảnh cũng bắt đầu bằng "sc" — đừng gọi nó
+//  từ đây, màn hình 4 cố ý không ghi gì vào bản nháp của bản ảnh.)
+// ════════════════════════════════════════════════════════════════════
+
+const SC_DET    = 420;    // cạnh dài (px) của ảnh thu nhỏ dùng để tìm mép giấy
+const SC_THUMB  = 340;    // cạnh dài (px) của ảnh nhỏ trong lưới trang
+const SC_MAXP   = 60;     // số trang tối đa một tài liệu
+const SC_STORE  = 'scans';
+const SC_SIGKEY = 'pti_sign_list';
+const SC_SIGMAX = 6;      // số chữ ký điện tử nhớ trong máy
+const SC_TESS   = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+
+const SC_FILTS = {
+  auto:  'Tự động — làm rõ chữ, nền trắng',
+  gray:  'Xám — đen trắng mềm',
+  bw:    'Đen trắng — nét nhất, nhẹ nhất',
+  color: 'Màu — giữ màu, bỏ bóng tối',
+  none:  'Không xử lý — ảnh gốc',
+};
+
+/** Trạng thái màn hình 4. `pages[]` sửa trực tiếp — không dựng lại từ danh sách file,
+ *  nhờ vậy giữ được thứ tự, 4 góc đã chỉnh tay, bộ lọc riêng và chữ ký đã đặt. */
+const scn = { pages: [], busy: false, pdf: null, ocr: null, docId: null, docName: '' };
+
+const scYield = () => new Promise(r => setTimeout(r, 0));
+const scFullQuad = (w, h) => [[0, 0], [w, 0], [w, h], [0, h]];
+const scPageAt = i => scn.pages[i] || null;
+
+// ════════════════════════════════════════════════════════
+//  TIỆN ÍCH ẢNH
+// ════════════════════════════════════════════════════════
+
+/** Ảnh gốc của trang, ĐÃ xoay theo page.rot. Mọi toạ độ 4 góc đong trên khung này. */
+async function scSrcCv(page) {
+  const img = await loadImage(page.src);
+  const w0 = img.naturalWidth || img.width, h0 = img.naturalHeight || img.height;
+  if (!w0 || !h0) throw new Error('Ảnh rỗng: ' + page.name);
+  const r = ((page.rot % 360) + 360) % 360;
+  const swap = (r === 90 || r === 270);
+  const cv = document.createElement('canvas');
+  cv.width  = swap ? h0 : w0;
+  cv.height = swap ? w0 : h0;
+  const cx = cv.getContext('2d', { willReadFrequently: true });
+  cx.imageSmoothingQuality = 'high';
+  cx.translate(cv.width / 2, cv.height / 2);
+  cx.rotate(r * Math.PI / 180);
+  cx.drawImage(img, -w0 / 2, -h0 / 2);
+  return cv;
+}
+
+function scToBlob(cv, type, q) {
+  return new Promise((res, rej) => cv.toBlob(b => {
+    if (!b) { rej(new Error('Không tạo được ảnh — trang có thể quá lớn so với bộ nhớ tab')); return; }
+    res(b);
+  }, type || 'image/jpeg', q === undefined ? .92 : q));
+}
+
+/** Mờ hộp hai chiều bằng TỔNG CHẠY (O(n) theo số điểm ảnh).
+ *  Cố ý KHÔNG dùng ảnh tích phân: trang 2000×2800 cần Float64 mới đủ chính xác
+ *  cho tổng tích phân (tổng tới ~1,4 tỷ, vượt xa 24 bit của Float32) → tốn 45MB. */
+function scBlur(src, w, h, r) {
+  if (r < 1) return src.slice();
+  const cl = (v, m) => v < 0 ? 0 : (v > m ? m : v);
+  const tmp = new Float32Array(w * h), out = new Float32Array(w * h);
+  const d = 2 * r + 1;
+  for (let y = 0; y < h; y++) {
+    const o = y * w;
+    let s = 0;
+    for (let x = -r; x <= r; x++) s += src[o + cl(x, w - 1)];
+    for (let x = 0; x < w; x++) {
+      tmp[o + x] = s / d;
+      s -= src[o + cl(x - r, w - 1)];
+      s += src[o + cl(x + r + 1, w - 1)];
+    }
+  }
+  for (let x = 0; x < w; x++) {
+    let s = 0;
+    for (let y = -r; y <= r; y++) s += tmp[cl(y, h - 1) * w + x];
+    for (let y = 0; y < h; y++) {
+      out[y * w + x] = s / d;
+      s -= tmp[cl(y - r, h - 1) * w + x];
+      s += tmp[cl(y + r + 1, h - 1) * w + x];
+    }
+  }
+  return out;
+}
+
+/** Giá trị ở phân vị p của một biểu đồ tần số */
+function scPct(hist, total, p) {
+  let want = total * p, acc = 0;
+  for (let i = 0; i < hist.length; i++) {
+    acc += hist[i];
+    if (acc >= want) return i;
+  }
+  return hist.length - 1;
+}
+
+// ════════════════════════════════════════════════════════
+//  TÌM MÉP GIẤY — Sobel + biến đổi Hough
+//
+//  Làm trên ảnh thu nhỏ còn SC_DET px cho nhanh, rồi quy toạ độ về ảnh gốc.
+//  Hough chịu được giấy chụp xiên và quay nghiêng, nên vừa cắt viền vừa
+//  chỉnh thẳng được bằng cùng một phép đo — không cần bước "dò góc nghiêng" riêng.
+//
+//  Chọn đường nào làm mép giấy: trong NỬA ảnh của mỗi cạnh, lấy các đường đủ
+//  mạnh rồi chọn đường NGOÀI CÙNG. Mép giấy thường yếu hơn đường kẻ bảng hay
+//  mép ảnh in bên trong tài liệu, nhưng luôn nằm ngoài hơn chúng.
+// ════════════════════════════════════════════════════════
+
+function scQuadArea(q) {
+  let s = 0;
+  for (let i = 0; i < 4; i++) {
+    const a = q[i], b = q[(i + 1) % 4];
+    s += a[0] * b[1] - b[0] * a[1];
+  }
+  return Math.abs(s) / 2;
+}
+function scConvex(q) {
+  let sign = 0;
+  for (let i = 0; i < 4; i++) {
+    const a = q[i], b = q[(i + 1) % 4], c = q[(i + 2) % 4];
+    const cr = (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]);
+    if (Math.abs(cr) < 1e-9) continue;
+    const s = cr > 0 ? 1 : -1;
+    if (!sign) sign = s;
+    else if (s !== sign) return false;
+  }
+  return true;
+}
+
+/** @returns 4 góc [TL, TR, BR, BL] theo toạ độ ảnh `cv`, hoặc null nếu không chắc */
+function scDetectQuad(cv) {
+  const k = Math.min(1, SC_DET / Math.max(cv.width, cv.height));
+  const w = Math.max(48, Math.round(cv.width * k));
+  const h = Math.max(48, Math.round(cv.height * k));
+  const sm = document.createElement('canvas');
+  sm.width = w; sm.height = h;
+  const sx = sm.getContext('2d', { willReadFrequently: true });
+  sx.imageSmoothingQuality = 'high';
+  sx.drawImage(cv, 0, 0, w, h);
+  const px = sx.getImageData(0, 0, w, h).data;
+  sm.width = sm.height = 0;
+
+  const g = new Float32Array(w * h);
+  for (let i = 0, p = 0; i < g.length; i++, p += 4)
+    g[i] = px[p] * .299 + px[p + 1] * .587 + px[p + 2] * .114;
+  const bl = scBlur(g, w, h, 2);
+
+  const mag = new Float32Array(w * h);
+  let sum = 0, sum2 = 0, n = 0;
+  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+    const i = y * w + x;
+    const gx = (bl[i - w + 1] + 2 * bl[i + 1] + bl[i + w + 1])
+             - (bl[i - w - 1] + 2 * bl[i - 1] + bl[i + w - 1]);
+    const gy = (bl[i + w - 1] + 2 * bl[i + w] + bl[i + w + 1])
+             - (bl[i - w - 1] + 2 * bl[i - w] + bl[i - w + 1]);
+    const m = Math.sqrt(gx * gx + gy * gy);
+    mag[i] = m; sum += m; sum2 += m * m; n++;
+  }
+  if (!n) return null;
+  const mean = sum / n;
+  const sd = Math.sqrt(Math.max(0, sum2 / n - mean * mean));
+
+  // Ngưỡng tự nới dần: ảnh giấy trắng trên nền sáng cho mép rất nhạt
+  let pts = [], th = mean + 2.4 * sd;
+  for (let pass = 0; pass < 6; pass++) {
+    pts = [];
+    for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++)
+      if (mag[y * w + x] > th) pts.push(x, y);
+    if (pts.length >= 700 || th <= mean * .55) break;
+    th *= .7;
+  }
+  if (pts.length < 280) return null;
+
+  const diag = Math.ceil(Math.hypot(w, h));
+  const R = 2 * diag + 1, T = 180;
+  const cosT = new Float32Array(T), sinT = new Float32Array(T);
+  for (let t = 0; t < T; t++) {
+    const a = t * Math.PI / 180;
+    cosT[t] = Math.cos(a); sinT[t] = Math.sin(a);
+  }
+  const acc = new Int32Array(T * R);
+  const step = (pts.length / 2 > 26000) ? 2 : 1;   // ảnh nhiều chữ cho rất nhiều điểm mép
+  for (let p = 0; p < pts.length; p += 2 * step) {
+    const x = pts[p], y = pts[p + 1];
+    for (let t = 0; t < T; t++)
+      acc[t * R + (Math.round(x * cosT[t] + y * sinT[t]) + diag)]++;
+  }
+
+  // Đỉnh của bộ đếm = một đường thẳng. Chặn đỉnh lân cận để không ra 5 đường sát nhau.
+  const minV = Math.max(16, Math.round(.16 * Math.min(w, h)));
+  const cands = [];
+  for (let t = 0; t < T; t++) for (let r = 1; r < R - 1; r++) {
+    const v = acc[t * R + r];
+    if (v < minV) continue;
+    let top = true;
+    for (let dt = -2; dt <= 2 && top; dt++) {
+      const tt = ((t + dt) % T + T) % T;
+      for (let dr = -3; dr <= 3; dr++) {
+        if (!dt && !dr) continue;
+        const rr = r + dr;
+        if (rr < 0 || rr >= R) continue;
+        if (acc[tt * R + rr] > v) { top = false; break; }
+      }
+    }
+    if (top) cands.push({ t: t, r: r - diag, v: v });
+  }
+  if (cands.length < 4) return null;
+
+  // Phân nhóm theo hướng pháp tuyến: t≈0 (hoặc ≈180) là đường DỌC, t≈90 là đường NGANG
+  const xm = w / 2, ym = h / 2;
+  const vert = [], horz = [];
+  for (const c of cands) {
+    const a = c.t;
+    if (a < 38 || a > 142) {
+      const ct = cosT[a];
+      if (Math.abs(ct) < 1e-4) continue;
+      vert.push({ t: a, r: c.r, v: c.v, pos: (c.r - ym * sinT[a]) / ct });   // x tại giữa chiều cao
+    } else if (Math.abs(a - 90) < 38) {
+      const st = sinT[a];
+      if (Math.abs(st) < 1e-4) continue;
+      horz.push({ t: a, r: c.r, v: c.v, pos: (c.r - xm * cosT[a]) / st });   // y tại giữa bề ngang
+    }
+  }
+
+  /** Trong dải [lo, hi]: lấy các đường đủ mạnh rồi chọn đường NGOÀI CÙNG.
+   *  dir = -1 lấy nhỏ nhất (mép trái / trên), +1 lấy lớn nhất (mép phải / dưới). */
+  function pick(list, lo, hi, dir) {
+    const z = list.filter(c => c.pos >= lo && c.pos <= hi);
+    if (!z.length) return null;
+    let best = 0;
+    for (const c of z) if (c.v > best) best = c.v;
+    const strong = z.filter(c => c.v >= best * .55);
+    strong.sort((a, b) => dir < 0 ? a.pos - b.pos : b.pos - a.pos);
+    return strong[0];
+  }
+  const eL = pick(vert, -.06 * w, .45 * w, -1);
+  const eR = pick(vert, .55 * w, 1.06 * w, +1);
+  const eT = pick(horz, -.06 * h, .45 * h, -1);
+  const eB = pick(horz, .55 * h, 1.06 * h, +1);
+  if (!eL || !eR || !eT || !eB) return null;
+
+  /** Giao điểm hai đường Hough: x·cos t + y·sin t = r */
+  function cross(a, b) {
+    const c1 = cosT[a.t], s1 = sinT[a.t], c2 = cosT[b.t], s2 = sinT[b.t];
+    const det = c1 * s2 - c2 * s1;
+    if (Math.abs(det) < 1e-6) return null;
+    return [(a.r * s2 - b.r * s1) / det, (b.r * c1 - a.r * c2) / det];
+  }
+  const q = [cross(eL, eT), cross(eR, eT), cross(eR, eB), cross(eL, eB)];
+  if (q.some(p => !p || !isFinite(p[0]) || !isFinite(p[1]))) return null;
+
+  // Kiểm tra: tứ giác lồi, đủ lớn, 4 góc không chạy quá xa khỏi ảnh, cạnh không quá ngắn
+  const area = scQuadArea(q);
+  if (area < .12 * w * h || area > 1.3 * w * h) return null;
+  for (const p of q)
+    if (p[0] < -.09 * w || p[0] > 1.09 * w || p[1] < -.09 * h || p[1] > 1.09 * h) return null;
+  if (!scConvex(q)) return null;
+  const len = (i, j) => Math.hypot(q[i][0] - q[j][0], q[i][1] - q[j][1]);
+  if (len(0, 1) < .18 * w || len(3, 2) < .18 * w || len(0, 3) < .18 * h || len(1, 2) < .18 * h)
+    return null;
+
+  // Thu vào tâm một chút: đường tìm được nằm ĐÚNG trên mép giấy, cắt sát mép thì
+  // trang quét còn một viền sẫm của mặt bàn, mà bước làm rõ lại tô nó đậm thêm.
+  // 0,6% cạnh là chưa tới 1/10 lề giấy thường, không ăn vào chữ.
+  const gx = (q[0][0] + q[1][0] + q[2][0] + q[3][0]) / 4;
+  const gy = (q[0][1] + q[1][1] + q[2][1] + q[3][1]) / 4;
+  const inset = .006;
+  const cx = (v, m) => Math.max(0, Math.min(m, v / k));
+  return q.map(p => [
+    cx(p[0] + (gx - p[0]) * inset, cv.width),
+    cx(p[1] + (gy - p[1]) * inset, cv.height)]);
+}
+
+// ════════════════════════════════════════════════════════
+//  CHỈNH THẲNG PHỐI CẢNH
+// ════════════════════════════════════════════════════════
+
+/** Khử Gauss có chọn trụ cho hệ n ẩn. null nếu suy biến. */
+function scSolve(A, b, n) {
+  for (let i = 0; i < n; i++) {
+    let p = i;
+    for (let r = i + 1; r < n; r++) if (Math.abs(A[r][i]) > Math.abs(A[p][i])) p = r;
+    if (Math.abs(A[p][i]) < 1e-12) return null;
+    if (p !== i) {
+      const t = A[p]; A[p] = A[i]; A[i] = t;
+      const u = b[p]; b[p] = b[i]; b[i] = u;
+    }
+    for (let r = i + 1; r < n; r++) {
+      const f = A[r][i] / A[i][i];
+      if (!f) continue;
+      for (let c = i; c < n; c++) A[r][c] -= f * A[i][c];
+      b[r] -= f * b[i];
+    }
+  }
+  const x = new Float64Array(n);
+  for (let i = n - 1; i >= 0; i--) {
+    let s = b[i];
+    for (let c = i + 1; c < n; c++) s -= A[i][c] * x[c];
+    x[i] = s / A[i][i];
+  }
+  return x;
+}
+
+/** Ma trận phối cảnh đưa 4 góc ĐÍCH về 4 góc NGUỒN — tức là đi NGƯỢC.
+ *  Phải đi ngược mới duyệt được từng điểm ảnh của trang kết quả rồi lấy mẫu
+ *  ở ảnh gốc; đi xuôi thì ảnh ra bị rỗ lỗ chỗ vì nhiều điểm đích không ai ghi. */
+function scHomo(dst, src) {
+  const A = [], b = [];
+  for (let i = 0; i < 4; i++) {
+    const u = dst[i][0], v = dst[i][1], x = src[i][0], y = src[i][1];
+    A.push([u, v, 1, 0, 0, 0, -u * x, -v * x]); b.push(x);
+    A.push([0, 0, 0, u, v, 1, -u * y, -v * y]); b.push(y);
+  }
+  return scSolve(A, b, 8);
+}
+
+/** Khổ trang kết quả, suy từ chiều dài trung bình của hai cặp cạnh đối. */
+function scOutSize(quad, target) {
+  const d = (a, b) => Math.hypot(quad[a][0] - quad[b][0], quad[a][1] - quad[b][1]);
+  const w = (d(0, 1) + d(3, 2)) / 2, h = (d(0, 3) + d(1, 2)) / 2;
+  if (!(w > 1) || !(h > 1)) return { w: 1000, h: 1414 };
+  // Không phóng to quá kích thước thật: kéo ảnh 800px lên 2000px chỉ làm file nặng
+  const cap = Math.min(target, Math.round(Math.max(w, h) * 1.15));
+  const k = cap / Math.max(w, h);
+  return { w: Math.max(80, Math.round(w * k)), h: Math.max(80, Math.round(h * k)) };
+}
+
+/** Cắt tứ giác `quad` của `cv` ra thành trang chữ nhật outW × outH, nội suy song tuyến tính. */
+async function scWarp(cv, quad, outW, outH, onProg) {
+  // Hạ độ phân giải NGUỒN xuống chỉ hơn mức cần một chút: đọc nguyên ảnh 12MP
+  // thành ImageData mất ~48MB, mà lấy mẫu xuống thì cũng không nét thêm.
+  const qLong = Math.max(
+    Math.hypot(quad[0][0] - quad[1][0], quad[0][1] - quad[1][1]),
+    Math.hypot(quad[0][0] - quad[3][0], quad[0][1] - quad[3][1]));
+  const pre = Math.min(1, (1.35 * Math.max(outW, outH)) / Math.max(1, qLong));
+  let src = cv, q = quad;
+  if (pre < .98) {
+    const w2 = Math.max(16, Math.round(cv.width * pre));
+    const h2 = Math.max(16, Math.round(cv.height * pre));
+    const c2 = document.createElement('canvas');
+    c2.width = w2; c2.height = h2;
+    const x2 = c2.getContext('2d', { willReadFrequently: true });
+    x2.imageSmoothingQuality = 'high';
+    x2.drawImage(cv, 0, 0, w2, h2);
+    src = c2;
+    q = quad.map(p => [p[0] * pre, p[1] * pre]);
+  }
+  const sw = src.width, sh = src.height;
+  const sd = src.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, sw, sh).data;
+  const H = scHomo([[0, 0], [outW, 0], [outW, outH], [0, outH]], q);
+  if (!H) throw new Error('Bốn góc đang chọn không thành một tứ giác — bấm 🔍 Tự nhận diện hoặc ⬛ Cả ảnh.');
+  const a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g2 = H[6], h2 = H[7];
+
+  const out = document.createElement('canvas');
+  out.width = outW; out.height = outH;
+  const octx = out.getContext('2d', { willReadFrequently: true });
+  const img = octx.createImageData(outW, outH);
+  const o = img.data;
+
+  for (let y0 = 0; y0 < outH; y0 += 96) {
+    const y1 = Math.min(outH, y0 + 96);
+    for (let y = y0; y < y1; y++) {
+      const v = y + .5;
+      let di = y * outW * 4;
+      for (let x = 0; x < outW; x++, di += 4) {
+        const u = x + .5;
+        const wq = g2 * u + h2 * v + 1;
+        const sx = (a * u + b * v + c) / wq, sy = (d * u + e * v + f) / wq;
+        if (!(sx >= 0) || !(sy >= 0) || sx > sw - 1 || sy > sh - 1) {
+          o[di] = o[di + 1] = o[di + 2] = 255; o[di + 3] = 255;
+          continue;
+        }
+        const xi = sx | 0, yi = sy | 0;
+        const fx = sx - xi, fy = sy - yi;
+        const x2i = xi + 1 < sw ? xi + 1 : xi, y2i = yi + 1 < sh ? yi + 1 : yi;
+        const i00 = (yi * sw + xi) * 4, i10 = (yi * sw + x2i) * 4;
+        const i01 = (y2i * sw + xi) * 4, i11 = (y2i * sw + x2i) * 4;
+        const w00 = (1 - fx) * (1 - fy), w10 = fx * (1 - fy);
+        const w01 = (1 - fx) * fy, w11 = fx * fy;
+        o[di]     = sd[i00]     * w00 + sd[i10]     * w10 + sd[i01]     * w01 + sd[i11]     * w11;
+        o[di + 1] = sd[i00 + 1] * w00 + sd[i10 + 1] * w10 + sd[i01 + 1] * w01 + sd[i11 + 1] * w11;
+        o[di + 2] = sd[i00 + 2] * w00 + sd[i10 + 2] * w10 + sd[i01 + 2] * w01 + sd[i11 + 2] * w11;
+        o[di + 3] = 255;
+      }
+    }
+    if (onProg) onProg(y1 / outH);
+    await scYield();                 // nhường luồng cho giao diện, kẻo tab đứng cả giây
+  }
+  octx.putImageData(img, 0, 0);
+  if (src !== cv) { src.width = src.height = 0; }
+  return out;
+}
+
+// ════════════════════════════════════════════════════════
+//  LÀM RÕ NỘI DUNG
+//
+//  Cốt lõi là phép CHIA CHO NỀN: ước lượng độ sáng của chính TỜ GIẤY rồi lấy ảnh
+//  chia cho nó. Bóng tay, vệt sáng đèn và giấy ngà đều biến mất, còn nét mực thì
+//  giữ nguyên — đây là cách các app quét tài liệu làm nền trắng.
+// ════════════════════════════════════════════════════════
+
+/** Độ sáng của tờ giấy, ước lượng bằng LỌC CỰC ĐẠI (local max) rồi làm mượt.
+ *
+ *  KHÔNG dùng trung bình (mờ hộp): trung bình bị nét mực kéo xuống, nên chỗ chữ
+ *  dày cho nền thấp hơn chỗ lề trắng — chia xong thì lề ra xám mà vùng chữ ra
+ *  trắng, bản in trông bẩn từng mảng. Lọc cực đại bỏ hẳn nét mực, chỉ còn giấy.
+ *
+ *  Chạy trên ảnh đã thu nhỏ bằng max-pooling nên nhanh: ảnh 2000×2800 chỉ còn
+ *  ~154×216 điểm, lọc cực đại ngây thơ trên đó là đủ rẻ.
+ *
+ *  @param floor sàn của nền — vùng tối NGUYÊN KHỐI (ảnh dán trên trang, ô đen)
+ *         có cực đại thấp, không chặn sàn thì nó bị kéo bật lên thành trắng bệch.
+ */
+function scBg(g, w, h, r, floor) {
+  const f = Math.max(1, Math.ceil(Math.max(w, h) / 220));
+  const ws = Math.max(1, Math.ceil(w / f)), hs = Math.max(1, Math.ceil(h / f));
+  const sm = new Float32Array(ws * hs);
+  for (let y = 0; y < h; y++) {
+    const o = ((y / f) | 0) * ws;
+    for (let x = 0; x < w; x++) {
+      const i = o + ((x / f) | 0), v = g[y * w + x];
+      if (v > sm[i]) sm[i] = v;
+    }
+  }
+  const rs = Math.max(1, Math.round(r / f));
+  const tmp = new Float32Array(ws * hs), mx = new Float32Array(ws * hs);
+  for (let y = 0; y < hs; y++) for (let x = 0; x < ws; x++) {     // cực đại theo trục ngang
+    let v = 0;
+    for (let k = -rs; k <= rs; k++) {
+      const xx = x + k;
+      if (xx < 0 || xx >= ws) continue;
+      const u = sm[y * ws + xx];
+      if (u > v) v = u;
+    }
+    tmp[y * ws + x] = v;
+  }
+  for (let y = 0; y < hs; y++) for (let x = 0; x < ws; x++) {     // rồi theo trục dọc
+    let v = 0;
+    for (let k = -rs; k <= rs; k++) {
+      const yy = y + k;
+      if (yy < 0 || yy >= hs) continue;
+      const u = tmp[yy * ws + x];
+      if (u > v) v = u;
+    }
+    mx[y * ws + x] = Math.max(v, floor || 0);
+  }
+  const sb = scBlur(mx, ws, hs, Math.max(1, Math.round(rs * .7)));
+  const out = new Float32Array(w * h);
+  for (let y = 0; y < h; y++) {                                   // phóng lại cỡ thật
+    const fy = Math.min(hs - 1, Math.max(0, (y + .5) / f - .5));
+    const y0 = fy | 0, y1 = Math.min(hs - 1, y0 + 1), ty = fy - y0;
+    for (let x = 0; x < w; x++) {
+      const fx = Math.min(ws - 1, Math.max(0, (x + .5) / f - .5));
+      const x0 = fx | 0, x1 = Math.min(ws - 1, x0 + 1), tx = fx - x0;
+      const a = sb[y0 * ws + x0] * (1 - tx) + sb[y0 * ws + x1] * tx;
+      const b = sb[y1 * ws + x0] * (1 - tx) + sb[y1 * ws + x1] * tx;
+      out[y * w + x] = a * (1 - ty) + b * ty;
+    }
+  }
+  return out;
+}
+
+/** Phân vị của một mảng Float32 (lấy mẫu thưa cho nhanh) */
+function scPctOf(arr, p) {
+  const hist = new Int32Array(512);
+  const step = Math.max(1, Math.floor(arr.length / 200000));
+  let n = 0;
+  for (let i = 0; i < arr.length; i += step) {
+    let b = arr[i] | 0;
+    hist[b < 0 ? 0 : (b > 511 ? 511 : b)]++;
+    n++;
+  }
+  return scPct(hist, n, p);
+}
+
+function scEnhance(cv, mode) {
+  if (mode === 'none') return;
+  const w = cv.width, h = cv.height;
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  const img = ctx.getImageData(0, 0, w, h);
+  const d = img.data;
+  const r = Math.max(4, Math.round(Math.max(w, h) / 16));
+
+  if (mode === 'color') {
+    for (let ch = 0; ch < 3; ch++) {
+      const p = new Float32Array(w * h);
+      for (let i = 0, j = ch; i < p.length; i++, j += 4) p[i] = d[j];
+      const bg = scBg(p, w, h, r, scPctOf(p, .97) * .5);
+      for (let i = 0, j = ch; i < p.length; i++, j += 4) {
+        const v = (p[i] / Math.max(24, bg[i])) * 252;
+        d[j] = v < 0 ? 0 : (v > 255 ? 255 : v);
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return;
+  }
+
+  const g = new Float32Array(w * h);
+  for (let i = 0, j = 0; i < g.length; i++, j += 4)
+    g[i] = d[j] * .299 + d[j + 1] * .587 + d[j + 2] * .114;
+  const bg = scBg(g, w, h, r, scPctOf(g, .97) * .5);
+  const flat = new Float32Array(w * h);
+  for (let i = 0; i < g.length; i++) flat[i] = (g[i] / Math.max(24, bg[i])) * 255;
+
+  if (mode === 'bw') {
+    // Ngưỡng theo VÙNG, không phải một ngưỡng chung: trang chụp lệch sáng vẫn ra đều
+    const loc = scBlur(flat, w, h, Math.max(6, Math.round(Math.max(w, h) / 90)));
+    for (let i = 0, j = 0; i < flat.length; i++, j += 4) {
+      const v = flat[i] < loc[i] - 10 ? 0 : 255;
+      d[j] = d[j + 1] = d[j + 2] = v; d[j + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    return;
+  }
+
+  const hist = new Int32Array(512);
+  for (let i = 0; i < flat.length; i++) {
+    let b = flat[i] | 0;
+    hist[b < 0 ? 0 : (b > 511 ? 511 : b)]++;
+  }
+  const auto = (mode === 'auto');
+  const hi = scPct(hist, flat.length, auto ? .900 : .985);
+  // Trang gần như trắng trơn (ít chữ) thì phân vị dưới cũng rơi vào phần giấy;
+  // ép mốc đen xuống dưới mốc trắng ít nhất 70 bậc, kẻo nền bị đẩy thành đen trắng lốm đốm.
+  const lo = Math.min(scPct(hist, flat.length, auto ? .045 : .012), hi - 70);
+  const span = Math.max(12, hi - lo);
+  const gam = auto ? .82 : 1;
+  for (let i = 0, j = 0; i < flat.length; i++, j += 4) {
+    let v = (flat[i] - lo) / span;
+    v = v < 0 ? 0 : (v > 1 ? 1 : v);
+    if (gam !== 1) v = Math.pow(v, gam);
+    const u = Math.round(v * 255);
+    d[j] = d[j + 1] = d[j + 2] = u; d[j + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+// ════════════════════════════════════════════════════════
+//  VẬT ĐẶT LÊN TRANG (chữ ký · ghi chú · dấu · ngày)
+//
+//  Toạ độ ghi theo TỈ LỆ của trang (0..1) chứ không theo điểm ảnh, nhờ vậy đổi
+//  độ phân giải trang quét thì chữ ký vẫn nằm đúng chỗ. Khoá bắt đầu bằng "_"
+//  là tạm (ảnh đã giải mã) — không được lưu vào IndexedDB.
+// ════════════════════════════════════════════════════════
+function scRound(ctx, x, y, w, h, r) {
+  const rr = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + rr, y);
+  ctx.lineTo(x + w - rr, y); ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+  ctx.lineTo(x + w, y + h - rr); ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+  ctx.lineTo(x + rr, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+  ctx.lineTo(x, y + rr); ctx.quadraticCurveTo(x, y, x + rr, y);
+  ctx.closePath();
+}
+
+/** Giải mã sẵn ảnh chữ ký của mọi vật — phải gọi TRƯỚC khi vẽ, vì drawImage
+ *  không chờ ảnh tải xong và sẽ vẽ ra khoảng trắng. */
+async function scLoadOvs(ovs) {
+  for (const o of (ovs || [])) {
+    if (o.type !== 'sig' || !o.data || o._img) continue;
+    try {
+      o._img = await new Promise((res, rej) => {
+        const im = new Image();
+        im.onload = () => res(im);
+        im.onerror = () => rej(new Error('ảnh chữ ký lỗi'));
+        im.src = o.data;
+      });
+      o._ar = (o._img.naturalWidth || 1) / Math.max(1, o._img.naturalHeight);
+    } catch (_) { o._img = null; }
+  }
+}
+
+function scDrawOvs(ctx, W, H, ovs) {
+  (ovs || []).forEach(o => {
+    ctx.save();
+    ctx.translate(o.x * W, o.y * H);
+    ctx.rotate((o.rot || 0) * Math.PI / 180);
+    if (o.type === 'sig') {
+      if (o._img) {
+        const w = Math.max(8, o.w * W), hh = w / Math.max(.05, o._ar || 2.4);
+        ctx.drawImage(o._img, -w / 2, -hh / 2, w, hh);
+      }
+    } else {
+      const fs = Math.max(8, (o.size || .03) * H);
+      ctx.font = '700 ' + fs + 'px system-ui, "Segoe UI", Roboto, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = o.color || '#102A43';
+      const tx = o.text || '';
+      if (o.type === 'stamp') {
+        const tw = ctx.measureText(tx).width;
+        const pw = tw + fs * .95, ph = fs * 1.75;
+        ctx.lineWidth = Math.max(2, fs * .09);
+        ctx.strokeStyle = o.color || '#C62828';
+        scRound(ctx, -pw / 2, -ph / 2, pw, ph, fs * .3);
+        ctx.stroke();
+      }
+      ctx.fillText(tx, 0, 0);
+    }
+    ctx.restore();
+  });
+}
+
+/** Kích thước vật trên trang (theo điểm ảnh của trang) — dùng để bắt điểm khi kéo */
+function scOvBox(ctx, W, H, o) {
+  if (o.type === 'sig') {
+    const w = Math.max(8, o.w * W);
+    return { w: w, h: w / Math.max(.05, o._ar || 2.4) };
+  }
+  const fs = Math.max(8, (o.size || .03) * H);
+  ctx.font = '700 ' + fs + 'px system-ui, "Segoe UI", Roboto, Arial, sans-serif';
+  const tw = ctx.measureText(o.text || '').width;
+  return { w: Math.max(fs, tw + fs * .95), h: fs * 1.75 };
+}
+
+// ════════════════════════════════════════════════════════
+//  XỬ LÝ MỘT TRANG
+// ════════════════════════════════════════════════════════
+
+function scProg(pct, msg) {
+  $('scProgBox').style.display = '';
+  $('scProgFill').style.width = Math.max(0, Math.min(100, pct)) + '%';
+  $('scProgTx').textContent = msg || '';
+}
+const scProgHide = () => { $('scProgBox').style.display = 'none'; };
+
+function scErr(msg) {
+  const el = $('scAlert');
+  el.textContent = msg || '';
+  el.className = 'alert alert-e' + (msg ? ' show' : '');
+  if (msg) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function scFreeThumb(p) {
+  if (p.thumb) { try { (window.URL || window.webkitURL).revokeObjectURL(p.thumb); } catch (_) {} }
+  p.thumb = null;
+}
+
+/** Dựng lại page.out (ảnh trang đã cắt viền, chỉnh thẳng, làm rõ) và ảnh nhỏ. */
+async function scProcess(page, onProg) {
+  const cv = await scSrcCv(page);
+  page.sw = cv.width; page.sh = cv.height;
+  if (!page.quad) page.quad = scDetectQuad(cv) || scFullQuad(cv.width, cv.height);
+  const target = parseInt($('scQual').value, 10) || 2000;
+  const sz = scOutSize(page.quad, target);
+  const warped = await scWarp(cv, page.quad, sz.w, sz.h, onProg);
+  cv.width = cv.height = 0;
+  scEnhance(warped, page.filt);
+  const blob = await scToBlob(warped, 'image/jpeg', .92);
+  page.out = new File([blob], page.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+  page.ow = warped.width; page.oh = warped.height;
+  page.err = '';
+  await scMakeThumb(page, warped);
+  warped.width = warped.height = 0;
+}
+
+/** Ảnh nhỏ cho lưới trang — có in cả chữ ký / dấu đã đặt để thấy ngay kết quả */
+async function scMakeThumb(page, baseCv) {
+  const src = baseCv || await (async () => {
+    const im = await loadImage(page.out);
+    const c = document.createElement('canvas');
+    c.width = im.naturalWidth; c.height = im.naturalHeight;
+    c.getContext('2d').drawImage(im, 0, 0);
+    return c;
+  })();
+  const k = Math.min(1, SC_THUMB / Math.max(src.width, src.height));
+  const tw = Math.max(24, Math.round(src.width * k));
+  const th = Math.max(24, Math.round(src.height * k));
+  const tc = document.createElement('canvas');
+  tc.width = tw; tc.height = th;
+  const tx = tc.getContext('2d');
+  tx.imageSmoothingQuality = 'high';
+  tx.fillStyle = '#FFFFFF'; tx.fillRect(0, 0, tw, th);
+  tx.drawImage(src, 0, 0, tw, th);
+  await scLoadOvs(page.ovs);
+  scDrawOvs(tx, tw, th, page.ovs);
+  const b = await scToBlob(tc, 'image/jpeg', .84);
+  tc.width = tc.height = 0;
+  scFreeThumb(page);
+  page.thumb = (window.URL || window.webkitURL).createObjectURL(b);
+}
+
+/** Trang đã xử lý + chữ ký / dấu in lên, dưới dạng canvas */
+async function scComposite(page) {
+  if (!page.out) throw new Error('Trang chưa được xử lý xong');
+  const im = await loadImage(page.out);
+  const cv = document.createElement('canvas');
+  cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+  const cx = cv.getContext('2d');
+  cx.drawImage(im, 0, 0);
+  if (page.ovs && page.ovs.length) {
+    await scLoadOvs(page.ovs);
+    scDrawOvs(cx, cv.width, cv.height, page.ovs);
+  }
+  return cv;
+}
+
+/** Ảnh JPEG cuối cùng của trang. Không có vật nào đặt lên thì dùng luôn page.out,
+ *  khỏi giải mã rồi nén lại một lần nữa cho mất nét. */
+async function scFinalJpeg(page, q) {
+  if (!page.ovs || !page.ovs.length) {
+    if (q >= .9) return page.out;
+  }
+  const cv = await scComposite(page);
+  const b = await scToBlob(cv, 'image/jpeg', q);
+  cv.width = cv.height = 0;
+  return b;
+}
+
+// ── Hàng đợi xử lý: chạy LẦN LƯỢT từng trang, không song song ──
+// Mỗi trang 2000×2800 đã chiếm ~22MB ImageData; chạy song song 5 trang là hết RAM tab.
+let _scRunning = false;
+async function scRunQueue() {
+  if (_scRunning) return;
+  _scRunning = true;
+  scn.busy = true;
+  try {
+    for (;;) {
+      const i = scn.pages.findIndex(p => p.dirty && !p.busy);
+      if (i < 0) break;
+      const p = scn.pages[i];
+      const tot = scn.pages.length;
+      p.busy = true; p.dirty = false;
+      scRender();
+      try {
+        await scProcess(p, f => scProg(
+          Math.round(((i + f) / tot) * 100), `Đang xử lý trang ${i + 1}/${tot} — ${Math.round(f * 100)}%`));
+      } catch (e) {
+        console.error('[quét tài liệu] trang', i + 1, e);
+        p.err = (e && e.message) || 'không xử lý được';
+        scErr(`Trang ${i + 1} (${p.name}): ${p.err}`);
+      }
+      p.busy = false;
+      scRender();
+    }
+  } finally {
+    _scRunning = false;
+    scn.busy = false;
+    scProgHide();
+    scn.pdf = null;                 // ảnh trang đã đổi → bản PDF đã dựng không còn đúng
+    updateActionBar();
+  }
+}
+
+function scTouch(p) {
+  p.dirty = true;
+  scn.pdf = null;
+  scRunQueue();
+}
+
+// ════════════════════════════════════════════════════════
+//  NẠP TRANG
+// ════════════════════════════════════════════════════════
+
+function scMkPage(file) {
+  return {
+    id: uid(), name: file.name || 'trang.jpg', src: file,
+    rot: 0, quad: null, filt: scDefFilt(), out: null, ow: 0, oh: 0, sw: 0, sh: 0,
+    thumb: null, ovs: [], dirty: true, busy: false, err: '',
+  };
+}
+const scDefFilt = () => {
+  const v = $('scFiltAll') ? $('scFiltAll').value : '';
+  return SC_FILTS[v] ? v : 'auto';
+};
+
+/** Cửa DUY NHẤT mọi trang đi qua trước khi vào scn.pages */
+async function scIntake(files) {
+  const all = Array.from(files || []);
+  if (!all.length) return;
+  scErr('');
+  const imgs = [], pdfs = [];
+  let bad = 0;
+  for (const f of all) {
+    const e = extOf(f.name);
+    if (e === '.jpg' || e === '.jpeg' || e === '.png') imgs.push(f);
+    else if (e === '.pdf') pdfs.push(f);
+    else if ((f.type || '').indexOf('image/') === 0) imgs.push(f);   // ảnh từ camera máy
+    else bad++;
+  }
+  if (bad) toast(`${bad} file bị bỏ qua — chỉ nhận .jpg · .png · .pdf`, 'e');
+
+  let add = imgs.slice();
+  if (pdfs.length) {
+    try {
+      scProg(4, 'Đang đọc file PDF…');
+      for (const f of pdfs) add = add.concat(await scPdfPages(f));
+    } catch (e) {
+      scProgHide();
+      scErr('Không đọc được file PDF: ' + ((e && e.message) || e)
+          + ' — lần đầu nạp PDF cần có mạng để tải thư viện pdf.js.');
+      return;
+    }
+  }
+  if (!add.length) { scProgHide(); return; }
+
+  const room = SC_MAXP - scn.pages.length;
+  if (add.length > room) {
+    add = add.slice(0, Math.max(0, room));
+    toast(`Một tài liệu chỉ nhận tối đa ${SC_MAXP} trang`, 'e');
+  }
+  if (!add.length) { scProgHide(); return; }
+
+  add.forEach(f => scn.pages.push(scMkPage(f)));
+  scRender();
+  scRunQueue();
+}
+
+/** Mỗi trang PDF thành một File ảnh — nhờ vậy phần sau (cắt viền, bộ lọc, ký,
+ *  xuất file) đi chung một đường với ảnh chụp, và không cần pdf.js nữa. */
+async function scPdfPages(file) {
+  const lib = await loadPdfjs();
+  const doc = await lib.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+  const base = file.name.replace(/\.pdf$/i, '');
+  const out = [];
+  try {
+    const target = parseInt($('scQual').value, 10) || 2000;
+    for (let n = 1; n <= doc.numPages; n++) {
+      scProg(4 + Math.round(n / doc.numPages * 40), `Đang đọc ${file.name} — trang ${n}/${doc.numPages}`);
+      const pg = await doc.getPage(n);
+      const v1 = pg.getViewport({ scale: 1 });
+      const k = Math.min(4, Math.max(1, target / Math.max(v1.width, v1.height)));
+      const vp = pg.getViewport({ scale: k });
+      const cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(vp.width));
+      cv.height = Math.max(1, Math.round(vp.height));
+      const cx = cv.getContext('2d');
+      cx.fillStyle = '#FFFFFF';                       // trang PDF nền trong suốt
+      cx.fillRect(0, 0, cv.width, cv.height);
+      await pg.render({ canvasContext: cx, viewport: vp }).promise;
+      const b = await scToBlob(cv, 'image/jpeg', .93);
+      cv.width = cv.height = 0;
+      pg.cleanup();
+      out.push(new File([b], doc.numPages > 1
+        ? `${base} (trang ${String(n).padStart(2, '0')}).jpg` : `${base}.jpg`, { type: 'image/jpeg' }));
+    }
+  } finally {
+    try { await doc.destroy(); } catch (_) {}
+  }
+  return out;
+}
+
+// ════════════════════════════════════════════════════════
+//  LƯỚI TRANG
+// ════════════════════════════════════════════════════════
+
+function scRender() {
+  const n = scn.pages.length;
+  $('scPagesCard').style.display = n ? '' : 'none';
+  $('scExpCard').style.display   = n ? '' : 'none';
+  $('scEmpty').style.display = n ? 'none' : '';
+  const nSig = scn.pages.reduce((s, p) => s + (p.ovs || []).filter(o => o.type === 'sig').length, 0);
+  $('scChip').textContent = n ? `${n} trang` + (nSig ? ` · ${nSig} chữ ký` : '')
+                              : 'chưa có trang nào — chụp hoặc chọn ảnh để bắt đầu';
+  const done = scn.pages.filter(p => p.out).length;
+  $('scPagesTag').textContent = `${done}/${n} trang đã xử lý`;
+  const tot = scn.pages.reduce((s, p) => s + (p.out ? p.out.size : 0), 0);
+  $('scExpTag').textContent = done ? `${done} trang · ảnh ${fmtBytes(tot)}` : 'chờ xử lý xong';
+
+  const filtOpts = p => Object.keys(SC_FILTS).map(k =>
+    `<option value="${k}"${p.filt === k ? ' selected' : ''}>${esc(SC_FILTS[k])}</option>`).join('');
+
+  $('scGrid').innerHTML = scn.pages.map((p, i) => {
+    const low = p.out && Math.max(p.ow, p.oh) < 1100;
+    const badge = p.out
+      ? `<span class="sc-tagq${low ? ' warn' : ''}" title="${low ? 'Độ phân giải thấp — in A4 có thể bị rỗ' : 'Kích thước trang đã quét'}">${p.ow}×${p.oh}</span>`
+      : '';
+    const inner = p.thumb
+      ? `<img src="${p.thumb}" alt="Trang ${i + 1}"/>`
+      : `<span class="wait">${p.busy ? '⏳ đang xử lý…' : (p.err ? '⚠️ ' + esc(p.err) : 'chờ xử lý')}</span>`;
+    const nOv = (p.ovs || []).length;
+    return `
+    <div class="sc-pg${p.busy ? ' busy' : ''}">
+      <span class="sc-no">${i + 1}</span>${badge}
+      <div class="sc-pv" onclick="scCropOpen(${i})" title="Bấm để cắt viền / chỉnh thẳng">${inner}</div>
+      <div class="sc-fil">
+        <select onchange="scSetFilt(${i}, this.value)" title="Bộ lọc làm rõ của riêng trang này">
+          ${filtOpts(p)}
+        </select>
+      </div>
+      <div class="sc-a">
+        <button onclick="scMove(${i},-1)" ${i === 0 ? 'disabled' : ''} title="Lên trước">◀</button>
+        <button onclick="scCropOpen(${i})" title="Cắt viền &amp; chỉnh thẳng">✂️</button>
+        <button onclick="scRot(${i})" title="Xoay 90°">↻</button>
+        <button onclick="scPlOpen(${i})" title="Ký · ghi chú · đóng dấu${nOv ? ` (đang có ${nOv} vật)` : ''}">✍️${nOv ? '<sup>' + nOv + '</sup>' : ''}</button>
+        <button class="x" onclick="scDel(${i})" title="Xóa trang này">🗑</button>
+        <button onclick="scMove(${i},1)" ${i === n - 1 ? 'disabled' : ''} title="Xuống sau">▶</button>
+      </div>
+    </div>`;
+  }).join('');
+  if (!$('scName').value) $('scName').placeholder = scDefName();
+  updateActionBar();
+}
+
+const scDefName = () => 'Tai lieu quet ' + new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
+
+function scSetFilt(i, v) {
+  const p = scPageAt(i);
+  if (!p || !SC_FILTS[v]) return;
+  p.filt = v;
+  scTouch(p);
+}
+function scFiltAllApply() {
+  const v = $('scFiltAll').value;
+  if (!SC_FILTS[v]) return;                       // "giữ riêng từng trang"
+  scn.pages.forEach(p => { p.filt = v; p.dirty = true; });
+  scn.pdf = null;
+  scRender(); scRunQueue();
+}
+function scReprocAll() {
+  scn.pages.forEach(p => p.dirty = true);
+  scn.pdf = null;
+  scRunQueue();
+}
+function scRedetectAll() {
+  if (!scn.pages.length) return;
+  scn.pages.forEach(p => { p.quad = null; p.dirty = true; });
+  scn.pdf = null;
+  toast('Đang tìm lại mép giấy cho mọi trang…');
+  scRunQueue();
+}
+function scFullAll() {
+  if (!scn.pages.length) return;
+  scn.pages.forEach(p => {
+    p.quad = (p.sw && p.sh) ? scFullQuad(p.sw, p.sh) : null;
+    p.dirty = true;
+  });
+  scn.pdf = null;
+  scRunQueue();
+}
+function scRotAll() {
+  scn.pages.forEach(p => { p.rot = (p.rot + 90) % 360; p.quad = null; p.dirty = true; });
+  scn.pdf = null;
+  scRunQueue();
+}
+function scRot(i) {
+  const p = scPageAt(i);
+  if (!p) return;
+  p.rot = (p.rot + 90) % 360;
+  p.quad = null;                                   // 4 góc đong theo khung ĐÃ xoay
+  scTouch(p);
+}
+function scMove(i, d) {
+  const j = i + d;
+  if (j < 0 || j >= scn.pages.length) return;
+  const t = scn.pages[i]; scn.pages[i] = scn.pages[j]; scn.pages[j] = t;
+  scn.pdf = null;
+  scRender();
+}
+function scDel(i) {
+  const p = scPageAt(i);
+  if (!p) return;
+  scFreeThumb(p);
+  scn.pages.splice(i, 1);
+  scn.pdf = null;
+  scRender();
+  if (!scn.pages.length) { scProgHide(); scErr(''); $('scOcrCard').style.display = 'none'; }
+}
+function scClearAll() {
+  if (!scn.pages.length) return;
+  if (!confirm('Xóa hết các trang đã quét? Tài liệu đã lưu vào máy vẫn còn.')) return;
+  scn.pages.forEach(scFreeThumb);
+  scn.pages = [];
+  scn.pdf = null; scn.ocr = null; scn.docId = null; scn.docName = '';
+  $('scOcrCard').style.display = 'none';
+  scErr(''); scProgHide();
+  scRender();
+}
+
+/** Dòng chữ giữa thanh nút dưới khi đang ở mục 4.
+ *  updateActionBar() (khối script thứ 2) gọi qua `typeof` vì lúc init() chạy
+ *  thì khối script cuối chưa thực thi. */
+function scBarMeta() {
+  const n = scn.pages.length;
+  if (!n) return '🔍 Quét tài liệu — chưa có trang nào';
+  const done = scn.pages.filter(p => p.out).length;
+  return `🔍 ${n} trang · ${done} đã xử lý` + (scn.busy ? ' · đang xử lý…' : '');
+}
+
+/** Mở thẳng một công cụ của màn hình 3 (nối · tách · nén…) */
+function scGoTool(id) {
+  goStep(3);
+  if (typeof tzOpen === 'function') tzOpen(id);
+}
+// ════════════════════════════════════════════════════════
+//  MÀN HÌNH CẮT VIỀN & CHỈNH THẲNG
+//
+//  8 điểm bắt: 4 GÓC (kéo riêng từng góc) + 4 ĐIỂM GIỮA CẠNH (kéo cả cạnh một
+//  lúc) — mép giấy chụp hơi lệch thì kéo điểm giữa cạnh nhanh hơn kéo 2 góc.
+//  Kính lúp hiện khi đang kéo, vì ngón tay che đúng chỗ cần ngắm.
+// ════════════════════════════════════════════════════════
+const scCrop = { idx: -1, cv: null, quad: null, drag: -1, last: null };
+
+async function scCropOpen(i) {
+  const p = scPageAt(i);
+  if (!p) return;
+  if (p.busy) { toast('Trang này đang được xử lý — chờ một chút', 'w'); return; }
+  scCrop.idx = i;
+  scCrop.drag = -1;
+  $('scCropWho').textContent = `Trang ${i + 1} · ${p.name}`;
+  $('scCropFilt').value = p.filt;
+  $('scCropOv').classList.remove('hidden');
+  $('scLoupe').classList.remove('on');
+  await scCropLoad();
+}
+
+async function scCropLoad() {
+  const p = scPageAt(scCrop.idx);
+  if (!p) return;
+  busyBtn('scCropOk', '⏳ Đang mở ảnh…');
+  try {
+    const cv = await scSrcCv(p);
+    scCrop.cv = cv;
+    p.sw = cv.width; p.sh = cv.height;
+    if (!p.quad) p.quad = scDetectQuad(cv) || scFullQuad(cv.width, cv.height);
+    scCrop.quad = p.quad.map(q => q.slice());
+    scCropFit();
+    scCropDraw();
+  } catch (e) {
+    console.error(e);
+    toast('Không mở được ảnh trang này: ' + ((e && e.message) || e), 'e');
+    scCropClose();
+  } finally {
+    freeBtn('scCropOk');
+  }
+}
+
+/** Đặt khung vẽ vừa khít khoảng trống của lớp phủ. Canvas để đúng cỡ hiển thị
+ *  (không nhân devicePixelRatio) nên toạ độ chuột = toạ độ canvas, bắt điểm đơn giản. */
+function scCropFit() {
+  const st = $('scCropStage').getBoundingClientRect();
+  const aw = Math.max(120, st.width - 24), ah = Math.max(120, st.height - 24);
+  const cv = scCrop.cv;
+  const k = Math.min(aw / cv.width, ah / cv.height, 2);
+  const c = $('scCropCv');
+  c.width = Math.max(60, Math.round(cv.width * k));
+  c.height = Math.max(60, Math.round(cv.height * k));
+}
+
+function scCropDraw() {
+  const c = $('scCropCv'), cv = scCrop.cv;
+  if (!cv || !scCrop.quad) return;
+  const x = c.getContext('2d');
+  const k = c.width / cv.width;
+  x.clearRect(0, 0, c.width, c.height);
+  x.imageSmoothingQuality = 'high';
+  x.drawImage(cv, 0, 0, c.width, c.height);
+
+  const P = scCrop.quad.map(p => [p[0] * k, p[1] * k]);
+  // Làm tối phần SẼ BỊ CẮT BỎ — nhìn là biết ngay trang in ra gồm những gì
+  x.save();
+  x.fillStyle = 'rgba(5,8,12,.56)';
+  x.beginPath();
+  x.rect(0, 0, c.width, c.height);
+  x.moveTo(P[0][0], P[0][1]);
+  for (let i = 1; i < 4; i++) x.lineTo(P[i][0], P[i][1]);
+  x.closePath();
+  x.fill('evenodd');
+  x.restore();
+
+  x.strokeStyle = '#F2C86A';
+  x.lineWidth = 2;
+  x.beginPath();
+  x.moveTo(P[0][0], P[0][1]);
+  for (let i = 1; i < 4; i++) x.lineTo(P[i][0], P[i][1]);
+  x.closePath();
+  x.stroke();
+
+  // điểm giữa cạnh (vuông nhỏ) rồi 4 góc (tròn to) — góc vẽ sau cho nổi lên trên
+  x.fillStyle = 'rgba(242,200,106,.92)';
+  x.strokeStyle = '#1A1403';
+  x.lineWidth = 1.5;
+  for (let i = 0; i < 4; i++) {
+    const m = scCropMid(P, i);
+    x.beginPath(); x.rect(m[0] - 6, m[1] - 6, 12, 12); x.fill(); x.stroke();
+  }
+  for (let i = 0; i < 4; i++) {
+    x.beginPath(); x.arc(P[i][0], P[i][1], 10, 0, Math.PI * 2); x.fill(); x.stroke();
+  }
+}
+const scCropMid = (P, i) => [(P[i][0] + P[(i + 1) % 4][0]) / 2, (P[i][1] + P[(i + 1) % 4][1]) / 2];
+
+function scCropPt(e) {
+  const c = $('scCropCv'), r = c.getBoundingClientRect();
+  return {
+    x: (e.clientX - r.left) * (c.width / Math.max(1, r.width)),
+    y: (e.clientY - r.top) * (c.height / Math.max(1, r.height)),
+  };
+}
+
+/** Kính lúp: vẽ vùng quanh điểm đang kéo ở độ phân giải THẬT của ảnh gốc,
+ *  nên ngắm được đúng mép giấy dù khung xem đã thu nhỏ mấy lần. */
+function scCropLoupe(pt) {
+  const box = $('scLoupe'), lc = $('scLoupeCv');
+  const c = $('scCropCv'), cv = scCrop.cv;
+  const k = c.width / cv.width;
+  const sx = pt.x / k, sy = pt.y / k;
+  const Z = 2.4, S = lc.width;
+  const half = (S / 2) / Z;
+  const x = lc.getContext('2d');
+  x.fillStyle = '#000';
+  x.fillRect(0, 0, S, S);
+  x.imageSmoothingQuality = 'high';
+  x.drawImage(cv, sx - half, sy - half, half * 2, half * 2, 0, 0, S, S);
+  x.strokeStyle = '#F2C86A';
+  x.lineWidth = 1;
+  x.beginPath();
+  x.moveTo(S / 2, 0); x.lineTo(S / 2, S);
+  x.moveTo(0, S / 2); x.lineTo(S, S / 2);
+  x.stroke();
+
+  const st = $('scCropStage').getBoundingClientRect();
+  const cr = c.getBoundingClientRect();
+  let lx = (cr.left - st.left) + pt.x / (c.width / cr.width) - S / 2;
+  let ly = (cr.top - st.top) + pt.y / (c.height / cr.height) - S - 26;
+  if (ly < 6) ly = (cr.top - st.top) + pt.y / (c.height / cr.height) + 30;
+  lx = Math.max(6, Math.min(st.width - S - 6, lx));
+  ly = Math.max(6, Math.min(st.height - S - 6, ly));
+  box.style.left = lx + 'px';
+  box.style.top = ly + 'px';
+  box.classList.add('on');
+}
+
+(function scCropBind() {
+  const c = $('scCropCv');
+  if (!c) return;
+  c.addEventListener('pointerdown', e => {
+    if (!scCrop.quad) return;
+    e.preventDefault();
+    try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    const pt = scCropPt(e);
+    const k = c.width / scCrop.cv.width;
+    const P = scCrop.quad.map(p => [p[0] * k, p[1] * k]);
+    let best = -1, bd = 26 * 26;
+    for (let i = 0; i < 4; i++) {
+      const d = (P[i][0] - pt.x) ** 2 + (P[i][1] - pt.y) ** 2;
+      if (d < bd) { bd = d; best = i; }
+    }
+    if (best < 0) {
+      for (let i = 0; i < 4; i++) {
+        const m = scCropMid(P, i);
+        const d = (m[0] - pt.x) ** 2 + (m[1] - pt.y) ** 2;
+        if (d < bd) { bd = d; best = 4 + i; }
+      }
+    }
+    if (best < 0) return;
+    scCrop.drag = best;
+    scCrop.last = pt;
+    scCropLoupe(pt);
+  });
+  c.addEventListener('pointermove', e => {
+    if (scCrop.drag < 0) return;
+    e.preventDefault();
+    const pt = scCropPt(e);
+    const cv = scCrop.cv;
+    const k = c.width / cv.width;
+    const cl = (v, m) => Math.max(0, Math.min(m, v));
+    if (scCrop.drag < 4) {
+      scCrop.quad[scCrop.drag] = [cl(pt.x / k, cv.width), cl(pt.y / k, cv.height)];
+    } else {
+      const i = scCrop.drag - 4, j = (i + 1) % 4;
+      const dx = (pt.x - scCrop.last.x) / k, dy = (pt.y - scCrop.last.y) / k;
+      scCrop.quad[i] = [cl(scCrop.quad[i][0] + dx, cv.width), cl(scCrop.quad[i][1] + dy, cv.height)];
+      scCrop.quad[j] = [cl(scCrop.quad[j][0] + dx, cv.width), cl(scCrop.quad[j][1] + dy, cv.height)];
+    }
+    scCrop.last = pt;
+    scCropDraw();
+    scCropLoupe(pt);
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => c.addEventListener(ev, () => {
+    if (scCrop.drag < 0) return;
+    scCrop.drag = -1;
+    $('scLoupe').classList.remove('on');
+  }));
+  window.addEventListener('resize', () => {
+    if ($('scCropOv').classList.contains('hidden') || !scCrop.cv) return;
+    scCropFit(); scCropDraw();
+  });
+})();
+
+function scCropDetect() {
+  if (!scCrop.cv) return;
+  const q = scDetectQuad(scCrop.cv);
+  if (!q) {
+    toast('Không tìm thấy mép giấy rõ ràng — kéo tay 4 góc, hoặc bấm ⬛ Cả ảnh', 'w');
+    return;
+  }
+  scCrop.quad = q;
+  scCropDraw();
+  toast('Đã tìm lại mép giấy', 'o');
+}
+function scCropFull() {
+  if (!scCrop.cv) return;
+  scCrop.quad = scFullQuad(scCrop.cv.width, scCrop.cv.height);
+  scCropDraw();
+}
+async function scCropRot() {
+  const p = scPageAt(scCrop.idx);
+  if (!p || !scCrop.cv) return;
+  p.rot = (p.rot + 90) % 360;
+  p.quad = null;
+  await scCropLoad();
+}
+function scCropFiltChange() {
+  const p = scPageAt(scCrop.idx);
+  if (p) p.filt = $('scCropFilt').value;
+}
+function scCropClose() {
+  $('scCropOv').classList.add('hidden');
+  $('scLoupe').classList.remove('on');
+  if (scCrop.cv) { scCrop.cv.width = scCrop.cv.height = 0; }
+  scCrop.cv = null; scCrop.quad = null; scCrop.idx = -1; scCrop.drag = -1;
+}
+function scCropDone() {
+  const p = scPageAt(scCrop.idx);
+  if (!p || !scCrop.quad) { scCropClose(); return; }
+  if (scQuadArea(scCrop.quad) < 400) {
+    toast('Vùng chọn quá nhỏ — kéo rộng 4 góc ra', 'e');
+    return;
+  }
+  p.quad = scCrop.quad.map(q => q.slice());
+  p.filt = $('scCropFilt').value;
+  scCropClose();
+  scTouch(p);
+  scRender();
+}
+
+// ════════════════════════════════════════════════════════
+//  MÀN HÌNH KÝ · GHI CHÚ · ĐÓNG DẤU
+//
+//  Vật đặt lên trang được giữ RIÊNG (page.ovs), không nung vào ảnh trang, nên
+//  sửa lại hay bỏ đi lúc nào cũng được. Chúng chỉ in lên bản sao khi xuất file.
+// ════════════════════════════════════════════════════════
+const scPl = { idx: -1, base: null, ovs: [], sel: -1, drag: null };
+
+async function scPlOpen(i) {
+  const p = scPageAt(i);
+  if (!p) return;
+  if (!p.out) { toast('Trang chưa xử lý xong — chờ một chút', 'w'); return; }
+  scPl.idx = i;
+  scPl.sel = -1;
+  scPl.drag = null;
+  scPl.ovs = (p.ovs || []).map(o => Object.assign({}, o));
+  await scLoadOvs(scPl.ovs);
+  $('scPlWho').textContent = `Trang ${i + 1} · ${p.name}`;
+  $('scPlSigRow').style.display = 'none';
+  $('scPlTextRow').style.display = 'none';
+  $('scPlaceOv').classList.remove('hidden');
+  try {
+    const im = await loadImage(p.out);
+    const cv = document.createElement('canvas');
+    cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+    cv.getContext('2d').drawImage(im, 0, 0);
+    scPl.base = cv;
+    scPlFit();
+    scPlDraw();
+    scPlList();
+  } catch (e) {
+    toast('Không mở được trang: ' + ((e && e.message) || e), 'e');
+    scPlClose();
+  }
+}
+
+function scPlFit() {
+  const st = $('scPlStage').getBoundingClientRect();
+  const aw = Math.max(120, st.width - 24), ah = Math.max(120, st.height - 24);
+  const b = scPl.base;
+  const k = Math.min(aw / b.width, ah / b.height, 1.6);
+  const c = $('scPlCv');
+  c.width = Math.max(60, Math.round(b.width * k));
+  c.height = Math.max(60, Math.round(b.height * k));
+}
+
+function scPlDraw() {
+  const c = $('scPlCv'), b = scPl.base;
+  if (!b) return;
+  const x = c.getContext('2d');
+  x.clearRect(0, 0, c.width, c.height);
+  x.imageSmoothingQuality = 'high';
+  x.drawImage(b, 0, 0, c.width, c.height);
+  scDrawOvs(x, c.width, c.height, scPl.ovs);
+  const o = scPl.ovs[scPl.sel];
+  if (!o) return;
+  const bx = scOvBox(x, c.width, c.height, o);
+  x.save();
+  x.translate(o.x * c.width, o.y * c.height);
+  x.rotate((o.rot || 0) * Math.PI / 180);
+  x.strokeStyle = '#F2C86A';
+  x.lineWidth = 2;
+  x.setLineDash([6, 4]);
+  x.strokeRect(-bx.w / 2 - 4, -bx.h / 2 - 4, bx.w + 8, bx.h + 8);
+  x.restore();
+}
+
+function scPlList() {
+  const lbl = { sig: '✍️ Chữ ký', text: '🖊 Ghi chú', stamp: '🔲 Dấu', date: '📅 Ngày' };
+  $('scPlList').innerHTML = scPl.ovs.map((o, i) =>
+    `<span class="sc-it${i === scPl.sel ? ' on' : ''}" onclick="scPlSel(${i})">` +
+    `${lbl[o.type] || o.type}${o.type !== 'sig' ? ': ' + esc((o.text || '').slice(0, 18)) : ''}` +
+    `<button onclick="event.stopPropagation();scPlDel(${i})" title="Bỏ vật này">✕</button></span>`).join('');
+}
+
+/** Thanh trượt cỡ chạy 4..95. Chữ ký đo theo BỀ NGANG trang (0,02–0,475), còn chữ
+ *  đo theo CHIỀU CAO trang (0,004–0,095) — hai thang đo khác nhau nên phải quy đổi,
+ *  dùng chung một công thức thì kéo hết nấc chữ ký vẫn bé tí. */
+const SC_SIG_K = 5;
+const scSizeToSlider = o => Math.round((o.type === 'sig' ? o.w / SC_SIG_K : o.size) * 1000);
+
+function scPlSel(i) {
+  scPl.sel = i;
+  const o = scPl.ovs[i];
+  if (o) {
+    $('scPlSize').value = Math.max(4, Math.min(95, scSizeToSlider(o)));
+    $('scPlRot').value = o.rot || 0;
+    const isTx = (o.type !== 'sig');
+    $('scPlTextRow').style.display = isTx ? '' : 'none';
+    if (isTx) {
+      $('scPlText').value = o.text || '';
+      $('scPlColor').value = o.color || '#102A43';
+    }
+  }
+  scPlList(); scPlDraw();
+}
+function scPlDel(i) {
+  scPl.ovs.splice(i, 1);
+  if (scPl.sel >= scPl.ovs.length) scPl.sel = scPl.ovs.length - 1;
+  scPlList(); scPlDraw();
+}
+
+function scPlPush(o) {
+  scPl.ovs.push(o);
+  scPl.sel = scPl.ovs.length - 1;
+  scPlSel(scPl.sel);
+}
+
+function scPlAdd(type) {
+  if (!scPl.base) return;
+  if (type === 'sig') {
+    const l = scSigList();
+    if (!l.length) { scPlSigNew(); return; }
+    scPlSigFill();
+    $('scPlSigRow').style.display = '';
+    scPlSigUse(l[0]);
+    return;
+  }
+  const now = new Date();
+  const base = { id: uid(), type: type, x: .5, y: .78, rot: 0, size: .028, color: $('scPlColor').value || '#102A43' };
+  if (type === 'text')  base.text = 'Ghi chú';
+  if (type === 'stamp') { base.text = 'BẢN SAO'; base.color = '#C62828'; base.size = .036; base.y = .3; }
+  if (type === 'date')  base.text = now.toLocaleDateString('vi-VN');
+  scPlPush(base);
+}
+
+// ── Chữ ký điện tử nhớ trong máy (localStorage, không rời thiết bị) ──
+function scSigList() {
+  try { return JSON.parse(localStorage.getItem(SC_SIGKEY) || '[]') || []; }
+  catch (_) { return []; }
+}
+function scSigStore(url) {
+  const l = scSigList().filter(x => x !== url);
+  l.unshift(url);
+  try { localStorage.setItem(SC_SIGKEY, JSON.stringify(l.slice(0, SC_SIGMAX))); } catch (_) {}
+}
+function scPlSigFill() {
+  const l = scSigList();
+  $('scPlSigSel').innerHTML = l.map((u, i) =>
+    `<option value="${i}">Chữ ký ${i + 1}${i ? '' : ' (mới nhất)'}</option>`).join('');
+}
+/** Đổi sang một chữ ký khác đã lưu. Nếu đang chọn sẵn một chữ ký trên trang thì
+ *  THAY nét ký của nó, giữ nguyên chỗ và cỡ — chứ không đẻ thêm một chữ ký nữa. */
+async function scPlSigPick() {
+  const l = scSigList();
+  const u = l[parseInt($('scPlSigSel').value, 10) || 0];
+  if (!u) return;
+  const o = scPl.ovs[scPl.sel];
+  if (o && o.type === 'sig') {
+    o.data = u; o._img = null; o._ar = 0;
+    await scLoadOvs([o]);
+    scPlDraw();
+    return;
+  }
+  scPlSigUse(u);
+}
+async function scPlSigUse(url) {
+  const o = { id: uid(), type: 'sig', x: .62, y: .8, rot: 0, w: .26, data: url };
+  await scLoadOvs([o]);
+  scPlPush(o);
+}
+function scPlSigNew() { openSign('scan'); }
+function scPlSigDel() {
+  const l = scSigList();
+  const i = parseInt($('scPlSigSel').value, 10) || 0;
+  if (!l[i]) return;
+  if (!confirm('Xóa chữ ký đã lưu này khỏi máy?')) return;
+  l.splice(i, 1);
+  try { localStorage.setItem(SC_SIGKEY, JSON.stringify(l)); } catch (_) {}
+  if (!l.length) { $('scPlSigRow').style.display = 'none'; toast('Đã xóa chữ ký đã lưu', 'o'); return; }
+  scPlSigFill();
+  toast('Đã xóa chữ ký đã lưu', 'o');
+}
+
+/** Gọi từ sigConfirm() khi màn hình ký được mở với who = 'scan' */
+function scSigDone(url) {
+  scSigStore(url);
+  if ($('scPlaceOv').classList.contains('hidden')) { toast('✅ Đã lưu chữ ký vào máy', 'o'); return; }
+  scPlSigFill();
+  $('scPlSigRow').style.display = '';
+  scPlSigUse(url);
+  toast('✅ Đã lưu chữ ký — kéo vào đúng chỗ rồi bấm Xong', 'o');
+}
+
+function scPlSizeChange() {
+  const o = scPl.ovs[scPl.sel];
+  if (!o) return;
+  const v = (parseInt($('scPlSize').value, 10) || 24) / 1000;
+  if (o.type === 'sig') o.w = v * SC_SIG_K; else o.size = v;
+  scPlDraw();
+}
+function scPlRotChange() {
+  const o = scPl.ovs[scPl.sel];
+  if (!o) return;
+  o.rot = parseInt($('scPlRot').value, 10) || 0;
+  scPlDraw();
+}
+function scPlTextChange() {
+  const o = scPl.ovs[scPl.sel];
+  if (!o || o.type === 'sig') return;
+  o.text = $('scPlText').value;
+  scPlList(); scPlDraw();
+}
+function scPlColorChange() {
+  const o = scPl.ovs[scPl.sel];
+  if (!o || o.type === 'sig') return;
+  o.color = $('scPlColor').value;
+  scPlDraw();
+}
+
+(function scPlBind() {
+  const c = $('scPlCv');
+  if (!c) return;
+  const pt = e => {
+    const r = c.getBoundingClientRect();
+    return {
+      x: (e.clientX - r.left) * (c.width / Math.max(1, r.width)),
+      y: (e.clientY - r.top) * (c.height / Math.max(1, r.height)),
+    };
+  };
+  c.addEventListener('pointerdown', e => {
+    if (!scPl.base) return;
+    e.preventDefault();
+    try { c.setPointerCapture(e.pointerId); } catch (_) {}
+    const p = pt(e);
+    const x = c.getContext('2d');
+    // Dò từ vật TRÊN CÙNG xuống: vật thêm sau nằm trên, bấm phải trúng nó trước
+    for (let i = scPl.ovs.length - 1; i >= 0; i--) {
+      const o = scPl.ovs[i];
+      const bx = scOvBox(x, c.width, c.height, o);
+      const dx = p.x - o.x * c.width, dy = p.y - o.y * c.height;
+      const a = -(o.rot || 0) * Math.PI / 180;       // đưa điểm về hệ của vật đã nghiêng
+      const lx = dx * Math.cos(a) - dy * Math.sin(a);
+      const ly = dx * Math.sin(a) + dy * Math.cos(a);
+      if (Math.abs(lx) <= bx.w / 2 + 8 && Math.abs(ly) <= bx.h / 2 + 8) {
+        scPlSel(i);
+        scPl.drag = { ox: o.x - p.x / c.width, oy: o.y - p.y / c.height };
+        return;
+      }
+    }
+    scPl.drag = null;
+  });
+  c.addEventListener('pointermove', e => {
+    if (!scPl.drag) return;
+    const o = scPl.ovs[scPl.sel];
+    if (!o) return;
+    e.preventDefault();
+    const p = pt(e);
+    o.x = Math.max(.02, Math.min(.98, p.x / c.width + scPl.drag.ox));
+    o.y = Math.max(.02, Math.min(.98, p.y / c.height + scPl.drag.oy));
+    scPlDraw();
+  });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev =>
+    c.addEventListener(ev, () => { scPl.drag = null; }));
+  window.addEventListener('resize', () => {
+    if ($('scPlaceOv').classList.contains('hidden') || !scPl.base) return;
+    scPlFit(); scPlDraw();
+  });
+})();
+
+function scPlClose() {
+  $('scPlaceOv').classList.add('hidden');
+  if (scPl.base) { scPl.base.width = scPl.base.height = 0; }
+  scPl.base = null; scPl.ovs = []; scPl.sel = -1; scPl.idx = -1; scPl.drag = null;
+}
+
+async function scPlDone() {
+  const p = scPageAt(scPl.idx);
+  if (!p) { scPlClose(); return; }
+  p.ovs = scPl.ovs.map(o => Object.assign({}, o));
+  const n = p.ovs.length;
+  scPlClose();
+  scn.pdf = null;
+  try { await scMakeThumb(p); } catch (e) { console.warn(e); }
+  scRender();
+  toast(n ? `Đã in ${n} vật lên trang` : 'Trang không còn vật nào đặt lên', 'o');
+}
+// ════════════════════════════════════════════════════════
+//  XUẤT FILE
+// ════════════════════════════════════════════════════════
+
+function scNameNow() {
+  const v = ($('scName').value || '').trim() || scDefName();
+  return String(v).replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim() || 'Tai lieu quet';
+}
+const scDone = () => scn.pages.filter(p => p.out);
+
+/** Dựng file PDF từ các trang đã xử lý. Kết quả nhớ ở scn.pdf để nút 📤 Chia sẻ
+ *  và nút 💾 dùng lại, khỏi dựng hai lần; mọi thay đổi trang đều xoá bộ nhớ đó. */
+async function scBuildPdf() {
+  const pages = scDone();
+  if (!pages.length) throw new Error('Chưa có trang nào xử lý xong.');
+  if (scn.pdf) return scn.pdf;
+  const { PDFDocument } = PDFLib;
+  const doc = await PDFDocument.create();
+  const mode = $('scPgSize').value || 'auto';
+  const pad = Math.max(0, Math.min(40, parseInt($('scPgPad').value, 10) || 0)) * MM;
+  const q = Math.max(.4, Math.min(1, (parseInt($('scPgQ').value, 10) || 82) / 100));
+  for (let i = 0; i < pages.length; i++) {
+    scProg(4 + Math.round(i / pages.length * 90), `Đang ghép trang ${i + 1}/${pages.length}…`);
+    const b = await scFinalJpeg(pages[i], q);
+    const img = await doc.embedJpg(await b.arrayBuffer());
+    tzImgPage(doc, img, mode, pad);                 // dùng chung hàm của màn hình 3
+    await scYield();
+  }
+  doc.setTitle(scNameNow());
+  doc.setCreator('Quét tài liệu — màn hình 4');
+  doc.setProducer('PTI SOS — Tiện ích ghép ảnh giám định ' + APP_VERSION);
+  const bytes = await doc.save();
+  scProgHide();
+  scn.pdf = {
+    blob: new Blob([bytes], { type: 'application/pdf' }),
+    name: scNameNow() + '.pdf', size: bytes.length, n: pages.length,
+  };
+  return scn.pdf;
+}
+
+async function scExportPdf() {
+  if (scn.busy) { toast('Đang xử lý trang — chờ xong đã', 'w'); return; }
+  busyBtn('scBtnPdf', '⏳ Đang tạo PDF…');
+  scErr('');
+  try {
+    const r = await scBuildPdf();
+    saveBlob(r.blob, r.name);
+    toast(`✅ Đã tải ${r.name} · ${fmtBytes(r.size)}`, 'o');
+  } catch (e) {
+    console.error('[quét tài liệu] xuất PDF', e);
+    scProgHide();
+    scErr('Không tạo được PDF: ' + ((e && e.message) || e));
+  } finally {
+    freeBtn('scBtnPdf');
+  }
+}
+
+async function scExportJpg() {
+  const pages = scDone();
+  if (!pages.length) { scErr('Chưa có trang nào xử lý xong.'); return; }
+  busyBtn('scBtnJpg', '⏳ Đang xuất ảnh…');
+  scErr('');
+  try {
+    const q = Math.max(.4, Math.min(1, (parseInt($('scPgQ').value, 10) || 82) / 100));
+    const base = scNameNow();
+    const outs = [];
+    for (let i = 0; i < pages.length; i++) {
+      scProg(4 + Math.round(i / pages.length * 92), `Đang xuất ảnh ${i + 1}/${pages.length}…`);
+      const b = await scFinalJpeg(pages[i], q);
+      outs.push({
+        blob: b,
+        name: pages.length > 1 ? `${base} - trang ${String(i + 1).padStart(2, '0')}.jpg` : base + '.jpg',
+      });
+      await scYield();
+    }
+    scProgHide();
+    const packed = await tzPack(outs, base + ' (jpg).zip');     // 1 file tải thẳng, nhiều file ra ZIP
+    saveBlob(packed[0].blob, packed[0].name);
+    const tot = outs.reduce((s, o) => s + o.blob.size, 0);
+    toast(`✅ Đã tải ${packed[0].name} · ${outs.length} ảnh · ${fmtBytes(tot)}`, 'o');
+  } catch (e) {
+    console.error('[quét tài liệu] xuất JPG', e);
+    scProgHide();
+    scErr('Không xuất được ảnh: ' + ((e && e.message) || e));
+  } finally {
+    freeBtn('scBtnJpg');
+  }
+}
+
+/** Gửi thẳng file qua khung chia sẻ của thiết bị (Zalo · email · Drive · AirDrop).
+ *  Không có khung đó thì tải file về — KHÔNG có đường nào đi qua máy chủ. */
+async function scShare() {
+  if (scn.busy) { toast('Đang xử lý trang — chờ xong đã', 'w'); return; }
+  busyBtn('scBtnShare', '⏳ Đang chuẩn bị…');
+  scErr('');
+  try {
+    const r = await scBuildPdf();
+    let f = null;
+    try { f = new File([r.blob], r.name, { type: 'application/pdf' }); } catch (_) {}
+    if (f && navigator.canShare && navigator.canShare({ files: [f] })) {
+      try {
+        await navigator.share({ files: [f], title: r.name });
+        toast('Đã mở khung chia sẻ của thiết bị', 'o');
+        return;
+      } catch (e) {
+        if (e && e.name === 'AbortError') return;         // người dùng tự đóng khung
+        console.warn('navigator.share', e);
+      }
+    }
+    saveBlob(r.blob, r.name);
+    toast('Thiết bị không có khung chia sẻ — đã tải file về để bạn tự gửi', 'w');
+  } catch (e) {
+    console.error('[quét tài liệu] chia sẻ', e);
+    scProgHide();
+    scErr('Không chia sẻ được: ' + ((e && e.message) || e));
+  } finally {
+    freeBtn('scBtnShare');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  NHẬN DẠNG CHỮ (OCR)
+//
+//  Đây là việc DUY NHẤT của ứng dụng cần thêm một thư viện ngoài: nhận dạng chữ
+//  không thể tự viết lại trong vài trăm dòng. Dùng tesseract.js, NẠP LƯỜI đúng
+//  như pdf.js — chỉ tải khi người dùng bấm nút, nên ai không dùng OCR thì
+//  ứng dụng vẫn nhẹ như trước và vẫn chạy offline.
+//
+//  Chữ và ảnh KHÔNG rời khỏi máy: tesseract.js chạy ngay trong trình duyệt;
+//  lần đầu chỉ tải về mã thư viện và bộ dữ liệu tiếng Việt.
+// ════════════════════════════════════════════════════════
+let _scTessP = null;
+function scLoadTess() {
+  if (window.Tesseract) return Promise.resolve(window.Tesseract);
+  if (_scTessP) return _scTessP;
+  _scTessP = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = SC_TESS;
+    s.onload = () => {
+      if (window.Tesseract) res(window.Tesseract);
+      else { _scTessP = null; rej(new Error('tesseract.js nạp xong nhưng trống')); }
+    };
+    s.onerror = () => {
+      _scTessP = null; s.remove();
+      rej(new Error('Không tải được thư viện nhận dạng chữ — lần dùng đầu cần có mạng'));
+    };
+    document.head.appendChild(s);
+  });
+  return _scTessP;
+}
+
+/** Danh sách từ kèm khung bao. tesseract.js v5 trả cây blocks → paragraphs →
+ *  lines → words; bản cũ trả thẳng data.words. Nhận cả hai cho chắc. */
+function scOcrWords(data) {
+  if (data && Array.isArray(data.words) && data.words.length) return data.words;
+  const out = [];
+  ((data && data.blocks) || []).forEach(b =>
+    (b.paragraphs || []).forEach(p =>
+      (p.lines || []).forEach(l =>
+        (l.words || []).forEach(w => out.push(w)))));
+  return out;
+}
+
+async function scOcrStart() {
+  const all = scDone();
+  if (!all.length) { scErr('Chưa có trang nào xử lý xong để nhận dạng chữ.'); return; }
+  if (scn.busy) { toast('Đang xử lý trang — chờ xong đã', 'w'); return; }
+  const lang = $('scOcrLang').value || 'vie';
+  const pages = ($('scOcrScope').value === 'one') ? [all[0]] : all;
+
+  $('scOcrCard').style.display = '';
+  $('scOcrWarn').textContent = '';
+  busyBtn('scBtnOcr', '⏳ Đang nhận dạng…');
+  scErr('');
+  let worker = null;
+  try {
+    scProg(2, 'Đang tải thư viện nhận dạng chữ…');
+    const T = await scLoadTess();
+    scProg(6, `Đang nạp bộ dữ liệu ${lang}… (lần đầu mất vài chục giây)`);
+    worker = await T.createWorker(lang, 1, {
+      logger: m => {
+        if (m && m.status === 'recognizing text')
+          scProg(10 + Math.round((m.progress || 0) * 80), 'Đang đọc chữ trên trang…');
+      },
+    });
+    const recs = [];
+    const texts = [];
+    for (let i = 0; i < pages.length; i++) {
+      const p = pages[i];
+      scProg(10 + Math.round(i / pages.length * 85),
+             `Đang đọc chữ — trang ${i + 1}/${pages.length}`);
+      let r;
+      try { r = await worker.recognize(p.out, {}, { text: true, blocks: true }); }
+      catch (_) { r = await worker.recognize(p.out); }
+      const words = scOcrWords(r && r.data);
+      const txt = ((r && r.data && r.data.text) || '').replace(/\n{3,}/g, '\n\n').trim();
+      recs.push({ idx: scn.pages.indexOf(p), words: words, text: txt });
+      texts.push(`───── Trang ${scn.pages.indexOf(p) + 1} ─────\n` + (txt || '(không đọc được chữ nào)'));
+      await scYield();
+    }
+    scn.ocr = { lang: lang, pages: recs };
+    $('scOcrTx').value = texts.join('\n\n');
+    const nw = recs.reduce((s, r) => s + r.words.length, 0);
+    $('scOcrTag').textContent = `${recs.length} trang · ${nw} từ · ${lang}`;
+    if (!nw) $('scOcrWarn').textContent =
+      'Không đọc được chữ nào. Thử bộ lọc "Đen trắng" hoặc "Xám" cho trang, nâng độ phân giải '
+      + 'lên "Nét", và kiểm tra ảnh có bị mờ / chụp xiên quá không.';
+    scProgHide();
+    toast(`✅ Đã nhận dạng ${recs.length} trang`, 'o');
+    $('scOcrCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) {
+    console.error('[quét tài liệu] OCR', e);
+    scProgHide();
+    scErr('Không nhận dạng được chữ: ' + ((e && e.message) || e));
+  } finally {
+    if (worker) { try { await worker.terminate(); } catch (_) {} }
+    freeBtn('scBtnOcr');
+  }
+}
+
+function scOcrCopy() {
+  const t = $('scOcrTx').value;
+  if (!t) { toast('Chưa có chữ nào để sao chép', 'e'); return; }
+  const done = () => toast('📋 Đã sao chép toàn bộ chữ', 'o');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(t).then(done, () => {
+      $('scOcrTx').select(); toast('Bấm Ctrl+C để sao chép', 'w');
+    });
+  } else {
+    $('scOcrTx').select();
+    try { document.execCommand('copy'); done(); }
+    catch (_) { toast('Bấm Ctrl+C để sao chép', 'w'); }
+  }
+}
+
+function scOcrTxt() {
+  const t = $('scOcrTx').value;
+  if (!t) { toast('Chưa có chữ nào để tải', 'e'); return; }
+  // BOM để Notepad trên Windows mở ra đúng tiếng Việt
+  saveBlob(new Blob(['﻿' + t], { type: 'text/plain;charset=utf-8' }), scNameNow() + '.txt');
+  toast('✅ Đã tải file .txt', 'o');
+}
+
+/** Ghi file Word tối thiểu. .docx là một ZIP chứa XML, mà app đã có zipStore()
+ *  để ghi ZIP kiểu "store" (không nén) — Word nhận ZIP store bình thường, nên
+ *  không phải thêm thư viện nào. */
+function scOcrDocx() {
+  const t = $('scOcrTx').value;
+  if (!t) { toast('Chưa có chữ nào để tải', 'e'); return; }
+  const esx = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const enc = new TextEncoder();
+  const paras = t.split(/\r?\n/).map(l =>
+    '<w:p><w:pPr><w:spacing w:after="80"/></w:pPr><w:r><w:rPr>'
+    + '<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/>'
+    + '<w:sz w:val="26"/><w:szCs w:val="26"/></w:rPr>'
+    + `<w:t xml:space="preserve">${esx(l)}</w:t></w:r></w:p>`).join('');
+  const ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+    + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+    + '<Default Extension="xml" ContentType="application/xml"/>'
+    + '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+    + '</Types>';
+  const rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+    + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>'
+    + '</Relationships>';
+  const docx = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+    + '<w:body>' + paras
+    + '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/>'
+    + '<w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1701"/></w:sectPr>'
+    + '</w:body></w:document>';
+  const zip = zipStore([
+    { name: '[Content_Types].xml', data: enc.encode(ct) },
+    { name: '_rels/.rels',         data: enc.encode(rels) },
+    { name: 'word/document.xml',   data: enc.encode(docx) },
+  ]);
+  saveBlob(new Blob([zip], {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  }), scNameNow() + '.docx');
+  toast('✅ Đã tải file Word (.docx)', 'o');
+}
+
+/** PDF "tìm kiếm được": ảnh trang như thường, cộng một lớp chữ VÔ HÌNH
+ *  (opacity 0) đặt đúng chỗ từng từ — bôi chọn, sao chép và Ctrl+F đều ăn. */
+async function scOcrPdf() {
+  if (!scn.ocr || !scn.ocr.pages.length) {
+    toast('Chưa nhận dạng chữ — bấm 🔍 Nhận dạng chữ (OCR) trước', 'e');
+    return;
+  }
+  scErr('');
+  try {
+    scProg(3, 'Đang dựng PDF tìm kiếm được…');
+    const { PDFDocument, rgb } = PDFLib;
+    const doc = await PDFDocument.create();
+    const F = await tzFonts(doc);
+    const recs = scn.ocr.pages;
+    let nw = 0;
+    for (let i = 0; i < recs.length; i++) {
+      const rec = recs[i];
+      const p = scn.pages[rec.idx];
+      if (!p || !p.out) continue;
+      scProg(5 + Math.round(i / recs.length * 90), `Đang dựng trang ${i + 1}/${recs.length}…`);
+      const b = await scFinalJpeg(p, .85);
+      const img = await doc.embedJpg(await b.arrayBuffer());
+      // Trang để đúng tỉ lệ ảnh, cạnh dài bằng cạnh dài A4 — nhờ vậy toạ độ từ
+      // quy đổi bằng MỘT hệ số, không lệch khi trang ngang / dọc lẫn nhau
+      const s = 842 / Math.max(img.width, img.height);
+      const pw = img.width * s, ph = img.height * s;
+      const pg = doc.addPage([pw, ph]);
+      pg.drawImage(img, { x: 0, y: 0, width: pw, height: ph });
+      for (const wd of rec.words) {
+        const t = tzClean((wd && wd.text) || '').trim();
+        const bb = wd && wd.bbox;
+        if (!t || !bb) continue;
+        const y0 = (bb.y0 || 0) * s, y1 = (bb.y1 || 0) * s;
+        const hgt = Math.max(2, y1 - y0);
+        try {
+          pg.drawText(t, {
+            x: (bb.x0 || 0) * s, y: ph - y1 + hgt * .2,
+            size: Math.max(2, hgt * .8), font: F.reg, color: rgb(0, 0, 0), opacity: 0,
+          });
+          nw++;
+        } catch (_) { /* từ có ký tự font không có glyph — bỏ qua một từ, không mất trang */ }
+      }
+      await scYield();
+    }
+    doc.setTitle(scNameNow());
+    doc.setProducer('PTI SOS — Tiện ích ghép ảnh giám định ' + APP_VERSION);
+    const bytes = await doc.save();
+    scProgHide();
+    saveBlob(new Blob([bytes], { type: 'application/pdf' }), scNameNow() + ' (tim kiem duoc).pdf');
+    toast(`✅ Đã tải PDF tìm kiếm được · ${nw} từ · ${fmtBytes(bytes.length)}`, 'o');
+  } catch (e) {
+    console.error('[quét tài liệu] PDF tìm kiếm được', e);
+    scProgHide();
+    scErr('Không dựng được PDF tìm kiếm được: ' + ((e && e.message) || e));
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  LƯU TRỮ TRONG MÁY (IndexedDB, store `scans`)
+//
+//  Lưu cả ảnh GỐC và ảnh trang đã xử lý: nhờ ảnh gốc mà mở lại vẫn cắt viền /
+//  đổi bộ lọc tiếp được, nhờ ảnh đã xử lý mà mở ra thấy ngay, không phải chờ
+//  xử lý lại từ đầu. Không có gì được tải lên internet.
+// ════════════════════════════════════════════════════════
+
+function scOpenSave() {
+  if (!scDone().length) { scErr('Chưa có trang nào xử lý xong để lưu.'); return; }
+  $('scSaveName').value = scn.docName || scNameNow();
+  openOverlay('scSaveModal');
+  setTimeout(() => $('scSaveName').select(), 80);
+}
+
+/** Bỏ các khoá tạm (ảnh đã giải mã) trước khi đưa vào IndexedDB —
+ *  structuredClone không nhân bản được đối tượng Image. */
+const scOvPlain = ovs => (ovs || []).map(o => ({
+  id: o.id, type: o.type, x: o.x, y: o.y, rot: o.rot || 0,
+  w: o.w, size: o.size, text: o.text, color: o.color, data: o.data,
+}));
+
+async function scDoSave() {
+  const name = ($('scSaveName').value || '').trim() || scNameNow();
+  closeModal('scSaveModal');
+  toast('Đang lưu tài liệu…');
+  try {
+    const rec = {
+      id: scn.docId || ('s' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
+      name: name, ts: Date.now(), n: scn.pages.length,
+      pages: scn.pages.map(p => ({
+        name: p.name, rot: p.rot, filt: p.filt, quad: p.quad,
+        ovs: scOvPlain(p.ovs), src: p.src, out: p.out, ow: p.ow, oh: p.oh,
+      })),
+    };
+    await dbTx(SC_STORE, 'readwrite', st => st.put(rec));
+    scn.docId = rec.id; scn.docName = name;
+    toast('💾 Đã lưu tài liệu vào máy', 'o');
+  } catch (e) {
+    console.error(e);
+    scErr('Không lưu được: ' + ((e && e.message) || e)
+        + ' — trình duyệt có thể đã hết dung lượng cho trang này.');
+  }
+}
+
+async function scOpenLib() {
+  openOverlay('scLibModal');
+  $('scLibList').innerHTML = '<div class="empty"><p>Đang đọc…</p></div>';
+  $('scLibNote').textContent = '';
+  try {
+    const all = (await dbTx(SC_STORE, 'readonly', st => st.getAll())) || [];
+    all.sort((a, b) => b.ts - a.ts);
+    if (!all.length) {
+      $('scLibList').innerHTML =
+        '<div class="empty"><div class="ei">🗂</div><p>Chưa lưu tài liệu quét nào.</p></div>';
+      return;
+    }
+    $('scLibNote').textContent = `${all.length} tài liệu — chỉ nằm trong trình duyệt máy này.`;
+    $('scLibList').innerHTML = all.map(r => `
+      <div class="sc-lb">
+        <span class="lb-tx"><b>${esc(r.name)}</b>
+          <span>${r.n} trang · ${new Date(r.ts).toLocaleString('vi-VN')}</span></span>
+        <span class="lb-a">
+          <button class="btn btn-p btn-sm" onclick="scLibOpen('${esc(r.id)}')">Mở</button>
+          <button class="btn btn-n btn-sm" onclick="scLibDel('${esc(r.id)}')">🗑</button>
+        </span>
+      </div>`).join('');
+  } catch (e) {
+    $('scLibList').innerHTML =
+      `<div class="empty"><div class="ei">⚠️</div><p>Không đọc được: ${esc((e && e.message) || e)}</p></div>`;
+  }
+}
+
+async function scLibOpen(id) {
+  try {
+    const r = await dbTx(SC_STORE, 'readonly', st => st.get(id));
+    if (!r) { toast('Không tìm thấy tài liệu này', 'e'); return; }
+    if (scn.pages.length && !confirm('Mở tài liệu đã lưu? Các trang đang quét trên màn hình sẽ bị thay.')) return;
+    closeModal('scLibModal');
+    scn.pages.forEach(scFreeThumb);
+    scn.pages = (r.pages || []).map(p => ({
+      id: uid(), name: p.name || 'trang.jpg', src: p.src,
+      rot: p.rot || 0, quad: p.quad || null, filt: SC_FILTS[p.filt] ? p.filt : 'auto',
+      out: p.out || null, ow: p.ow || 0, oh: p.oh || 0, sw: 0, sh: 0,
+      thumb: null, ovs: (p.ovs || []), dirty: !p.out, busy: false, err: '',
+    }));
+    scn.docId = r.id; scn.docName = r.name; scn.pdf = null; scn.ocr = null;
+    $('scName').value = r.name || '';
+    $('scOcrCard').style.display = 'none';
+    scErr('');
+    scRender();
+    // Trang nào còn ảnh đã xử lý thì chỉ cần dựng lại ảnh nhỏ, khỏi quét lại
+    for (const p of scn.pages) {
+      if (!p.out) continue;
+      try { await scMakeThumb(p); } catch (e) { console.warn(e); }
+    }
+    scRender();
+    scRunQueue();
+    toast(`Đã mở "${r.name}" · ${scn.pages.length} trang`, 'o');
+  } catch (e) {
+    console.error(e);
+    toast('Không mở được tài liệu: ' + ((e && e.message) || e), 'e');
+  }
+}
+
+async function scLibDel(id) {
+  if (!confirm('Xóa tài liệu này khỏi máy? Không lấy lại được.')) return;
+  try {
+    await dbTx(SC_STORE, 'readwrite', st => st.delete(id));
+    if (scn.docId === id) { scn.docId = null; scn.docName = ''; }
+    toast('Đã xóa tài liệu', 'o');
+    scOpenLib();
+  } catch (e) { toast('Không xóa được: ' + ((e && e.message) || e), 'e'); }
+}
+
+// ════════════════════════════════════════════════════════
+//  NGUỒN ẢNH: CAMERA + KÉO THẢ + CHỌN FILE
+//
+//  Dùng lại hộp chụp ảnh #camModal của luồng bản ảnh ở chế độ camMode='scan':
+//  khung ngắm, đèn flash, đổi camera, nháy trắng và nút "Camera máy" đều y như
+//  cũ — chỉ khác chỗ ảnh chụp được đi về đâu. Nhờ vậy không có hai bộ mã camera.
+// ════════════════════════════════════════════════════════
+function scOpenCam() { openCamera(null, 'scan'); }
+
+/** Gọi từ camShoot() khi camMode === 'scan'. Trả về trang vừa thêm. */
+async function scCamShot(blob) {
+  const f = new File([blob], `Trang quet_${scn.pages.length + 1}.jpg`, { type: 'image/jpeg' });
+  await scIntake([f]);
+  return scn.pages[scn.pages.length - 1] || null;
+}
+
+/** Gọi từ camUndo() khi camMode === 'scan' — bỏ ngay trang vừa chụp lỗi */
+function scCamUndo(id) {
+  const i = scn.pages.findIndex(p => p.id === id);
+  if (i >= 0) scDel(i);
+}
+
+(function scBind() {
+  const dz = $('scDz');
+  if (!dz) return;
+  ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation(); dz.classList.add('drag');
+  }));
+  ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => {
+    e.preventDefault(); e.stopPropagation(); dz.classList.remove('drag');
+  }));
+  dz.addEventListener('drop', e => {
+    const fs = e.dataTransfer && e.dataTransfer.files;
+    if (fs && fs.length) scIntake(fs);
+  });
+  ['scFileImg', 'scFilePdf'].forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener('change', e => {
+      const fs = e.target.files;
+      if (fs && fs.length) scIntake(fs);
+      e.target.value = '';
+    });
+  });
+  // Camera máy: ảnh về đây y như mọi nguồn khác, nhưng nếu hộp chụp đang mở thì
+  // phải đẩy thêm vào dải ảnh vừa chụp, kẻo bấm xong mà hộp trông như không nhận.
+  $('scNative').addEventListener('change', async e => {
+    const fs = [...e.target.files];
+    e.target.value = '';
+    if (!fs.length) return;
+    const n0 = scn.pages.length;
+    await scIntake(fs);
+    const added = scn.pages.slice(n0);
+    if ($('camModal').classList.contains('hidden')) {
+      if (added.length) toast(`Đã thêm ${added.length} trang vừa chụp`, 'o');
+      return;
+    }
+    added.forEach(p => camShots.unshift({
+      id: p.id, url: (window.URL || window.webkitURL).createObjectURL(p.src) }));
+    camAdded += added.length;
+    camRenderStrip();
+  });
+  $('scName').addEventListener('input', () => { scn.pdf = null; });
+  ['scPgSize', 'scPgPad', 'scPgQ'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('change', () => { scn.pdf = null; });
+  });
+  scRender();
+})();
 </script>
 
 </body>

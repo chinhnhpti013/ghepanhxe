@@ -1,12 +1,13 @@
 {
   "name": "pti-ghepanh-tests",
   "private": true,
-  "description": "Kiểm thử màn hình 3 (Công cụ file) của index.html ngoài trình duyệt",
+  "description": "Kiểm thử màn hình 3 (Công cụ file) và màn hình 4 (Quét tài liệu) của index.html ngoài trình duyệt",
   "scripts": {
-    "test": "node test.mjs && node test2.mjs && node test3.mjs",
+    "test": "node test.mjs && node test2.mjs && node test3.mjs && node test4.mjs",
     "t1": "node test.mjs",
     "t2": "node test2.mjs",
     "t3": "node test3.mjs",
+    "t4": "node test4.mjs",
     "check": "python check.py && python check_ids.py"
   },
   "dependencies": {

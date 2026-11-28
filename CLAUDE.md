@@ -34,7 +34,7 @@ anh-giam-dinh-vcx-theo-ten-file/
 ├── dat_ten_file.py               ← Giai đoạn 1 (Python)
 ├── ghep_anh.py                   ← Giai đoạn 2 (Python)
 ├── chay_doc.bat / chay_ngang.bat ← chạy nhanh bằng double-click
-├── tests/                        ← kiểm thử màn hình 3 bằng Node (xem mục riêng ở cuối)
+├── tests/                        ← kiểm thử màn hình 3 + 4 bằng Node (xem mục riêng ở cuối)
 └── requirements.txt
 ```
 
@@ -45,21 +45,27 @@ anh-giam-dinh-vcx-theo-ten-file/
 File HTML đơn, không cần build. Phải mở qua **địa chỉ web** (GitHub Pages / Render / `python -m http.server`),
 **không mở trực tiếp bằng `file://`** — vì cần `fetch()` font tiếng Việt và logo.
 
-App có **3 màn hình**: `1 · Lập bản ảnh` → `2 · Xem & Xuất` (một luồng tuần tự), và
-`3 · Công cụ file` — bộ công cụ PDF/Office **độc lập**, vào tự do, xem mục riêng ở cuối.
+App có **4 màn hình**: `1 · Lập bản ảnh` → `2 · Xem & Xuất` (một luồng tuần tự), rồi
+`3 · Công cụ file` (bộ công cụ PDF/Office) và `4 · Quét tài liệu` (máy quét giấy tờ:
+cắt viền · chỉnh thẳng · làm rõ · OCR · ký) — hai mục sau **độc lập**, vào tự do,
+mỗi mục có một phần riêng ở cuối tài liệu này.
 
 Thư viện CDN: `pdf-lib` + `@pdf-lib/fontkit` (dựng PDF) nạp sẵn ở `<head>`;
 `pdf.js` (`PDFJS_VER`, cdnjs) **nạp lười** bởi `loadPdfjs()` ở lần đầu người dùng nạp file PDF
 (và bởi các công cụ của màn hình 3);
 `firebase-app` + `firebase-database` (ESM, gstatic) **nạp lười** cho bộ đếm lượt truy cập, và
-**chỉ khi `FB_CFG` đã được điền** — xem *Bộ đếm lượt truy cập*. Không dùng thư viện nào khác.
+**chỉ khi `FB_CFG` đã được điền** — xem *Bộ đếm lượt truy cập*;
+`tesseract.js` (`SC_TESS`, jsDelivr) **nạp lười** cho nhận dạng chữ của màn hình 4, chỉ khi
+người dùng bấm nút OCR. **Ngoài 5 thư viện đó thì không dùng thư viện nào khác** —
+tesseract.js là ngoại lệ có chủ ý, xem *Màn hình 4 → Nhận dạng chữ*.
 
 **Hướng dẫn sử dụng** nằm ở `huong-dan.html` — trang HTML độc lập, tự chứa CSS, không phụ thuộc
 `index.html`. Nút `Help` (ngoài cùng bên phải thanh tiêu đề, cạnh 🌙) và phím `F1` mở nó trong
 hộp thoại `#guideModal` qua iframe `huong-dan.html?theme={sáng|tối}`; `openGuide()` chỉ dựng
 iframe một lần và nạp lại khi đổi sáng/tối. Trang này cũng mở trực tiếp được bằng link hoặc
 in ra giấy (có `@media print`). Hướng dẫn **chỉ nói về web app** (A · Các bước sử dụng ·
-**B · Công cụ file (màn hình 3)** · C · Thông số · D · Xử lý sự cố · E · FAQ; mục **9c** là
+**B · Công cụ file (màn hình 3)** · **C · Quét tài liệu (màn hình 4)** · D · Thông số ·
+E · Xử lý sự cố · F · FAQ; mục **9c** là
 Biên bản giám định & chữ ký tay, mục **7** có dải nút Thay thế/Sửa chữa/Không) — phần luồng
 Python đã bỏ khỏi hướng dẫn, chỉ còn tài liệu ở CLAUDE.md. **Sửa tính năng thì phải sửa `huong-dan.html` kèm theo** —
 bảng tiền tố giấy tờ, bảng lưới ảnh/trang và danh sách phím tắt được nhắc lại ở đó.
@@ -138,6 +144,10 @@ Nút `📷 Chụp ảnh` ở `.dz-btns` (trên ≤700px có `order:-1` + tô mà
 đây là việc hay làm nhất) và nút `📷 Chụp thêm` ở thanh công cụ mỗi hạng mục đều gọi
 `openCamera(gid?)`. Lớp phủ `.cam` dùng **màu cố định tối**, không theo token sáng/tối, vì khung
 ngắm phải tối mới nhìn rõ hình camera — nên **đổi hệ màu không phải sửa khối này**.
+
+> **Hộp này dùng chung với màn hình 4.** `openCamera(gid, mode)` nhận thêm `mode = 'scan'` và
+> biến `camMode ∈ {photo, scan}` quyết định ảnh chụp được đi về đâu — xem
+> *Màn hình 4 → Camera dùng chung*. Sửa hộp chụp thì phải thử cả hai đường.
 
 Hai đường chụp dùng chung một hộp thoại:
 - **Khung ngắm trong app** — `camStart()` xin `getUserMedia` với `{width/height: {ideal: CAM_IDEAL}}`,
@@ -260,7 +270,8 @@ và chỉ vài KB — nhờ vậy gõ chú thích không phải ghi lại toàn 
 tập ảnh thay đổi. Mở lại app mà còn bản nháp thì có thanh mời **Mở bản nháp** / **Xóa nháp**.
 
 ### Lưu hồ sơ trên máy (IndexedDB)
-- DB `pti_ghepanh` (v2) với 3 store: `records` (hồ sơ lưu tay) · `draft_meta` + `draft_blobs` (bản nháp tự lưu)
+- DB `pti_ghepanh` (**v3**) với 4 store: `records` (hồ sơ lưu tay) · `draft_meta` + `draft_blobs`
+  (bản nháp tự lưu) · `scans` (tài liệu của màn hình 4 — xem mục riêng)
 - Lưu thông tin + ảnh (Blob) ngay trong trình duyệt, **không tải lên internet**
 - Mở lại / tìm kiếm (theo mã hồ sơ, BKS, ga-ra, GĐV) / xóa qua nút 🗂️
 - Hồ sơ lưu kèm `loaiXe` + `sdtGdv` (hồ sơ cũ thiếu `sdtGdv` thì lấy lại từ `pti_gdv_tel`
@@ -544,19 +555,22 @@ Người dùng được chỉ sang "mở bằng Word rồi Lưu thành PDF" khi 
 #### Kiểm thử ngoài trình duyệt — `tests/`
 
 Bộ test **nằm trong repo**: `cd tests && npm install && npm test` (xem `tests/README.md`).
-Nó **trích khối `<script>` cuối của `index.html`** rồi chạy bằng **Node + `vm.runInThisContext`**
-với `$`/`document` giả lập — không có bản sao mã nguồn nào, nên sửa app là test theo ngay.
+Nó **trích hai khối `<script>` cuối của `index.html`** — tìm theo dấu mốc `MÀN HÌNH 3` /
+`MÀN HÌNH 4` trong chú thích, **không** lấy theo thứ tự — rồi chạy bằng
+**Node + `vm.runInThisContext`** với `$`/`document` giả lập; không có bản sao mã nguồn nào,
+nên sửa app là test theo ngay.
 
 | File | Kiểm gì |
 |---|---|
 | `test.mjs` | hàm tiện ích · đọc ZIP · Word/Excel → PDF (pdf-lib **giả lập**, ghi lại mọi lệnh vẽ) |
 | `test2.mjs` | 6 công cụ PDF + Office → PDF + luồng giao diện (pdf-lib **thật** + font thật) — 20 mục |
 | `test3.mjs` | nén PDF · PDF→ảnh · ảnh→PDF · đổi định dạng ảnh (**node-canvas** + **pdfjs-dist**) — 13 mục |
+| `test4.mjs` | **màn hình 4**: ma trận phối cảnh · tìm mép giấy · chỉnh thẳng · 5 bộ lọc · nạp trang → xuất PDF/JPG · dấu & ghi chú · .txt/.docx/PDF tìm kiếm được · xoay trang · chạy thử hai lớp phủ — 29 mục |
 | `check.py` | `node --check` từng khối `<script>` + báo tên khai báo trùng giữa các khối |
-| `check_ids.py` | mọi `$('id')` của màn hình 3 có id thật · mọi `onclick=` có hàm thật |
+| `check_ids.py` | mọi `$('id')` của màn hình 3 **và 4** có id thật · mọi `onclick=` có hàm thật |
 
-**Ba bẫy đã sửa, đừng lặp lại:**
-1. **Phải dùng `runInThisContext`, không dùng `vm.createContext`** ở `test2`/`test3` — pdf-lib kiểm
+**Năm bẫy đã sửa, đừng lặp lại:**
+1. **Phải dùng `runInThisContext`, không dùng `vm.createContext`** ở `test2`/`test3`/`test4` — pdf-lib kiểm
    `instanceof Array`, mà mảng tạo trong realm khác sẽ không qua được phép kiểm đó. Riêng `test.mjs`
    dùng pdf-lib giả lập nên `createContext` vẫn được.
 2. **File mẫu trong `docs/` đều bị gitignore** (tài liệu nội bộ; `bien_ban_giam_dinh.pdf` có dữ liệu
@@ -565,9 +579,13 @@ với `$`/`document` giả lập — không có bản sao mã nguồn nào, nên
    (đã gitignore) — chúng dẫn xuất từ tài liệu có dữ liệu thật, đừng để lọt lên repo public.
 3. Nhận diện định danh JS phải dùng **`(?![\w$])` chứ không phải `\b`** — `$` không phải ký tự chữ
    nên `\b` không thấy biên giới sau nó, và `check_ids.py` từng báo oan là hàm `$` thiếu định nghĩa.
+4. **`localStorage` và `navigator` của Node 24 là thuộc tính chỉ đọc của `globalThis`** —
+   `Object.assign(globalThis, {…})` ném lỗi, phải đặt bằng `Object.defineProperty`.
+5. **`scIntake()` tự gọi `scRunQueue()`**, nên gọi `scRunQueue()` lần nữa trả về ngay (cờ
+   `_scRunning`). Phép thử phải đợi `scn.busy` hạ xuống bằng `waitIdle()` của `test4.mjs`.
 
-`npm run t3` cần biên dịch node-canvas; máy không có bộ build C++ thì bỏ `t3` và kiểm 4 công cụ
-cần canvas bằng mắt trong trình duyệt. `package-lock.json` **được commit** để ghim `pdfjs-dist`
+`npm run t3` và `npm run t4` cần biên dịch node-canvas; máy không có bộ build C++ thì bỏ chúng
+và kiểm các phần cần canvas bằng mắt trong trình duyệt. `package-lock.json` **được commit** để ghim `pdfjs-dist`
 đúng bản `PDFJS_VER` mà app nạp từ CDN.
 
 #### CSS
@@ -575,8 +593,203 @@ Khối CSS của màn hình 3 nằm **cuối `<style>`, ngay trước `@media pr
 nên media query riêng của nó (`≤700px`, `≤400px`) đặt ở cuối khối là đúng thứ tự.
 Class chính: `.tool-grid` / `.tool-tile` (lưới ô công cụ) · `.tz-dz` (vùng kéo thả) · `.tz-f`
 (một dòng file) · `.tz-opt` (lưới tùy chọn) · `.tz-run` · `.tz-out` (khối kết quả, nền xanh lá)
-· `.pg-grid` / `.pg` (lưới trang PDF) · `.stp-sep` / `.stp.free` (mục 3 của thanh bước).
+· `.pg-grid` / `.pg` (lưới trang PDF) · `.stp-sep` / `.stp.free` (mục 3 **và 4** của thanh bước).
 Tất cả dùng design token, trừ `.pg-cv` cố ý nền trắng — ảnh nhỏ của trang PDF là tờ giấy trắng.
+
+### Màn hình 4 — Quét tài liệu (`#panel4`)
+
+Máy quét giấy tờ kiểu CamScanner, chạy **hoàn toàn trong trình duyệt**. Độc lập với luồng
+lập bản ảnh: không đọc `state.groups`, không ghi hồ sơ / bản nháp, không gọi
+`scheduleDraftSave()`. Toàn bộ mã nằm ở **khối `<script>` cuối cùng** của `index.html`
+(sau khối màn hình 3), mọi tên mang tiền tố **`sc` / `SC`**.
+
+> `scheduleDraftSave` cũng bắt đầu bằng "sc" — đừng gọi nó từ đây. Mục 4 cố ý không ghi gì
+> vào bản nháp của bản ảnh.
+
+**Mục 4 vào TỰ DO như mục 3**: `goStep()` kẹp `n` trong `1..4`, `#stp4` mang class `.stp.free`
+và tách khỏi `#stp3` bằng `.stp-sep`; `abGoBack()` từ mục 3 **hoặc 4** về thẳng bước 1;
+phím `←` `→` vẫn chỉ đi lại giữa bước 1 và 2. `updateActionBar()` hỏi
+**`typeof scBarMeta === 'function'`** chứ không gọi thẳng — lúc `init()` chạy thì khối
+script cuối chưa thực thi (đúng như `tzBarMeta`).
+
+#### Đường đi của MỘT trang quét
+```
+ảnh gốc (page.src)
+  → xoay theo page.rot            scSrcCv()
+  → tìm 4 góc mép giấy            scDetectQuad()   Sobel + biến đổi Hough
+  → chỉnh thẳng phối cảnh         scHomo + scWarp()  nội suy song tuyến tính
+  → làm rõ chữ                    scEnhance()      chia cho nền + giãn tương phản
+  → page.out                      ảnh JPEG sạch, CHƯA có chữ ký / dấu
+  → scComposite()                 in chữ ký · ghi chú · dấu lên BẢN SAO
+  → xuất PDF / JPG / OCR
+```
+Chữ ký và dấu **không nung vào `page.out`**, nhờ vậy sửa lại hay bỏ đi lúc nào cũng được —
+kể cả sau khi đổi bộ lọc hay cắt lại viền. Chúng chỉ được vẽ lên khi dựng ảnh nhỏ,
+khi xem và khi xuất file.
+
+**Lúc chưa có trang nào** thì ba thẻ `#scPagesCard` · `#scExpCard` · `#scOcrCard` đều ẩn —
+rỗng không thì chúng vô nghĩa. Vì vậy phải có khối **`#scEmpty`** (6 ô giới thiệu việc làm được)
+hiện thay vào chỗ đó, kẻo màn hình trông như chỉ có mỗi ô nạp file và người dùng **không biết là
+còn ký, OCR, chia sẻ**. `scRender()` là nơi duy nhất bật/tắt nó. Đã mắc đúng lỗi này ở bản đầu —
+**đừng bỏ `#scEmpty` đi.**
+
+**Mô hình dữ liệu**: `scn.pages[] = {id, name, src, rot, quad, filt, out, ow, oh, sw, sh,
+thumb, ovs[], dirty, busy, err}` — sửa trực tiếp như `state.groups`, không dựng lại từ danh
+sách file. `quad` đong theo **khung ĐÃ xoay**, nên `scRot()` phải đặt `quad = null` để tìm lại.
+
+**Hàng đợi `scRunQueue()`** xử lý **lần lượt** từng trang có `dirty`, không song song: một
+trang 2000×2800 đã chiếm ~22MB `ImageData`, chạy song song 5 trang là hết RAM tab. Cờ
+`_scRunning` chặn gọi chồng — vì vậy `scIntake()` đã gọi `scRunQueue()` rồi thì gọi lại
+sẽ **trả về ngay**, muốn đợi xong phải xem `scn.busy` (bộ test có `waitIdle()`).
+
+#### Tìm mép giấy (`scDetectQuad`)
+Làm trên ảnh thu nhỏ còn `SC_DET` = 420px cho nhanh rồi quy toạ độ về ảnh gốc:
+Sobel → ngưỡng tự nới dần cho tới khi đủ ~700 điểm mép → **biến đổi Hough**
+(θ 0–179°, ρ bước 1px) → chặn đỉnh lân cận → chia hai nhóm đường **dọc** (θ≈0/180) và
+**ngang** (θ≈90) → mỗi cạnh lấy đường **ngoài cùng trong số các đường đủ mạnh**
+(≥ 55% số phiếu cao nhất của nửa ảnh đó).
+
+> Vì sao "ngoài cùng trong số đủ mạnh" chứ không phải "nhiều phiếu nhất": mép giấy thường
+> **yếu hơn** đường kẻ bảng hay mép ảnh in bên trong tài liệu, nhưng luôn **nằm ngoài hơn**.
+
+Hough chịu được giấy quay nghiêng và chụp xiên, nên vừa cắt viền vừa chỉnh thẳng bằng cùng
+một phép đo — **không cần bước "dò góc nghiêng" riêng**.
+
+Kiểm tra trước khi nhận: tứ giác **lồi**, diện tích 12–130% ảnh, 4 góc không ra ngoài ảnh
+quá 9%, mỗi cạnh ≥ 18% cạnh tương ứng. Trượt bất kỳ điều kiện nào → **trả `null`**, và
+`scProcess()` lấy cả ảnh. **Thà không cắt còn hơn cắt bừa mất chữ.**
+
+Góc tìm được được **thu vào tâm 0,6%**: đường Hough nằm đúng trên mép giấy, cắt sát mép thì
+trang quét còn một viền sẫm của mặt bàn mà bước làm rõ lại tô đậm thêm.
+
+#### Chỉnh thẳng phối cảnh (`scHomo` + `scWarp`)
+`scHomo(dst, src)` giải hệ 8 ẩn bằng khử Gauss có chọn trụ (`scSolve`), cho ma trận đưa
+4 góc **ĐÍCH** về 4 góc **NGUỒN** — tức là đi **ngược**. Phải đi ngược mới duyệt được từng
+điểm ảnh của trang kết quả rồi lấy mẫu ở ảnh gốc; đi xuôi thì ảnh ra **rỗ lỗ chỗ** vì nhiều
+điểm đích không ai ghi.
+
+`scWarp()` hạ độ phân giải **nguồn** xuống 1,35× mức cần trước khi `getImageData` (ảnh 12MP
+đọc nguyên là ~48MB mà lấy mẫu xuống cũng không nét thêm), rồi chạy theo dải 96 hàng và
+`await scYield()` giữa các dải để tab không đứng cả giây.
+
+`scOutSize()` suy khổ trang từ chiều dài trung bình hai cặp cạnh đối, và **không phóng to quá
+kích thước thật** (`cap = min(target, cạnh dài × 1,15)`).
+
+#### Làm rõ nội dung (`scEnhance`)
+Cốt lõi là **chia cho nền**: ước lượng độ sáng của chính tờ giấy rồi lấy ảnh chia cho nó —
+bóng tay, vệt sáng đèn và giấy ngà đều biến mất, nét mực giữ nguyên.
+
+`scBg()` ước lượng nền bằng **LỌC CỰC ĐẠI** (local max) rồi làm mượt, **không phải trung bình**:
+
+> Trung bình (mờ hộp) bị nét mực kéo xuống, nên chỗ chữ dày cho nền thấp hơn chỗ lề trắng —
+> chia xong thì **lề ra xám mà vùng chữ ra trắng**, bản in trông bẩn từng mảng. Đã mắc đúng
+> lỗi này ở bản đầu, `tests/test4.mjs` bắt được (nền 188 so với chữ 136).
+
+Lọc cực đại chạy trên ảnh đã thu nhỏ bằng max-pooling (còn ~220px) nên rẻ, rồi nội suy
+song tuyến tính phóng lại. Có **sàn** `= phân vị 97% × 0,5`: vùng tối nguyên khối (ảnh dán
+trên trang, ô đen) có cực đại thấp, không chặn sàn thì nó bị kéo bật lên thành trắng bệch.
+
+| Bộ lọc | Cách làm |
+|---|---|
+| `auto` *(mặc định)* | chia cho nền → giãn tương phản phân vị 4,5%–90% → gamma 0,82 |
+| `gray` | như trên, phân vị 1,2%–98,5%, không gamma |
+| `bw` | ngưỡng **theo vùng** (so với mờ hộp bán kính `cạnh/90`, trừ 10) → chỉ 0 hoặc 255 |
+| `color` | chia cho nền **từng kênh R/G/B** — giữ dấu đỏ, mực xanh, ảnh màu |
+| `none` | để nguyên |
+
+Mốc đen bị ép xuống dưới mốc trắng ít nhất **70 bậc** (`lo = min(lo, hi - 70)`): trang gần
+như trắng trơn thì phân vị dưới cũng rơi vào phần giấy, không chặn thì nền ra lốm đốm.
+
+`scBlur()` là mờ hộp hai chiều bằng **tổng chạy**, cố ý **không dùng ảnh tích phân**: trang
+2000×2800 cần `Float64` mới đủ chính xác cho tổng tích phân (tổng tới ~1,4 tỷ, vượt xa 24 bit
+của `Float32`) → tốn 45MB.
+
+#### Vật đặt lên trang (`page.ovs`) — ký · ghi chú · dấu · ngày
+Toạ độ ghi theo **tỉ lệ trang (0..1)**, không theo điểm ảnh, nhờ vậy đổi độ phân giải trang
+quét thì chữ ký vẫn nằm đúng chỗ. Khoá bắt đầu bằng `_` (`_img`, `_ar`) là **tạm** — ảnh đã
+giải mã — và `scOvPlain()` **phải** bỏ chúng trước khi ghi IndexedDB, vì `structuredClone`
+không nhân bản được đối tượng `Image`.
+
+`scLoadOvs()` phải chạy **trước** mọi lần vẽ: `drawImage` không chờ ảnh tải xong và sẽ vẽ ra
+khoảng trắng.
+
+Màn hình đặt vật (`#scPlaceOv`) dùng Pointer Events; bắt điểm bằng cách **đưa điểm bấm về hệ
+toạ độ của vật đã nghiêng** rồi so với khung bao, và dò **từ vật trên cùng xuống**.
+
+**Chữ ký điện tử** nhớ trong `localStorage` (`pti_sign_list`, tối đa `SC_SIGMAX` = 6).
+Dùng chung bảng ký `#sigModal` của biên bản qua `openSign('scan')`; `sigConfirm()` có nhánh
+`who === 'scan'` gọi `scSigDone(url)` và **thoát sớm**, không đụng gì tới object `bb`.
+
+#### Camera dùng chung với bản ảnh (`camMode`)
+Mục 4 **không có bộ mã camera riêng**. Biến `camMode ∈ {photo, scan}` quyết định ảnh chụp
+được đi về đâu; khung ngắm, đèn flash, đổi camera, nháy trắng và nút *Camera máy* giữ nguyên.
+Các chỗ có nhánh `scan`: `openCamera(gid, mode)` (ẩn `#camGrpRow`, đổi nhãn) ·
+`camShoot()` → `camShootScan()` → `scCamShot()` · `camUndo()` → `scCamUndo()` ·
+`useNativeCam()` (bấm `#scNative`) · `camRenderStrip()` · `closeCamera()` (đặt lại
+`camMode = 'photo'`).
+
+#### Nhận dạng chữ (OCR) — thư viện ngoài DUY NHẤT của dự án
+`tesseract.js` (`SC_TESS`, jsDelivr), **nạp lười** đúng như pdf.js — chỉ tải khi người dùng
+bấm nút, nên ai không dùng OCR thì app vẫn nhẹ và vẫn chạy ngoại tuyến. Nhận dạng chữ là việc
+không thể tự viết lại trong vài trăm dòng; đây là ngoại lệ **có chủ ý** của quy tắc
+"không dùng thư viện nào khác". Ảnh và chữ vẫn không rời khỏi máy — chỉ mã thư viện và bộ dữ
+liệu ngôn ngữ là tải về.
+
+`scOcrWords()` nhận **cả hai dạng** kết quả: `data.words` (bản cũ) và cây
+`blocks → paragraphs → lines → words` (v5).
+
+Ba đường xuất:
+- **`.txt`** — có **BOM UTF-8** để Notepad trên Windows mở ra đúng tiếng Việt.
+- **`.docx`** — `scOcrDocx()` tự ghi file Word tối thiểu (3 phần: `[Content_Types].xml`,
+  `_rels/.rels`, `word/document.xml`) bằng chính **`zipStore()`** đã có. Word nhận ZIP kiểu
+  *store* (không nén) bình thường, nên **không phải thêm thư viện nào**.
+- **PDF tìm kiếm được** — ảnh trang + lớp chữ **vô hình** (`drawText` với `opacity: 0`) đặt
+  đúng chỗ từng từ. Trang để đúng tỉ lệ ảnh, **cạnh dài bằng cạnh dài A4 (842pt)** nên toạ độ
+  từ quy đổi bằng MỘT hệ số, không lệch khi trang ngang và dọc lẫn nhau. Mọi chữ phải qua
+  `tzClean()`, và `drawText` của từng từ bọc `try/catch` — hỏng một từ không được mất cả trang.
+
+#### Lưu trữ & chia sẻ
+- **IndexedDB**: `openDB()` lên **v3**, thêm store `scans` (`{id, name, ts, n, pages[]}`).
+  Tên store ghi **thẳng chuỗi `'scans'`** trong `onupgradeneeded` chứ không qua hằng `SC_STORE`:
+  hằng đó khai ở khối script cuối, lúc `openDB()` chạy lần đầu thì khối ấy có thể chưa thực thi.
+  Lưu **cả ảnh gốc lẫn ảnh trang đã xử lý** — nhờ ảnh gốc mà mở lại vẫn cắt viền / đổi bộ lọc
+  tiếp được, nhờ ảnh đã xử lý mà mở ra thấy ngay.
+- **Chia sẻ**: `navigator.share({files})` — gửi thẳng sang Zalo / email / Drive / AirDrop,
+  không qua máy chủ nào. Không có khung chia sẻ thì tải file về.
+- **KHÔNG có đồng bộ đám mây và chia sẻ bằng liên kết** — hai việc đó cần máy chủ riêng.
+  Đã nói rõ ở thẻ *Xuất & chia sẻ* và ở `huong-dan.html` mục C5; **đừng coi là thiếu sót**.
+
+#### Chỉnh sửa PDF: KHÔNG viết lại
+Nối · tách · sắp xếp · xóa trang · nén · đánh số · đóng dấu chữ đều đã có ở màn hình 3.
+Thẻ `#scEditCard` chỉ có các nút `scGoTool(id)` → `goStep(3)` + `tzOpen(id)`.
+Mục 4 cũng **dùng lại** `tzImgPage()` · `tzPack()` · `tzFonts()` · `tzClean()` · `tzUnzip()`
+của màn hình 3 (khối script của nó chạy trước nên mọi tên đã sẵn sàng).
+
+#### CSS
+Khối CSS của màn hình 4 nằm **cuối `<style>`, ngay trước `@media print`** — sau phần màn hình 3,
+nên media query riêng của nó (`≤700px`, `≤400px`) đặt ở cuối khối là đúng thứ tự.
+Class chính: `.sc-grid` / `.sc-pg` / `.sc-pv` / `.sc-a` (lưới trang) · `.sc-exp` (dải nút xuất)
+· `#scEmpty` / `.sc-feat` (6 ô giới thiệu lúc màn hình trống)
+· `.sc-ov` / `.sc-ovt` / `.sc-stage` / `.sc-ovb` / `.sc-ovopt` (hai lớp phủ) · `.sc-loupe`
+(kính lúp) · `.sc-items` / `.sc-it` (chip vật đặt lên trang) · `.sc-lib` / `.sc-lb`.
+
+- `.sc-a` là **lưới 3 cột** (`display:grid`), không phải một hàng flex: thẻ trang trên điện
+  thoại chỉ rộng ~142px, 6 nút một hàng thì mỗi nút còn 23px — không bấm nổi.
+- `.sc-ov` dùng **màu cố định tối** như `.cam` và `.sig-ov` — ảnh giấy tờ phải nằm trên nền tối
+  mới nhìn rõ mép giấy; **đổi hệ màu sáng/tối không phải sửa khối này**.
+- `z-index` của `.sc-ov` là **920**: trên `.ov` (900) nhưng **dưới `.sig-ov` (950)**, để bảng ký
+  mở đè lên được màn hình đặt chữ ký.
+
+**Bẫy đã sửa, đừng lặp lại:**
+1. **Đừng viết thẻ `script` nguyên văn trong chú thích HTML.** Bộ kiểm thử tách các khối script
+   bằng biểu thức chính quy; một thẻ lạc trong chú thích sẽ cắt ra một "khối" giả và test đứng
+   ngay dòng đầu. Viết "khối script cuối file" là đủ.
+2. `scProcess()` phải đặt `page.sw`/`page.sh` **sau khi** giải mã ảnh — `scFullAll()` dựa vào
+   hai số đó để dựng tứ giác "cả ảnh".
+3. `scFinalJpeg()` trả thẳng `page.out` khi trang **không có vật nào** đặt lên và chất lượng
+   ≥ 0,9 — giải mã rồi nén lại một lần nữa chỉ làm mất nét.
+4. Mọi thay đổi trang đều phải xoá `scn.pdf` (bộ nhớ bản PDF đã dựng), kẻo nút
+   *📤 Chia sẻ* gửi đi bản cũ.
 
 ### Bộ đếm lượt truy cập (`#abCnt`)
 
@@ -684,9 +897,11 @@ Các điểm ngắt: **≤980px** (bỏ cột phải) · **≤760px** (`fgrid3` 
 **≤700px** (khối RESPONSIVE chính: nút cao ≥42px, ô nhập 16px để iOS không tự phóng to,
 `.toolbar`/`.draft-bar` ẩn `.sp` cho nút xếp 2 cái/hàng, `#btnCam` lên đầu `.dz-btns`,
 `.fsec` thu lề trong, `.segm` xếp dọc mỗi nút một hàng) ·
-**≤620px** (bảng hạng mục + thanh ký) · **≤480px** (`fgrid3` 1 cột, thumbnail 132px,
+**≤620px** (bảng hạng mục + thanh ký) · **≤520px** (thanh bước bỏ hẳn nhãn, chỉ còn số) ·
+**≤480px** (`fgrid3` 1 cột, thumbnail 132px,
 `#btnCam` chiếm trọn một hàng, **bảng hạng mục bỏ `min-width` để vừa màn hình, không phải vuốt
-ngang**) · **≤400px** (ẩn nhãn phụ của appbar/stepper) ·
+ngang**) · **≤400px** (ẩn dòng phụ của appbar) ·
+**≤760px** (thanh bước bỏ nhãn phụ — có 4 mục nên phải bỏ sớm hơn trước, kẻo tràn ngang) ·
 **`max-height:560px` + landscape** (bỏ `max-height` của `.pv-scroll` / `.bb-pv`).
 
 > **Bẫy thứ tự CSS:** khối RESPONSIVE chung nằm **trước** phần CSS của Biên bản (`.bb-*`,
@@ -723,9 +938,12 @@ section, bảng còn `min-width:430px`).
     160ms của handler `blur` sẽ đóng ngay droplist vừa mở. Phải giữ `comboBlurT` và
     `clearTimeout(comboBlurT)` ở đầu `openCombo()`; lần mở đầu tiên không dính lỗi này nên triệu
     chứng là "chỉ chọn được 1 lần"
-- Phím tắt: `Ctrl/Cmd+A` chọn tất cả · `Delete` xóa ảnh đã chọn · `Esc` bỏ chọn · `←` `→` chuyển giữa 2 bước
+- Phím tắt: `Ctrl/Cmd+A` chọn tất cả · `Delete` xóa ảnh đã chọn · `Esc` bỏ chọn · `←` `→` chuyển
+  giữa 2 bước (**không** nhảy vào mục 3 / 4)
 - Khi đang xem ảnh lớn: `←` `→` chuyển ảnh · `R` xoay · `Esc` đóng
 - Khi đang ở màn hình ký tay: `Esc` đóng (nhánh này nằm **trước** nhánh màn hình chụp)
+- Khi đang cắt viền (`#scCropOv`) hoặc đặt chữ ký (`#scPlaceOv`) ở mục 4: `Esc` đóng. Hai nhánh
+  này nằm **sau** nhánh màn hình chụp và **trước** nhánh xem ảnh lớn
 - Khi đang ở màn hình chụp: `Space` / `Enter` chụp · `Esc` đóng. Nhánh này nằm **đầu** handler
   phím tắt và bỏ qua cả `BUTTON` (không chỉ ô nhập), kẻo `Enter` trên nút *Xong* vừa chụp vừa đóng
 

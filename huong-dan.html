@@ -233,9 +233,18 @@ td{color:var(--text-2)}
     <a class="lv2" href="#cc-doi">B3. Chuyển đổi định dạng</a>
   </div>
   <div class="nav-g">
-    <a href="#thiet-ke">C · Thông số bản ảnh</a>
-    <a href="#su-co">D · Xử lý sự cố</a>
-    <a href="#faq">E · Câu hỏi thường gặp</a>
+    <a href="#quet">C · Quét tài liệu (màn hình 4)</a>
+    <a class="lv2" href="#q-dung">C1. Nạp trang</a>
+    <a class="lv2" href="#q-cat">C2. Cắt viền &amp; chỉnh thẳng</a>
+    <a class="lv2" href="#q-loc">C3. Làm rõ nội dung</a>
+    <a class="lv2" href="#q-ky">C4. Ký · ghi chú · đóng dấu</a>
+    <a class="lv2" href="#q-xuat">C5. Xuất &amp; chia sẻ</a>
+    <a class="lv2" href="#q-ocr">C6. Nhận dạng chữ (OCR)</a>
+  </div>
+  <div class="nav-g">
+    <a href="#thiet-ke">D · Thông số bản ảnh</a>
+    <a href="#su-co">E · Xử lý sự cố</a>
+    <a href="#faq">F · Câu hỏi thường gặp</a>
   </div>
 </nav>
 
@@ -262,6 +271,12 @@ td{color:var(--text-2)}
      giữa Word, Excel, JPG, PNG và PDF — xem mục <a href="#cong-cu">B</a>.
      Tất cả cũng chạy ngay trong máy, không tải file lên internet.</p>
 
+  <h3>Và một máy quét giấy tờ</h3>
+  <p>Mục <b>4 · Quét tài liệu</b> biến điện thoại hoặc webcam thành máy quét: chụp tờ giấy đặt
+     trên bàn, ứng dụng <b>tự tìm mép giấy, cắt viền, bẻ thẳng tờ chụp xiên và làm rõ chữ</b>,
+     rồi ghép nhiều trang thành một PDF, <b>ký và đóng dấu</b> lên trang, hoặc
+     <b>nhận dạng chữ</b> thành văn bản sao chép được — xem mục <a href="#quet">C</a>.</p>
+
   <div class="note">
     🔒 <b>Toàn bộ ảnh được xử lý ngay trên máy của bạn.</b> Web app không tải ảnh, thông tin
     hồ sơ hay file PDF lên internet. Hồ sơ "lưu trên máy" nằm trong bộ nhớ của chính trình duyệt
@@ -283,12 +298,15 @@ td{color:var(--text-2)}
     <pre><code>python -m http.server 8000</code></pre>
     sau đó vào <code>http://localhost:8000</code>.
   </div>
-  <p>Ứng dụng có <b>2 bước</b>, chuyển qua lại bằng thanh bước ở trên hoặc nút
+  <p>Luồng lập bản ảnh có <b>2 bước</b>, chuyển qua lại bằng thanh bước ở trên hoặc nút
      <span class="btn-ex">Tiếp tục →</span> / <span class="btn-ex">← Quay lại</span> ở cuối màn hình:</p>
   <ol class="steps">
     <li><b>Lập bản ảnh</b> — nhập thông tin giám định và nạp, sắp xếp, đặt chú thích cho ảnh.</li>
     <li><b>Xem &amp; Xuất</b> — xem trước từng trang A4 rồi tạo và tải file PDF.</li>
   </ol>
+  <p>Hai mục còn lại trên thanh bước — <b>3 · Công cụ file</b> và <b>4 · Quét tài liệu</b> —
+     là hai bộ công cụ <b>riêng</b>, vào bất cứ lúc nào (viền chấm trên thanh bước là dấu hiệu
+     của chúng). Vào đó rồi quay lại thì <b>ảnh và thông tin đang làm dở vẫn còn nguyên</b>.</p>
   <p>Các biểu tượng ở góc <b>trên cùng bên phải</b>:
      <span class="btn-ex">🔄 Tạo bản mới</span> làm lại từ đầu (mục <a href="#tao-ban-moi">13</a>) ·
      <span class="btn-ex">🗂️</span> hồ sơ đã lưu ·
@@ -935,7 +953,7 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><td><span class="kbd">Delete</span></td><td>Xóa các ảnh đang chọn</td></tr>
     <tr><td><span class="kbd">Esc</span></td><td>Bỏ chọn ảnh · đóng hộp thoại · đóng xem ảnh lớn</td></tr>
     <tr><td><span class="kbd">←</span> <span class="kbd">→</span></td>
-        <td>Chuyển giữa bước 1 và bước 2</td></tr>
+        <td>Chuyển giữa bước 1 và bước 2 (không nhảy vào mục 3 · 4)</td></tr>
     <tr><td><span class="kbd">↓</span> <span class="kbd">↑</span> · <span class="kbd">Enter</span></td>
         <td>Trong ô <b>GĐV</b> / <b>Phòng</b>: mở danh sách, chạy giữa các dòng và chọn dòng đang sáng</td></tr>
     <tr><td><span class="kbd">Tab</span> / <span class="kbd">Shift</span>+<span class="kbd">Tab</span></td>
@@ -950,6 +968,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><td><span class="kbd">Esc</span></td><td>Đóng màn hình chụp</td></tr>
     <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang ở màn hình ký tay</b></td></tr>
     <tr><td><span class="kbd">Esc</span></td><td>Đóng màn hình ký (chữ ký chưa lưu sẽ mất)</td></tr>
+    <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang cắt viền hoặc ký lên trang quét (mục 4)</b></td></tr>
+    <tr><td><span class="kbd">Esc</span></td><td>Đóng, giữ nguyên trang như cũ</td></tr>
     <tr><td colspan="2" style="background:var(--surface-2)"><b>Khi đang xem ảnh kích thước lớn</b></td></tr>
     <tr><td><span class="kbd">←</span> <span class="kbd">→</span></td><td>Ảnh trước / ảnh sau</td></tr>
     <tr><td><span class="kbd">R</span></td><td>Xoay ảnh 90°</td></tr>
@@ -1102,8 +1122,161 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 </section>
 
 <!-- ════════════════════════════════════════════════════ -->
+<section id="quet">
+  <h2 class="sec">🔍 C · Quét tài liệu (màn hình 4)</h2>
+
+  <p>Mục <b>4 · Quét tài liệu</b> biến điện thoại hoặc webcam thành <b>máy quét giấy tờ</b>:
+     chụp một tờ giấy đặt trên bàn, ứng dụng <b>tự tìm 4 mép giấy, cắt bỏ phần bàn, bẻ thẳng
+     tờ giấy chụp xiên và làm rõ chữ</b>, rồi ghép nhiều trang thành một file PDF.
+     Cũng như mục 3, đây là một tab riêng — <b>vào bất cứ lúc nào</b>, không cần nhập thông tin
+     hồ sơ, không làm mất ảnh đang làm dở ở bước 1.</p>
+
+  <div class="note">
+    🔒 <b>Ảnh giấy tờ không rời khỏi máy bạn.</b> Tìm mép giấy, bẻ thẳng, làm rõ, ghép PDF và
+    ký đều chạy ngay trong trình duyệt. Khác hẳn các app quét tài liệu trên điện thoại —
+    chúng tải ảnh lên máy chủ của hãng — nên <b>dùng được cho giấy tờ có thông tin khách hàng</b>.
+  </div>
+
+  <h3 id="q-dung">C1. Nạp trang</h3>
+  <ol class="steps">
+    <li>Bấm mục <b>4 · Quét tài liệu</b> trên thanh bước.</li>
+    <li>Chọn một trong bốn cách đưa giấy tờ vào:
+      <ul>
+        <li><b>📷 Chụp tài liệu</b> — khung ngắm ngay trong ứng dụng, chụp liên tiếp nhiều tờ.
+            Cần trang mở bằng <code>https://</code>.</li>
+        <li><b>📱 Camera máy</b> — gọi ứng dụng camera của điện thoại. <b>Ảnh nét nhất</b>
+            và là cách <b>duy nhất</b> chạy được khi trang mở bằng <code>http://</code> trong mạng nội bộ.</li>
+        <li><b>🖼 Chọn ảnh</b> — ảnh đã chụp sẵn trong máy (<code>.jpg</code> · <code>.png</code>).</li>
+        <li><b>📄 Nạp PDF</b> — mỗi trang PDF thành một trang quét, để bẻ thẳng lại, làm rõ,
+            ký hay đóng dấu lên một file PDF có sẵn.</li>
+      </ul>
+      Kéo thả file vào khung cũng được.</li>
+    <li>Mỗi trang được xử lý xong sẽ hiện ảnh nhỏ trong lưới, kèm kích thước trang
+        (ví dụ <code>1654×2339</code>). Số đo <b>màu vàng</b> nghĩa là trang hơi nhỏ, in A4 có thể rỗ —
+        nên chụp lại gần hơn hoặc nâng <b>Độ phân giải</b>.</li>
+  </ol>
+  <p>Một tài liệu nhận tối đa <b>60 trang</b>. Các trang được xử lý <b>lần lượt</b>, không song song —
+     mỗi trang chiếm khá nhiều bộ nhớ nên làm cùng lúc dễ treo tab.</p>
+
+  <h3 id="q-cat">C2. Cắt viền &amp; chỉnh thẳng</h3>
+  <p>Bấm vào <b>ảnh nhỏ của trang</b> (hoặc nút <b>✂️</b>) để mở màn hình cắt viền.</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:26%">Thao tác</th><th>Làm gì</th></tr>
+    <tr><td>Kéo <b>4 chấm tròn</b></td>
+        <td>Chỉnh từng góc tờ giấy. Đang kéo thì hiện <b>kính lúp</b> phóng to chỗ đang ngắm,
+            vì ngón tay che mất đúng điểm cần nhìn.</td></tr>
+    <tr><td>Kéo <b>4 ô vuông</b> giữa cạnh</td>
+        <td>Dời cả một cạnh một lúc — nhanh hơn kéo hai góc khi tờ giấy chỉ lệch nhẹ.</td></tr>
+    <tr><td><b>🔍 Tự nhận diện</b></td>
+        <td>Tìm lại mép giấy. Không thấy mép rõ ràng thì ứng dụng <b>báo ra và giữ nguyên</b>,
+            chứ không cắt bừa.</td></tr>
+    <tr><td><b>⬛ Cả ảnh</b></td>
+        <td>Bỏ cắt viền, giữ trọn tấm ảnh. Dùng khi tờ giấy chiếm kín khung hình.</td></tr>
+    <tr><td><b>↻ Xoay</b></td>
+        <td>Xoay ảnh 90°. Xoay xong ứng dụng <b>tự tìm lại mép giấy</b> trên khung mới.</td></tr>
+  </table>
+  </div>
+  <p>Vùng <b>tối màu</b> là phần sẽ bị cắt bỏ — nhìn là biết ngay trang in ra gồm những gì.
+     Bấm <b>✓ Xong</b> thì trang được xử lý lại; bấm <b>Hủy</b> hoặc <b>Esc</b> thì giữ nguyên như cũ.</p>
+
+  <h3 id="q-loc">C3. Làm rõ nội dung</h3>
+  <p>Chọn ở ô dưới mỗi trang (riêng từng trang) hoặc ở <b>Bộ lọc làm rõ cho tất cả</b>
+     (áp dụng một lượt cho mọi trang).</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:24%">Bộ lọc</th><th>Hợp với</th></tr>
+    <tr><td><b>Tự động</b> <i>(mặc định)</i></td>
+        <td>Hầu hết giấy tờ: xoá bóng tay và vệt sáng đèn, <b>nền ra trắng, chữ ra đen</b>.</td></tr>
+    <tr><td><b>Xám</b></td><td>Giấy tờ có ảnh hoặc chữ ký bút chì — giữ sắc độ mềm hơn.</td></tr>
+    <tr><td><b>Đen trắng</b></td>
+        <td>Văn bản thuần chữ: nét gọn nhất và <b>file nhẹ nhất</b>. Cũng là lựa chọn
+            dễ đọc nhất cho <b>nhận dạng chữ OCR</b>.</td></tr>
+    <tr><td><b>Màu</b></td>
+        <td>Giấy tờ có con dấu đỏ, ảnh màu, chữ ký mực xanh — bỏ bóng mà vẫn giữ màu.</td></tr>
+    <tr><td><b>Không xử lý</b></td><td>Giữ nguyên ảnh gốc, chỉ cắt viền và bẻ thẳng.</td></tr>
+  </table>
+  </div>
+  <p><b>Độ phân giải trang quét</b> — <i>Nhẹ</i> 1400px · <i>Chuẩn</i> 2000px <i>(mặc định)</i> ·
+     <i>Nét</i> 2800px tính theo cạnh dài. Càng nét thì xử lý càng lâu và file càng nặng.
+     Ứng dụng <b>không phóng to quá ảnh thật</b>: ảnh gốc nhỏ thì trang quét cũng nhỏ theo,
+     phóng lên chỉ làm file nặng chứ không nét thêm.</p>
+
+  <h3 id="q-ky">C4. Ký · ghi chú · đóng dấu</h3>
+  <p>Bấm nút <b>✍️</b> ở trang cần ký. Bốn thứ đặt lên trang được:</p>
+  <ul>
+    <li><b>✍️ Chữ ký</b> — vẽ bằng ngón tay, bút cảm ứng hoặc chuột. Chữ ký được
+        <b>nhớ lại trong máy</b> (tối đa 6 chữ ký) để lần sau chọn lại chứ không phải vẽ lại.</li>
+    <li><b>🖊 Ghi chú</b> — một dòng chữ.</li>
+    <li><b>🔲 Dấu</b> — chữ trong khung, kiểu <i>BẢN SAO</i>, <i>ĐÃ ĐỐI CHIẾU</i>.</li>
+    <li><b>📅 Ngày</b> — ngày hôm nay, sửa lại được.</li>
+  </ul>
+  <p>Bấm vào một vật rồi <b>kéo để di chuyển</b>; hai thanh trượt đổi <b>cỡ</b> và <b>độ nghiêng</b>;
+     dải chip phía trên để chọn hoặc bỏ từng vật.</p>
+  <div class="tip">
+    💡 <b>Chữ ký không bị nung vào ảnh trang.</b> Nó được giữ riêng và chỉ in lên khi xuất file,
+    nên <b>sửa lại hay bỏ đi lúc nào cũng được</b> — kể cả sau khi đã đổi bộ lọc hay cắt lại viền.
+  </div>
+
+  <h3 id="q-xuat">C5. Xuất &amp; chia sẻ</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:26%">Nút</th><th>Làm gì</th></tr>
+    <tr><td><b>📄 Xuất file PDF</b></td>
+        <td>Ghép mọi trang thành một PDF. Chọn khổ A4 dọc / ngang / tự theo chiều trang /
+            vừa đúng khổ ảnh, lề trang và chất lượng JPEG.</td></tr>
+    <tr><td><b>🖼 Xuất ảnh JPG</b></td>
+        <td>Mỗi trang một ảnh. Một trang thì tải thẳng <code>.jpg</code>,
+            nhiều trang thì gói thành một <b>ZIP</b>.</td></tr>
+    <tr><td><b>📤 Chia sẻ PDF</b></td>
+        <td>Mở <b>khung chia sẻ của chính thiết bị</b> — gửi thẳng sang Zalo, email, Drive,
+            AirDrop. Máy tính không có khung đó thì nút này tải file về để bạn tự gửi.</td></tr>
+    <tr><td><b>💾 Lưu vào máy</b></td>
+        <td>Giữ cả tài liệu trong trình duyệt máy này. Mở lại ở <b>🗂 Tài liệu đã lưu</b> —
+            vẫn cắt viền, đổi bộ lọc, ký tiếp được vì ảnh gốc cũng được lưu kèm.</td></tr>
+  </table>
+  </div>
+  <div class="warn">
+    ⚠️ <b>Chưa có đồng bộ đám mây và chia sẻ bằng đường liên kết.</b> Hai việc đó cần một máy chủ
+    riêng, mà ứng dụng này cố ý chạy hoàn toàn trong máy bạn để giấy tờ khách hàng không rời khỏi
+    thiết bị. Muốn đưa lên đám mây thì xuất PDF rồi tự tải lên Drive / OneDrive, hoặc dùng
+    <b>📤 Chia sẻ</b> và chọn ứng dụng đám mây trong khung chia sẻ của máy.
+  </div>
+  <div class="tip">
+    💡 <b>Sửa file PDF</b> — nối file, tách trang, xóa và đổi thứ tự trang, nén dung lượng,
+    đánh số trang, đóng dấu chữ đều nằm ở <b>mục 3 · Công cụ file</b>. Thẻ
+    <b>🛠 Chỉnh sửa file PDF</b> ở cuối màn hình 4 có nút mở thẳng từng công cụ đó.
+  </div>
+
+  <h3 id="q-ocr">C6. Nhận dạng chữ (OCR)</h3>
+  <p>Bấm <b>🔍 Nhận dạng chữ (OCR)</b> để đọc chữ trên các trang đã quét thành văn bản
+     <b>sao chép và tìm kiếm được</b>. Chọn ngôn ngữ <b>Tiếng Việt</b> / <i>Việt + Anh</i> /
+     <i>Anh</i>, và quét tất cả các trang hay chỉ trang đầu (để thử nhanh).</p>
+  <p>Chữ đọc được hiện trong ô văn bản, kèm bốn nút:</p>
+  <ul>
+    <li><b>📋 Sao chép toàn bộ</b> — dán thẳng vào email, Zalo, phần mềm nghiệp vụ.</li>
+    <li><b>⬇ Tải file .txt</b></li>
+    <li><b>📝 Tải file Word (.docx)</b> — mở bằng Word rồi sửa tiếp.</li>
+    <li><b>📄 PDF tìm kiếm được</b> — nhìn y hệt bản quét, nhưng <b>bôi chọn, sao chép và
+        Ctrl+F tìm chữ</b> ngay trong file PDF được.</li>
+  </ul>
+  <div class="warn">
+    ⚠️ <b>Lần đầu dùng OCR cần có mạng.</b> Đây là việc duy nhất của ứng dụng phải tải thêm một
+    thư viện (và bộ dữ liệu tiếng Việt, vài chục MB) — nhận dạng chữ thì không tự viết lại được.
+    Thư viện chỉ được tải <b>khi bạn bấm nút</b>, nên ai không dùng OCR thì ứng dụng vẫn nhẹ và vẫn
+    chạy ngoại tuyến như trước. <b>Ảnh và chữ vẫn không rời khỏi máy</b>: việc đọc chữ chạy ngay
+    trong trình duyệt, chỉ có mã thư viện là tải về.
+  </div>
+  <div class="tip">
+    💡 <b>Đọc không ra chữ?</b> Đổi bộ lọc trang sang <b>Đen trắng</b> hoặc <b>Xám</b>, nâng
+    <b>Độ phân giải</b> lên <i>Nét</i>, và chụp lại cho thẳng — ảnh mờ hoặc chụp quá xiên thì
+    máy nào cũng đọc sai. Chữ viết tay thì gần như không đọc được; OCR hợp với <b>chữ in</b>.
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════ -->
 <section id="thiet-ke">
-  <h2 class="sec">📐 C · Thông số bản ảnh xuất ra</h2>
+  <h2 class="sec">📐 D · Thông số bản ảnh xuất ra</h2>
   <div class="tbl-wrap">
   <table>
     <tr><th style="width:30%">Thành phần</th><th>Thông số</th></tr>
@@ -1133,7 +1306,7 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 
 <!-- ════════════════════════════════════════════════════ -->
 <section id="su-co">
-  <h2 class="sec">🛠️ D · Xử lý sự cố</h2>
+  <h2 class="sec">🛠️ E · Xử lý sự cố</h2>
   <div class="tbl-wrap">
   <table>
     <tr><th style="width:38%">Hiện tượng</th><th>Cách xử lý</th></tr>
@@ -1190,7 +1363,7 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 
 <!-- ════════════════════════════════════════════════════ -->
 <section id="faq">
-  <h2 class="sec">❓ E · Câu hỏi thường gặp</h2>
+  <h2 class="sec">❓ F · Câu hỏi thường gặp</h2>
 
   <details class="faq">
     <summary>Ảnh của tôi có bị tải lên mạng không?</summary>

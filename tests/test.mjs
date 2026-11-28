@@ -11,8 +11,10 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 const blocks = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-const code = blocks[blocks.length - 1];
-if (!/MÀN HÌNH 3/.test(code)) { console.error('khong lay dung khoi script man hinh 3'); process.exit(1); }
+// Khoi CUOI file gio la man hinh 4 (Quet tai lieu), nen phai tim theo dau moc
+// chu khong lay blocks[length-1] nua.
+const code = blocks.find(b => /MÀN HÌNH 3/.test(b));
+if (!code) { console.error('khong lay dung khoi script man hinh 3'); process.exit(1); }
 
 // ───────────────────────── pdf-lib giả lập: ghi lại mọi lệnh vẽ
 const log = { pages: [], text: [], rect: 0, line: 0, img: 0 };
