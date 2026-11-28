@@ -571,7 +571,7 @@ nên sửa app là test theo ngay.
 | `test.mjs` | hàm tiện ích · đọc ZIP · Word/Excel → PDF (pdf-lib **giả lập**, ghi lại mọi lệnh vẽ) |
 | `test2.mjs` | 6 công cụ PDF + Office → PDF + luồng giao diện (pdf-lib **thật** + font thật) — 20 mục |
 | `test3.mjs` | nén PDF · PDF→ảnh · ảnh→PDF · đổi định dạng ảnh (**node-canvas** + **pdfjs-dist**) — 13 mục |
-| `test4.mjs` | **màn hình 4**: ma trận phối cảnh · tìm mép giấy (kèm **bản scan sẵn: không cắt theo đường kẻ bảng**) · chỉnh thẳng · 6 bộ lọc (riêng `cbw` có 2 phép thử: con dấu đỏ · xoá watermark + giữ nét nguyên bản) · nạp trang → xuất PDF/JPG · dấu & ghi chú · .txt/.docx/PDF tìm kiếm được · xoay trang · chạy thử hai lớp phủ — 33 mục |
+| `test4.mjs` | **màn hình 4**: ma trận phối cảnh · tìm mép giấy (kèm **bản scan sẵn: không cắt theo đường kẻ bảng**) · chỉnh thẳng · 6 bộ lọc (riêng `cbw` có 2 phép thử: con dấu đỏ · xoá watermark + giữ nét nguyên bản) · nạp trang → xuất PDF/JPG · dấu & ghi chú · .txt/.docx/PDF tìm kiếm được · **nạp PDF giữ trọn trang** · **bộ nhớ trang đã chỉnh thẳng (khớp từng byte)** · xoay trang · chạy thử hai lớp phủ — 35 mục |
 | `check.py` | `node --check` từng khối `<script>` + báo tên khai báo trùng giữa các khối |
 | `check_ids.py` | mọi `$('id')` của màn hình 3 **và 4** có id thật · mọi `onclick=` có hàm thật |
 
@@ -624,11 +624,41 @@ script cuối chưa thực thi (đúng như `tzBarMeta`).
   → xoay theo page.rot            scSrcCv()
   → tìm 4 góc mép giấy            scDetectQuad()   Sobel + biến đổi Hough
   → chỉnh thẳng phối cảnh         scHomo + scWarp()  nội suy song tuyến tính
+  → [nhớ lại ở _scWarpCache]      scWarpKeep()     bản CHƯA qua bộ lọc
   → làm rõ chữ                    scEnhance()      chia cho nền + giãn tương phản
   → page.out                      ảnh JPEG sạch, CHƯA có chữ ký / dấu
   → scComposite()                 in chữ ký · ghi chú · dấu lên BẢN SAO
   → xuất PDF / JPG / OCR
 ```
+
+**Hai đường TẮT trong `scProcess()` — đừng gỡ, cả hai đều đã đo:**
+
+| Đường tắt | Khi nào | Được gì |
+|---|---|---|
+| **`asIs`** — bỏ hẳn `scWarp()` | `scIsFullQuad(quad)` **và** khổ ra đúng bằng ảnh nguồn (mọi trang PDF, nút *⬛ Cả ảnh*) | warp lúc đó chỉ là lấy mẫu lại y nguyên: tốn thời gian mà còn làm nhoè nét chữ |
+| **`_scWarpCache`** — nhớ MỘT trang đã chỉnh thẳng, chưa qua bộ lọc | lần `scProcess()` sau trên **cùng** `id/rot/quad/khổ/kích thước file` — tức là người dùng chỉ đổi bộ lọc | khỏi giải mã ảnh gốc + warp lại; đo trên trang xiên 900×1100: **2,4–3,9× nhanh hơn**, ảnh ra **khớp từng byte** ở cả 5 bộ lọc |
+
+`scWarpTake()` trả **bản sao** (vì `scEnhance()` sửa thẳng canvas được đưa cho nó) và
+`scWarpKeep()` cũng cất **bản sao**. Một ô nhớ là đủ — người dùng thử các bộ lọc trên *cùng*
+một trang rồi mới sang trang khác; giữ cả tập là ~22MB mỗi trang, 60 trang thì hết RAM tab.
+`scWarpDrop()` phải được gọi ở **`scDel()` · `scClearAll()` · `scLibOpen()`** (mọi chỗ xoá sạch
+trang), kẻo một canvas ~22MB nằm lại vô ích.
+
+#### Nạp file PDF — KHÔNG dò mép giấy
+`scPdfPages()` raster hóa mỗi trang PDF thành một File JPEG; `scIntake()` chuyển tiếp cờ
+`pdf: true` vào `scMkPage(file, fromPdf)` → `page.pdf`. `scProcess()` và `scCropLoad()` đều đọc
+cờ này: **trang PDF lấy thẳng `scFullQuad()`**, không gọi `scDetectQuad()`.
+
+> **Vì sao.** Trang PDF vốn đã là một tờ giấy chữ nhật đầy đủ — *không có* mép giấy nào để tìm,
+> nên mọi thứ `scDetectQuad()` bắt được đều là đường kẻ bảng hay khung chữ **bên trong** tài
+> liệu. Đo thật trên một báo giá A4 raster 1413×2000: trước đây ra `[4,15]–[1405,1989]` (97,9%,
+> mất một dải mép trên và dưới), nay ra đúng 100% và **khổ ra đúng bằng ảnh nguồn**
+> (1413×2000 thay vì 1420×2000 — không lấy mẫu lại nên không mất nét).
+> Kèm đường tắt `asIs`: **642ms → 210ms mỗi trang PDF (3,06×)**.
+
+Nút ✂️ và **🔍 Tự nhận diện** trong màn hình cắt viền vẫn chạy bình thường — ai muốn cắt thật
+thì vẫn cắt được. Cờ `pdf` được lưu kèm tài liệu (`scDoSave`) và đọc lại ở `scLibOpen()`, nên
+xoay trang sau khi mở lại cũng không làm nó quay về dò mép.
 Chữ ký và dấu **không nung vào `page.out`**, nhờ vậy sửa lại hay bỏ đi lúc nào cũng được —
 kể cả sau khi đổi bộ lọc hay cắt lại viền. Chúng chỉ được vẽ lên khi dựng ảnh nhỏ,
 khi xem và khi xuất file.

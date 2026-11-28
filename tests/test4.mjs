@@ -10,6 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import * as PDFLibReal from 'pdf-lib';
@@ -525,6 +526,70 @@ try {
   if (!ev('scn.pages.every(p => p.thumb)')) throw new Error('thiếu ảnh nhỏ');
   ok('2 ảnh → 2 trang đã cắt viền, chỉnh thẳng, làm rõ', dims);
 } catch (e) { bad('scIntake + scRunQueue', e); }
+
+try {
+  // Nạp file PDF: trang PDF vốn đã là một tờ giấy chữ nhật đầy đủ nên KHÔNG được
+  // dò mép giấy — dò là cắt nhầm vào đường kẻ bảng / khung chữ bên trong.
+  const pcv = Canvas.createCanvas(760, 1080);
+  const px = pcv.getContext('2d');
+  px.fillStyle = '#FFFFFF'; px.fillRect(0, 0, 760, 1080);
+  px.strokeStyle = '#000000'; px.lineWidth = 6;
+  px.strokeRect(58, 150, 644, 420);                              // bảng kẻ đậm nửa trên
+  for (let r = 1; r < 10; r++) { px.beginPath(); px.moveTo(58, 150 + r * 42); px.lineTo(702, 150 + r * 42); px.stroke(); }
+  px.fillStyle = '#111111';
+  px.fillRect(70, 60, 520, 12);                                  // chữ đầu trang
+  px.fillRect(70, 1020, 300, 10);                                // chữ SÁT ĐÁY trang
+  px.fillRect(718, 150, 10, 420);                                // vệt SÁT MÉP PHẢI
+  const doc = await PDFLibReal.PDFDocument.create();
+  const jpg = await doc.embedJpg(pcv.toBuffer('image/jpeg', { quality: .95 }));
+  doc.addPage([595, 842]).drawImage(jpg, { x: 0, y: 0, width: 595, height: 842 });
+  const pdfBytes = await doc.save();
+
+  const before = ev('scn.pages.length');
+  globalThis.__fs = [new File([pdfBytes], 'ho-so.pdf', { type: 'application/pdf' })];
+  await ev('scIntake(__fs)');
+  await waitIdle();
+  const i = before;                                              // trang vừa thêm
+  if (ev('scn.pages.length') !== before + 1) throw new Error('PDF 1 trang mà không ra đúng 1 trang');
+  if (!ev('scn.pages[' + i + '].pdf')) throw new Error('trang từ PDF không được gắn cờ pdf');
+  const q = ev('scn.pages[' + i + '].quad');
+  const sw = ev('scn.pages[' + i + '].sw'), sh = ev('scn.pages[' + i + '].sh');
+  globalThis.__q = q;
+  if (!ev('scIsFullQuad(__q, ' + sw + ', ' + sh + ')'))
+    throw new Error('trang PDF bị cắt: ' + JSON.stringify(q.map(v => v.map(Math.round)))
+      + ' trong khung ' + sw + '×' + sh);
+  if (ev('scn.pages[' + i + '].ow') !== sw || ev('scn.pages[' + i + '].oh') !== sh)
+    throw new Error('trang PDF bị lấy mẫu lại dù không phải cắt gì');
+  if (ev('scn.pages[' + i + '].err')) throw new Error(ev('scn.pages[' + i + '].err'));
+  ok('nạp PDF → giữ TRỌN trang, không dò mép giấy, không lấy mẫu lại',
+     sw + '×' + sh + ' · quad = cả khung');
+  ev('scn.pages.pop()');                                          // trả lại 2 trang cho các phép thử sau
+  ev('scRender()');
+} catch (e) { bad('nạp PDF ở màn hình 4', e); }
+
+try {
+  // Đổi bộ lọc dùng lại bản đã chỉnh thẳng trong bộ nhớ. Nhanh hơn nhiều, nhưng
+  // ảnh ra phải GIỐNG HỆT bản chạy lại từ đầu — nếu không là bộ nhớ đã sai.
+  const of = ev('scn.pages[0].filt');
+  const h = async (filt, useCache) => {
+    if (!useCache) ev('scWarpDrop()');
+    ev('scn.pages[0].filt = ' + JSON.stringify(filt));
+    await ev('scProcess')(ev('scn.pages[0]'), null);
+    const b = Buffer.from(await bytesOf(ev('scn.pages[0].out')));
+    return crypto.createHash('md5').update(b).digest('hex').slice(0, 10);
+  };
+  const diff = [];
+  for (const filt of ['auto', 'gray', 'bw', 'color', 'cbw'])
+    if ((await h(filt, false)) !== (await h(filt, true))) diff.push(filt);
+  if (diff.length) throw new Error('bộ nhớ làm đổi ảnh ra ở bộ lọc: ' + diff.join(', '));
+  if (!ev('_scWarpCache')) throw new Error('không nhớ lại trang đã chỉnh thẳng');
+  ev('scWarpDrop()');
+  if (ev('_scWarpCache')) throw new Error('scWarpDrop() không dọn bộ nhớ');
+  ev('scn.pages[0].filt = ' + JSON.stringify(of));
+  ev('scn.pages[0].dirty = true'); ev('scRunQueue()');
+  await waitIdle();
+  ok('đổi bộ lọc dùng lại bản đã chỉnh thẳng — ảnh ra khớp từng byte ở cả 5 bộ lọc');
+} catch (e) { bad('bộ nhớ trang đã chỉnh thẳng', e); }
 
 console.log('\n== Xuất PDF / JPG ==');
 try {

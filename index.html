@@ -2466,7 +2466,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-28i';
+const APP_BUILD   = '2026-11-28j';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -6815,28 +6815,6 @@ function tzW(font, s, size) {
   try { return font.widthOfTextAtSize(s, size); } catch (_) { return String(s).length * size * .52; }
 }
 
-/** Ngắt dòng cho pdf-lib: giữ nguyên dòng trống, cắt cả "từ" dài hơn một dòng */
-function tzWrap(text, font, size, maxW) {
-  const lines = [];
-  for (const para of String(text == null ? '' : text).split('\n')) {
-    let line = '';
-    for (const w of para.split(/\s+/)) {
-      if (!w) continue;
-      const t = line ? line + ' ' + w : w;
-      if (tzW(font, t, size) <= maxW) { line = t; continue; }
-      if (line) { lines.push(line); line = ''; }
-      if (tzW(font, w, size) <= maxW) { line = w; continue; }
-      let cur = '';                           // từ dài hơn cả dòng → cắt theo ký tự
-      for (const ch of w) {
-        if (cur && tzW(font, cur + ch, size) > maxW) { lines.push(cur); cur = ch; } else cur += ch;
-      }
-      line = cur;
-    }
-    lines.push(line);
-  }
-  return lines;
-}
-
 /** Cắt bớt chữ cho vừa bề ngang, thêm "…" */
 function tzEllip(font, s, size, maxW) {
   if (tzW(font, s, size) <= maxW) return s;
@@ -9617,15 +9595,80 @@ function scFreeThumb(p) {
   p.thumb = null;
 }
 
+/** Tứ giác này có đúng là CẢ KHUNG ẢNH không (trong vòng nửa điểm ảnh)? */
+function scIsFullQuad(q, w, h) {
+  if (!q || q.length !== 4) return false;
+  const f = scFullQuad(w, h);
+  for (let i = 0; i < 4; i++)
+    if (Math.abs(q[i][0] - f[i][0]) > .5 || Math.abs(q[i][1] - f[i][1]) > .5) return false;
+  return true;
+}
+
+/* Bộ nhớ MỘT trang đã chỉnh thẳng nhưng CHƯA qua bộ lọc. Đổi bộ lọc là việc người
+   dùng làm nhiều nhất (dải nút dưới mỗi trang, ô trong khung xem, "bộ lọc cho tất
+   cả"), mà bộ lọc không hề đụng tới việc giải mã ảnh gốc và chỉnh thẳng phối cảnh —
+   đo thật trên trang A4 2000px: giải mã + warp 432ms, chỉ riêng bộ lọc 170ms.
+   Một ô nhớ là đủ: người dùng thử các bộ lọc trên CÙNG một trang rồi mới sang trang
+   khác. Giữ cả tập là ~22MB mỗi trang, 60 trang thì hết RAM tab. */
+let _scWarpCache = null;                       // { key, cv }
+const scWarpKey = (page, sz) => [page.id, page.rot, sz.w, sz.h,
+  (page.src && page.src.size) || 0, JSON.stringify(page.quad)].join('|');
+
+/** Bản sao mới của trang đã chỉnh thẳng, hoặc null. Phải là BẢN SAO vì scEnhance
+ *  sửa thẳng vào canvas được đưa cho nó. */
+function scWarpTake(key) {
+  if (!_scWarpCache || _scWarpCache.key !== key) return null;
+  const src = _scWarpCache.cv;
+  const c = document.createElement('canvas');
+  c.width = src.width; c.height = src.height;
+  c.getContext('2d', { willReadFrequently: true }).drawImage(src, 0, 0);
+  return c;
+}
+function scWarpKeep(key, cv) {
+  scWarpDrop();
+  const c = document.createElement('canvas');
+  c.width = cv.width; c.height = cv.height;
+  c.getContext('2d').drawImage(cv, 0, 0);
+  _scWarpCache = { key: key, cv: c };
+}
+function scWarpDrop() {
+  if (_scWarpCache) { _scWarpCache.cv.width = _scWarpCache.cv.height = 0; }
+  _scWarpCache = null;
+}
+
 /** Dựng lại page.out (ảnh trang đã cắt viền, chỉnh thẳng, làm rõ) và ảnh nhỏ. */
 async function scProcess(page, onProg) {
-  const cv = await scSrcCv(page);
-  page.sw = cv.width; page.sh = cv.height;
-  if (!page.quad) page.quad = scDetectQuad(cv) || scFullQuad(cv.width, cv.height);
   const target = parseInt($('scQual').value, 10) || 2000;
-  const sz = scOutSize(page.quad, target);
-  const warped = await scWarp(cv, page.quad, sz.w, sz.h, onProg);
-  cv.width = cv.height = 0;
+  let warped = null, key = null;
+
+  // Trang đã xử lý một lần rồi (đổi bộ lọc) thì quad và khổ ảnh đã biết sẵn —
+  // thử lấy bản đã chỉnh thẳng trong bộ nhớ, khỏi giải mã và warp lại từ đầu.
+  if (page.quad && page.sw && page.sh) {
+    key = scWarpKey(page, scOutSize(page.quad, target));
+    warped = scWarpTake(key);
+  }
+
+  if (!warped) {
+    const cv = await scSrcCv(page);
+    page.sw = cv.width; page.sh = cv.height;
+    // Trang đến từ file PDF thì KHÔNG dò mép giấy: trang PDF vốn đã là một tờ giấy
+    // chữ nhật đầy đủ, dò mép chỉ có thể cắt nhầm vào đường kẻ hay khung chữ bên
+    // trong. Muốn cắt thật thì bấm ✂️ rồi kéo tay (nút 🔍 Tự nhận diện vẫn chạy).
+    if (!page.quad)
+      page.quad = (page.pdf ? null : scDetectQuad(cv)) || scFullQuad(cv.width, cv.height);
+    const sz = scOutSize(page.quad, target);
+    key = scWarpKey(page, sz);
+    // Giữ NGUYÊN XI khi không phải cắt mà khổ ra cũng đúng bằng ảnh nguồn — đây là
+    // đường đi của mọi trang PDF và của nút ⬛ Cả ảnh. Chạy scWarp lúc đó chỉ là lấy
+    // mẫu lại y nguyên: vừa chậm vừa làm nhoè nét chữ đi một chút.
+    const asIs = sz.w === cv.width && sz.h === cv.height
+              && scIsFullQuad(page.quad, cv.width, cv.height);
+    warped = asIs ? cv : await scWarp(cv, page.quad, sz.w, sz.h, onProg);
+    if (!asIs) cv.width = cv.height = 0;
+    scWarpKeep(key, warped);
+  }
+
+  if (onProg) onProg(1);
   scEnhance(warped, page.filt);
   const blob = await scToBlob(warped, 'image/jpeg', .92);
   page.out = new File([blob], page.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
@@ -9733,9 +9776,9 @@ function scTouch(p) {
 //  NẠP TRANG
 // ════════════════════════════════════════════════════════
 
-function scMkPage(file) {
+function scMkPage(file, fromPdf) {
   return {
-    id: uid(), name: file.name || 'trang.jpg', src: file,
+    id: uid(), name: file.name || 'trang.jpg', src: file, pdf: !!fromPdf,
     rot: 0, quad: null, filt: scDefFilt(), out: null, ow: 0, oh: 0, sw: 0, sh: 0,
     thumb: null, ovs: [], dirty: true, busy: false, err: '',
   };
@@ -9761,11 +9804,13 @@ async function scIntake(files) {
   }
   if (bad) toast(`${bad} file bị bỏ qua — chỉ nhận .jpg · .png · .pdf`, 'e');
 
-  let add = imgs.slice();
+  // Mỗi phần tử mang theo cờ `pdf` để scProcess() biết có phải dò mép giấy không
+  let add = imgs.map(f => ({ f: f, pdf: false }));
   if (pdfs.length) {
     try {
       scProg(4, 'Đang đọc file PDF…');
-      for (const f of pdfs) add = add.concat(await scPdfPages(f));
+      for (const f of pdfs)
+        add = add.concat((await scPdfPages(f)).map(x => ({ f: x, pdf: true })));
     } catch (e) {
       scProgHide();
       scErr('Không đọc được file PDF: ' + ((e && e.message) || e)
@@ -9782,7 +9827,7 @@ async function scIntake(files) {
   }
   if (!add.length) { scProgHide(); return; }
 
-  add.forEach(f => scn.pages.push(scMkPage(f)));
+  add.forEach(x => scn.pages.push(scMkPage(x.f, x.pdf)));
   scRender();
   scRunQueue();
 }
@@ -9932,6 +9977,7 @@ function scDel(i) {
   const p = scPageAt(i);
   if (!p) return;
   scFreeThumb(p);
+  scWarpDrop();
   scn.pages.splice(i, 1);
   scn.pdf = null;
   scRender();
@@ -9941,6 +9987,7 @@ function scClearAll() {
   if (!scn.pages.length) return;
   if (!confirm('Xóa hết các trang đã quét? Tài liệu đã lưu vào máy vẫn còn.')) return;
   scn.pages.forEach(scFreeThumb);
+  scWarpDrop();
   scn.pages = [];
   scn.pdf = null; scn.ocr = null; scn.docId = null; scn.docName = '';
   $('scOcrCard').style.display = 'none';
@@ -9993,7 +10040,8 @@ async function scCropLoad() {
     const cv = await scSrcCv(p);
     scCrop.cv = cv;
     p.sw = cv.width; p.sh = cv.height;
-    if (!p.quad) p.quad = scDetectQuad(cv) || scFullQuad(cv.width, cv.height);
+    if (!p.quad)
+      p.quad = (p.pdf ? null : scDetectQuad(cv)) || scFullQuad(cv.width, cv.height);
     scCrop.quad = p.quad.map(q => q.slice());
     scCropFit();
     scCropDraw();
@@ -11024,7 +11072,7 @@ async function scDoSave() {
       id: scn.docId || ('s' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
       name: name, ts: Date.now(), n: scn.pages.length,
       pages: scn.pages.map(p => ({
-        name: p.name, rot: p.rot, filt: p.filt, quad: p.quad,
+        name: p.name, rot: p.rot, filt: p.filt, quad: p.quad, pdf: !!p.pdf,
         ovs: scOvPlain(p.ovs), src: p.src, out: p.out, ow: p.ow, oh: p.oh,
       })),
     };
@@ -11073,8 +11121,9 @@ async function scLibOpen(id) {
     if (scn.pages.length && !confirm('Mở tài liệu đã lưu? Các trang đang quét trên màn hình sẽ bị thay.')) return;
     closeModal('scLibModal');
     scn.pages.forEach(scFreeThumb);
+    scWarpDrop();
     scn.pages = (r.pages || []).map(p => ({
-      id: uid(), name: p.name || 'trang.jpg', src: p.src,
+      id: uid(), name: p.name || 'trang.jpg', src: p.src, pdf: !!p.pdf,
       rot: p.rot || 0, quad: p.quad || null, filt: SC_FILTS[p.filt] ? p.filt : 'auto',
       out: p.out || null, ow: p.ow || 0, oh: p.oh || 0, sw: 0, sh: 0,
       thumb: null, ovs: (p.ovs || []), dirty: !p.out, busy: false, err: '',
