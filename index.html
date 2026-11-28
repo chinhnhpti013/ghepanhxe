@@ -2466,7 +2466,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-28h';
+const APP_BUILD   = '2026-11-28i';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -8806,6 +8806,16 @@ const SC_TESS   = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesserac
    đen ~200 · chữ in nhạt ~90 · watermark "BẢN SAO" mờ ~10–20 · đường kẻ ô mờ ~20. */
 const SC_DEEP   = 26;
 
+/* Phép thử "đây có đúng là MÉP GIẤY không" (xem scDetectQuad). Mép giấy thật thì phía
+   TRONG là giấy, phía NGOÀI là mặt bàn — tối hơn hẳn. Đường kẻ bảng, khung chữ hay dòng
+   chữ nằm GIỮA tài liệu có giấy trắng cả hai bên nên trượt phép thử này. Thiếu nó thì một
+   ảnh đã là bản scan sẵn (giấy phủ kín khung hình, không còn mép nào) bị cắt đúng theo
+   đường kẻ đáy bảng — mất cả nửa dưới trang, kể cả con dấu và chữ ký. */
+const SC_EDGE_DIFF = 12;    // trong phải sáng hơn ngoài ít nhất bấy nhiêu bậc xám
+const SC_EDGE_OUT  = .85;   // ngoài phải tối hơn mức giấy (phân vị 90%) ít nhất bấy nhiêu lần
+const SC_EDGE_IN   = .72;   // trong phải sáng ít nhất bấy nhiêu lần mức giấy
+const SC_EDGE_OFF  = .022;  // khoảng cách lấy mẫu hai bên đường, theo cạnh ngắn ảnh thu nhỏ
+
 const SC_FILTS = {
   auto:  'Tự động — làm rõ chữ, nền trắng',
   gray:  'Xám — đen trắng mềm',
@@ -8912,6 +8922,12 @@ function scPct(hist, total, p) {
 //  Chọn đường nào làm mép giấy: trong NỬA ảnh của mỗi cạnh, lấy các đường đủ
 //  mạnh rồi chọn đường NGOÀI CÙNG. Mép giấy thường yếu hơn đường kẻ bảng hay
 //  mép ảnh in bên trong tài liệu, nhưng luôn nằm ngoài hơn chúng.
+//
+//  Đường ngoài cùng đó còn phải QUA PHÉP THỬ MÉP GIẤY (scEdgeIsPaper): phía trong
+//  là giấy sáng, phía ngoài là mặt bàn tối hơn hẳn. Trượt phép thử nghĩa là bên
+//  ngoài đường ấy VẪN LÀ GIẤY, tức mép thật còn ở xa hơn mà không bắt được —
+//  khi đó lấy luôn mép khung ảnh cho cạnh đó, KHÔNG dò tiếp vào trong (dò vào
+//  trong sẽ cắt mất nửa dưới trang theo đường kẻ đáy bảng).
 // ════════════════════════════════════════════════════════
 
 function scQuadArea(q) {
@@ -8952,6 +8968,11 @@ function scDetectQuad(cv) {
   for (let i = 0, p = 0; i < g.length; i++, p += 4)
     g[i] = px[p] * .299 + px[p + 1] * .587 + px[p + 2] * .114;
   const bl = scBlur(g, w, h, 2);
+
+  // Mức sáng của CHÍNH TỜ GIẤY — phép thử mép giấy bên dưới so với mức này
+  const hist0 = new Int32Array(256);
+  for (let i = 0; i < bl.length; i++) hist0[bl[i] < 0 ? 0 : (bl[i] > 255 ? 255 : bl[i] | 0)]++;
+  const paperL = Math.max(1, scPct(hist0, bl.length, .9));
 
   const mag = new Float32Array(w * h);
   let sum = 0, sum2 = 0, n = 0;
@@ -9030,8 +9051,55 @@ function scDetectQuad(cv) {
     }
   }
 
+  const EDGE_D = Math.max(4, SC_EDGE_OFF * Math.min(w, h));
+  const at = (x, y) => {
+    const xi = Math.round(x), yi = Math.round(y);
+    return (xi < 0 || yi < 0 || xi >= w || yi >= h) ? -1 : bl[yi * w + xi];
+  };
+  const med = a => { a.sort((u, v) => u - v); return a[a.length >> 1]; };
+
+  /** Đường `c` có đúng là mép giấy không: lấy mẫu dọc hai bên đường, bên TRONG
+   *  (phía tâm ảnh) phải là giấy sáng còn bên NGOÀI phải tối hơn hẳn mức giấy.
+   *  Đường kẻ bảng / dòng chữ giữa trang có giấy trắng cả hai bên → false. */
+  function scEdgeIsPaper(c) {
+    const ct = cosT[c.t], st = sinT[c.t];
+    const bx = c.r * ct, by = c.r * st, dx = -st, dy = ct;   // điểm gốc + hướng chạy dọc đường
+    let lo = -1e9, hi = 1e9, span = true;
+    const clip = (b, d, m) => {                              // cắt đường theo khung ảnh
+      if (Math.abs(d) < 1e-9) { if (b < 0 || b > m) span = false; return; }
+      const a1 = (0 - b) / d, a2 = (m - b) / d;
+      lo = Math.max(lo, Math.min(a1, a2));
+      hi = Math.min(hi, Math.max(a1, a2));
+    };
+    clip(bx, dx, w - 1); clip(by, dy, h - 1);
+    if (!span || hi - lo < 8) return false;
+
+    let nx = ct, ny = st;                                    // pháp tuyến hướng VÀO tâm ảnh
+    if ((xm - bx) * nx + (ym - by) * ny < 0) { nx = -nx; ny = -ny; }
+
+    const IN1 = [], IN2 = [], OUT = [];
+    for (let i = 0; i <= 28; i++) {
+      const s = lo + (hi - lo) * (.15 + .7 * i / 28);        // bỏ hai đầu, chỉ lấy khúc giữa
+      const x = bx + dx * s, y = by + dy * s;
+      const a = at(x + nx * EDGE_D, y + ny * EDGE_D);
+      const b = at(x + nx * EDGE_D * 2.5, y + ny * EDGE_D * 2.5);
+      const o = at(x - nx * EDGE_D, y - ny * EDGE_D);
+      if (a >= 0) IN1.push(a);
+      if (b >= 0) IN2.push(b);
+      if (o >= 0) OUT.push(o);
+    }
+    // Mép nằm sát hoặc ngoài khung ảnh: không đo được bên nào thì cứ nhận
+    if (IN1.length < 8 || OUT.length < 8) return true;
+    // Lấy mẫu ở 2 độ sâu rồi chọn bên sáng hơn, để dải bóng sát mép giấy không làm hỏng phép đo
+    const vi = Math.max(med(IN1), IN2.length >= 8 ? med(IN2) : 0), vo = med(OUT);
+    return vi - vo >= SC_EDGE_DIFF
+        && vo <= paperL * SC_EDGE_OUT
+        && vi >= paperL * SC_EDGE_IN;
+  }
+
   /** Trong dải [lo, hi]: lấy các đường đủ mạnh rồi chọn đường NGOÀI CÙNG.
-   *  dir = -1 lấy nhỏ nhất (mép trái / trên), +1 lấy lớn nhất (mép phải / dưới). */
+   *  dir = -1 lấy nhỏ nhất (mép trái / trên), +1 lấy lớn nhất (mép phải / dưới).
+   *  null = đường ngoài cùng không qua được phép thử mép giấy → dùng mép khung ảnh. */
   function pick(list, lo, hi, dir) {
     const z = list.filter(c => c.pos >= lo && c.pos <= hi);
     if (!z.length) return null;
@@ -9039,13 +9107,15 @@ function scDetectQuad(cv) {
     for (const c of z) if (c.v > best) best = c.v;
     const strong = z.filter(c => c.v >= best * .55);
     strong.sort((a, b) => dir < 0 ? a.pos - b.pos : b.pos - a.pos);
-    return strong[0];
+    return (strong[0] && scEdgeIsPaper(strong[0])) ? strong[0] : null;
   }
-  const eL = pick(vert, -.06 * w, .45 * w, -1);
-  const eR = pick(vert, .55 * w, 1.06 * w, +1);
-  const eT = pick(horz, -.06 * h, .45 * h, -1);
-  const eB = pick(horz, .55 * h, 1.06 * h, +1);
-  if (!eL || !eR || !eT || !eB) return null;
+  const eL0 = pick(vert, -.06 * w, .45 * w, -1);
+  const eR0 = pick(vert, .55 * w, 1.06 * w, +1);
+  const eT0 = pick(horz, -.06 * h, .45 * h, -1);
+  const eB0 = pick(horz, .55 * h, 1.06 * h, +1);
+  if (!eL0 && !eR0 && !eT0 && !eB0) return null;   // không mép nào → giữ nguyên cả ảnh
+  const eL = eL0 || { t: 0,  r: 0     }, eR = eR0 || { t: 0,  r: w - 1 };
+  const eT = eT0 || { t: 90, r: 0     }, eB = eB0 || { t: 90, r: h - 1 };
 
   /** Giao điểm hai đường Hough: x·cos t + y·sin t = r */
   function cross(a, b) {

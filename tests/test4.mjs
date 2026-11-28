@@ -339,6 +339,46 @@ try {
   ok('ảnh một màu → trả null (để nguyên cả ảnh, không cắt bừa)');
 } catch (e) { bad('ảnh một màu', e); }
 
+try {
+  // Ảnh ĐÃ LÀ BẢN SCAN: giấy phủ kín khung hình, không còn mép nào, nhưng bên
+  // trong có một bảng kẻ đậm ở nửa trên. Đường kẻ đáy bảng mạnh hơn hẳn mép
+  // giấy (vốn không tồn tại) — nếu lấy nó làm mép thì mất sạch nửa dưới trang,
+  // tức là mất con dấu và chữ ký. Phải giữ nguyên cả ảnh.
+  const W = 820, H = 1160;
+  const cv = Canvas.createCanvas(W, H);
+  const x = cv.getContext('2d');
+  x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, W, H);
+  x.fillStyle = '#111111';
+  for (let i = 0; i < 4; i++) x.fillRect(70, 46 + i * 26, 600 - i * 70, 11);   // khối chữ đầu trang
+  x.strokeStyle = '#000000'; x.lineWidth = 6;
+  x.strokeRect(62, 170, W - 124, 480);                                          // khung bảng
+  for (let r = 1; r < 12; r++) {                                                // 11 đường kẻ ngang
+    x.beginPath(); x.moveTo(62, 170 + r * 40); x.lineTo(W - 62, 170 + r * 40); x.stroke();
+  }
+  for (const cx0 of [120, 420, 540, 660]) {                                     // 4 đường kẻ dọc
+    x.beginPath(); x.moveTo(cx0, 170); x.lineTo(cx0, 650); x.stroke();
+  }
+  x.fillStyle = '#111111';
+  for (let i = 0; i < 5; i++) x.fillRect(90, 700 + i * 34, 560, 9);             // chữ dưới bảng
+  x.strokeStyle = '#C01515'; x.lineWidth = 7;                                   // con dấu đỏ
+  x.beginPath(); x.arc(560, 980, 92, 0, Math.PI * 2); x.stroke();
+  x.lineWidth = 4;                                                              // chữ ký
+  x.beginPath(); x.moveTo(470, 1010); x.bezierCurveTo(540, 930, 600, 1060, 680, 970); x.stroke();
+  globalThis.__cv = cv;
+  const got = ev('scDetectQuad(__cv)');
+  if (got) {
+    const nearBot = Math.min(got[2][1], got[3][1]);
+    if (nearBot < H * .94)
+      throw new Error('cắt mất đáy trang (mép dưới ở y=' + Math.round(nearBot) + '/' + H
+        + ') — con dấu và chữ ký bị bỏ đi');
+    globalThis.__q = got;
+    if (ev('scQuadArea(__q)') < W * H * .88)
+      throw new Error('cắt vào giữa tài liệu: ' + JSON.stringify(got.map(v => v.map(Math.round))));
+  }
+  ok('bản scan sẵn (giấy phủ kín khung) → không cắt theo đường kẻ bảng',
+     got ? 'giữ nguyên cả ảnh (4 góc sát khung)' : 'trả null → giữ nguyên cả ảnh');
+} catch (e) { bad('bản scan sẵn: giữ cả trang, không cắt theo đường kẻ bảng', e); }
+
 console.log('\n== Chỉnh thẳng phối cảnh ==');
 try {
   const q = [[170, 150], [640, 90], [735, 905], [95, 835]];

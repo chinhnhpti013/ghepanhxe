@@ -571,7 +571,7 @@ nên sửa app là test theo ngay.
 | `test.mjs` | hàm tiện ích · đọc ZIP · Word/Excel → PDF (pdf-lib **giả lập**, ghi lại mọi lệnh vẽ) |
 | `test2.mjs` | 6 công cụ PDF + Office → PDF + luồng giao diện (pdf-lib **thật** + font thật) — 20 mục |
 | `test3.mjs` | nén PDF · PDF→ảnh · ảnh→PDF · đổi định dạng ảnh (**node-canvas** + **pdfjs-dist**) — 13 mục |
-| `test4.mjs` | **màn hình 4**: ma trận phối cảnh · tìm mép giấy · chỉnh thẳng · 6 bộ lọc (riêng `cbw` có 2 phép thử: con dấu đỏ · xoá watermark + giữ nét nguyên bản) · nạp trang → xuất PDF/JPG · dấu & ghi chú · .txt/.docx/PDF tìm kiếm được · xoay trang · chạy thử hai lớp phủ — 32 mục |
+| `test4.mjs` | **màn hình 4**: ma trận phối cảnh · tìm mép giấy (kèm **bản scan sẵn: không cắt theo đường kẻ bảng**) · chỉnh thẳng · 6 bộ lọc (riêng `cbw` có 2 phép thử: con dấu đỏ · xoá watermark + giữ nét nguyên bản) · nạp trang → xuất PDF/JPG · dấu & ghi chú · .txt/.docx/PDF tìm kiếm được · xoay trang · chạy thử hai lớp phủ — 33 mục |
 | `check.py` | `node --check` từng khối `<script>` + báo tên khai báo trùng giữa các khối |
 | `check_ids.py` | mọi `$('id')` của màn hình 3 **và 4** có id thật · mọi `onclick=` có hàm thật |
 
@@ -657,6 +657,28 @@ Sobel → ngưỡng tự nới dần cho tới khi đủ ~700 điểm mép → *
 
 > Vì sao "ngoài cùng trong số đủ mạnh" chứ không phải "nhiều phiếu nhất": mép giấy thường
 > **yếu hơn** đường kẻ bảng hay mép ảnh in bên trong tài liệu, nhưng luôn **nằm ngoài hơn**.
+
+**Phép thử mép giấy (`scEdgeIsPaper`) — bắt buộc.** Đường ngoài cùng tìm được mới chỉ là
+*ứng viên*; nó phải chứng minh mình là mép giấy: lấy 29 mẫu dọc khúc giữa (15–85%) của đường,
+cách đường `SC_EDGE_OFF` = 2,2% cạnh ngắn về **hai phía**, rồi đòi cả ba điều —
+`trong − ngoài ≥ SC_EDGE_DIFF` (12 bậc xám) · `ngoài ≤ SC_EDGE_OUT` (0,85) × mức giấy ·
+`trong ≥ SC_EDGE_IN` (0,72) × mức giấy. "Mức giấy" = phân vị 90% của ảnh thu nhỏ đã làm mờ.
+Bên trong lấy mẫu ở **2 độ sâu** (1× và 2,5×) rồi chọn bên sáng hơn, để dải bóng sát mép giấy
+không làm hỏng phép đo.
+
+- **Trượt phép thử ⇒ lấy luôn mép KHUNG ẢNH cho cạnh đó, KHÔNG dò tiếp vào trong.** Trượt nghĩa
+  là bên ngoài đường ấy *vẫn là giấy*, tức mép thật còn ở xa hơn mà không bắt được. Dò vào trong
+  là sai hẳn: với một trang có dải tiêu đề tối ở đầu, cạnh **trong** của dải đó qua phép thử rất
+  dễ (trong trắng / ngoài tối) và app sẽ cắt mất chính cái tiêu đề.
+- Cả 4 cạnh đều trượt → trả `null` (giữ nguyên cả ảnh). Chỉ vài cạnh trượt thì các cạnh còn lại
+  vẫn cắt bình thường.
+
+> **Bẫy đã sửa, đừng gỡ phép thử này.** Ảnh **đã là bản scan sẵn** (CamScanner, bản chụp màn
+> hình, PDF raster hóa) có tờ giấy **phủ kín khung hình** nên *không còn mép giấy nào*. Lúc đó
+> đường mạnh nhất và ngoài cùng ở nửa dưới chính là **đường kẻ đáy bảng**, và app cắt mất nửa
+> dưới trang — đúng chỗ có con dấu và chữ ký. Đã đo trên ảnh thật 866×1280: không có phép thử thì
+> tứ giác ra `[60,8]–[790,708]` (46% ảnh), có phép thử thì `[3,10]–[860,1273]` (97,7%).
+> `tests/test4.mjs` giữ một phép thử tái hiện đúng tình huống đó.
 
 Hough chịu được giấy quay nghiêng và chụp xiên, nên vừa cắt viền vừa chỉnh thẳng bằng cùng
 một phép đo — **không cần bước "dò góc nghiêng" riêng**.
