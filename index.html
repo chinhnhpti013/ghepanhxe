@@ -48,6 +48,11 @@
   --sh-3:0 14px 28px -10px rgba(21,101,192,.22), 0 4px 10px -4px rgba(16,42,67,.10);
   --ring:0 0 0 3px rgba(21,101,192,.16);
   --t:.18s cubic-bezier(.4,0,.2,1);
+
+  /* Chiều cao THỰC của 2 thanh dính, do syncBarHeights() đo lại mỗi khi chúng đổi cỡ.
+     Số ở đây chỉ là giá trị khởi đầu để trang không nhảy trước khi JS chạy.
+     Dùng cho: .stepper-wrap{top} · .sticky-side{top} · scroll-margin-top của thẻ. */
+  --abh:70px; --sth:57px;
 }
 :root[data-theme="dark"]{
   --brand:#5B9DF0; --brand-d:#8FC0FA; --brand-m:#4A8FE8; --brand-soft:#16293F;
@@ -100,7 +105,10 @@ body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);backgro
 .ab-ver{font-size:.64rem;font-weight:700;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.28);
   padding:1px 7px;border-radius:20px;letter-spacing:.03em}
 .ab-txt p{font-size:.76rem;opacity:.85;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ab-acts{display:flex;gap:7px;flex-shrink:0}
+.ab-acts{display:flex;gap:7px;flex-shrink:0;align-items:center}
+/* Vạch ngăn 2 nhóm nút: [việc đang làm] ┊ [cài đặt & trợ giúp].
+   Không dùng khoảng trắng rộng — appbar hẹp, vạch 1px nói rõ hơn mà không tốn chỗ. */
+.ab-sep{width:1px;height:20px;background:rgba(255,255,255,.26);flex-shrink:0;margin:0 2px}
 .ab-btn{width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.22);
   background:rgba(255,255,255,.12);color:#fff;font-size:1.02rem;cursor:pointer;display:flex;
   align-items:center;justify-content:center;transition:var(--t);font-family:inherit}
@@ -109,16 +117,17 @@ body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);backgro
 /* Nút "Tạo bản mới" phải ở THANH TIÊU ĐỀ, không phải thanh bước: .appbar và
    .stepper-wrap đều sticky top:0, appbar z-index 60 > 50, nên vừa cuộn vài chục px
    là thanh bước trượt xuống dưới appbar — nút ở đó bị che và bấm vào lại trúng 🌙.
-   Tông vàng #F2C86A lấy từ vạch nhấn ở đáy appbar cho nổi trên nền xanh. */
-.ab-btn-new{width:auto;padding:0 12px;gap:6px;font-size:.78rem;font-weight:700;
-  background:rgba(242,200,106,.22);border-color:rgba(242,200,106,.55);color:#FFF3D6}
-.ab-btn-new:hover{background:rgba(242,200,106,.36)}
+   NHƯNG nó KHÔNG còn tô vàng: thanh tiêu đề chỉ chứa tiện ích, còn vàng trong dự án
+   nghĩa là "việc chính / cần để ý" (xem quy ước màu ở CLAUDE.md). Đây là việc HIẾM nhất
+   (mỗi hồ sơ một lần, lúc đã xong) và là nút DUY NHẤT xóa dữ liệu — tô nổi nhất màn hình
+   vừa sai thứ tự ưu tiên vừa mời bấm nhầm. Giữ chữ cho khỏi bị hiểu là "tải lại trang". */
+.ab-btn-new{width:auto;padding:0 11px;gap:6px;font-size:.78rem;font-weight:700}
 .ab-btn-new .sn-ico{font-size:.95rem;line-height:1}
 
 /* ── BỘ ĐẾM LƯỢT TRUY CẬP ──
    Nằm ở khoảng trống BÊN DƯỚI dải nút (.ab-acts cao 38px, .appbar-in cao 70px → thừa 16px),
    neo theo .appbar-in nên thẳng mép phải với nội dung trang. Vì position:absolute nên nó
-   KHÔNG đẩy nút nào sang trái — Help vẫn ngoài cùng bên phải.
+   KHÔNG đẩy nút nào sang trái — nút Hướng dẫn vẫn ngoài cùng bên phải.
    Chữ cố ý mờ (.38) cho "ẩn mà vẫn nhìn ra"; đừng hạ thấp hơn nữa kẻo mất hẳn. */
 .ab-cnt{position:absolute;right:20px;bottom:2px;display:flex;align-items:center;gap:4px;
   font-size:.6rem;line-height:1.1;font-weight:600;letter-spacing:.02em;white-space:nowrap;
@@ -133,10 +142,33 @@ body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);backgro
    tự tắt thuộc tính hidden, không thì bộ đếm chưa có số vẫn hiện ra "– lượt · – đang dùng" */
 .ab-cnt[hidden]{display:none}
 
+/* ── THU GỌN KHI CUỘN: THANH TIÊU ĐỀ ──
+   Cùng class .tight trên <body> với thanh bước (xem onScrollShrink()). Hai thanh đều dính
+   nên lúc đang cuộn xem ảnh chúng ăn mất ~125px chiều cao; co lại còn ~84px.
+   Thứ bị bỏ đều là thứ TRANG TRÍ: khẩu hiệu, huy hiệu phiên bản, bộ đếm lượt truy cập
+   (nó nằm trong phần lề dưới vừa bị cắt — không ẩn thì nó đè lên dải nút).
+   Thứ Ở LẠI là thứ còn bấm: logo, tên app, cả 4 nút kèm nhãn chữ. */
+.appbar-in{transition:padding .18s cubic-bezier(.4,0,.2,1)}
+.ab-logo,.ab-logo-fb,.ab-btn{transition:var(--t)}
+body.tight .appbar-in{padding-top:6px;padding-bottom:6px}
+body.tight .ab-logo,body.tight .ab-logo-fb{width:34px;height:34px}
+body.tight .ab-txt h1{font-size:.93rem}
+body.tight .ab-txt p{display:none}
+body.tight .ab-ver{display:none}
+body.tight .ab-cnt{display:none}
+body.tight .ab-btn{width:32px;height:32px;font-size:.92rem}
+body.tight .ab-btn-new,body.tight .ab-btn-h{width:auto;padding:0 10px;font-size:.74rem}
+body.tight .ab-sep{height:18px}
+
 /* ════════ STEPPER ════════ */
+/* Thanh bước dính NGAY DƯỚI thanh tiêu đề (top = chiều cao appbar, đo bằng JS).
+   Trước đây cả hai cùng top:0 nên appbar (z 60) che mất thanh bước sau khi cuộn vài chục px —
+   tên 4 mục biến mất đúng lúc người dùng đang làm việc. Nay nó ở lại suốt.
+   Đánh đổi: 2 thanh chiếm ~125px chiều cao cố định trên điện thoại. */
 .stepper-wrap{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;
-  top:0;z-index:50;box-shadow:var(--sh-1)}
-.stepper{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:4px}
+  top:var(--abh);z-index:50;box-shadow:var(--sh-1)}
+.stepper{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:4px;
+  transition:padding .18s cubic-bezier(.4,0,.2,1)}
 .stp{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:none;
   font-family:inherit;padding:4px 6px;border-radius:var(--r-sm);transition:var(--t)}
 .stp:hover:not(:disabled){background:var(--surface-2)}
@@ -154,6 +186,18 @@ body{font-family:'Be Vietnam Pro',system-ui,sans-serif;color:var(--text);backgro
 .stp-line{flex:1;height:2px;background:var(--border);border-radius:2px;margin:0 6px;min-width:14px;transition:var(--t)}
 .stp-line.done{background:var(--brand)}
 
+/* ── THU GỌN KHI CUỘN: THANH BƯỚC (class .tight trên <body>, do onScrollShrink() bật/tắt) ──
+   Thanh bước dính lại suốt nên phải trả bớt chiều cao khi người dùng đang cuộn xem ảnh:
+   bỏ nhãn phụ, chấm số và chữ nhỏ lại, lề mỏng đi → ~56px xuống ~38px trên máy tính.
+   TÊN 4 MỤC VẪN Ở NGUYÊN — thu gọn là bớt thứ phụ, không phải giấu cái chính.
+   ResizeObserver trong watchBarHeights() tự đo lại --sth nên .sticky-side đi theo. */
+body.tight .stepper{padding:6px 20px}
+body.tight .stp{padding:2px 6px;gap:8px}
+body.tight .stp-dot{width:23px;height:23px;font-size:.71rem}
+body.tight .stp-lbl span{display:none}
+body.tight .stp-lbl b{font-size:.75rem}
+body.tight .stp-sep{height:20px}
+
 /* ════════ LAYOUT ════════ */
 /* padding-bottom = chiều cao thanh nút cố định (61px) + khoảng hở, để dòng chữ
    cuối trang nằm sát ngay trên thanh nút mà không bị nó che */
@@ -164,12 +208,13 @@ main{max-width:1180px;margin:26px auto 0;padding:0 20px calc(77px + env(safe-are
 @keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 .cols{display:grid;grid-template-columns:1fr 340px;gap:22px;align-items:start}
 @media(max-width:980px){.cols{grid-template-columns:1fr}}
-.sticky-side{position:sticky;top:86px}
+.sticky-side{position:sticky;top:calc(var(--abh) + var(--sth) + 14px)}
 @media(max-width:980px){.sticky-side{position:static}}
 
 /* ════════ CARD ════════ */
 .card{background:var(--surface);border-radius:var(--r);box-shadow:var(--sh-1);
-  border:1px solid var(--sky-b);margin-bottom:20px;overflow:hidden}
+  border:1px solid var(--sky-b);margin-bottom:20px;overflow:hidden;
+  scroll-margin-top:calc(var(--abh) + var(--sth) + 12px)}
 .card-hd{padding:14px 20px;font-weight:700;font-size:.92rem;display:flex;align-items:center;gap:10px;
   background:linear-gradient(180deg,var(--sky-2) 0,var(--sky) 100%);
   border-bottom:1px solid var(--sky-b);color:var(--brand-d);letter-spacing:-.01em}
@@ -625,6 +670,18 @@ details.fold .fold-bd{padding:11px 13px;font-size:.77rem;line-height:1.6;color:v
 .res h3{font-size:1.06rem;font-weight:700;color:var(--green);margin-bottom:5px}
 .res p{font-size:.84rem;color:var(--text-2)}
 .res-btns{margin-top:16px;display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
+/* Khối "Làm hồ sơ khác" ở đáy thẻ Xuất PDF. Hai trạng thái:
+   thường = nút trung tính, lặng lẽ · .ready (sau khi đã tải file) = khung vàng
+   "việc cần làm tiếp" theo quy ước màu của dự án, kèm dòng nhắc lưu hồ sơ. */
+.nextdoc{margin-top:13px;border-radius:var(--r-sm);transition:var(--t)}
+.nextdoc .nd-hint{display:none}
+.nextdoc.ready{background:var(--sand-2);border:1px solid var(--sand-b);padding:11px}
+.nextdoc.ready .nd-hint{display:block;font-size:.76rem;line-height:1.55;
+  color:var(--sand-tx);margin-bottom:9px}
+.nextdoc.ready #btnNextDoc{background:var(--surface);color:var(--sand-tx);
+  border-color:var(--sand-b)}
+.nextdoc.ready #btnNextDoc:hover:not(:disabled){background:var(--sand);
+  border-color:var(--sand-tx);color:var(--sand-tx)}
 
 /* ════════ ALERT / EMPTY ════════ */
 .alert{padding:10px 14px;border-radius:var(--r-xs);font-size:.81rem;margin-bottom:12px;
@@ -652,7 +709,14 @@ details.fold .fold-bd{padding:11px 13px;font-size:.77rem;line-height:1.6;color:v
 hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
 
 /* ════════ NÚT HƯỚNG DẪN + MODAL HƯỚNG DẪN ════════ */
-.ab-btn-h{position:relative;width:auto;min-width:38px;padding:0 12px;font-size:.84rem;font-weight:700;letter-spacing:.01em}
+/* Nhãn đầy đủ "Hướng dẫn sử dụng" (trước đây là "Help" — chữ Anh, người dùng ở hiện trường
+   không phải ai cũng đoán ra). Ba mức nhãn theo bề ngang màn hình, đổi bằng cách ẩn/hiện
+   chứ không đổi textContent, để chấm cam ::after và phím F1 không phải biết gì về chuyện này:
+   rộng → "📖 Hướng dẫn sử dụng" · vừa → "📖 Hướng dẫn" · hẹp → chỉ 📖 */
+.ab-btn-h{position:relative;width:auto;min-width:38px;padding:0 11px;gap:6px;
+  font-size:.8rem;font-weight:700;letter-spacing:.01em}
+.ab-btn-h .gd-ico{font-size:.95rem;line-height:1}
+.ab-btn-h .gd-sh{display:none}
 .ab-btn-h::after{content:'';position:absolute;top:-2px;right:-2px;width:9px;height:9px;
   border-radius:50%;background:#FFC94D;border:2px solid var(--brand-d);
   opacity:0;transition:var(--t)}
@@ -715,13 +779,25 @@ hr.div{border:none;border-top:1px solid var(--border);margin:16px 0}
 main > .foot{margin-top:auto}
 
 /* ════════ RESPONSIVE ════════ */
+/* Màn hình laptop hẹp: nhãn dài "Hướng dẫn sử dụng" (~175px) ăn vào chỗ của tiêu đề và
+   làm tên app bị cắt sớm → rút còn "Hướng dẫn". Phải đặt TRƯỚC khối ≤560px bên dưới
+   (khối đó ẩn cả hai nhãn), vì cùng độ ưu tiên thì rule viết sau thắng. */
+@media(max-width:1100px){
+  .ab-btn-h .gd-tx{display:none}
+  .ab-btn-h .gd-sh{display:inline}
+}
 @media(max-width:700px){
   /* Nới lề dưới 15px để bộ đếm có chỗ riêng: nút .ab-btn thu còn 34px nhưng logo 38px
      vẫn quyết định chiều cao, chỉ còn ~11px trống — không đủ cho dòng chữ đọc được */
   .appbar-in{padding:9px 13px 15px;gap:10px}
+  body.tight .appbar-in{padding-top:5px;padding-bottom:5px}
+  body.tight .ab-logo,body.tight .ab-logo-fb{width:30px;height:30px}
+  body.tight .ab-btn{width:30px;height:30px}
   .ab-cnt{right:13px;bottom:1px;font-size:.56rem}
   .ab-logo,.ab-logo-fb{width:38px;height:38px;border-radius:10px}
-  .ab-txt h1{font-size:.93rem}
+  /* Ghim tiêu đề một dòng ngay từ 700px (trước đây chỉ từ 560px): dải nút nay rộng hơn
+     vì nhãn "Hướng dẫn" có chữ, để h1 wrap thì thanh tiêu đề cao gấp đôi ở quãng 560–700px */
+  .ab-txt h1{font-size:.93rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ab-txt p{font-size:.68rem}
   .ab-btn{width:34px;height:34px;font-size:.95rem}
   .ab-btn-h{width:auto;min-width:34px;padding:0 10px;font-size:.78rem}
@@ -809,9 +885,11 @@ main > .foot{margin-top:auto}
   .lay{padding:9px 5px}
 }
 @media(max-width:560px){
-  /* Hết chỗ cho chữ trên thanh tiêu đề — giữ lại dấu 🔄, tooltip vẫn nói rõ nút làm gì */
+  /* Hết chỗ cho chữ trên thanh tiêu đề — giữ lại dấu 🔄 / 📖, tooltip vẫn nói rõ nút làm gì */
   .ab-btn-new .sn-tx{display:none}
   .ab-btn-new{width:34px;padding:0}
+  .ab-btn-h .gd-tx,.ab-btn-h .gd-sh{display:none}
+  .ab-btn-h{width:34px;min-width:34px;padding:0}
   /* 4 nút bên phải KHÔNG co được (.ab-acts flex-shrink:0), nên tiêu đề phải chịu co.
      Không ghim một dòng thì chữ xuống 2–3 dòng và thanh tiêu đề cao gấp đôi,
      đẩy cả trang xuống. Bỏ luôn huy hiệu phiên bản cho đỡ chiếm chỗ. */
@@ -820,7 +898,8 @@ main > .foot{margin-top:auto}
 }
 @media(max-width:400px){
   .ab-txt p{display:none}
-  .stp-lbl{display:none}
+  .ab-sep{display:none}             /* 4 nút đã sát nhau, vạch ngăn chỉ tốn thêm 5px */
+  .ab-acts{gap:5px}
 }
 /* Điện thoại nằm ngang (bàn phím ảo / màn hình thấp): đừng để khung xem trước
    chiếm hết chiều cao, nếu không nút bấm bị đẩy ra ngoài tầm với.
@@ -1143,6 +1222,21 @@ main > .foot{margin-top:auto}
 .sc-ovopt .seg button:first-child{border-left:none}
 .sc-ovopt .seg button.on{background:#F2C86A;color:#1A1403;font-weight:700}
 
+/* ── Khung xem & phóng to (#scPvOv) ──
+   .sc-stage gốc là flex căn giữa + overflow:hidden; ở đây phải CUỘN được khi phóng to.
+   Mẹo "flex + margin:auto trên con" là cách duy nhất vừa căn giữa lúc ảnh nhỏ hơn khung
+   vừa cuộn được tới sát mép lúc ảnh lớn hơn — justify-content:center sẽ cắt mất đầu ảnh. */
+.sc-pvst{overflow:auto;touch-action:auto;cursor:grab;background:#0A0F16}
+.sc-pvst.drag{cursor:grabbing}
+.sc-pvst img{display:block;margin:auto;max-width:none;max-height:none;background:#fff}
+.sc-pvz{font-size:.74rem;font-weight:700;opacity:.9;min-width:46px;text-align:center;
+  font-variant-numeric:tabular-nums}
+.sc-cmp{font-family:inherit;font-size:.76rem;font-weight:700;padding:7px 11px;border-radius:8px;
+  border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;
+  transition:var(--t);white-space:nowrap}
+.sc-cmp:hover{background:rgba(255,255,255,.22)}
+.sc-cmp.on{background:#F2C86A;border-color:#F2C86A;color:#1A1403}
+
 /* ── Danh sách vật đặt lên trang (chữ ký · ghi chú · dấu) ── */
 .sc-items{display:flex;gap:7px;overflow-x:auto;padding:8px 13px;background:rgba(255,255,255,.04);
   border-bottom:1px solid rgba(255,255,255,.08)}
@@ -1152,12 +1246,36 @@ main > .foot{margin-top:auto}
 .sc-it.on{border-color:#F2C86A;background:rgba(242,200,106,.2)}
 .sc-it button{border:none;background:none;color:#F2847E;cursor:pointer;font-size:.86rem;padding:0 2px}
 
-/* Thanh bước có 4 mục kể từ khi thêm màn hình 4, nên nhãn phải bỏ SỚM HƠN trước đây
-   (nhãn phụ ≤760px, bỏ hẳn nhãn ≤520px thay vì ≤400px) — không thì thanh tràn ngang và
-   kéo theo cả trang trượt ngang. Hai rule này đặt ở cuối <style> nên thắng rule ≤400px
-   khai trước đó — xem bẫy thứ tự CSS ở CLAUDE.md. */
+/* Thanh bước có 4 mục kể từ khi thêm màn hình 4 → nhãn PHỤ bỏ từ ≤760px.
+   Nhưng TÊN MỤC thì KHÔNG BAO GIỜ BỎ: 4 cái tên là bản đồ duy nhất của app, chỉ còn
+   4 vòng tròn số thì không ai đoán được mục 3 và 4 làm gì (trước đây nhãn bị ẩn hẳn
+   từ ≤520px). Màn hình hẹp thì ĐỔI CÁCH XẾP thay vì giấu chữ: chấm số lên trên, tên
+   xuống dưới, mỗi mục một cột bằng nhau — 4 cột × ~80px vẫn vừa máy 320px.
+   Các rule này đặt ở cuối <style> nên thắng rule khai trước đó — xem bẫy thứ tự CSS
+   ở CLAUDE.md. */
 @media(max-width:760px){ .stp-lbl span{display:none} }
-@media(max-width:520px){ .stp-lbl{display:none} .stp-sep{margin:0 5px} }
+@media(max-width:560px){
+  .stepper{padding:8px 8px;gap:0}
+  .stp{flex:1 1 0;min-width:0;flex-direction:column;gap:4px;padding:4px 2px}
+  .stp-lbl{display:block;text-align:center;min-width:0}
+  /* cho tên xuống dòng trong cột hẹp — 2 dòng vẫn đọc được, cắt cụt thì không */
+  .stp-lbl b{font-size:.63rem;line-height:1.22;white-space:normal;overflow-wrap:anywhere}
+  /* vạch nối 1→2 vô nghĩa khi nhãn nằm dưới chấm số: nó sẽ cắt ngang giữa hai cột.
+     Dấu "1 và 2 đi liền nhau" vẫn còn, vì chỉ 2|3 và 3|4 mới có vách .stp-sep */
+  .stp-line{display:none}
+  .stp-sep{height:40px;margin:0 3px}
+  /* Thu gọn ở chế độ cột: VẪN GIỮ CỘT (xếp ngang thì 4 tên không vừa máy 320px),
+     chỉ rút chấm số và lề → ~78px xuống ~58px */
+  body.tight .stepper{padding:4px 8px}
+  body.tight .stp{gap:2px;padding:2px}
+  body.tight .stp-dot{width:20px;height:20px;font-size:.64rem}
+  body.tight .stp-lbl b{font-size:.6rem}
+  body.tight .stp-sep{height:30px}
+}
+@media(max-width:360px){
+  .stp-lbl b{font-size:.59rem}
+  .stp-sep{margin:0 1px}
+}
 
 @media(max-width:700px){
   .sc-grid{grid-template-columns:repeat(auto-fill,minmax(142px,1fr));gap:10px}
@@ -1186,20 +1304,27 @@ main > .foot{margin-top:auto}
       <h1>Tiện ích ghép ảnh giám định <span class="ab-ver" id="abVer">v2.0</span></h1>
       <p>PTI SOS : Tận tâm từng phút - Kịp thời từng giây</p>
     </div>
+    <!-- Hai nhóm, ngăn bằng vạch .ab-sep:
+         ① HỒ SƠ ĐANG LÀM — 🔄 Tạo bản mới · 🗂️ Hồ sơ đã lưu
+         ② APP           — 🌙 sáng/tối · 📖 Hướng dẫn sử dụng
+         Thứ tự giữ nguyên như cũ (Hướng dẫn ngoài cùng phải, cạnh 🌙) để người quen tay
+         không phải tìm lại nút, và để bộ đếm lượt truy cập bên dưới không đụng ai. -->
     <div class="ab-acts">
-      <!-- Làm lại từ đầu. Ở thanh tiêu đề (luôn hiện) nên bấm được từ CẢ màn hình 1 và 2.
-           Đặt trước 🗂️ để 🌙 và Help giữ nguyên vị trí ngoài cùng bên phải. -->
+      <!-- Làm lại từ đầu. Ở thanh tiêu đề (luôn hiện) nên bấm được từ MỌI màn hình. -->
       <button class="ab-btn ab-btn-new" id="btnNewDoc" onclick="resetApp()"
               title="Tạo bản ảnh mới — xóa ảnh và thông tin đang có trên màn hình để làm hồ sơ khác. Hồ sơ đã lưu trong máy vẫn còn.">
         <span class="sn-ico">🔄</span><span class="sn-tx">Tạo bản mới</span>
       </button>
       <button class="ab-btn" id="btnRecords" onclick="openRecords()" title="Hồ sơ đã lưu">🗂️</button>
+      <span class="ab-sep" aria-hidden="true"></span>
       <button class="ab-btn" id="btnTheme" onclick="toggleTheme()" title="Chế độ sáng / tối">🌙</button>
       <button class="ab-btn ab-btn-h" id="btnGuide" onclick="openGuide()"
-              title="Hướng dẫn sử dụng (F1)">Help</button>
+              title="Hướng dẫn sử dụng (F1)" aria-label="Hướng dẫn sử dụng">
+        <span class="gd-ico">📖</span><span class="gd-tx">Hướng dẫn sử dụng</span><span class="gd-sh">Hướng dẫn</span>
+      </button>
     </div>
     <!-- Bộ đếm lượt truy cập — đặt TUYỆT ĐỐI ở góc dưới-phải nền tiêu đề, KHÔNG nằm trong
-         .ab-acts: Help và 🌙 phải giữ nguyên vị trí ngoài cùng bên phải (xem CLAUDE.md).
+         .ab-acts: Hướng dẫn và 🌙 phải giữ nguyên vị trí ngoài cùng bên phải (xem CLAUDE.md).
          Màu chữ mờ (trắng ~38%) để chìm vào nền xanh nhưng vẫn đọc được bằng mắt thường;
          trỏ chuột vào thì rõ hẳn. Mã dựng nằm ở khối script CUỐI file. -->
     <div class="ab-cnt" id="abCnt" hidden>
@@ -1646,8 +1771,15 @@ main > .foot{margin-top:auto}
                       title="Xuất mỗi trang bản ảnh thành một file ảnh .jpg (nhiều trang sẽ gói trong 1 file .zip)">🖼️ Tải file ảnh JPG</button>
             </div>
             <div class="foot" id="dlNote" style="padding-top:9px"></div>
-            <div class="res-btns" style="margin-top:11px">
-              <button class="btn btn-n btn-sm" style="flex:1" onclick="resetApp()">🔄 Tạo bản ảnh mới</button>
+            <!-- Làm hồ sơ khác — việc tiếp theo tự nhiên sau khi đã tải file về.
+                 Nút CHỈ SÁNG LÊN (class .ready → khung vàng + nhắc lưu hồ sơ) sau khi người
+                 dùng thật sự tải được ít nhất một file (markDownloaded()). Trước đó nó vẫn
+                 bấm được nhưng để màu trung tính, kẻo tạo PDF xong đã mời xóa sạch màn hình. -->
+            <div class="nextdoc" id="nextDocRow">
+              <p class="nd-hint">Đã tải file về máy. Cần mở lại hồ sơ này sau thì bấm
+                 <b>💾 Lưu hồ sơ</b> ở thẻ bên dưới trước đã.</p>
+              <button class="btn btn-n" style="width:100%" id="btnNextDoc" onclick="resetApp()">
+                🔄 Làm hồ sơ khác →</button>
             </div>
           </div>
         </div>
@@ -1852,14 +1984,8 @@ main > .foot{margin-top:auto}
         </div>
         <div class="tz-opt" style="margin-top:14px">
           <div class="fg"><label>Bộ lọc làm rõ cho tất cả</label>
-            <select id="scFiltAll" onchange="scFiltAllApply()">
-              <option value="">— giữ riêng từng trang —</option>
-              <option value="auto">Tự động — làm rõ chữ, nền trắng</option>
-              <option value="gray">Xám — ảnh đen trắng mềm</option>
-              <option value="bw">Đen trắng — nét nhất, file nhẹ nhất</option>
-              <option value="color">Màu — giữ màu, bỏ bóng tối</option>
-              <option value="none">Không xử lý — ảnh gốc</option>
-            </select></div>
+            <!-- Danh sách bộ lọc do scFillFiltSelects() dựng từ SC_FILTS — đừng viết tay -->
+            <select id="scFiltAll" onchange="scFiltAllApply()"></select></div>
           <div class="fg"><label>Độ phân giải trang quét</label>
             <select id="scQual" onchange="scReprocAll()">
               <option value="1400">Nhẹ — cạnh dài 1400px (~150 DPI A4)</option>
@@ -2169,13 +2295,8 @@ main > .foot{margin-top:auto}
   </div>
   <div class="sc-ovopt">
     <label for="scCropFilt">Làm rõ</label>
-    <select id="scCropFilt" onchange="scCropFiltChange()">
-      <option value="auto">Tự động — làm rõ chữ, nền trắng</option>
-      <option value="gray">Xám — đen trắng mềm</option>
-      <option value="bw">Đen trắng — nét nhất, nhẹ nhất</option>
-      <option value="color">Màu — giữ màu, bỏ bóng tối</option>
-      <option value="none">Không xử lý — ảnh gốc</option>
-    </select>
+    <!-- do scFillFiltSelects() dựng từ SC_FILTS -->
+    <select id="scCropFilt" onchange="scCropFiltChange()"></select>
     <span class="sp"></span>
     <div class="seg">
       <button type="button" onclick="scCropDetect()" title="Tìm lại mép giấy">🔍 Tự nhận diện</button>
@@ -2192,6 +2313,44 @@ main > .foot{margin-top:auto}
     <span class="note">Kéo <b>4 góc</b> vào đúng 4 mép giấy — kéo <b>điểm giữa cạnh</b> để chỉnh cả cạnh một lúc.</span>
     <span class="sp"></span>
     <button class="btn btn-g" id="scCropOk" onclick="scCropDone()">✓ Xong — xử lý trang này</button>
+  </div>
+</div>
+
+<!-- ════════ MÀN HÌNH 4: XEM & PHÓNG TO TRANG ĐÃ LỌC ════════
+     Mở bằng cách bấm ảnh nhỏ của trang. Dùng chung bộ class .sc-ov của hai lớp phủ kia
+     (nền tối cố định), chỉ khác phần khung ảnh .sc-pvst: nó CUỘN được để phóng to. -->
+<div class="sc-ov hidden" id="scPvOv">
+  <div class="sc-ovt">
+    <b>🔍 Xem &amp; phóng to</b>
+    <span class="who" id="scPvWho"></span>
+    <span class="sp"></span>
+    <button class="sc-ic" onclick="scPvClose()" title="Đóng (Esc)">✕</button>
+  </div>
+  <div class="sc-ovopt">
+    <label for="scPvFilt">Làm rõ</label>
+    <!-- do scFillFiltSelects() dựng từ SC_FILTS -->
+    <select id="scPvFilt" onchange="scPvFiltChange()"></select>
+    <span class="sp"></span>
+    <div class="seg">
+      <button type="button" onclick="scPvZoom(-1)" title="Thu nhỏ (phím −)">−</button>
+      <button type="button" onclick="scPvFit()" title="Vừa khung (phím 0)">Vừa khung</button>
+      <button type="button" onclick="scPvOne()" title="Đúng 100% (phím 1)">1:1</button>
+      <button type="button" onclick="scPvZoom(1)" title="Phóng to (phím +)">+</button>
+    </div>
+    <span class="sc-pvz" id="scPvZTag">—</span>
+    <button type="button" class="sc-cmp" id="scPvCmp" onclick="scPvToggleRaw()"
+            title="Xem ảnh gốc chưa cắt viền, chưa làm rõ — để so bộ lọc được gì">⇄ Ảnh gốc</button>
+  </div>
+  <div class="sc-stage sc-pvst" id="scPvStage">
+    <img id="scPvImg" alt="Trang đã lọc"/>
+  </div>
+  <div class="sc-ovb">
+    <button class="btn btn-n" id="scPvPrev" onclick="scPvStep(-1)">◀ Trang trước</button>
+    <span class="note" id="scPvNote"></span>
+    <span class="sp"></span>
+    <button class="btn btn-n" onclick="scPvCrop()">✂️ Cắt viền</button>
+    <button class="btn btn-n" onclick="scPvSign()">✍️ Ký · ghi chú</button>
+    <button class="btn btn-p" id="scPvNext" onclick="scPvStep(1)">Trang sau ▶</button>
   </div>
 </div>
 
@@ -2307,7 +2466,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-28a';
+const APP_BUILD   = '2026-11-28g';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -5022,6 +5181,7 @@ function resetGenerate() {
   $('stateProgress').style.display = 'none';
   $('stateDone').style.display = 'none';
   $('alertErr3').className = 'alert alert-e';
+  $('nextDocRow').classList.remove('ready');   // bản mới thì chưa tải gì
   state.pdfBytes = null; state.smallBytes = null;
 }
 
@@ -5217,9 +5377,17 @@ function freeBtn(id) {
 }
 const pdfBaseName = () => (state.pdfName || 'Ban anh.pdf').replace(/\.pdf$/i, '');
 
+/** Đã tải được ít nhất một file → mời làm hồ sơ khác (khối #nextDocRow sáng lên).
+ *  Gọi từ CẢ 3 đường tải: file gốc, bản nén, ảnh JPG. resetGenerate() tắt lại. */
+function markDownloaded() {
+  const r = $('nextDocRow');
+  if (r) r.classList.add('ready');
+}
+
 function downloadPDF() {
   if (!state.pdfBytes) return;
   saveBlob(new Blob([state.pdfBytes], { type: 'application/pdf' }), state.pdfName);
+  markDownloaded();
 }
 
 /** Nén PDF về dưới 10MB: giảm dần độ phân giải ảnh + nén JPEG, giữ nguyên bố cục */
@@ -5227,6 +5395,7 @@ async function downloadSmallPDF() {
   if (!state.pdfBytes) return;
   if (state.smallBytes) {                  // đã nén rồi thì tải lại ngay
     saveBlob(new Blob([state.smallBytes], { type: 'application/pdf' }), pdfBaseName() + '_nen.pdf');
+    markDownloaded();
     return;
   }
   busyBtn('btnDlSmall', '⏳ Đang nén…');
@@ -5247,6 +5416,7 @@ async function downloadSmallPDF() {
     $('dlNote').textContent = out.length <= MAX_SMALL
       ? `✅ Đã nén: ${tx}`
       : `⚠️ Đã nén hết mức: ${tx} — vẫn trên 10MB, hãy chia bản ảnh thành nhiều file.`;
+    markDownloaded();
     toast(out.length <= MAX_SMALL ? 'Đã nén xong — ' + fmtBytes(out.length) : 'Đã nén hết mức', 'o');
   } catch (err) {
     console.error(err);
@@ -5294,6 +5464,7 @@ async function downloadJPG() {
       const sum = files.reduce((t, f) => t + f.data.length, 0);
       $('dlNote').textContent = `✅ Đã xuất ${files.length} file .jpg trong ${name} · ${fmtBytes(sum)}`;
     }
+    markDownloaded();
     toast(`Đã xuất ${files.length} file ảnh JPG`, 'o');
   } catch (err) {
     console.error(err);
@@ -5491,6 +5662,18 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Escape') { e.preventDefault(); scPlClose(); }
     return;
   }
+  // Đang xem & phóng to trang: Esc đóng · ← → đổi trang · + − 0 1 chỉnh mức phóng
+  if (!$('scPvOv').classList.contains('hidden')) {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.key === 'Escape')          { e.preventDefault(); scPvClose(); }
+    else if (e.key === 'ArrowLeft')  { e.preventDefault(); scPvStep(-1); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); scPvStep(1); }
+    else if (e.key === '+' || e.key === '=') { e.preventDefault(); scPvZoom(1); }
+    else if (e.key === '-')          { e.preventDefault(); scPvZoom(-1); }
+    else if (e.key === '0')          { e.preventDefault(); scPvFit(); }
+    else if (e.key === '1')          { e.preventDefault(); scPvOne(); }
+    return;
+  }
   // Đang xem ảnh lớn: ←/→ chuyển ảnh, R xoay
   if (!$('viewer').classList.contains('hidden')) {
     if (e.key === 'ArrowLeft')  { e.preventDefault(); viewerStep(-1); }
@@ -5526,6 +5709,7 @@ function closeTopLayer() {
   if (!$('camModal').classList.contains('hidden')) { closeCamera(); return true; }
   if (!$('scCropOv').classList.contains('hidden')) { scCropClose(); return true; }
   if (!$('scPlaceOv').classList.contains('hidden')){ scPlClose();   return true; }
+  if (!$('scPvOv').classList.contains('hidden'))   { scPvClose();   return true; }
   if (!$('viewer').classList.contains('hidden'))   { closeViewer(); return true; }
   const ovs = document.querySelectorAll('.ov:not(.hidden)');
   if (ovs.length) { ovs[ovs.length - 1].classList.add('hidden'); return true; }
@@ -5568,8 +5752,53 @@ window.addEventListener('keydown', e => {
 // ════════════════════════════════════════════════════════
 //  KHỞI TẠO
 // ════════════════════════════════════════════════════════
+/** Đo chiều cao thật của 2 thanh dính (.appbar + .stepper-wrap) và ghi vào --abh / --sth.
+ *  Thanh bước dính ở top:var(--abh) nên nếu đo sai thì nó đè lên hoặc rời khỏi appbar.
+ *  Chiều cao thay đổi theo bề ngang màn hình (nhãn xuống 2 dòng ở ≤560px), theo
+ *  safe-area-inset-top của iPhone, và theo cỡ chữ hệ thống — nên PHẢI đo, không hằng số hóa. */
+function syncBarHeights() {
+  const ab = document.querySelector('.appbar');
+  const st = document.querySelector('.stepper-wrap');
+  if (!ab || !st) return;
+  const r = document.documentElement.style;
+  r.setProperty('--abh', Math.round(ab.getBoundingClientRect().height) + 'px');
+  r.setProperty('--sth', Math.round(st.getBoundingClientRect().height) + 'px');
+}
+/* ── Thu gọn CẢ HAI thanh dính khi cuộn ──
+ *  Thanh tiêu đề + thanh bước đều dính nên chúng ăn chiều cao suốt phiên làm việc.
+ *  Khi người dùng đã cuộn xuống (tức là đang xem nội dung, không còn định bấm chuyển mục),
+ *  cả hai co lại: bỏ khẩu hiệu / nhãn phụ / bộ đếm, rút logo và chấm số.
+ *  TÊN APP, 4 NÚT và TÊN 4 MỤC vẫn nguyên — co là bớt thứ trang trí, không giấu cái chính.
+ *  Hai ngưỡng KHÁC NHAU (bật 56px / tắt 18px) là có chủ ý: một ngưỡng duy nhất sẽ khiến
+ *  thanh nhấp nháy khi người dùng dừng tay đúng ngay mốc đó, vì chính việc thu gọn làm
+ *  nội dung dịch lên vài chục px. */
+const TIGHT_ON = 56, TIGHT_OFF = 18;
+function onScrollShrink() {
+  // Đọc scrollY và đổi class là hai việc RẺ (không ép trình duyệt tính lại bố cục), nên
+  // KHÔNG cần gói trong requestAnimationFrame. Bản trước có gói, và cờ chặn gọi chồng của
+  // nó làm lần cuộn đầu tiên không ăn khi khung hình bị hoãn.
+  const b = document.body;
+  const y = window.scrollY || document.documentElement.scrollTop || 0;
+  const on = b.classList.contains('tight');
+  if (!on && y > TIGHT_ON)       b.classList.add('tight');
+  else if (on && y < TIGHT_OFF)  b.classList.remove('tight');
+}
+
+function watchBarHeights() {
+  const els = [document.querySelector('.appbar'), document.querySelector('.stepper-wrap')]
+                .filter(Boolean);
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(syncBarHeights);
+    els.forEach(el => ro.observe(el));
+  }
+  // ResizeObserver đủ cho mọi trình duyệt dự án hỗ trợ; orientationchange là lưới an toàn
+  window.addEventListener('orientationchange', () => setTimeout(syncBarHeights, 200));
+  window.addEventListener('scroll', onScrollShrink, { passive: true });
+}
+
 (function init() {
   $('abVer').textContent  = APP_VERSION;
+  syncBarHeights(); watchBarHeights(); onScrollShrink();   // F5 giữa trang → thu gọn ngay
   if (!window.matchMedia('(hover:hover)').matches || window.innerWidth <= 700) {
     document.querySelectorAll('.d-desk').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.d-mob').forEach(el => el.style.display = '');
@@ -8576,8 +8805,19 @@ const SC_FILTS = {
   gray:  'Xám — đen trắng mềm',
   bw:    'Đen trắng — nét nhất, nhẹ nhất',
   color: 'Màu — giữ màu, bỏ bóng tối',
+  cbw:   'Màu — nét nhất (chữ đậm, nền trắng)',
   none:  'Không xử lý — ảnh gốc',
 };
+/* BẢNG NÀY LÀ NGUỒN DUY NHẤT của 3 droplist bộ lọc (#scFiltAll, #scCropFilt, #scPvFilt và
+   droplist của từng thẻ trang) — scFillFiltSelects() dựng chúng lúc nạp trang. Đừng viết tay
+   <option> vào HTML nữa: trước đây 2 chỗ viết tay đã lệch nhau khi thêm bộ lọc mới. */
+function scFillFiltSelects() {
+  const opts = Object.keys(SC_FILTS)
+    .map(k => `<option value="${k}">${esc(SC_FILTS[k])}</option>`).join('');
+  const all = $('scFiltAll');
+  if (all) all.innerHTML = '<option value="">— giữ riêng từng trang —</option>' + opts;
+  ['scCropFilt', 'scPvFilt'].forEach(id => { const el = $(id); if (el) el.innerHTML = opts; });
+}
 
 /** Trạng thái màn hình 4. `pages[]` sửa trực tiếp — không dựng lại từ danh sách file,
  *  nhờ vậy giữ được thứ tự, 4 góc đã chỉnh tay, bộ lọc riêng và chữ ký đã đặt. */
@@ -9064,6 +9304,75 @@ function scEnhance(cv, mode) {
   const flat = new Float32Array(w * h);
   for (let i = 0; i < g.length; i++) flat[i] = (g[i] / Math.max(24, bg[i])) * 255;
 
+  // ── MÀU — NÉT NHẤT ──
+  // Mục tiêu: NÉT ĐÚNG BẰNG bw, nền trắng sạch, nhưng con dấu, chữ ký và chữ viết tay bằng
+  // bút màu thì GIỮ MÀU. Muốn vậy phải tách làm HAI mặt nạ, vì chữ và mảng màu cần hai cách
+  // vẽ khác hẳn nhau:
+  //
+  //   aT — NÉT CHỮ. Ngưỡng theo vùng y như bw, nhưng chuyển tiếp chỉ ~6 bậc xám nên mép chữ
+  //        vừa sắc như bw vừa không răng cưa. Pixel nào là chữ thì lấy MÀU MỰC ĐẬM NHẤT
+  //        (đen tuyền nếu nét không màu) — KHÔNG lấy sắc độ gốc.
+  //   aR — MẢNG LỚN: vùng tối nguyên khối (ảnh dán, ô đã tô đen) và vùng có màu (ruột con
+  //        dấu, vệt bút nhớ dòng). Vẽ bằng SẮC ĐỘ THẬT để ảnh không bị bệt thành mảng phẳng.
+  //
+  // Bản đầu chỉ có MỘT mặt nạ mềm dùng chung và lấy thẳng sắc độ gốc làm màu mực → nét chữ
+  // xám nhờ nhờ, nhìn mờ hơn hẳn bw. Đó là lỗi đã sửa ở đây — đừng gộp hai mặt nạ lại.
+  if (mode === 'cbw') {
+    const loc = scBlur(flat, w, h, Math.max(6, Math.round(Math.max(w, h) / 90)));
+    const aT = new Uint8Array(w * h);   // 255 = chắc chắn là nét chữ
+    const aR = new Uint8Array(w * h);   // 255 = mảng tối / mảng có màu
+    const cW = new Uint8Array(w * h);   // 255 = nét có màu thật · 0 = nét không màu → đen tuyền
+    for (let i = 0, j = 0; i < aT.length; i++, j += 4) {
+      const L = flat[i], t = loc[i] - 10;
+      const R0 = d[j], G0 = d[j + 1], B0 = d[j + 2];
+      const mx = R0 > G0 ? (R0 > B0 ? R0 : B0) : (G0 > B0 ? G0 : B0);
+      const mn = R0 < G0 ? (R0 < B0 ? R0 : B0) : (G0 < B0 ? G0 : B0);
+      const sat = mx > 10 ? (mx - mn) / mx : 0;
+      const vT = (t - L) / 6 + .5;                  // dốc đứng → nét
+      let   vR = (175 - L) / 70;                    // mảng tối (mốc 175: nền ngà vẫn ra trắng)
+      const vC = (sat - .26) / .26;                 // mảng có màu
+      if (vC > vR) vR = vC;
+      const vW = (sat - .12) / .14;
+      aT[i] = vT <= 0 ? 0 : (vT >= 1 ? 255 : (vT * 255) | 0);
+      aR[i] = vR <= 0 ? 0 : (vR >= 1 ? 255 : (vR * 255) | 0);
+      cW[i] = vW <= 0 ? 0 : (vW >= 1 ? 255 : (vW * 255) | 0);
+    }
+    // Từng kênh: chia nền rồi giãn levels 20→0 / 235→255. Ghi thẳng vào d để lát nữa đọc lại
+    // được cả 3 kênh cùng lúc mà không phải giữ 3 mảng Float song song (66MB cho trang A4).
+    const LO = 20, HI = 235, K = 255 / (HI - LO);
+    for (let ch = 0; ch < 3; ch++) {
+      const pc = new Float32Array(w * h);
+      for (let i = 0, j = ch; i < pc.length; i++, j += 4) pc[i] = d[j];
+      const bgc = scBg(pc, w, h, r, scPctOf(pc, .97) * .5);
+      for (let i = 0, j = ch; i < pc.length; i++, j += 4) {
+        const v = ((pc[i] / Math.max(24, bgc[i])) * 252 - LO) * K;
+        d[j] = v < 0 ? 0 : (v > 255 ? 255 : v);
+      }
+    }
+    // Lượt cuối: dựng màu mực rồi trộn lên nền trắng.
+    //   ĐẬM MÀU bằng cách hạ các kênh yếu xuống theo luỹ thừa 1,6, GIỮ NGUYÊN kênh mạnh nhất
+    //   — không bịa thêm độ sáng, chỉ làm sắc màu rõ hơn. Tra bảng 256 ô thay cho Math.pow,
+    //   vì một trang A4 cần tới 16 triệu lần tính.
+    const POW = new Float32Array(256);
+    for (let k = 0; k < 256; k++) POW[k] = Math.pow(k / 255, 1.6);
+    for (let i = 0, j = 0; i < aT.length; i++, j += 4) {
+      const vr = d[j], vg = d[j + 1], vb = d[j + 2];
+      const mxv = vr > vg ? (vr > vb ? vr : vb) : (vg > vb ? vg : vb);
+      const tA = aT[i] / 255, rA = aR[i] / 255, cw = cW[i] / 255;
+      for (let c = 0; c < 3; c++) {
+        const v = d[j + c];
+        // ① mảng lớn: sắc độ thật, trộn lên nền trắng
+        const tone = 255 - rA * (255 - v);
+        // ② nét chữ: màu mực đậm — nét không màu (cw→0) thành đen tuyền như bw
+        const ink = mxv > 0 ? cw * POW[(v * 255 / mxv) | 0] * mxv : 0;
+        d[j + c] = tone + (ink - tone) * tA;
+      }
+      d[j + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    return;
+  }
+
   if (mode === 'bw') {
     // Ngưỡng theo VÙNG, không phải một ngưỡng chung: trang chụp lệch sáng vẫn ra đều
     const loc = scBlur(flat, w, h, Math.max(6, Math.round(Math.max(w, h) / 90)));
@@ -9433,7 +9742,7 @@ function scRender() {
     return `
     <div class="sc-pg${p.busy ? ' busy' : ''}">
       <span class="sc-no">${i + 1}</span>${badge}
-      <div class="sc-pv" onclick="scCropOpen(${i})" title="Bấm để cắt viền / chỉnh thẳng">${inner}</div>
+      <div class="sc-pv" onclick="scPvOpen(${i})" title="Bấm để xem to &amp; phóng to trang">${inner}</div>
       <div class="sc-fil">
         <select onchange="scSetFilt(${i}, this.value)" title="Bộ lọc làm rõ của riêng trang này">
           ${filtOpts(p)}
@@ -9772,6 +10081,176 @@ function scCropClose() {
   if (scCrop.cv) { scCrop.cv.width = scCrop.cv.height = 0; }
   scCrop.cv = null; scCrop.quad = null; scCrop.idx = -1; scCrop.drag = -1;
 }
+// ════════════════════════════════════════════════════════
+//  XEM & PHÓNG TO TRANG ĐÃ LỌC (#scPvOv)
+//
+//  Ảnh nhỏ trong lưới chỉ rộng ~150px — nhìn vậy không thể biết bộ lọc có ăn chữ hay
+//  để lại vệt bẩn. Màn hình này cho xem trang ở đúng độ phân giải đã quét, đổi bộ lọc
+//  rồi xem lại ngay, và so với ảnh gốc.
+//  Ảnh hiển thị đi qua scFinalJpeg() — ĐÚNG file sẽ xuất ra, kể cả chữ ký và dấu.
+// ════════════════════════════════════════════════════════
+const scPv = { i: -1, zoom: 1, raw: false, url: '', zoomed: false, seq: 0, pan: null };
+
+function scPvRevoke() {
+  if (scPv.url) { try { (window.URL || window.webkitURL).revokeObjectURL(scPv.url); } catch (_) {} }
+  scPv.url = '';
+}
+
+async function scPvOpen(i) {
+  const p = scPageAt(i);
+  if (!p) return;
+  scPv.i = i; scPv.raw = false; scPv.zoomed = false;
+  $('scPvOv').classList.remove('hidden');
+  $('scPvCmp').classList.remove('on');
+  await scPvLoad();
+}
+
+function scPvClose() {
+  scPv.seq++;                       // huỷ lượt nạp đang chạy dở
+  $('scPvOv').classList.add('hidden');
+  $('scPvImg').removeAttribute('src');
+  scPvRevoke();
+  scPv.i = -1; scPv.pan = null;
+}
+
+/** Nạp ảnh của trang hiện tại vào khung xem. */
+async function scPvLoad() {
+  const my = ++scPv.seq;
+  const p = scPageAt(scPv.i);
+  if (!p) { scPvClose(); return; }
+  const n = scn.pages.length;
+  $('scPvWho').textContent = `Trang ${scPv.i + 1}/${n} · ${p.name}`;
+  $('scPvFilt').value = p.filt;
+  $('scPvPrev').disabled = scPv.i <= 0;
+  $('scPvNext').disabled = scPv.i >= n - 1;
+  const img = $('scPvImg');
+
+  let blob = null;
+  if (scPv.raw) {
+    blob = p.src;
+    $('scPvNote').textContent = 'Ảnh gốc — chưa cắt viền, chưa làm rõ';
+  } else if (p.out) {
+    $('scPvNote').textContent = 'Đang dựng ảnh xem…';
+    try { blob = await scFinalJpeg(p, .92); } catch (e) { blob = null; }
+  }
+  if (my !== scPv.seq) return;      // người dùng đã đổi trang / đóng → bỏ lượt này
+  if (!blob) {
+    img.removeAttribute('src');
+    $('scPvNote').textContent = p.busy ? 'Đang xử lý trang…' : (p.err || 'Trang chưa xử lý xong');
+    $('scPvZTag').textContent = '—';
+    return;
+  }
+  scPvRevoke();
+  scPv.url = (window.URL || window.webkitURL).createObjectURL(blob);
+  img.onload = () => {
+    if (my !== scPv.seq) return;
+    if (scPv.zoomed) scPvApply(); else scPvFit();
+    if (!scPv.raw) $('scPvNote').textContent =
+      `${img.naturalWidth}×${img.naturalHeight} px · ${fmtBytes(blob.size)}`;
+  };
+  img.src = scPv.url;
+}
+
+function scPvApply() {
+  const img = $('scPvImg');
+  const nw = img.naturalWidth;
+  if (!nw) return;
+  img.style.width = Math.max(16, Math.round(nw * scPv.zoom)) + 'px';
+  img.style.height = 'auto';
+  $('scPvZTag').textContent = Math.round(scPv.zoom * 100) + '%';
+}
+
+/** Thu cho vừa khung. Không chặn ở 100%: ảnh quét nhỏ cũng nên lấp đầy khung xem. */
+function scPvFit() {
+  const img = $('scPvImg'), st = $('scPvStage');
+  if (!img.naturalWidth) return;
+  const k = Math.min((st.clientWidth - 24) / img.naturalWidth,
+                     (st.clientHeight - 24) / img.naturalHeight);
+  scPv.zoom = Math.max(.05, Math.min(8, k));
+  scPv.zoomed = false;
+  scPvApply();
+}
+function scPvOne() { scPv.zoom = 1; scPv.zoomed = true; scPvApply(); }
+function scPvZoom(dir, ax, ay) {
+  const st = $('scPvStage');
+  const old = scPv.zoom;
+  const k = Math.max(.05, Math.min(8, old * (dir > 0 ? 1.3 : 1 / 1.3)));
+  if (k === old) return;
+  // Giữ nguyên điểm đang nhìn: chuột ở đâu thì chỗ đó phải đứng yên khi phóng to
+  const cx = (ax == null ? st.clientWidth / 2 : ax) + st.scrollLeft;
+  const cy = (ay == null ? st.clientHeight / 2 : ay) + st.scrollTop;
+  scPv.zoom = k; scPv.zoomed = true;
+  scPvApply();
+  st.scrollLeft += cx * (k / old - 1);
+  st.scrollTop  += cy * (k / old - 1);
+}
+
+async function scPvStep(d) {
+  const j = scPv.i + d;
+  if (j < 0 || j >= scn.pages.length) return;
+  scPv.i = j; scPv.raw = false;
+  $('scPvCmp').classList.remove('on');
+  await scPvLoad();
+}
+
+async function scPvToggleRaw() {
+  const p = scPageAt(scPv.i);
+  if (!p || !p.src) return;
+  scPv.raw = !scPv.raw;
+  $('scPvCmp').classList.toggle('on', scPv.raw);
+  await scPvLoad();
+}
+
+/** Đổi bộ lọc ngay trong khung xem: xử lý lại trang rồi hiện bản mới. */
+async function scPvFiltChange() {
+  const p = scPageAt(scPv.i);
+  const v = $('scPvFilt').value;
+  if (!p || !SC_FILTS[v]) return;
+  p.filt = v;
+  scPv.raw = false;
+  $('scPvCmp').classList.remove('on');
+  scTouch(p);                       // → scRunQueue()
+  scRender();
+  $('scPvNote').textContent = 'Đang xử lý lại trang…';
+  const guard = Date.now() + 120000;
+  while ((p.dirty || p.busy) && Date.now() < guard && !$('scPvOv').classList.contains('hidden'))
+    await new Promise(r => setTimeout(r, 120));
+  if (!$('scPvOv').classList.contains('hidden')) await scPvLoad();
+}
+
+function scPvCrop() { const i = scPv.i; scPvClose(); scCropOpen(i); }
+function scPvSign() { const i = scPv.i; scPvClose(); scPlOpen(i); }
+
+// Lăn chuột = phóng to quanh con trỏ · kéo = di chuyển trong ảnh
+(function scPvBind() {
+  const st = $('scPvStage');
+  if (!st) return;
+  st.addEventListener('wheel', e => {
+    if (!$('scPvImg').naturalWidth) return;
+    e.preventDefault();
+    const r = st.getBoundingClientRect();
+    scPvZoom(e.deltaY < 0 ? 1 : -1, e.clientX - r.left, e.clientY - r.top);
+  }, { passive: false });
+  st.addEventListener('pointerdown', e => {
+    if (e.target.tagName !== 'IMG') return;
+    scPv.pan = { x: e.clientX, y: e.clientY, l: st.scrollLeft, t: st.scrollTop, id: e.pointerId };
+    st.classList.add('drag');
+    try { st.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  st.addEventListener('pointermove', e => {
+    if (!scPv.pan || e.pointerId !== scPv.pan.id) return;
+    st.scrollLeft = scPv.pan.l - (e.clientX - scPv.pan.x);
+    st.scrollTop  = scPv.pan.t - (e.clientY - scPv.pan.y);
+  });
+  const up = e => {
+    if (!scPv.pan) return;
+    try { st.releasePointerCapture(scPv.pan.id); } catch (_) {}
+    scPv.pan = null; st.classList.remove('drag');
+  };
+  st.addEventListener('pointerup', up);
+  st.addEventListener('pointercancel', up);
+})();
+
 function scCropDone() {
   const p = scPageAt(scCrop.idx);
   if (!p || !scCrop.quad) { scCropClose(); return; }
@@ -10585,6 +11064,7 @@ function scCamUndo(id) {
     const el = $(id);
     if (el) el.addEventListener('change', () => { scn.pdf = null; });
   });
+  scFillFiltSelects();      // 3 droplist bộ lọc dựng từ SC_FILTS, trước khi scRender() đọc giá trị
   scRender();
 })();
 </script>

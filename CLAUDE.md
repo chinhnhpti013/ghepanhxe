@@ -14,7 +14,7 @@ Có **2 cách dùng song song**, cùng một bố cục PDF:
 ```
 anh-giam-dinh-vcx-theo-ten-file/
 ├── index.html                    ← WEB APP v2.0 (toàn bộ UI + logic trong 1 file)
-├── huong-dan.html                ← HƯỚNG DẪN SỬ DỤNG (trang độc lập, mở bằng nút `Help` / F1)
+├── huong-dan.html                ← HƯỚNG DẪN SỬ DỤNG (trang độc lập, mở bằng nút `📖 Hướng dẫn sử dụng` / F1)
 ├── input/                        ← ảnh gốc + file báo giá (CHỈ dùng cho luồng Python)
 │   ├── 0. Số khung xe/           ← ảnh nhận dạng xe (prefix 0)
 │   ├── 1. Cốp sau lõm bẹp/       ← ảnh hạng mục (prefix 1, 2, 3...)
@@ -60,7 +60,7 @@ người dùng bấm nút OCR. **Ngoài 5 thư viện đó thì không dùng th�
 tesseract.js là ngoại lệ có chủ ý, xem *Màn hình 4 → Nhận dạng chữ*.
 
 **Hướng dẫn sử dụng** nằm ở `huong-dan.html` — trang HTML độc lập, tự chứa CSS, không phụ thuộc
-`index.html`. Nút `Help` (ngoài cùng bên phải thanh tiêu đề, cạnh 🌙) và phím `F1` mở nó trong
+`index.html`. Nút `📖 Hướng dẫn sử dụng` (ngoài cùng bên phải thanh tiêu đề, cạnh 🌙) và phím `F1` mở nó trong
 hộp thoại `#guideModal` qua iframe `huong-dan.html?theme={sáng|tối}`; `openGuide()` chỉ dựng
 iframe một lần và nạp lại khi đổi sáng/tối. Trang này cũng mở trực tiếp được bằng link hoặc
 in ra giấy (có `@media print`). Hướng dẫn **chỉ nói về web app** (A · Các bước sử dụng ·
@@ -69,7 +69,7 @@ E · Xử lý sự cố · F · FAQ; mục **9c** là
 Biên bản giám định & chữ ký tay, mục **7** có dải nút Thay thế/Sửa chữa/Không) — phần luồng
 Python đã bỏ khỏi hướng dẫn, chỉ còn tài liệu ở CLAUDE.md. **Sửa tính năng thì phải sửa `huong-dan.html` kèm theo** —
 bảng tiền tố giấy tờ, bảng lưới ảnh/trang và danh sách phím tắt được nhắc lại ở đó.
-Chấm cam trên nút `Help` hiện khi `localStorage.pti_guide_seen !== APP_BUILD`, nên **tăng `APP_BUILD`
+Chấm cam trên nút Hướng dẫn hiện khi `localStorage.pti_guide_seen !== APP_BUILD`, nên **tăng `APP_BUILD`
 mỗi lần cập nhật hướng dẫn** để người dùng thấy nhắc.
 
 > **Web app không có OCR báo giá.** BKS và tên ga-ra nhập tay ở đầu bước 1.
@@ -135,6 +135,12 @@ Nút **Tiếp tục** luôn bấm được; thiếu gì thì báo đúng chỗ �
   **`rowIf()`** cho các dòng không bắt buộc (Mã hồ sơ, 3 dòng tổn thất): **trống thì không in dòng**.
   Dòng `Chú thích` chỉ in khi `capSrc !== 'auto'`, dòng `Biên bản giám định` chỉ in khi `bbEnabled()`
 - Tạo PDF → tải xuống → tùy chọn **lưu hồ sơ trên máy**
+- **`🔄 Làm hồ sơ khác →`** (`#nextDocRow` / `#btnNextDoc`, đáy `#stateDone`) — gọi `resetApp()`.
+  Nó **chỉ sáng lên** (class `.ready`: khung vàng + dòng nhắc lưu hồ sơ) khi `markDownloaded()`
+  chạy, tức là người dùng **thật sự tải được một file** — gọi từ cả 3 đường: `downloadPDF()`,
+  `downloadSmallPDF()` (cả nhánh cache `state.smallBytes`) và `downloadJPG()`.
+  `resetGenerate()` gỡ class. Tạo PDF xong mà chưa tải thì nút vẫn bấm được nhưng để màu trung
+  tính — mời xóa sạch màn hình trước khi file về máy là mời mất việc
 - **Biên bản giám định** (`#cardBienBan`) — xem mục riêng bên dưới
 
 ---
@@ -565,7 +571,7 @@ nên sửa app là test theo ngay.
 | `test.mjs` | hàm tiện ích · đọc ZIP · Word/Excel → PDF (pdf-lib **giả lập**, ghi lại mọi lệnh vẽ) |
 | `test2.mjs` | 6 công cụ PDF + Office → PDF + luồng giao diện (pdf-lib **thật** + font thật) — 20 mục |
 | `test3.mjs` | nén PDF · PDF→ảnh · ảnh→PDF · đổi định dạng ảnh (**node-canvas** + **pdfjs-dist**) — 13 mục |
-| `test4.mjs` | **màn hình 4**: ma trận phối cảnh · tìm mép giấy · chỉnh thẳng · 5 bộ lọc · nạp trang → xuất PDF/JPG · dấu & ghi chú · .txt/.docx/PDF tìm kiếm được · xoay trang · chạy thử hai lớp phủ — 29 mục |
+| `test4.mjs` | **màn hình 4**: ma trận phối cảnh · tìm mép giấy · chỉnh thẳng · 6 bộ lọc (riêng `cbw` có phép thử con dấu đỏ) · nạp trang → xuất PDF/JPG · dấu & ghi chú · .txt/.docx/PDF tìm kiếm được · xoay trang · chạy thử hai lớp phủ — 31 mục |
 | `check.py` | `node --check` từng khối `<script>` + báo tên khai báo trùng giữa các khối |
 | `check_ids.py` | mọi `$('id')` của màn hình 3 **và 4** có id thật · mọi `onclick=` có hàm thật |
 
@@ -695,7 +701,34 @@ trên trang, ô đen) có cực đại thấp, không chặn sàn thì nó bị 
 | `gray` | như trên, phân vị 1,2%–98,5%, không gamma |
 | `bw` | ngưỡng **theo vùng** (so với mờ hộp bán kính `cạnh/90`, trừ 10) → chỉ 0 hoặc 255 |
 | `color` | chia cho nền **từng kênh R/G/B** — giữ dấu đỏ, mực xanh, ảnh màu |
+| `cbw` | **Màu — nét nhất**: nền trắng tinh + chữ đen hẳn như `bw`, nhưng **giữ màu nét mực** |
 | `none` | để nguyên |
+
+**`cbw` — cách làm:** phải tách **HAI mặt nạ**, vì nét chữ và mảng màu cần hai cách vẽ khác hẳn:
+
+| Mặt nạ | Bắt gì | Vẽ thế nào |
+|---|---|---|
+| **`aT` — nét chữ** | ngưỡng theo **vùng** y như `bw`, nhưng chuyển tiếp **chỉ ~6 bậc xám** | **màu mực đậm nhất**, nét không màu thành **đen tuyền** |
+| **`aR` — mảng lớn** | vùng tối nguyên khối `(175−L)/70` (ảnh dán, ô tô đen) · vùng có màu `(sat−.26)/.26` (ruột con dấu, bút nhớ dòng) | **sắc độ thật**, để ảnh không bệt thành mảng phẳng |
+
+Ghép: `tone = 255 − aR·(255 − v)` rồi `out = tone + (ink − tone)·aT` — chữ luôn thắng.
+Màu mực `ink` = màu đã chia nền và giãn levels (20→0 / 235→255), **đậm màu** bằng cách hạ các
+kênh yếu theo luỹ thừa 1,6 mà **giữ nguyên kênh mạnh nhất** (không bịa thêm độ sáng, chỉ làm
+sắc màu rõ hơn), rồi nhân với trọng số màu `cW = (sat−.12)/.14` — nên nét gần như không màu
+tự về đen tuyền, và **không cần lượt khử màu giả riêng** nữa.
+`Math.pow` thay bằng **bảng tra 256 ô**: một trang A4 cần tới 16 triệu lần tính.
+
+> **Bẫy đã sửa, đừng lặp lại:** bản đầu dùng **một** mặt nạ mềm dùng chung (chuyển tiếp ~67 bậc)
+> và lấy thẳng sắc độ gốc làm màu mực → nét chữ ra **xám nhờ nhờ**, người dùng báo ngay là
+> "mờ, không nét". **Đừng gộp hai mặt nạ lại.** `tests/test4.mjs` nay đếm số điểm xám nhờ nhờ
+> trên vùng chữ đen và bắt `cbw` phải **ngang `bw`** (hiện cả hai đều 0).
+
+> `bw` thì **xoá sạch con dấu đỏ và chữ ký bút xanh** (giữa một mảng màu đều, ngưỡng vùng coi
+> là nền) — phép thử kiểm đúng điều đó để chứng minh `cbw` khác `bw` ở chỗ nào.
+
+**3 droplist bộ lọc dựng từ `SC_FILTS` bằng `scFillFiltSelects()`** (`#scFiltAll` · `#scCropFilt` ·
+`#scPvFilt`, cộng droplist của từng thẻ trang do `scRender()` dựng). Trước đây 2 chỗ viết tay
+`<option>` trong HTML và đã lệch nhau — **đừng viết tay lại**.
 
 Mốc đen bị ép xuống dưới mốc trắng ít nhất **70 bậc** (`lo = min(lo, hi - 70)`): trang gần
 như trắng trơn thì phân vị dưới cũng rơi vào phần giấy, không chặn thì nền ra lốm đốm.
@@ -719,6 +752,26 @@ toạ độ của vật đã nghiêng** rồi so với khung bao, và dò **từ
 **Chữ ký điện tử** nhớ trong `localStorage` (`pti_sign_list`, tối đa `SC_SIGMAX` = 6).
 Dùng chung bảng ký `#sigModal` của biên bản qua `openSign('scan')`; `sigConfirm()` có nhánh
 `who === 'scan'` gọi `scSigDone(url)` và **thoát sớm**, không đụng gì tới object `bb`.
+
+#### Xem & phóng to trang đã lọc (`#scPvOv`)
+
+Ảnh nhỏ trong lưới chỉ rộng ~150px — nhìn vậy không biết được bộ lọc có ăn mất nét chữ hay
+để lại vệt bẩn. **Bấm ảnh nhỏ nay mở lớp phủ này** (trước đây mở thẳng màn hình cắt viền;
+cắt viền vẫn có nút ✂️ riêng ngay dưới ảnh và một nút nữa trong chính lớp phủ này).
+
+- Ảnh hiển thị đi qua **`scFinalJpeg()`** — đúng file sẽ xuất ra, kể cả chữ ký và dấu đã đặt.
+- **Đổi bộ lọc ngay trong khung xem** (`scPvFiltChange()`): đặt `p.filt` → `scTouch()` →
+  chờ `p.dirty`/`p.busy` hạ xuống → nạp lại ảnh. Có hạn 120 giây và kiểm lớp phủ còn mở không,
+  kẻo đóng rồi mà vòng chờ vẫn chạy.
+- **`⇄ Ảnh gốc`** hiện thẳng `page.src` — ảnh chụp chưa cắt viền, chưa làm rõ. Đó là cách duy
+  nhất thấy được bộ lọc làm được gì.
+- `scPv.seq` chặn lượt nạp cũ ghi đè lượt mới (đổi trang nhanh tay), `scPv.zoomed` nhớ việc
+  người dùng đã tự chỉnh mức phóng để lần nạp sau không tự co về "vừa khung".
+- Mức phóng: nút −/Vừa khung/1:1/+ · lăn chuột (**giữ nguyên điểm dưới con trỏ**) · kéo để
+  di chuyển · phím `+` `−` `0` `1` `←` `→` `Esc`.
+- CSS `.sc-pvst` phải là **flex + `margin:auto` trên ảnh**: đó là cách duy nhất vừa căn giữa
+  lúc ảnh nhỏ hơn khung vừa cuộn được tới sát mép lúc ảnh lớn hơn — `justify-content:center`
+  sẽ cắt mất đầu ảnh khi cuộn.
 
 #### Camera dùng chung với bản ảnh (`camMode`)
 Mục 4 **không có bộ mã camera riêng**. Biến `camMode ∈ {photo, scan}` quyết định ảnh chụp
@@ -791,6 +844,67 @@ Class chính: `.sc-grid` / `.sc-pg` / `.sc-pv` / `.sc-a` (lưới trang) · `.sc
 4. Mọi thay đổi trang đều phải xoá `scn.pdf` (bộ nhớ bản PDF đã dựng), kẻo nút
    *📤 Chia sẻ* gửi đi bản cũ.
 
+### Thanh bước (`.stepper-wrap`) — 4 mục, tên LUÔN hiện
+
+- **Dính ngay DƯỚI thanh tiêu đề**: `.stepper-wrap{top:var(--abh)}`. Trước đây cả `.appbar` và
+  `.stepper-wrap` cùng `top:0`, appbar `z-index 60 > 50` nên cuộn vài chục px là thanh bước
+  **chui xuống dưới appbar và biến mất** — tên 4 mục mất đúng lúc đang làm việc.
+- **`--abh` / `--sth`** = chiều cao thật của appbar / thanh bước, do **`syncBarHeights()`** đo và
+  **`watchBarHeights()`** (ResizeObserver + `orientationchange`) cập nhật; giá trị trong `:root`
+  chỉ là khởi đầu cho tới khi JS chạy. **Phải đo, không hằng số hóa**: chiều cao đổi theo bề
+  ngang màn hình (nhãn xuống 2 dòng ở ≤560px), theo `safe-area-inset-top` của iPhone và theo cỡ
+  chữ hệ thống. Hai token này cũng nuôi `.sticky-side{top}` và `scroll-margin-top` của `.card`
+  (thiếu cái sau thì `scrollIntoView({block:'start'})` đưa thẻ chui xuống dưới 2 thanh dính).
+- **TÊN 4 MỤC KHÔNG BAO GIỜ BỊ ẨN.** Màn hình hẹp thì **đổi cách xếp**, không giấu chữ:
+  **≤760px** bỏ nhãn phụ (`.stp-lbl span`) · **≤560px** `.stp` chuyển `flex-direction:column`
+  (chấm số trên, tên dưới, mỗi mục `flex:1 1 0`), `.stp-line` ẩn đi vì nó sẽ cắt ngang giữa hai
+  cột · **≤360px** hạ cỡ chữ thêm một nấc. Bốn cột × ~80px vẫn vừa máy 320px.
+  (Bản cũ ẩn hẳn nhãn từ ≤520px, chỉ còn 4 vòng tròn số — không ai đoán được mục 3 và 4 làm gì.)
+- Dấu "1 và 2 đi liền nhau" ở chế độ cột không còn `.stp-line`, nhưng vẫn đọc được vì **chỉ 2|3
+  và 3|4 mới có vách `.stp-sep`**.
+### Thu gọn CẢ HAI thanh dính khi cuộn (`body.tight`)
+
+`onScrollShrink()` (listener `scroll` `passive`) bật/tắt class **`tight` trên `<body>`** —
+trên body chứ không trên từng thanh, vì cả `.appbar` lẫn `.stepper-wrap` cùng co theo nó.
+Hai thanh đều dính nên chúng ăn chiều cao suốt phiên làm việc; đo thật ở 1080px:
+**141px → 89px** (appbar 73→49, thanh bước 68→40).
+
+| | Bị bỏ ở `.tight` | Ở lại |
+|---|---|---|
+| Thanh tiêu đề | khẩu hiệu `.ab-txt p` · huy hiệu `.ab-ver` · bộ đếm `.ab-cnt` · logo 46→34px · nút 38→32px | logo, tên app, **cả 4 nút kèm nhãn chữ** |
+| Thanh bước | nhãn phụ `.stp-lbl span` · chấm số 30→23px · lề | **tên cả 4 mục** |
+
+- **Bộ đếm phải ẩn**, không chỉ cho gọn: nó `position:absolute` trong phần lề dưới vừa bị cắt,
+  không ẩn thì nó đè lên dải nút.
+- Ở chế độ cột (≤560px) **vẫn giữ cột** khi thu gọn, chỉ rút chấm số và lề (~78px → ~58px) —
+  xếp ngang lại thì 4 tên không vừa máy 320px.
+- Hai ngưỡng **khác nhau** (`TIGHT_ON` 56px / `TIGHT_OFF` 18px) là **có chủ ý**: một ngưỡng duy
+  nhất làm thanh nhấp nháy khi người dùng dừng tay đúng mốc đó, vì chính việc thu gọn đẩy nội
+  dung dịch lên vài chục px.
+- **Không gói trong `requestAnimationFrame`**: đọc `scrollY` và đổi class đều không ép trình
+  duyệt tính lại bố cục. Bản đầu có gói, và cờ chặn gọi chồng của nó làm lần cuộn đầu tiên
+  không ăn khi khung hình bị hoãn.
+- `init()` gọi một lần để F5 giữa trang là thu gọn ngay. Chiều cao đổi → `ResizeObserver` trong
+  `watchBarHeights()` tự đo lại `--abh` / `--sth`, nên `.stepper-wrap{top}` và `.sticky-side{top}`
+  đi theo mà không phải chỉnh tay.
+
+### Dải nút thanh tiêu đề (`.ab-acts`)
+
+Bốn nút, chia **2 nhóm** bằng vạch dọc `.ab-sep`:
+`🔄 Tạo bản mới` · `🗂️` **┊** `🌙` · `📖 Hướng dẫn sử dụng` — trái là việc với **hồ sơ đang làm**,
+phải là **cài đặt & trợ giúp**. Thứ tự giữ nguyên như bản cũ (Hướng dẫn ngoài cùng bên phải,
+cạnh 🌙) để người quen tay không phải tìm lại nút và để `#abCnt` bên dưới không đụng ai.
+
+- **`Tạo bản mới` ở lại thanh tiêu đề** (lý do: `.stepper-wrap` trượt xuống dưới `.appbar` khi
+  cuộn — xem chú thích CSS), **nhưng không còn tô vàng**. Trong dự án vàng = "việc chính / cần
+  để ý"; đây là việc hiếm nhất (mỗi hồ sơ một lần) và là nút duy nhất xóa dữ liệu, tô nổi nhất
+  màn hình thì vừa sai thứ tự ưu tiên vừa mời bấm nhầm. `resetApp()` vẫn hỏi lại một lần.
+  **Giữ chữ "Tạo bản mới"** — để trơ mỗi 🔄 thì bị hiểu là "tải lại trang".
+- **Nhãn nút hướng dẫn có 3 mức**, đổi bằng ẩn/hiện `<span>` chứ **không** đổi `textContent`
+  (chấm cam `::after` và `openGuide()` không phải biết gì về chuyện này):
+  `📖 Hướng dẫn sử dụng` → **≤1100px** `📖 Hướng dẫn` (`.gd-sh`) → **≤560px** chỉ `📖`.
+  Rule ≤1100px phải viết **trước** khối ≤560px, cùng độ ưu tiên thì rule sau thắng.
+
 ### Bộ đếm lượt truy cập (`#abCnt`)
 
 Dòng chữ mờ ở **góc dưới-phải nền thanh tiêu đề**: `{tổng} lượt · {n} đang dùng`.
@@ -798,7 +912,7 @@ Toàn bộ mã nằm trong **IIFE ở khối `<script>` cuối cùng** của `in
 không để lọt biến nào ra phạm vi toàn cục.
 
 - **Vị trí**: `position:absolute` neo vào `.appbar-in` (đã thêm `position:relative`), nằm trong
-  khoảng trống **dưới** dải nút. **Đừng đưa nó vào `.ab-acts`** — `🌙` và `Help` phải giữ nguyên
+  khoảng trống **dưới** dải nút. **Đừng đưa nó vào `.ab-acts`** — `🌙` và nút Hướng dẫn phải giữ nguyên
   vị trí ngoài cùng bên phải. Trên ≤700px `.appbar-in` được nới `padding-bottom` lên `15px`
   để có chỗ riêng cho dòng này (logo 38px quyết định chiều cao, chỉ còn ~11px trống là không đủ).
 - **Màu**: `rgba(255,255,255,.38)` — cố ý mờ để "ẩn mà mắt thường vẫn nhìn ra"; hover lên `.88`.
@@ -888,7 +1002,7 @@ chỉ đạt 2.6:1 nên **không dùng cho chữ**. `--amber` đã đổi từ c
 `#9A6700` để đọc được trên nền vàng nhạt.
 
 **Vạch vàng `#F2C86A`** dày 3px ở đáy `.appbar` (và `.hd` của trang hướng dẫn) là điểm nhấn
-duy nhất dùng màu vàng đậm — chấm "hướng dẫn mới" trên nút `Help` dùng `#FFC94D` cho nổi trên
+duy nhất dùng màu vàng đậm — chấm "hướng dẫn mới" trên nút Hướng dẫn dùng `#FFC94D` cho nổi trên
 nền xanh của appbar (trước đây dùng `var(--amber)`, sau khi đổi sang vàng-nâu thì bị tối).
 
 ### Bố cục trên điện thoại
@@ -897,11 +1011,11 @@ Các điểm ngắt: **≤980px** (bỏ cột phải) · **≤760px** (`fgrid3` 
 **≤700px** (khối RESPONSIVE chính: nút cao ≥42px, ô nhập 16px để iOS không tự phóng to,
 `.toolbar`/`.draft-bar` ẩn `.sp` cho nút xếp 2 cái/hàng, `#btnCam` lên đầu `.dz-btns`,
 `.fsec` thu lề trong, `.segm` xếp dọc mỗi nút một hàng) ·
-**≤620px** (bảng hạng mục + thanh ký) · **≤520px** (thanh bước bỏ hẳn nhãn, chỉ còn số) ·
+**≤620px** (bảng hạng mục + thanh ký) ·
 **≤480px** (`fgrid3` 1 cột, thumbnail 132px,
 `#btnCam` chiếm trọn một hàng, **bảng hạng mục bỏ `min-width` để vừa màn hình, không phải vuốt
 ngang**) · **≤400px** (ẩn dòng phụ của appbar) ·
-**≤760px** (thanh bước bỏ nhãn phụ — có 4 mục nên phải bỏ sớm hơn trước, kẻo tràn ngang) ·
+**≤760px** (thanh bước bỏ **nhãn phụ**) · **≤560px** (thanh bước xếp dọc — xem mục dưới) ·
 **`max-height:560px` + landscape** (bỏ `max-height` của `.pv-scroll` / `.bb-pv`).
 
 > **Bẫy thứ tự CSS:** khối RESPONSIVE chung nằm **trước** phần CSS của Biên bản (`.bb-*`,

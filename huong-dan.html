@@ -237,6 +237,7 @@ td{color:var(--text-2)}
     <a class="lv2" href="#q-dung">C1. Nạp trang</a>
     <a class="lv2" href="#q-cat">C2. Cắt viền &amp; chỉnh thẳng</a>
     <a class="lv2" href="#q-loc">C3. Làm rõ nội dung</a>
+    <a class="lv2" href="#q-xem">C3b. Xem &amp; phóng to trang</a>
     <a class="lv2" href="#q-ky">C4. Ký · ghi chú · đóng dấu</a>
     <a class="lv2" href="#q-xuat">C5. Xuất &amp; chia sẻ</a>
     <a class="lv2" href="#q-ocr">C6. Nhận dạng chữ (OCR)</a>
@@ -307,11 +308,21 @@ td{color:var(--text-2)}
   <p>Hai mục còn lại trên thanh bước — <b>3 · Công cụ file</b> và <b>4 · Quét tài liệu</b> —
      là hai bộ công cụ <b>riêng</b>, vào bất cứ lúc nào (viền chấm trên thanh bước là dấu hiệu
      của chúng). Vào đó rồi quay lại thì <b>ảnh và thông tin đang làm dở vẫn còn nguyên</b>.</p>
+  <p><b>Thanh bước luôn nằm trên màn hình</b>, ngay dưới thanh tiêu đề xanh, dù bạn cuộn tới đâu —
+     và <b>tên của cả 4 mục luôn hiện</b>. Màn hình điện thoại hẹp thì thanh tự xếp lại:
+     số thứ tự nằm trên, tên mục nằm dưới, mỗi mục một cột — chứ không giấu chữ đi.
+     Khi bạn <b>cuộn xuống</b>, <b>cả thanh tiêu đề lẫn thanh bước tự thu gọn lại</b> cho đỡ
+     chiếm chỗ: thanh tiêu đề bỏ dòng khẩu hiệu và thu nhỏ logo, thanh bước bỏ dòng mô tả nhỏ.
+     <b>Tên app, 4 nút và tên 4 mục vẫn còn nguyên</b> — chỉ bớt phần trang trí.
+     Cuộn về đầu trang thì cả hai giãn ra như cũ.</p>
   <p>Các biểu tượng ở góc <b>trên cùng bên phải</b>:
      <span class="btn-ex">🔄 Tạo bản mới</span> làm lại từ đầu (mục <a href="#tao-ban-moi">13</a>) ·
      <span class="btn-ex">🗂️</span> hồ sơ đã lưu ·
-     <span class="btn-ex">🌙</span> chế độ sáng/tối · <span class="btn-ex">Help</span> mở lại bản hướng dẫn này.
-     Thanh tiêu đề <b>luôn nằm trên màn hình</b> dù bạn cuộn tới đâu, nên 4 nút này bấm được bất cứ lúc nào.</p>
+     <span class="btn-ex">🌙</span> chế độ sáng/tối · <span class="btn-ex">📖 Hướng dẫn sử dụng</span> mở lại bản hướng dẫn này.
+     Một <b>vạch dọc mảnh</b> chia 4 nút thành 2 nhóm: bên trái là việc làm với <b>hồ sơ đang làm</b>,
+     bên phải là <b>cài đặt &amp; trợ giúp</b> của app.
+     Thanh tiêu đề <b>luôn nằm trên màn hình</b> dù bạn cuộn tới đâu, nên 4 nút này bấm được bất cứ lúc nào.
+     Màn hình hẹp thì các nút tự thu lại còn biểu tượng — rê chuột (hoặc giữ ngón tay) vào nút sẽ hiện tên đầy đủ.</p>
 
   <h4>Đọc giao diện theo màu</h4>
   <p>Giao diện dùng <b>2 màu nền</b> để bạn nhận ra ngay vai trò của từng khối:</p>
@@ -781,8 +792,12 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
         giấy tờ xe → <code>Anh GD giay to xe …</code>). Dung lượng file hiện ngay dưới
         dòng thông báo. Xem thêm <a href="#xuat-jpg">PDF nén &amp; ảnh JPG</a>.</li>
     <li>Nếu cần: <span class="btn-ex">💾 Lưu hồ sơ</span> ở thẻ <b>Hồ sơ lưu trên máy</b> ngay bên
-        dưới để mở lại sau, hoặc <span class="btn-ex">🔄 Tạo bản mới</span> (xem mục
-        <a href="#tao-ban-moi">13</a>) để bắt đầu hồ sơ khác.</li>
+        dưới để mở lại sau.</li>
+    <li>Tải xong thì ngay dưới các nút tải hiện <b>khung vàng</b> với nút
+        <span class="btn-ex">🔄 Làm hồ sơ khác →</span> — bấm để xóa màn hình và bắt đầu hồ sơ
+        tiếp theo (xem mục <a href="#tao-ban-moi">13</a>). Khung chỉ sáng lên
+        <b>sau khi bạn đã tải được ít nhất một file</b>, kèm lời nhắc lưu hồ sơ trước khi xóa.
+        Trước đó nút vẫn bấm được nhưng để màu xám.</li>
   </ol>
   <div class="tip">
     💡 Sửa gì ở bước 1 (thêm ảnh, đổi chú thích, xoay ảnh) thì <b>tạo lại PDF</b> để file mới
@@ -981,8 +996,7 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
 
   <h3 id="tao-ban-moi">13. Tạo bản mới &amp; nút Back của trình duyệt</h3>
   <p>Nút <span class="btn-ex">🔄 Tạo bản mới</span> nằm trên <b>thanh tiêu đề xanh ở trên cùng</b>,
-     bên trái nhóm <span class="btn-ex">🗂️</span> <span class="btn-ex">🌙</span>
-     <span class="btn-ex">Help</span>. Thanh tiêu đề không cuộn đi, nên nút này bấm được
+     ngay bên trái vạch ngăn, cùng nhóm với <span class="btn-ex">🗂️</span>. Thanh tiêu đề không cuộn đi, nên nút này bấm được
      <b>ở cả màn hình 1 và màn hình 2, ở bất kỳ vị trí cuộn nào</b>.
      Màn hình hẹp thì nút thu lại còn dấu <span class="btn-ex">🔄</span>.</p>
   <ul>
@@ -991,6 +1005,10 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <li><b>Hồ sơ đã lưu trong máy vẫn còn nguyên</b> (nút <span class="btn-ex">🗂️</span>),
         chỉ mất những gì chưa lưu. Muốn giữ lại thì lưu hồ sơ trước khi bấm.</li>
     <li>Tên <b>Phòng / Khu vực</b> được giữ lại, vì thường làm nhiều hồ sơ cùng một phòng.</li>
+    <li><b>Lối thứ hai:</b> sau khi tải file ở màn hình 2, nút
+        <span class="btn-ex">🔄 Làm hồ sơ khác →</span> hiện trong khung vàng ở đáy thẻ
+        <b>⚡ Xuất PDF</b> — cùng một việc, nhưng nằm đúng chỗ bạn vừa làm xong
+        (xem mục <a href="#xuat-pdf">9</a>).</li>
   </ul>
   <div class="note">
     <b>Nút ◀ của trình duyệt không còn làm thoát app.</b> Trước đây bấm <b>◀</b>,
@@ -1159,7 +1177,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
      mỗi trang chiếm khá nhiều bộ nhớ nên làm cùng lúc dễ treo tab.</p>
 
   <h3 id="q-cat">C2. Cắt viền &amp; chỉnh thẳng</h3>
-  <p>Bấm vào <b>ảnh nhỏ của trang</b> (hoặc nút <b>✂️</b>) để mở màn hình cắt viền.</p>
+  <p>Bấm nút <b>✂️</b> dưới trang để mở màn hình cắt viền. (Bấm vào <b>ảnh nhỏ</b> thì mở
+     <a href="#q-xem">khung xem &amp; phóng to</a> — trong đó cũng có nút <b>✂️ Cắt viền</b>.)</p>
   <div class="tbl-wrap">
   <table>
     <tr><th style="width:26%">Thao tác</th><th>Làm gì</th></tr>
@@ -1192,8 +1211,16 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     <tr><td><b>Đen trắng</b></td>
         <td>Văn bản thuần chữ: nét gọn nhất và <b>file nhẹ nhất</b>. Cũng là lựa chọn
             dễ đọc nhất cho <b>nhận dạng chữ OCR</b>.</td></tr>
-    <tr><td><b>Màu</b></td>
-        <td>Giấy tờ có con dấu đỏ, ảnh màu, chữ ký mực xanh — bỏ bóng mà vẫn giữ màu.</td></tr>
+    <tr><td><b>Màu — giữ màu</b></td>
+        <td>Giấy tờ có con dấu đỏ, ảnh màu, chữ ký mực xanh — bỏ bóng mà vẫn giữ màu.
+            Giữ cả sắc độ mềm, nên nền hơi ngà chứ không trắng tinh.</td></tr>
+    <tr><td><b>Màu — nét nhất</b></td>
+        <td><b>Nét đúng bằng Đen trắng nhưng vẫn còn màu:</b> nền ra <b>trắng tinh</b>,
+            chữ ra <b>đen hẳn</b>, còn <b>con dấu đỏ, chữ ký và chữ viết tay bằng bút màu</b>
+            thì giữ nguyên màu, lại còn rõ màu hơn ảnh gốc.
+            Hợp nhất với biên bản, giấy tờ có dấu đỏ cần in ra hoặc gửi đi.
+            Lưu ý: nền bị ép trắng nên <b>nền giấy màu, giấy kẻ ô mờ sẽ biến mất</b> —
+            cần giữ thì dùng <b>Màu — giữ màu</b>.</td></tr>
     <tr><td><b>Không xử lý</b></td><td>Giữ nguyên ảnh gốc, chỉ cắt viền và bẻ thẳng.</td></tr>
   </table>
   </div>
@@ -1201,6 +1228,36 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
      <i>Nét</i> 2800px tính theo cạnh dài. Càng nét thì xử lý càng lâu và file càng nặng.
      Ứng dụng <b>không phóng to quá ảnh thật</b>: ảnh gốc nhỏ thì trang quét cũng nhỏ theo,
      phóng lên chỉ làm file nặng chứ không nét thêm.</p>
+
+  <h3 id="q-xem">C3b. Xem &amp; phóng to trang</h3>
+  <p>Ảnh nhỏ trong lưới chỉ rộng bằng ngón tay — nhìn vậy không thể biết bộ lọc có làm mất
+     nét chữ hay còn để lại vệt bẩn. <b>Bấm vào ảnh nhỏ của trang</b> để mở khung xem lớn.</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th style="width:26%">Thao tác</th><th>Làm gì</th></tr>
+    <tr><td><b>Làm rõ</b> (ô trên cùng)</td>
+        <td>Đổi bộ lọc <b>ngay tại đây</b> — trang được xử lý lại và hiện ngay bản mới,
+            không phải đóng ra đóng vào để so.</td></tr>
+    <tr><td><b>− / Vừa khung / 1:1 / +</b></td>
+        <td>Mức phóng. <b>1:1</b> là đúng từng điểm ảnh — mức để soi xem chữ có bị rỗ không.
+            Lăn chuột cũng phóng to, và <b>chỗ con trỏ đang chỉ sẽ đứng yên</b>.</td></tr>
+    <tr><td><b>Kéo trong ảnh</b></td><td>Di chuyển khi đang phóng to.</td></tr>
+    <tr><td><b>⇄ Ảnh gốc</b></td>
+        <td>Xem lại <b>tấm ảnh vừa chụp</b> — chưa cắt viền, chưa làm rõ. Bấm qua bấm lại
+            là thấy ngay bộ lọc được gì.</td></tr>
+    <tr><td><b>◀ Trang trước / Trang sau ▶</b></td>
+        <td>Xem lần lượt cả tập mà không phải đóng khung xem.</td></tr>
+    <tr><td><b>✂️ Cắt viền</b> · <b>✍️ Ký · ghi chú</b></td>
+        <td>Sang thẳng hai màn hình kia cho trang đang xem.</td></tr>
+  </table>
+  </div>
+  <p>Dòng chữ dưới cùng cho biết <b>kích thước điểm ảnh và dung lượng</b> của trang —
+     số đó chính là của file sẽ xuất ra, vì khung xem dựng từ đúng ảnh đó (kể cả chữ ký
+     và dấu đã đặt lên).</p>
+  <p>Phím tắt: <span class="kbd">+</span> <span class="kbd">−</span> phóng ·
+     <span class="kbd">0</span> vừa khung · <span class="kbd">1</span> đúng 100% ·
+     <span class="kbd">←</span> <span class="kbd">→</span> đổi trang ·
+     <span class="kbd">Esc</span> đóng.</p>
 
   <h3 id="q-ky">C4. Ký · ghi chú · đóng dấu</h3>
   <p>Bấm nút <b>✍️</b> ở trang cần ký. Bốn thứ đặt lên trang được:</p>
@@ -1268,7 +1325,8 @@ hop_dong_sua_chua.jpg             → theo bố cục bạn chọn</code></pre>
     trong trình duyệt, chỉ có mã thư viện là tải về.
   </div>
   <div class="tip">
-    💡 <b>Đọc không ra chữ?</b> Đổi bộ lọc trang sang <b>Đen trắng</b> hoặc <b>Xám</b>, nâng
+    💡 <b>Đọc không ra chữ?</b> Đổi bộ lọc trang sang <b>Đen trắng</b>, <b>Màu — nét nhất</b>
+    hoặc <b>Xám</b>, nâng
     <b>Độ phân giải</b> lên <i>Nét</i>, và chụp lại cho thẳng — ảnh mờ hoặc chụp quá xiên thì
     máy nào cũng đọc sai. Chữ viết tay thì gần như không đọc được; OCR hợp với <b>chữ in</b>.
   </div>

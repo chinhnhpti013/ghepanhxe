@@ -185,6 +185,48 @@ function meanBox(cv, u0, v0, u1, v1) {
   return s / (d.length / 4);
 }
 
+/** Trung bình TỪNG KÊNH của một ô — dùng để kiểm bộ lọc có giữ được màu không. */
+function meanRGB(cv, u0, v0, u1, v1) {
+  const x0 = Math.round(u0 * cv.width), y0 = Math.round(v0 * cv.height);
+  const x1 = Math.round(u1 * cv.width), y1 = Math.round(v1 * cv.height);
+  const d = cv.getContext('2d').getImageData(x0, y0, Math.max(1, x1 - x0), Math.max(1, y1 - y0)).data;
+  let r = 0, g = 0, b = 0;
+  for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; }
+  const n = d.length / 4;
+  return { r: r / n, g: g / n, b: b / n };
+}
+
+/** Trang chụp bằng điện thoại: nền trắng, bóng tối dần sang phải, 9 dòng chữ đen
+ *  và một con dấu đỏ ở góc dưới-phải. */
+function pageWithStamp() {
+  const cv = Canvas.createCanvas(360, 480);
+  const x = cv.getContext('2d');
+  x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, 360, 480);
+  const g2 = x.createLinearGradient(0, 0, 360, 0);
+  g2.addColorStop(0, 'rgba(0,0,0,0)'); g2.addColorStop(1, 'rgba(0,0,0,.45)');
+  x.fillStyle = g2; x.fillRect(0, 0, 360, 480);
+  x.fillStyle = '#1A1A1A';
+  for (let i = 0; i < 9; i++) x.fillRect(40, 60 + i * 44, 280, 11);
+  x.fillStyle = '#C62828'; x.fillRect(216, 384, 108, 62);        // con dấu đỏ
+  x.strokeStyle = '#1B46B0'; x.lineWidth = 5;                    // chữ ký bút bi xanh
+  x.beginPath(); x.moveTo(60, 420); x.bezierCurveTo(110, 370, 140, 460, 190, 400); x.stroke();
+  return cv;
+}
+
+/** Đếm điểm ảnh "xám nhờ nhờ" (không ra trắng cũng không ra mực) trên một dải ngang.
+ *  Nét càng sắc thì con số này càng nhỏ — đây là thước đo độ NÉT của bộ lọc. */
+function fuzzyCount(cv, u0, v0, u1, v1) {
+  const x0 = Math.round(u0 * cv.width), y0 = Math.round(v0 * cv.height);
+  const x1 = Math.round(u1 * cv.width), y1 = Math.round(v1 * cv.height);
+  const d = cv.getContext('2d').getImageData(x0, y0, Math.max(1, x1 - x0), Math.max(1, y1 - y0)).data;
+  let n = 0;
+  for (let i = 0; i < d.length; i += 4) {
+    const L = d[i] * .299 + d[i + 1] * .587 + d[i + 2] * .114;
+    if (L > 70 && L < 205) n++;
+  }
+  return n;
+}
+
 // ════════════════════════════════════════════════════════
 async function main() {
 
@@ -300,7 +342,7 @@ try {
 } catch (e) { bad('scWarp', e); }
 
 console.log('\n== Bộ lọc làm rõ ==');
-for (const m of ['auto', 'gray', 'bw', 'color', 'none']) {
+for (const m of ['auto', 'gray', 'bw', 'color', 'cbw', 'none']) {
   try {
     // trang có bóng tối dần từ trái sang phải — đúng kiểu chụp bằng điện thoại
     const cv = Canvas.createCanvas(360, 480);
@@ -336,6 +378,44 @@ for (const m of ['auto', 'gray', 'bw', 'color', 'none']) {
        `nền phải ${before.r.toFixed(0)} → ${after.r.toFixed(0)} · nét chữ ${ink.toFixed(0)}`);
   } catch (e) { bad('bộ lọc ' + m, e); }
 }
+
+console.log('\n== Bộ lọc "Màu — nét nhất" ==');
+try {
+  // Bộ lọc này phải làm được CẢ HAI việc mà bw và color mỗi bên chỉ làm được một:
+  // nền trắng tinh + chữ đen hẳn (như bw) NHƯNG con dấu đỏ vẫn còn màu (như color).
+  const a = pageWithStamp(), b = pageWithStamp();
+  globalThis.__cv = a; ev('scEnhance(__cv, "cbw")');
+  globalThis.__cv = b; ev('scEnhance(__cv, "bw")');
+  // Khoảng giấy TRỐNG giữa hai dòng chữ (dòng chữ nằm ở y = 60 + 44·i, cao 11px),
+  // lấy ở nửa phải là chỗ bóng tối nhất
+  const paper = meanRGB(a, .45, .615, .85, .660);
+  const ink   = meanBox(a, .20, .497, .80, .512);     // nằm trọn trong dòng chữ thứ 5
+  const st    = meanRGB(a, .64, .83, .86, .90);        // giữa con dấu
+  const stBw  = meanRGB(b, .64, .83, .86, .90);
+  if (!(paper.r > 248 && paper.g > 248 && paper.b > 248))
+    throw new Error('nền chưa trắng tinh: ' + JSON.stringify(paper));
+  if (!(ink < 60)) throw new Error('chữ chưa đen hẳn: ' + ink.toFixed(0));
+  if (!(st.r - st.g > 70 && st.r - st.b > 70))
+    throw new Error('con dấu mất màu đỏ: ' + JSON.stringify(st));
+  if (Math.abs(stBw.r - stBw.g) > 2)
+    throw new Error('phép so sánh sai — "bw" lẽ ra phải cho ảnh không màu');
+  // Chữ ký bút bi xanh phải CÒN MÀU XANH và đủ đậm
+  const pen = meanRGB(a, .17, .845, .23, .875);
+  if (!(pen.b - pen.r > 45)) throw new Error('chữ ký bút xanh mất màu: ' + JSON.stringify(pen));
+  // ĐỘ NÉT: đếm điểm xám nhờ nhờ trên dải cắt ngang 9 dòng chữ, so thẳng với bw.
+  // Bản đầu dùng một mặt nạ mềm nên chỗ này nhiều gấp nhiều lần bw — đúng cái người dùng
+  // thấy là "mờ". Nay chỉ được phép hơn bw một chút (mép chữ có khử răng cưa).
+  // Chỉ đo ở vùng CHỮ ĐEN (4 dòng trên cùng) — con dấu đỏ và bút xanh cố ý không phải
+  // trắng-hoặc-đen nên đưa vào đây là đo nhầm màu thành "mờ".
+  const fz = fuzzyCount(a, .10, .10, .90, .45), fzBw = fuzzyCount(b, .10, .10, .90, .45);
+  if (fz > fzBw + 288 * 168 * .02)
+    throw new Error(`nét chưa đủ sắc: ${fz} điểm xám, bw chỉ ${fzBw}`);
+  fs.writeFileSync(outPath('sc-filter-cbw-stamp.jpg'), a.toBuffer('image/jpeg', { quality: .9 }));
+  ok('cbw — nét ngang bw, nền trắng tinh, dấu đỏ và bút xanh vẫn còn màu',
+     `nền ${paper.r.toFixed(0)} · chữ ${ink.toFixed(0)} · dấu R${st.r.toFixed(0)} G${st.g.toFixed(0)} B${st.b.toFixed(0)}`
+     + ` (bw xoá thành ${stBw.r.toFixed(0)}) · bút R${pen.r.toFixed(0)} B${pen.b.toFixed(0)}`
+     + ` · điểm xám ${fz} so với bw ${fzBw}`);
+} catch (e) { bad('bộ lọc cbw — giữ màu con dấu', e); }
 
 console.log('\n== Nạp trang & xử lý ==');
 vals.scQual = '1400';
