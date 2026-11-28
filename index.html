@@ -2466,7 +2466,7 @@ main > .foot{margin-top:auto}
 //  CONST & UTILS
 // ════════════════════════════════════════════════════════
 const APP_VERSION = 'v2.0';
-const APP_BUILD   = '2026-11-28g';
+const APP_BUILD   = '2026-11-28h';
 
 const LOAI_MAP = {
   chitiet:    'Giám định chi tiết xe ô tô BKS',
@@ -8800,12 +8800,18 @@ const SC_SIGKEY = 'pti_sign_list';
 const SC_SIGMAX = 6;      // số chữ ký điện tử nhớ trong máy
 const SC_TESS   = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
 
+/* Bộ lọc "Màu — nét rõ": độ sâu nét (nền cục bộ − điểm ảnh, thang 0–255) để coi một điểm
+   là MỰC THẬT. Nét mờ hơn mức này mà không nằm cạnh nét thật nào thì bị xoá — đó là cách
+   watermark, nền hoa văn và giấy kẻ ô mờ biến mất. Đong thử trên ảnh quét thật: chữ in
+   đen ~200 · chữ in nhạt ~90 · watermark "BẢN SAO" mờ ~10–20 · đường kẻ ô mờ ~20. */
+const SC_DEEP   = 26;
+
 const SC_FILTS = {
   auto:  'Tự động — làm rõ chữ, nền trắng',
   gray:  'Xám — đen trắng mềm',
   bw:    'Đen trắng — nét nhất, nhẹ nhất',
   color: 'Màu — giữ màu, bỏ bóng tối',
-  cbw:   'Màu — nét nhất (chữ đậm, nền trắng)',
+  cbw:   'Màu — nét rõ, nền trắng, xoá vệt mờ',
   none:  'Không xử lý — ảnh gốc',
 };
 /* BẢNG NÀY LÀ NGUỒN DUY NHẤT của 3 droplist bộ lọc (#scFiltAll, #scCropFilt, #scPvFilt và
@@ -9275,6 +9281,34 @@ function scPctOf(arr, p) {
   return scPct(hist, n, p);
 }
 
+/** Kẹp 0..1 về một byte 0..255 — dùng cho mọi mặt nạ của scEnhance(). */
+function scC8(v) { return v <= 0 ? 0 : (v >= 1 ? 255 : (v * 255) | 0); }
+
+/** Giãn (phép max) một mặt nạ 0/255 ra bán kính r điểm ảnh — hai lượt một chiều cho rẻ.
+ *  Dùng để biết một nét mờ có nằm CẠNH một nét thật hay không: nét mờ đứng một mình là
+ *  watermark / hoa văn nền, còn nét mờ sát nét thật chính là mép chữ đã khử răng cưa. */
+function scDil(a, w, h, r) {
+  const t = new Uint8Array(w * h), o = new Uint8Array(w * h);
+  for (let y = 0; y < h; y++) {
+    const row = y * w;
+    for (let x = 0; x < w; x++) {
+      const x1 = Math.min(w - 1, x + r);
+      let v = 0;
+      for (let k = Math.max(0, x - r); k <= x1; k++) if (a[row + k]) { v = 255; break; }
+      t[row + x] = v;
+    }
+  }
+  for (let x = 0; x < w; x++) {
+    for (let y = 0; y < h; y++) {
+      const y1 = Math.min(h - 1, y + r);
+      let v = 0;
+      for (let k = Math.max(0, y - r); k <= y1; k++) if (t[k * w + x]) { v = 255; break; }
+      o[y * w + x] = v;
+    }
+  }
+  return o;
+}
+
 function scEnhance(cv, mode) {
   if (mode === 'none') return;
   const w = cv.width, h = cv.height;
@@ -9304,39 +9338,48 @@ function scEnhance(cv, mode) {
   const flat = new Float32Array(w * h);
   for (let i = 0; i < g.length; i++) flat[i] = (g[i] / Math.max(24, bg[i])) * 255;
 
-  // ── MÀU — NÉT NHẤT ──
-  // Mục tiêu: NÉT ĐÚNG BẰNG bw, nền trắng sạch, nhưng con dấu, chữ ký và chữ viết tay bằng
-  // bút màu thì GIỮ MÀU. Muốn vậy phải tách làm HAI mặt nạ, vì chữ và mảng màu cần hai cách
-  // vẽ khác hẳn nhau:
+  // ── MÀU — NÉT RÕ, NỀN TRẮNG, XOÁ VỆT MỜ ──
+  // Ba việc cùng một lượt:
+  //   ① nền ra TRẮNG TINH;
+  //   ② nét chữ GIỮ NGUYÊN BẢN — đúng độ đậm và đúng màu của bản gốc, chỉ sắc hơn ở mép.
+  //      KHÔNG tô đậm thêm, không ép đen tuyền (bản trước có, người dùng thấy chữ bị "béo"
+  //      ra và mất nét bút chì / mực nhạt);
+  //   ③ watermark, dấu "BẢN SAO" mờ, nền hoa văn và giấy kẻ ô mờ bị XOÁ.
   //
-  //   aT — NÉT CHỮ. Ngưỡng theo vùng y như bw, nhưng chuyển tiếp chỉ ~6 bậc xám nên mép chữ
-  //        vừa sắc như bw vừa không răng cưa. Pixel nào là chữ thì lấy MÀU MỰC ĐẬM NHẤT
-  //        (đen tuyền nếu nét không màu) — KHÔNG lấy sắc độ gốc.
-  //   aR — MẢNG LỚN: vùng tối nguyên khối (ảnh dán, ô đã tô đen) và vùng có màu (ruột con
-  //        dấu, vệt bút nhớ dòng). Vẽ bằng SẮC ĐỘ THẬT để ảnh không bị bệt thành mảng phẳng.
+  // Vẫn hai mặt nạ — nét chữ và mảng lớn — vì chúng cần hai cách vẽ khác hẳn nhau
+  // (đừng gộp lại: một mặt nạ mềm dùng chung đã từng làm nét chữ xám nhờ nhờ). Nay thêm
+  // phép lọc "nét thật" kiểu Canny để làm việc ③:
   //
-  // Bản đầu chỉ có MỘT mặt nạ mềm dùng chung và lấy thẳng sắc độ gốc làm màu mực → nét chữ
-  // xám nhờ nhờ, nhìn mờ hơn hẳn bw. Đó là lỗi đã sửa ở đây — đừng gộp hai mặt nạ lại.
+  //   str  — điểm có độ sâu nét (nền cục bộ − điểm ảnh) ≥ SC_DEEP ⇒ chắc chắn là mực.
+  //   strD — str giãn ra vài điểm ảnh. Nét YẾU chỉ được giữ khi nằm trong vùng này, tức là
+  //          sát một nét thật — đó là mép chữ đã khử răng cưa. Nét yếu ĐỨNG MỘT MÌNH
+  //          (watermark, hoa văn, vệt giấy ngà) không có nét thật nào bên cạnh nên ra trắng.
+  //
+  // Mặt nạ mảng cũng có hai mức vì lẽ đó: cạnh nét thật thì nhận cả vùng tối nhạt, còn xa
+  // nét thật thì đòi tối sâu hoặc màu đậm mới giữ — nhờ vậy watermark xám hay màu nhạt
+  // không để lại vệt, mà ảnh dán trên trang và con dấu đỏ thì vẫn nguyên.
   if (mode === 'cbw') {
     const loc = scBlur(flat, w, h, Math.max(6, Math.round(Math.max(w, h) / 90)));
-    const aT = new Uint8Array(w * h);   // 255 = chắc chắn là nét chữ
-    const aR = new Uint8Array(w * h);   // 255 = mảng tối / mảng có màu
-    const cW = new Uint8Array(w * h);   // 255 = nét có màu thật · 0 = nét không màu → đen tuyền
+    const aT  = new Uint8Array(w * h);   // 255 = nét chữ (mềm ~6 bậc ở mép cho khỏi răng cưa)
+    const str = new Uint8Array(w * h);   // 255 = nét CHẮC CHẮN là mực
+    const aR  = new Uint8Array(w * h);   // mảng tối / mảng màu — khi ở cạnh nét thật
+    const aRf = new Uint8Array(w * h);   // mảng tối / mảng màu — khi ở XA nét thật (đòi đậm hơn)
+    const cW  = new Uint8Array(w * h);   // 255 = nét có màu thật · 0 = nét không màu → xám thuần
     for (let i = 0, j = 0; i < aT.length; i++, j += 4) {
-      const L = flat[i], t = loc[i] - 10;
+      const L = flat[i], dep = loc[i] - L;
       const R0 = d[j], G0 = d[j + 1], B0 = d[j + 2];
       const mx = R0 > G0 ? (R0 > B0 ? R0 : B0) : (G0 > B0 ? G0 : B0);
       const mn = R0 < G0 ? (R0 < B0 ? R0 : B0) : (G0 < B0 ? G0 : B0);
       const sat = mx > 10 ? (mx - mn) / mx : 0;
-      const vT = (t - L) / 6 + .5;                  // dốc đứng → nét
-      let   vR = (175 - L) / 70;                    // mảng tối (mốc 175: nền ngà vẫn ra trắng)
-      const vC = (sat - .26) / .26;                 // mảng có màu
-      if (vC > vR) vR = vC;
-      const vW = (sat - .12) / .14;
-      aT[i] = vT <= 0 ? 0 : (vT >= 1 ? 255 : (vT * 255) | 0);
-      aR[i] = vR <= 0 ? 0 : (vR >= 1 ? 255 : (vR * 255) | 0);
-      cW[i] = vW <= 0 ? 0 : (vW >= 1 ? 255 : (vW * 255) | 0);
+      aT[i]  = scC8((dep - 10) / 6 + .5);                  // dốc đứng → nét sắc như bw
+      str[i] = dep >= SC_DEEP ? 255 : 0;
+      // mốc 175: nền ngà vẫn ra trắng · sat .26: ruột con dấu, vệt bút nhớ dòng
+      aR[i]  = scC8(Math.max((175 - L) / 70, (sat - .26) / .26));
+      // xa nét thật: phải tối hẳn (ảnh dán, ô tô đen) hoặc màu đậm (dấu đỏ) mới được giữ
+      aRf[i] = scC8(Math.max((128 - L) / 56, (sat - .42) / .20));
+      cW[i]  = scC8((sat - .10) / .12);
     }
+    const strD = scDil(str, w, h, Math.max(2, Math.round(Math.max(w, h) / 650)));
     // Từng kênh: chia nền rồi giãn levels 20→0 / 235→255. Ghi thẳng vào d để lát nữa đọc lại
     // được cả 3 kênh cùng lúc mà không phải giữ 3 mảng Float song song (66MB cho trang A4).
     const LO = 20, HI = 235, K = 255 / (HI - LO);
@@ -9349,22 +9392,20 @@ function scEnhance(cv, mode) {
         d[j] = v < 0 ? 0 : (v > 255 ? 255 : v);
       }
     }
-    // Lượt cuối: dựng màu mực rồi trộn lên nền trắng.
-    //   ĐẬM MÀU bằng cách hạ các kênh yếu xuống theo luỹ thừa 1,6, GIỮ NGUYÊN kênh mạnh nhất
-    //   — không bịa thêm độ sáng, chỉ làm sắc màu rõ hơn. Tra bảng 256 ô thay cho Math.pow,
-    //   vì một trang A4 cần tới 16 triệu lần tính.
-    const POW = new Float32Array(256);
-    for (let k = 0; k < 256; k++) POW[k] = Math.pow(k / 255, 1.6);
+    // Lượt cuối: trộn nét và mảng lên nền trắng.
+    //   Màu nét = ĐÚNG sắc độ đã chia nền, không luỹ thừa, không đậm thêm — "giữ nguyên bản".
+    //   Chỉ có một việc nhỏ: nét gần như không màu (cw→0) được kéo về XÁM THUẦN, để bỏ viền
+    //   màu giả do JPEG sinh ra quanh chữ đen. Độ sáng không đổi, nên chữ không đậm lên.
     for (let i = 0, j = 0; i < aT.length; i++, j += 4) {
-      const vr = d[j], vg = d[j + 1], vb = d[j + 2];
-      const mxv = vr > vg ? (vr > vb ? vr : vb) : (vg > vb ? vg : vb);
-      const tA = aT[i] / 255, rA = aR[i] / 255, cw = cW[i] / 255;
+      const near = strD[i] !== 0;
+      const tA = near ? aT[i] / 255 : 0;
+      const rA = (near ? aR[i] : aRf[i]) / 255;
+      const cw = cW[i] / 255;
+      const lum = d[j] * .299 + d[j + 1] * .587 + d[j + 2] * .114;
       for (let c = 0; c < 3; c++) {
         const v = d[j + c];
-        // ① mảng lớn: sắc độ thật, trộn lên nền trắng
-        const tone = 255 - rA * (255 - v);
-        // ② nét chữ: màu mực đậm — nét không màu (cw→0) thành đen tuyền như bw
-        const ink = mxv > 0 ? cw * POW[(v * 255 / mxv) | 0] * mxv : 0;
+        const tone = 255 - rA * (255 - v);        // ① mảng lớn: sắc độ thật trên nền trắng
+        const ink  = lum + (v - lum) * cw;        // ② nét: nguyên bản, chỉ khử màu giả
         d[j + c] = tone + (ink - tone) * tA;
       }
       d[j + 3] = 255;

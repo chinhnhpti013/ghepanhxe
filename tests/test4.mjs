@@ -213,6 +213,21 @@ function pageWithStamp() {
   return cv;
 }
 
+/** Trang có WATERMARK mờ: 4 dòng chữ đen, 2 dòng chữ mực NHẠT (phải giữ nguyên độ nhạt),
+ *  một ô watermark xám mờ và một ô watermark màu hồng mờ ở khoảng giấy trống. */
+function pageWithWatermark() {
+  const cv = Canvas.createCanvas(360, 480);
+  const x = cv.getContext('2d');
+  x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, 360, 480);
+  x.fillStyle = '#E2E2E2'; x.fillRect(40, 290, 170, 70);          // watermark xám mờ
+  x.fillStyle = '#F3D6D6'; x.fillRect(230, 290, 90, 70);          // watermark màu mờ
+  x.fillStyle = '#1A1A1A';
+  for (let i = 0; i < 4; i++) x.fillRect(40, 60 + i * 44, 280, 11);
+  x.fillStyle = '#8C8C8C';                                        // chữ in bằng mực nhạt
+  for (let i = 0; i < 2; i++) x.fillRect(40, 240 + i * 22, 280, 7);
+  return cv;
+}
+
 /** Đếm điểm ảnh "xám nhờ nhờ" (không ra trắng cũng không ra mực) trên một dải ngang.
  *  Nét càng sắc thì con số này càng nhỏ — đây là thước đo độ NÉT của bộ lọc. */
 function fuzzyCount(cv, u0, v0, u1, v1) {
@@ -379,7 +394,7 @@ for (const m of ['auto', 'gray', 'bw', 'color', 'cbw', 'none']) {
   } catch (e) { bad('bộ lọc ' + m, e); }
 }
 
-console.log('\n== Bộ lọc "Màu — nét nhất" ==');
+console.log('\n== Bộ lọc "Màu — nét rõ": nền trắng, giữ màu ==');
 try {
   // Bộ lọc này phải làm được CẢ HAI việc mà bw và color mỗi bên chỉ làm được một:
   // nền trắng tinh + chữ đen hẳn (như bw) NHƯNG con dấu đỏ vẫn còn màu (như color).
@@ -416,6 +431,36 @@ try {
      + ` (bw xoá thành ${stBw.r.toFixed(0)}) · bút R${pen.r.toFixed(0)} B${pen.b.toFixed(0)}`
      + ` · điểm xám ${fz} so với bw ${fzBw}`);
 } catch (e) { bad('bộ lọc cbw — giữ màu con dấu', e); }
+
+console.log('\n== "Màu — nét rõ": xoá vệt mờ, giữ nguyên nét ==');
+try {
+  // ③ của bộ lọc: watermark và hoa văn nền mờ bị xoá — nhưng chữ in bằng mực NHẠT thì giữ,
+  // và giữ ĐÚNG độ nhạt của nó (bản trước ép mọi nét về đen tuyền nên không phân biệt được).
+  const a = pageWithWatermark(), b = pageWithWatermark(), c = pageWithWatermark();
+  globalThis.__cv = a; ev('scEnhance(__cv, "cbw")');
+  globalThis.__cv = b; ev('scEnhance(__cv, "color")');
+  globalThis.__cv = c; ev('scEnhance(__cv, "bw")');
+  const wmG  = meanBox(a, .15, .625, .55, .735);      // trong ô watermark xám
+  const wmC  = meanRGB(a, .67, .625, .86, .735);      // trong ô watermark màu
+  const wmG0 = meanBox(b, .15, .625, .55, .735);      // "Màu — giữ màu" vẫn để lại vệt
+  const dark = meanBox(a, .20, .133, .80, .148);      // dòng chữ đen thứ 2
+  const pale = meanBox(a, .20, .503, .80, .517);      // dòng chữ mực nhạt thứ 1
+  const paleBw = meanBox(c, .20, .503, .80, .517);
+  if (!(wmG > 250)) throw new Error('watermark xám chưa bị xoá: ' + wmG.toFixed(0));
+  if (!(wmC.r > 250 && wmC.g > 250 && wmC.b > 250))
+    throw new Error('watermark màu chưa bị xoá: ' + JSON.stringify(wmC));
+  if (!(wmG0 < 245))
+    throw new Error('phép so sánh sai — "color" lẽ ra vẫn còn vệt watermark: ' + wmG0.toFixed(0));
+  if (!(dark < 60)) throw new Error('chữ đen bị nhạt đi: ' + dark.toFixed(0));
+  if (!(pale > 95 && pale < 200))
+    throw new Error('chữ mực nhạt không còn nguyên bản (mất hẳn hoặc bị ép đen): ' + pale.toFixed(0));
+  if (!(paleBw < 40))
+    throw new Error('phép so sánh sai — "bw" lẽ ra ép chữ nhạt thành đen: ' + paleBw.toFixed(0));
+  fs.writeFileSync(outPath('sc-filter-cbw-watermark.jpg'), a.toBuffer('image/jpeg', { quality: .9 }));
+  ok('cbw — watermark mờ ra trắng, chữ nhạt vẫn giữ đúng độ nhạt',
+     `watermark xám ${wmG.toFixed(0)} (bộ lọc "màu" còn ${wmG0.toFixed(0)}) · chữ đen ${dark.toFixed(0)}`
+     + ` · chữ nhạt ${pale.toFixed(0)} (bw ép thành ${paleBw.toFixed(0)})`);
+} catch (e) { bad('bộ lọc cbw — xoá watermark, giữ nét nguyên bản', e); }
 
 console.log('\n== Nạp trang & xử lý ==');
 vals.scQual = '1400';

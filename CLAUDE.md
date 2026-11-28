@@ -571,7 +571,7 @@ nên sửa app là test theo ngay.
 | `test.mjs` | hàm tiện ích · đọc ZIP · Word/Excel → PDF (pdf-lib **giả lập**, ghi lại mọi lệnh vẽ) |
 | `test2.mjs` | 6 công cụ PDF + Office → PDF + luồng giao diện (pdf-lib **thật** + font thật) — 20 mục |
 | `test3.mjs` | nén PDF · PDF→ảnh · ảnh→PDF · đổi định dạng ảnh (**node-canvas** + **pdfjs-dist**) — 13 mục |
-| `test4.mjs` | **màn hình 4**: ma trận phối cảnh · tìm mép giấy · chỉnh thẳng · 6 bộ lọc (riêng `cbw` có phép thử con dấu đỏ) · nạp trang → xuất PDF/JPG · dấu & ghi chú · .txt/.docx/PDF tìm kiếm được · xoay trang · chạy thử hai lớp phủ — 31 mục |
+| `test4.mjs` | **màn hình 4**: ma trận phối cảnh · tìm mép giấy · chỉnh thẳng · 6 bộ lọc (riêng `cbw` có 2 phép thử: con dấu đỏ · xoá watermark + giữ nét nguyên bản) · nạp trang → xuất PDF/JPG · dấu & ghi chú · .txt/.docx/PDF tìm kiếm được · xoay trang · chạy thử hai lớp phủ — 32 mục |
 | `check.py` | `node --check` từng khối `<script>` + báo tên khai báo trùng giữa các khối |
 | `check_ids.py` | mọi `$('id')` của màn hình 3 **và 4** có id thật · mọi `onclick=` có hàm thật |
 
@@ -701,27 +701,45 @@ trên trang, ô đen) có cực đại thấp, không chặn sàn thì nó bị 
 | `gray` | như trên, phân vị 1,2%–98,5%, không gamma |
 | `bw` | ngưỡng **theo vùng** (so với mờ hộp bán kính `cạnh/90`, trừ 10) → chỉ 0 hoặc 255 |
 | `color` | chia cho nền **từng kênh R/G/B** — giữ dấu đỏ, mực xanh, ảnh màu |
-| `cbw` | **Màu — nét nhất**: nền trắng tinh + chữ đen hẳn như `bw`, nhưng **giữ màu nét mực** |
+| `cbw` | **Màu — nét rõ**: nền trắng tinh, nét sắc như `bw`, nhưng **nét chữ giữ nguyên bản** (đúng độ đậm + đúng màu) và **vệt mờ / watermark bị xoá** |
 | `none` | để nguyên |
 
-**`cbw` — cách làm:** phải tách **HAI mặt nạ**, vì nét chữ và mảng màu cần hai cách vẽ khác hẳn:
+**`cbw` — cách làm:** ba việc một lượt — ① nền **trắng tinh** · ② nét chữ **giữ nguyên bản**
+(đúng độ đậm, đúng màu của ảnh gốc, chỉ sắc hơn ở mép — **không tô đậm thêm**) · ③ **xoá vệt mờ**
+(watermark, chữ "BẢN SAO" in mờ, nền hoa văn, giấy kẻ ô mờ).
+
+Vẫn **HAI mặt nạ**, vì nét chữ và mảng màu cần hai cách vẽ khác hẳn:
 
 | Mặt nạ | Bắt gì | Vẽ thế nào |
 |---|---|---|
-| **`aT` — nét chữ** | ngưỡng theo **vùng** y như `bw`, nhưng chuyển tiếp **chỉ ~6 bậc xám** | **màu mực đậm nhất**, nét không màu thành **đen tuyền** |
-| **`aR` — mảng lớn** | vùng tối nguyên khối `(175−L)/70` (ảnh dán, ô tô đen) · vùng có màu `(sat−.26)/.26` (ruột con dấu, bút nhớ dòng) | **sắc độ thật**, để ảnh không bệt thành mảng phẳng |
+| **`aT` — nét chữ** | ngưỡng theo **vùng** y như `bw`, nhưng chuyển tiếp **chỉ ~6 bậc xám** | **sắc độ thật** đã chia nền + giãn levels (20→0 / 235→255) — nguyên bản, không luỹ thừa |
+| **`aR` / `aRf` — mảng lớn** | vùng tối nguyên khối `(175−L)/70` · vùng có màu `(sat−.26)/.26`; bản `aRf` dùng cho điểm **xa nét thật**, đòi đậm hơn: `(128−L)/56` · `(sat−.42)/.20` | **sắc độ thật**, để ảnh không bệt thành mảng phẳng |
+
+Việc ③ làm bằng phép lọc **"nét thật" kiểu Canny**, nhờ vậy không cần dò watermark theo hình dạng:
+
+- `str[i] = (loc[i] − flat[i]) ≥ **SC_DEEP** (26)` — độ sâu nét đủ lớn ⇒ chắc chắn là mực.
+  Đong trên ảnh quét thật: chữ in đen ~200 · chữ in nhạt ~90 · watermark mờ ~10–20 · kẻ ô mờ ~20.
+- `strD = scDil(str, …)` giãn `str` ra `max(2, cạnh/650)` điểm ảnh (hàm **`scDil`**, max 2 lượt
+  một chiều, thoát sớm vì mặt nạ chỉ 0/255).
+- Điểm **nằm ngoài `strD`** thì `aT = 0` và dùng `aRf` thay cho `aR`. Nét mờ **đứng một mình**
+  (watermark, hoa văn) ra trắng; nét mờ **sát nét thật** là mép chữ đã khử răng cưa nên vẫn giữ.
 
 Ghép: `tone = 255 − aR·(255 − v)` rồi `out = tone + (ink − tone)·aT` — chữ luôn thắng.
-Màu mực `ink` = màu đã chia nền và giãn levels (20→0 / 235→255), **đậm màu** bằng cách hạ các
-kênh yếu theo luỹ thừa 1,6 mà **giữ nguyên kênh mạnh nhất** (không bịa thêm độ sáng, chỉ làm
-sắc màu rõ hơn), rồi nhân với trọng số màu `cW = (sat−.12)/.14` — nên nét gần như không màu
-tự về đen tuyền, và **không cần lượt khử màu giả riêng** nữa.
-`Math.pow` thay bằng **bảng tra 256 ô**: một trang A4 cần tới 16 triệu lần tính.
+`ink` = **đúng sắc độ đã chia nền**, chỉ kéo về **xám thuần** khi nét gần như không màu
+(`cW = (sat−.10)/.12`, trộn với luminance) để bỏ **viền màu giả** do JPEG sinh quanh chữ đen —
+độ sáng không đổi nên chữ **không đậm lên**. `scC8()` kẹp mọi mặt nạ về byte.
 
-> **Bẫy đã sửa, đừng lặp lại:** bản đầu dùng **một** mặt nạ mềm dùng chung (chuyển tiếp ~67 bậc)
-> và lấy thẳng sắc độ gốc làm màu mực → nét chữ ra **xám nhờ nhờ**, người dùng báo ngay là
-> "mờ, không nét". **Đừng gộp hai mặt nạ lại.** `tests/test4.mjs` nay đếm số điểm xám nhờ nhờ
-> trên vùng chữ đen và bắt `cbw` phải **ngang `bw`** (hiện cả hai đều 0).
+> **Hai bẫy đã sửa, đừng lặp lại:**
+> 1. Bản đầu dùng **một** mặt nạ mềm dùng chung (chuyển tiếp ~67 bậc) → nét chữ **xám nhờ nhờ**,
+>    người dùng báo "mờ, không nét". **Đừng gộp hai mặt nạ lại.** `tests/test4.mjs` đếm số điểm
+>    xám nhờ nhờ trên vùng chữ đen và bắt `cbw` phải **ngang `bw`** (hiện cả hai đều 0).
+> 2. Bản thứ hai chữa lỗi trên bằng cách **đậm màu nét** (luỹ thừa 1,6 + bảng tra 256 ô, nét
+>    không màu ép **đen tuyền**) → chữ "béo" ra, **chữ mực nhạt và bút chì bị ép thành đen**,
+>    người dùng báo "không cần đậm, giữ chữ nguyên bản". Nay nét vẽ bằng sắc độ thật; `test4.mjs`
+>    kiểm dòng chữ `#8C8C8C` phải ra **100–200** (hiện 156) trong khi `bw` ép xuống 36.
+
+> `aR` **không** đi qua phép lọc nét thật theo cách của `aT` (chỉ đổi sang `aRf`): vùng tối
+> nguyên khối lớn (ảnh dán, ô tô đen) có độ sâu nét ~0 ở giữa, áp `strD` lên nó là **xoá mất ảnh**.
 
 > `bw` thì **xoá sạch con dấu đỏ và chữ ký bút xanh** (giữa một mảng màu đều, ngưỡng vùng coi
 > là nền) — phép thử kiểm đúng điều đó để chứng minh `cbw` khác `bw` ở chỗ nào.
